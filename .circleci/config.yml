@@ -1,16 +1,25 @@
 version: 2.1
 orbs:
-  node: circleci/node@5.0.2
+  browser-tools: circleci/browser-tools@1.4.4
   # heroku: circleci/heroku@1.2.6
 
 jobs:
   test_frontend_and_backend:
-    executor: node/default
+    docker:
+      - image: cimg/node:current-browsers
     steps:
+      - browser-tools/install-browser-tools
       - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
       - run:
           name: install dependencies
           command: npm install
+      - save_cache:
+          key: v1-npm-deps-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
       - run:
           command: npm run test
           name: Run frontend and backend tests
@@ -18,8 +27,9 @@ jobs:
 
   build_and_deploy_frontend:
     docker:
-      - image: cimg/node:16.20-browsers
+      - image: cimg/node:current-browsers
     steps:
+      - browser-tools/install-browser-tools
       - checkout
       - restore_cache:
           keys:
@@ -36,7 +46,7 @@ jobs:
           name: Build frontend
       - run:
           name: Deploy Main to Firebase
-          command: npm run deploy:frontend --token=$FIREBASE_DEPLOY_TOKEN
+          command: npm run deploy:frontend --token=$FIREBASE_TOKEN
 
   build_and_deploy_backend: # this can be any name you choose
     executor: heroku/default
