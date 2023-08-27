@@ -7,7 +7,9 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
+//@ts-ignore
 import {onRequest} from "firebase-functions/v2/https";
+//@ts-ignore
 import * as logger from "firebase-functions/logger";
 
 // Start writing functions
