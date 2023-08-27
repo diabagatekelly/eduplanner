@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next src/",
+    "build": "next build src/",
+    "start": "next start src/",
     "deploy": "firebase deploy",
-    "start": "next start",
     "lint": "next lint",
     "test": "nyc mocha './src/app/*-test.ts'"
   },
