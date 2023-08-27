@@ -6,7 +6,7 @@ orbs:
 jobs:
   test_frontend_and_backend:
     docker:
-      - image: cimg/node:current-browsers
+      - image: cimg/node:18.17-browsers
     steps:
       - browser-tools/install-browser-tools
       - checkout
@@ -27,7 +27,7 @@ jobs:
 
   build_and_deploy_frontend:
     docker:
-      - image: cimg/node:current-browsers
+      - image: cimg/node:18.17-browsers
     steps:
       - browser-tools/install-browser-tools
       - checkout
@@ -46,7 +46,7 @@ jobs:
           name: Build frontend
       - run:
           name: Deploy Main to Firebase
-          command: npm run deploy:frontend --token=$FIREBASE_TOKEN
+          command: npm install --save-dev firebase-tools && npm run deploy:frontend --token=$FIREBASE_TOKEN
 
   build_and_deploy_backend: # this can be any name you choose
     executor: heroku/default
