@@ -34,12 +34,12 @@ jobs:
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
-      - commands:
-          - cd frontend/dashboard && npm install && cd functions && npm install
-          - cd .. && npm run build
-          - npm run deploy --token=$FIREBASE_TOKEN
-      #     name: install dependencies
-      #     command: npm install
+      - run:
+          name: Install deps, build and deploy
+          command: |
+            cd frontend/dashboard && npm install && cd functions && npm install
+            cd .. && npm run build
+            npm run deploy --token=$FIREBASE_TOKEN
       - save_cache:
           key: v1-npm-deps-{{ checksum "package-lock.json" }}
           paths:
