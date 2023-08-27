@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "concurrently npm:install:*",
+    "install:frontend": "cd frontend/dashboard & npm install",
+    "install:backend": "cd backend & npm install",
     "start": "concurrently npm:start:*",
     "start:backend": "cd backend & npm run start",
     "start:frontend": "cd frontend/dashboard & npm run dev",
