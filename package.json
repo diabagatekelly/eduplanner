@@ -12,7 +12,7 @@
     "test:backend": "nyc mocha --recursive './backend/**/*.spec.js'",
     "test:frontend": "nyc mocha --recursive './frontend/dashboard/src/app/*.spec.ts'",
     "build:frontend": "cd frontend/dashboard && npm run build",
-    "deploy:frontend": "cd frontend/dashboard && ./node_modules/.bin/firebase deploy"
+    "deploy:frontend": "cd frontend/dashboard && npm run deploy"
   },
   "author": "Kelly Diabagate",
   "license": "ISC",

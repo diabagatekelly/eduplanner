@@ -6,6 +6,7 @@
     "postinstall": "cd functions && npm install",
     "dev": "next dev",
     "build": "next build",
+    "deploy": "firebase deploy",
     "start": "next start",
     "lint": "next lint",
     "test": "nyc mocha './src/app/*-test.ts'"
