@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   node: circleci/node@5.0.2
-  browsers: cimg/node:16.20.2-browsers
+  browsers: cimg/node:16.20-browsers
   # heroku: circleci/heroku@1.2.6
 
 jobs:
