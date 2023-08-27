@@ -9,7 +9,8 @@
     "start:frontend": "cd frontend/dashboard & npm run dev",
     "test": "concurrently npm:test:*",
     "test:backend": "nyc mocha --recursive './backend/**/*.spec.js'",
-    "test:frontend": "nyc mocha --recursive './frontend/dashboard/src/app/*.spec.ts'"
+    "test:frontend": "nyc mocha --recursive './frontend/dashboard/src/app/*.spec.ts'",
+    "build:frontend": "cd frontend/dashboard & npm run build"
   },
   "author": "Kelly Diabagate",
   "license": "ISC",
