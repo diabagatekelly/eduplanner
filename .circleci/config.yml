@@ -18,6 +18,7 @@ jobs:
 
   build_and_deploy_frontend:
     executor: node/default
+    working_dir: ~/frontend/dashboard
     steps:
       - checkout
       - run:
@@ -28,7 +29,7 @@ jobs:
           name: Build frontend
       - run:
           name: Deploy Main to Firebase
-          command: npm run deploy:frontend --token=$FIREBASE_DEPLOY_TOKEN
+          command: ./node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN
 
   build_and_deploy_backend: # this can be any name you choose
     executor: heroku/default
