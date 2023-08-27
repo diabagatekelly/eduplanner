@@ -17,7 +17,8 @@ jobs:
           test-results-for: mocha
 
   build_and_deploy_frontend:
-    executor: node/default
+    docker:
+      - image: circleci/node:10.16.0
     working_directory: ~/frontend/dashboard
     steps:
       - checkout
@@ -29,7 +30,7 @@ jobs:
           name: Build frontend
       - run:
           name: Deploy Main to Firebase
-          command: ./node_modules/.bin/firebase deploy --token=$FIREBASE_DEPLOY_TOKEN
+          command: npm run deploy --token=$FIREBASE_DEPLOY_TOKEN
 
   build_and_deploy_backend: # this can be any name you choose
     executor: heroku/default
