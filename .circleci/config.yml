@@ -26,7 +26,7 @@ jobs:
           name: install dependencies
           command: npm install
       - run:
-          command: npm run build:frontend
+          command: npm run build
           name: Build frontend
       - run:
           name: Deploy Main to Firebase
