@@ -8,8 +8,9 @@ jobs:
     executor: node/default
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
+      - run:
+          name: install dependencies
+          command: npm install
       - run:
           command: npm run test
           name: Run frontend and backend tests
@@ -19,8 +20,9 @@ jobs:
     executor: node/default
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
+      - run:
+          name: install dependencies
+          command: npm install
       - run:
           command: npm run build:frontend
           name: Build frontend
