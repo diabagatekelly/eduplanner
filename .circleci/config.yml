@@ -21,11 +21,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install main dependencies
+          name: install dependencies
           command: npm install
-      - run:
-          name: install frontend dependencies
-          command: cd frontend/dashboard && npm install
       - run:
           command: npm run build:frontend
           name: Build frontend
