@@ -29,6 +29,7 @@ jobs:
     docker:
       - image: cimg/node:18.17-browsers
     steps:
+      -working_directory: ~/frontend/dashboard
       - browser-tools/install-browser-tools
       - checkout
       - restore_cache:
