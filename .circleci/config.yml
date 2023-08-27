@@ -42,7 +42,7 @@ jobs:
           paths:
             - ./node_modules, ./backend/node_modules, ./frontend/dashboard/node_modules
       - run:
-          command: npm run build:frontend && npm run deploy:frontend --token=$FIREBASE_TOKEN
+          command: npm run build:frontend && npm run deploy --token=$FIREBASE_TOKEN
           name: Build and deploy frontend
 
   build_and_deploy_backend: # this can be any name you choose
