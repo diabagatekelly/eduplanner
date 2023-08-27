@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "install:all-packages": "cd backend && npm install && cd ../frontend/dashboard && npm install && cd ../frontend/dashboard/functions && npm install",
+    "postinstall": "cd backend && npm install && cd ../frontend/dashboard && npm install",
     "start": "concurrently npm:start:*",
     "start:backend": "cd backend && npm run start",
     "start:frontend": "cd frontend/dashboard && npm run dev",

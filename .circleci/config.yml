@@ -19,7 +19,7 @@ jobs:
       - save_cache:
           key: v1-npm-deps-{{ checksum "package-lock.json" }}
           paths:
-            - ./node_modules
+            - ./node_modules, ./backend/node_modules, ./frontend/dashboard/node_modules
       - run:
           command: npm run test
           name: Run frontend and backend tests
@@ -35,21 +35,18 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
       - run:
-          name: Install deps, build and deploy
-          command: |
-            cd frontend/dashboard && npm install && cd functions && npm install
-            cd .. && npm run build
-            npm run deploy --token=$FIREBASE_TOKEN
+          name: install dependencies
+          command: npm install
       - save_cache:
           key: v1-npm-deps-{{ checksum "package-lock.json" }}
           paths:
-            - ./node_modules
-      # - run:
-      #     command: npm run build:frontend
-      #     name: Build frontend
-      # - run:
-      #     name: Deploy Main to Firebase
-      #     command: npm install --save-dev firebase-tools && npm run deploy:frontend --token=$FIREBASE_TOKEN
+            - ./node_modules, ./backend/node_modules, ./frontend/dashboard/node_modules
+      - run:
+          command: npm run build:frontend
+          name: Build frontend
+      - run:
+          name: Deploy Main to Firebase
+          command: npm run deploy:frontend --token=$FIREBASE_TOKEN
 
   build_and_deploy_backend: # this can be any name you choose
     executor: heroku/default
