@@ -4,16 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "concurrently npm:postinstall:*",
-    "postinstall:frontend": "cd ./frontend/dashboard & npm install",
-    "postinstall:backend": "cd ./backend & npm install",
+    "postinstall": "cd backend && npm install && cd ../frontend/dashboard && npm install",
     "start": "concurrently npm:start:*",
-    "start:backend": "cd backend & npm run start",
-    "start:frontend": "cd frontend/dashboard & npm run dev",
+    "start:backend": "cd backend && npm run start",
+    "start:frontend": "cd frontend/dashboard && npm run dev",
     "test": "concurrently npm:test:*",
     "test:backend": "nyc mocha --recursive './backend/**/*.spec.js'",
     "test:frontend": "nyc mocha --recursive './frontend/dashboard/src/app/*.spec.ts'",
-    "build:frontend": "cd frontend/dashboard & npm run build"
+    "build:frontend": "cd frontend/dashboard && npm run build"
   },
   "author": "Kelly Diabagate",
   "license": "ISC",
