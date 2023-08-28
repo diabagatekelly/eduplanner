@@ -5,8 +5,6 @@ orbs:
 
 jobs:
   test_frontend_and_backend:
-    docker:
-      - image: cimg/node:18.17
     steps:
       - checkout
       - run:
@@ -16,19 +14,6 @@ jobs:
           command: npm run test
           name: Run frontend and backend tests
           test-results-for: mocha
-
-  build_and_deploy_frontend:
-    docker:
-      - image: cimg/node:18.17
-    steps:
-      - checkout
-      - run:
-          name: Install dependencies
-          command: npm install
-      - run:
-          name: Build and deploy frontend
-          command: |
-            npm run build:frontend && npm run deploy:frontend
 
   build_and_deploy_backend: # this can be any name you choose
     executor: heroku/default
@@ -42,9 +27,9 @@ workflows:
   test_my_app:
     jobs:
       - test_frontend_and_backend
-      - build_and_deploy_frontend:
-          requires:
-            - test_frontend_and_backend # only deploy if the build_and_test job has completed
-          filters:
-            branches:
-              only: main # only deploy when on main
+      # - build_and_deploy_frontend:
+      #     requires:
+      #       - test_frontend_and_backend # only deploy if the build_and_test job has completed
+      #     filters:
+      #       branches:
+      #         only: main # only deploy when on main
