@@ -5,6 +5,7 @@ orbs:
 
 jobs:
   test_frontend_and_backend:
+    executor: node/default
     steps:
       - checkout
       - run:
