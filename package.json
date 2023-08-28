@@ -18,7 +18,9 @@
     "mocha": "^10.2.0"
   },
   "dependencies": {
+    "@types/node": "20.5.7",
     "concurrently": "^8.2.1",
-    "nyc": "^15.1.0"
+    "nyc": "^15.1.0",
+    "typescript": "5.2.2"
   }
 }
