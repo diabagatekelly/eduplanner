@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "nyc mocha './src/app/*-test.ts'"
+    "test": "nyc mocha 'src/**/*spec.ts'"
   },
   "dependencies": {
     "@types/node": "20.5.7",

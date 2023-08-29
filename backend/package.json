@@ -4,14 +4,16 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "start": "node index.ts",
-    "test": "nyc mocha './**/*.spec.ts'"
+    "dev": "nodemon src/index.ts",
+    "test": "nyc mocha 'src/**/*.spec.ts'"
   },
   "author": "Kelly Diabagate",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
     "mongodb": "^6.0.0",
+    "mongoose": "^7.4.5",
+    "nodemon": "^3.0.1",
     "vercel": "^32.1.0"
   }
 }
