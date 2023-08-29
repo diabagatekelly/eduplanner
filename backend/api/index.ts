@@ -3,14 +3,14 @@ const app = express();
 const port = 8000;
 const userRouter = require("../src/routes/userRouter");
 
-app.use('/', (req, res) => {
+app.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
   res.send('Hello World again!');
 });
 
 
-app.use('/404', (req, res) => {
+app.get('/404', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
   res.send('OOPs!');
