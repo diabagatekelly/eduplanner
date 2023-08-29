@@ -2,9 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "api/index.ts",
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "build": "vercel build",
+    "dev": "nodemon api/index.ts",
     "test": "nyc mocha 'src/**/*.spec.ts'"
   },
   "author": "Kelly Diabagate",
