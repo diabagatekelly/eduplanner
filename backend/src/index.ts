@@ -16,7 +16,6 @@ app.listen(port, () => {
 new ConnectMongodb().run().catch(console.error)
 new SeedDefaultDb().run().catch(console.error)
 
-module.exports = app
 
 
 
