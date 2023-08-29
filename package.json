@@ -9,7 +9,7 @@
     "start:backend": "cd backend && npm run start",
     "start:frontend": "cd frontend && npm run dev",
     "test": "concurrently npm:test:*",
-    "test:backend": "nyc mocha --recursive './backend/**/*.spec.js'",
+    "test:backend": "nyc mocha --recursive './backend/**/*.spec.ts'",
     "test:frontend": "nyc mocha --recursive './frontend/src/app/*.spec.ts'"
   },
   "author": "Kelly Diabagate",

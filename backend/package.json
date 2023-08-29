@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "node index.ts",
-    "test": "nyc mocha"
+    "test": "nyc mocha './**/*.spec.ts'"
   },
   "author": "Kelly Diabagate",
   "license": "ISC",
