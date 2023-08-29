@@ -15,6 +15,7 @@
   "author": "Kelly Diabagate",
   "license": "ISC",
   "devDependencies": {
+    "@types/mocha": "^10.0.1",
     "mocha": "^10.2.0"
   },
   "dependencies": {
