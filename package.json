@@ -1,26 +1,30 @@
 {
-  "name": "eduplanner",
-  "version": "1.0.0",
-  "description": "",
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "postinstall": "cd backend && npm install && cd ../frontend && npm install",
-    "start": "concurrently npm:start:*",
-    "start:backend": "cd backend && npm run dev",
-    "start:frontend": "cd frontend && npm run dev",
-    "test": "concurrently npm:test:*",
-    "test:backend": "nyc mocha --recursive './backend/src/**/*.spec.ts'",
-    "test:frontend": "nyc mocha --recursive './frontend/src/**/*.spec.ts'"
-  },
-  "author": "Kelly Diabagate",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/mocha": "^10.0.1",
-    "mocha": "^10.2.0"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "nyc mocha 'src/**/*spec.ts'"
   },
   "dependencies": {
     "@types/node": "20.5.7",
-    "concurrently": "^8.2.1",
-    "nyc": "^15.1.0",
-    "typescript": "5.2.2"
+    "@types/react": "18.2.21",
+    "@types/react-dom": "18.2.7",
+    "autoprefixer": "10.4.15",
+    "eslint": "8.48.0",
+    "eslint-config-next": "13.4.19",
+    "next": "13.4.19",
+    "postcss": "8.4.28",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "tailwindcss": "3.3.3",
+    "nyc": "^15.1.0"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.1",
+    "mocha": "^10.2.0"
   }
 }

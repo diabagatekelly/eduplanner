@@ -1,5 +1,5 @@
 {
-  "exclude": ["backend/**/*.spec.js", "frontend/src/app/*.spec.ts"],
+  "exclude": ["src/**/*.spec.ts"],
   "check-coverage": true,
   "lines": 100,
   "statements": 100,
