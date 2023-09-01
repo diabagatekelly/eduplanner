@@ -1,18 +1,21 @@
 "use client"
 
 import Navbar from "../ui/navbar";
-import LoginForm from "../ui/login-form";
+import RegisterForm from "../ui/register-form";
 import React, { useState, FormEvent } from "react";
-import Link from "next/link";
-import { IUserLogin } from "../interfaces/IUser";
+import { IUserRegister } from "../interfaces/IUser";
+import { redirect } from 'next/navigation'
 
 export default function Login() {
-  const [formData, setFormData] = useState<IUserLogin>({
+  const [formData, setFormData] = useState<IUserRegister>({
+    firstName: "",
+    lastName: "",
     username: "",
+    email: "",
     password: "",
+    accountType: "",
   });
-
-  const url = `${process.env.BASE_URL}/user/login`
+  const url = `${process.env.BASE_URL}/user/register`
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -27,20 +30,18 @@ export default function Login() {
       ...prevState,
       [fieldName]: fieldValue
     }));
-
   }
 
   async function submitForm(e: FormEvent<HTMLFormElement>) {
     // We don't want the page to refresh
-    console.log(e)
     e.preventDefault()
     setIsLoading(true) // Set loading to true when the request starts
 
     try {
-      const data = new FormData(e.currentTarget)
+      const formData = new FormData(e.currentTarget)
       const response = await fetch(url, {
         method: 'POST',
-        body: data,
+        body: formData,
         headers: {
           'accept': 'application/json',
         },
@@ -48,17 +49,21 @@ export default function Login() {
         .then((response) => response.json())
         .then((data) => {
           setFormData({
+            firstName: "",
+            lastName: "",
             username: "",
-            password: ""
+            email: "",
+            password: "",
+            accountType: "",
           })
+          setIsLoading(false)
+          setFormSuccess(true)
           setFormSuccessMessage(data.submission_text)
+          redirect(`/${data.username}`)
         })
     } catch (error) {
       console.error(error)
-    } finally {
-      setIsLoading(false)
-      setFormSuccess(true)
-    }
+    } 
   }
 
   return (
@@ -70,16 +75,11 @@ export default function Login() {
           :
           <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-              <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
+              <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Create an account</h2>
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-              <LoginForm {...{handleInput, formData, isLoading, submitForm}}  />
-
-              <p className="mt-10 text-center text-sm text-gray-500">
-                <span>No account yet? </span>
-                <Link href="/register" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Create an account</Link>
-              </p>
+              <RegisterForm {...{ handleInput, formData, isLoading, submitForm }} />
             </div>
           </div>
         }

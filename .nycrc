@@ -1,5 +1,6 @@
 {
-  "exclude": ["src/**/*.spec.ts"],
+  "exclude": ["src/specs/**/*.ts"],
+  "include": ["src/app/**/*.ts, src/app/**/*.tsx, src/app/**/*.js"],
   "check-coverage": true,
   "lines": 100,
   "statements": 100,
