@@ -3,8 +3,8 @@
 import Navbar from "../ui/navbar";
 import RegisterForm from "../ui/register-form";
 import React, { useState, FormEvent } from "react";
+import { useRouter } from 'next/navigation'
 import { IUserRegister } from "../interfaces/IUser";
-import { redirect } from 'next/navigation'
 
 export default function Login() {
   const [formData, setFormData] = useState<IUserRegister>({
@@ -15,9 +15,10 @@ export default function Login() {
     password: "",
     accountType: "",
   });
-  const url = `${process.env.BASE_URL}/user/register`
+  const url = 'https://eduplanner-backend-7fdf262835f2.herokuapp.com/user/register';
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const router = useRouter()
 
   const [formSuccess, setFormSuccess] = useState(false)
   const [formSuccessMessage, setFormSuccessMessage] = useState("")
@@ -38,51 +39,59 @@ export default function Login() {
     setIsLoading(true) // Set loading to true when the request starts
 
     try {
-      const formData = new FormData(e.currentTarget)
+      const rawFormData = new FormData(e.currentTarget)
+      const formData = new URLSearchParams()
+
+      for (const pair of rawFormData.entries()) {
+        formData.append(pair[0], `${pair[1]}`);
+      }
+
       const response = await fetch(url, {
         method: 'POST',
         body: formData,
         headers: {
           'accept': 'application/json',
+          'Access-Control-Allow-Origin': '*'
         },
       })
-        .then((response) => response.json())
-        .then((data) => {
-          setFormData({
-            firstName: "",
-            lastName: "",
-            username: "",
-            email: "",
-            password: "",
-            accountType: "",
-          })
-          setIsLoading(false)
-          setFormSuccess(true)
-          setFormSuccessMessage(data.submission_text)
-          redirect(`/${data.username}`)
-        })
+
+      const data = await response.json()
+      setIsLoading(false)
+      if (data.status) {
+        setFormSuccess(false)
+        setFormSuccessMessage(data.message)
+      } else {
+        setFormData({
+          firstName: "",
+          lastName: "",
+          username: "",
+          email: "",
+          password: "",
+          accountType: "",
+        });
+        setFormSuccess(true);
+        setFormSuccessMessage('New user created.')
+        router.push('/'+ data.username)
+      }
     } catch (error) {
       console.error(error)
-    } 
+    }
   }
 
   return (
     <>
       <Navbar />
       <div>
-        {formSuccess ?
-          <div>{formSuccessMessage}</div>
-          :
-          <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-              <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Create an account</h2>
-            </div>
-
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-              <RegisterForm {...{ handleInput, formData, isLoading, submitForm }} />
-            </div>
+        <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+          <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+            <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Create an account</h2>
           </div>
-        }
+
+          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+            <RegisterForm {...{ handleInput, formData, isLoading, submitForm }} />
+            <div>{formSuccessMessage}</div>
+          </div>
+        </div>
       </div>
     </>
   )

@@ -49,12 +49,12 @@ const LoginForm = ({
         <fieldset>
           <legend>Account Type:</legend>
           <div>
-            <input type="radio" id="student" name="accountyType" value="student" defaultChecked />
+            <input type="radio" id="student" name="accountType" value="student" defaultChecked />
             <label htmlFor="student">Student</label>
           </div>
 
           <div>
-            <input type="radio" id="teacher" name="accountyType" value="teacher" />
+            <input type="radio" id="teacher" name="accountType" value="teacher" />
             <label htmlFor="teacher">Teacher</label>
           </div>
         </fieldset>
