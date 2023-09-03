@@ -1,38 +1,30 @@
 version: 2.1
 orbs:
   node: circleci/node@5.1.0
-  # heroku: circleci/heroku@1.2.6
+executors:
+  pw-jammy-development:
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.37.0-jammy
 
 jobs:
-  test_frontend_and_backend:
-    executor: node/default
-    steps:
-      - checkout
-      - run:
-          name: Install dependencies
-          command: npm install
-      - run:
-          command: | 
-            npx playwright install
-            sudo npx playwright install-deps
-            npm run test
-          name: Run frontend and backend tests
-
-  build_and_deploy_backend: # this can be any name you choose
-    executor: heroku/default
-    steps:
-      - attach_workspace:
-          at: ~/project
-      - heroku/deploy-via-git:
-          force: true # force push when pushing to the heroku remote, see: https://devcenter.heroku.com/articles/git
+  test_frontend:
+    executor: pw-jammy-development
+      parallelism: 4
+      steps:
+        - run: SHARD="$((${CIRCLE_NODE_INDEX}+1))"; npx playwright test -- --shard=${SHARD}/${CIRCLE_NODE_TOTAL}
+        - checkout
+        - run:
+            name: Install dependencies
+            command: npm install
+        - run:
+            name: Run frontend tests
+            command: | 
+              npm ci
+              npx playwright install --with-deps
+              npx playwright test
+            
 
 workflows:
   test_my_app:
     jobs:
-      - test_frontend_and_backend
-      # - build_and_deploy_frontend:
-      #     requires:
-      #       - test_frontend_and_backend # only deploy if the build_and_test job has completed
-      #     filters:
-      #       branches:
-      #         only: main # only deploy when on main
+      - test_frontend

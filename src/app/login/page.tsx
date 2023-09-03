@@ -14,8 +14,7 @@ export default function Login() {
     password: "",
   });
 
-  const baseUrl = process.env.BASE_URL
-  const url = `${baseUrl}/user/login`
+  const url = `${process.env.BASE_URL}/user/login`
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const router = useRouter()

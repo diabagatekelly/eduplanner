@@ -1,13 +1,10 @@
 import { test, expect } from '@playwright/test'
-const baseUrl = process.env.BASE_URL
 
 test('Mock user creating an account', async ({ page }) => {
   // Mock the api call before navigating
   
-  const registerApiUrl = `${baseUrl}/user/register`
+  const registerApiUrl = `${process.env.BASE_URL}/user/register`
   const siteUrl = 'https://eduplanner-jade.vercel.app';
-
-  console.log(registerApiUrl)
 
   await page.route(registerApiUrl, async route => {
     const response = {
@@ -63,7 +60,7 @@ test('Mock user creating an account', async ({ page }) => {
 
 test.skip('Mock user login into an existing account', async ({ page }) => {
   // Mock the api call before navigating
-  const loginApiUrl = `${baseUrl}/user/login`;
+  const loginApiUrl = `${process.env.BASE_URL}/user/login`;
   const siteUrl = 'https://eduplanner-jade.vercel.app';
   await page.route(loginApiUrl, async route => {
     const response = {
