@@ -50,7 +50,7 @@ export default function Login() {
         method: 'POST',
         body: formData,
         headers: {
-          'accept': 'application/json',
+          'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
       })
@@ -75,6 +75,8 @@ export default function Login() {
       }
     } catch (error) {
       console.error(error)
+      setFormSuccess(false)
+      setFormSuccessMessage('Oops, something went wrong')
     }
   }
 
