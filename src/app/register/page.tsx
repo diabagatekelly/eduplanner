@@ -6,6 +6,8 @@ import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserRegister } from "../interfaces/IUser";
 import axios from "axios";
+import dotenv from "dotenv";
+dotenv.config()
 
 export default function Login() {
   const [formData, setFormData] = useState<IUserRegister>({
