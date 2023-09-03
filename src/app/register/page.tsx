@@ -6,7 +6,6 @@ import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserRegister } from "../interfaces/IUser";
 import axios from "axios";
-import {config} from '../../../environments';
 
 export default function Login() {
   const [formData, setFormData] = useState<IUserRegister>({
@@ -18,7 +17,7 @@ export default function Login() {
     accountType: "",
   });
 
-  const baseUrl = process.env.BASE_URL || config.BASE_URL
+  const baseUrl = process.env.BASE_URL
   const url = `${baseUrl}/user/register`
   // const url = 'http://localhost:8000/user/register'
   console.log('url', url)

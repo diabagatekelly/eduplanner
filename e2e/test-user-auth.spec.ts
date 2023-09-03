@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test'
-import {config} from '../environments';
-const baseUrl = process.env.BASE_URL || config.BASE_URL
+const baseUrl = process.env.BASE_URL
 
 test('Mock user creating an account', async ({ page }) => {
   // Mock the api call before navigating
