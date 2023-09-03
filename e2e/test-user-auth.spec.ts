@@ -55,6 +55,7 @@ test('Mock user creating an account', async ({ page }) => {
   expect(teacherRadioVal).toBe(true)
 
   await page.getByRole('button', { name: 'Create Account' }).click();
+  await page.waitForURL(`${siteUrl}/mockuser`)
   await expect(page).toHaveURL(`${siteUrl}/mockuser`)
 });
 

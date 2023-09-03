@@ -21,7 +21,6 @@ export default function Login() {
 
   const url = `${process.env.NEXT_BASE_URL}/user/register`
   // const url = 'http://localhost:8000/user/register'
-  console.log('url', url)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const router = useRouter()
