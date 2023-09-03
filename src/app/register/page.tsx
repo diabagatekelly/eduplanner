@@ -5,6 +5,7 @@ import RegisterForm from "../ui/register-form";
 import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserRegister } from "../interfaces/IUser";
+import axios from "axios";
 
 export default function Login() {
   const [formData, setFormData] = useState<IUserRegister>({
@@ -16,6 +17,7 @@ export default function Login() {
     accountType: "",
   });
   const url = 'https://eduplanner-backend-7fdf262835f2.herokuapp.com/user/register';
+  // const url = 'http://localhost:8000/user/register'
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const router = useRouter()
@@ -40,43 +42,46 @@ export default function Login() {
 
     try {
       const rawFormData = new FormData(e.currentTarget)
-      const formData = new URLSearchParams()
+      const jsonData = {}
 
       for (const pair of rawFormData.entries()) {
-        formData.append(pair[0], `${pair[1]}`);
+        jsonData[pair[0]] = `${pair[1]}`;
       }
 
-      const response = await fetch(url, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
+      const data = JSON.stringify(jsonData)
+
+      const response = await axios.post(
+        url,
+        data
+      ).then((response) => {
+        setIsLoading(false)
+        if (response.status !== 200) {
+          setFormSuccess(false)
+          setFormSuccessMessage(response.data.message)
+        } else {
+          setFormData({
+            firstName: "",
+            lastName: "",
+            username: "",
+            email: "",
+            password: "",
+            accountType: "",
+          });
+          setFormSuccess(true);
+          setFormSuccessMessage('New user created.')
+          router.push('/'+ response.data.username)
+        }
       })
 
-      const data = await response.json()
-      setIsLoading(false)
-      if (data.status) {
-        setFormSuccess(false)
-        setFormSuccessMessage(data.message)
-      } else {
-        setFormData({
-          firstName: "",
-          lastName: "",
-          username: "",
-          email: "",
-          password: "",
-          accountType: "",
-        });
-        setFormSuccess(true);
-        setFormSuccessMessage('New user created.')
-        router.push('/'+ data.username)
-      }
+      
     } catch (error) {
       console.error(error)
+      setIsLoading(false)
       setFormSuccess(false)
-      setFormSuccessMessage('Oops, something went wrong')
+      if (error.response) {
+        setFormSuccessMessage(error.response.data.message)
+      }
+      
     }
   }
 
