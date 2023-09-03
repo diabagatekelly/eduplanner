@@ -14,6 +14,7 @@ jobs:
       - run:
           command: | 
             npx playwright install
+            sudo npx playwright install-deps
             npm run test
           name: Run frontend and backend tests
 
