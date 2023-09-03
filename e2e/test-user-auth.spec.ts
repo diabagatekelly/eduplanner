@@ -7,6 +7,8 @@ test('Mock user creating an account', async ({ page }) => {
   const registerApiUrl = `${baseUrl}/user/register`
   const siteUrl = 'https://eduplanner-jade.vercel.app';
 
+  console.log(registerApiUrl)
+
   await page.route(registerApiUrl, async route => {
     const response = {
       body: '{ \
