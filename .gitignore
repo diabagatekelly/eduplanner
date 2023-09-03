@@ -39,3 +39,5 @@ next-env.d.ts
 
 .vercel
 /environments.ts
+
+.env*.local
