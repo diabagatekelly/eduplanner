@@ -1,7 +1,7 @@
 import { FormEvent } from "react";
 import { IUserRegister } from "../interfaces/IUser";
 
-const LoginForm = ({
+const RegisterForm = ({
   handleInput,
   formData,
   isLoading,
@@ -19,19 +19,19 @@ const LoginForm = ({
         <div>
           <label htmlFor="firstName" className="block text-sm font-medium leading-6 text-gray-900">First Name:</label>
           <div className="mt-2">
-            <input onChange={handleInput} value={formData.firstName} id="firstName" name="firstName" type="firstName" autoComplete="firstName" required className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+            <input onChange={handleInput} value={formData.firstName} id="firstName" name="firstName" type="text" autoComplete="firstName" required className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
           </div>
         </div>
         <div>
           <label htmlFor="lastName" className="block text-sm font-medium leading-6 text-gray-900">Last Name:</label>
           <div className="mt-2">
-            <input onChange={handleInput} value={formData.lastName} id="lastName" name="lastName" type="lastName" autoComplete="lastName" required className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+            <input onChange={handleInput} value={formData.lastName} id="lastName" name="lastName" type="text" autoComplete="lastName" required className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
           </div>
         </div>
         <div>
           <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">Username:</label>
           <div className="mt-2">
-            <input onChange={handleInput} value={formData.username} id="username" name="username" type="username" autoComplete="username" required className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+            <input onChange={handleInput} value={formData.username} id="username" name="username" type="text" autoComplete="username" required className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
           </div>
         </div>
         <div>
@@ -67,4 +67,4 @@ const LoginForm = ({
   )
 }
 
-export default LoginForm;
+export default RegisterForm;

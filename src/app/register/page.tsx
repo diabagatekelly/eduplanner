@@ -6,6 +6,8 @@ import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserRegister } from "../interfaces/IUser";
 import axios from "axios";
+import dotenv from 'dotenv';
+dotenv.config()
 
 export default function Login() {
   const [formData, setFormData] = useState<IUserRegister>({
@@ -16,7 +18,7 @@ export default function Login() {
     password: "",
     accountType: "",
   });
-  const url = 'https://eduplanner-backend-7fdf262835f2.herokuapp.com/user/register';
+  const url = `${process.env.BASE_URL}/user/register`
   // const url = 'http://localhost:8000/user/register'
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -59,6 +61,7 @@ export default function Login() {
           setFormSuccess(false)
           setFormSuccessMessage(response.data.message)
         } else {
+          console.log(response)
           setFormData({
             firstName: "",
             lastName: "",

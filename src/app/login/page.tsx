@@ -3,18 +3,23 @@
 import Navbar from "../ui/navbar";
 import LoginForm from "../ui/login-form";
 import React, { useState, FormEvent } from "react";
-import Link from "next/link";
+import { useRouter } from 'next/navigation'
 import { IUserLogin } from "../interfaces/IUser";
+import axios from "axios";
+import dotenv from 'dotenv';
+import Link from "next/link";
+dotenv.config()
 
 export default function Login() {
   const [formData, setFormData] = useState<IUserLogin>({
-    username: "",
+    userId: "",
     password: "",
   });
 
   const url = `${process.env.BASE_URL}/user/login`
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const router = useRouter()
 
   const [formSuccess, setFormSuccess] = useState(false)
   const [formSuccessMessage, setFormSuccessMessage] = useState("")
@@ -32,32 +37,48 @@ export default function Login() {
 
   async function submitForm(e: FormEvent<HTMLFormElement>) {
     // We don't want the page to refresh
-    console.log(e)
     e.preventDefault()
     setIsLoading(true) // Set loading to true when the request starts
 
     try {
-      const data = new FormData(e.currentTarget)
-      const response = await fetch(url, {
-        method: 'POST',
-        body: data,
-        headers: {
-          'accept': 'application/json',
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
+      const rawFormData = new FormData(e.currentTarget)
+      const jsonData = {}
+
+      for (const pair of rawFormData.entries()) {
+        jsonData[pair[0]] = `${pair[1]}`;
+      }
+
+      const data = JSON.stringify(jsonData)
+
+      const response = await axios.post(
+        url,
+        data
+      ).then((response) => {
+        setIsLoading(false)
+        if (response.status !== 200) {
+          setFormSuccess(false)
+          setFormSuccessMessage(response.data.message)
+        } else {
+          console.log(response)
           setFormData({
-            username: "",
-            password: ""
-          })
-          setFormSuccessMessage(data.submission_text)
-        })
+            userId: "",
+            password: "",
+          });
+          setFormSuccess(true);
+          setFormSuccessMessage('Loggin in...')
+          router.push('/'+ response.data.username)
+        }
+      })
+
+      
     } catch (error) {
       console.error(error)
-    } finally {
       setIsLoading(false)
-      setFormSuccess(true)
+      setFormSuccess(false)
+      if (error.response) {
+        setFormSuccessMessage(error.response.data.message)
+      }
+      
     }
   }
 
