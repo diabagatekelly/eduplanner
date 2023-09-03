@@ -6,8 +6,7 @@ import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserRegister } from "../interfaces/IUser";
 import axios from "axios";
-import dotenv from 'dotenv';
-dotenv.config()
+import {config} from '../../../environments';
 
 export default function Login() {
   const [formData, setFormData] = useState<IUserRegister>({
@@ -19,10 +18,10 @@ export default function Login() {
     accountType: "",
   });
 
-  console.log(process.env)
-  console.log(process.env.BASE_URL)
-  const url = `${process.env.BASE_URL}/user/register`
+  const baseUrl = process.env.BASE_URL || config.BASE_URL
+  const url = `${baseUrl}/user/register`
   // const url = 'http://localhost:8000/user/register'
+  console.log('url', url)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const router = useRouter()
@@ -64,7 +63,6 @@ export default function Login() {
           setFormSuccess(false)
           setFormSuccessMessage(response.data.message)
         } else {
-          console.log(response)
           setFormData({
             firstName: "",
             lastName: "",

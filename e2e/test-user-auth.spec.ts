@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test'
-import dotenv from 'dotenv';
-dotenv.config()
+import {config} from '../environments';
+const baseUrl = process.env.BASE_URL || config.BASE_URL
 
 test('Mock user creating an account', async ({ page }) => {
   // Mock the api call before navigating
-  const registerApiUrl = `${process.env.BASE_URL}/user/register`
+  
+  const registerApiUrl = `${baseUrl}/user/register`
   const siteUrl = 'https://eduplanner-jade.vercel.app';
 
   await page.route(registerApiUrl, async route => {
@@ -61,7 +62,7 @@ test('Mock user creating an account', async ({ page }) => {
 
 test.skip('Mock user login into an existing account', async ({ page }) => {
   // Mock the api call before navigating
-  const loginApiUrl = `${process.env.BASE_URL}/user/login`;
+  const loginApiUrl = `${baseUrl}/user/login`;
   const siteUrl = 'https://eduplanner-jade.vercel.app';
   await page.route(loginApiUrl, async route => {
     const response = {
