@@ -19,6 +19,7 @@ export default function Login() {
     accountType: "",
   });
 
+  console.log(process.env)
   console.log(process.env.BASE_URL)
   const url = `${process.env.BASE_URL}/user/register`
   // const url = 'http://localhost:8000/user/register'
