@@ -11,7 +11,6 @@ jobs:
     executor: pw-jammy-development
     parallelism: 4
     steps:
-      - run: SHARD="$((${CIRCLE_NODE_INDEX}+1))"; npx playwright test -- --shard=${SHARD}/${CIRCLE_NODE_TOTAL}
       - checkout
       - run:
           name: Install dependencies
@@ -21,7 +20,7 @@ jobs:
           command: | 
             npm ci
             npx playwright install --with-deps
-            npx playwright test
+            SHARD="$((${CIRCLE_NODE_INDEX}+1))"; npx playwright test -- --shard=${SHARD}/${CIRCLE_NODE_TOTAL}
             
 
 workflows:
