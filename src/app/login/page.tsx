@@ -7,8 +7,11 @@ import { useRouter } from 'next/navigation'
 import { IUserLogin } from "../interfaces/IUser";
 import axios from "axios";
 import Link from "next/link";
+import { setAuthToken } from "../actions/authActions";
+import { useDispatch } from "react-redux";
 
 export default function Login() {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState<IUserLogin>({
     userId: "",
     password: "",
@@ -40,32 +43,36 @@ export default function Login() {
 
     try {
       const rawFormData = new FormData(e.currentTarget)
-      const jsonData = {}
+      let jsonData = {}
 
       for (const pair of rawFormData.entries()) {
         jsonData[pair[0]] = `${pair[1]}`;
       }
 
-      const data = JSON.stringify(jsonData)
+      jsonData = {token: 'jjj', ...jsonData}
 
-      const response = await axios.post(
-        url,
-        data
-      ).then((response) => {
-        setIsLoading(false)
-        if (response.status !== 200) {
-          setFormSuccess(false)
-          setFormSuccessMessage(response.data.message)
-        } else {
-          setFormData({
-            userId: "",
-            password: "",
-          });
-          setFormSuccess(true);
-          setFormSuccessMessage('Loggin in...')
-          router.push('/'+ response.data.username)
-        }
-      })
+      const data = JSON.stringify(jsonData)
+      dispatch(setAuthToken(jsonData));
+
+      // const response = await axios.post(
+      //   "#",
+      //   data
+      // ).then((response) => {
+      //   // setIsLoading(false)
+      //   // if (response.status !== 200) {
+      //   //   setFormSuccess(false)
+      //   //   setFormSuccessMessage(response.data.message)
+      //   // } else {
+      //   //   setFormData({
+      //   //     userId: "",
+      //   //     password: "",
+      //   //   });
+      //     setFormSuccess(true);
+      //     setFormSuccessMessage('Loggin in...')
+      //     dispatch(setAuthToken({}));
+      //     router.push('/mockuser')
+      //   // }
+      // })
 
       
     } catch (error) {

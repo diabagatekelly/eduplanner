@@ -7,9 +7,12 @@ import { useRouter } from 'next/navigation'
 import { IUserRegister } from "../interfaces/IUser";
 import axios from "axios";
 import dotenv from "dotenv";
+import { setAuthToken } from "../actions/authActions";
+import { useDispatch } from "react-redux";
 dotenv.config()
 
 export default function Login() {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState<IUserRegister>({
     firstName: "",
     lastName: "",
@@ -73,6 +76,7 @@ export default function Login() {
           setFormSuccess(true);
           setFormSuccessMessage('New user created.')
           router.push('/'+ response.data.username)
+          dispatch(setAuthToken(response.data));
         }
       })
 
