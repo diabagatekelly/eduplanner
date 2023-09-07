@@ -2,17 +2,22 @@
 
 import Navbar from "../ui/navbar";
 import RegisterForm from "../ui/register-form";
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserRegister } from "../interfaces/IUser";
 import axios from "axios";
 import dotenv from "dotenv";
-import { setAuthToken } from "../actions/authActions";
+import { hasToken, setAuthToken } from "../actions/authActions";
 import { useDispatch } from "react-redux";
 dotenv.config()
 
 export default function Login() {
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(hasToken())
+  }, []);
+
   const [formData, setFormData] = useState<IUserRegister>({
     firstName: "",
     lastName: "",
@@ -23,7 +28,7 @@ export default function Login() {
   });
 
   const url = `${process.env.NEXT_BASE_URL}/user/register`
-  // const url = 'http://localhost:8000/user/register'
+  // const url = 'http://localhost:8080/user/register'
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const router = useRouter()

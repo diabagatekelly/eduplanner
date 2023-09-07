@@ -1,4 +1,4 @@
-const INITIAL_STATE = {isAuthenticated : sessionStorage.getItem('user_token') !== null}
+const INITIAL_STATE = {isAuthenticated : false}
 
 export default function auth(state = INITIAL_STATE, action) {
   switch(action.type) {

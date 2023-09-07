@@ -2,21 +2,27 @@
 
 import Navbar from "../ui/navbar";
 import LoginForm from "../ui/login-form";
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserLogin } from "../interfaces/IUser";
 import axios from "axios";
 import Link from "next/link";
-import { setAuthToken } from "../actions/authActions";
+import { hasToken, setAuthToken } from "../actions/authActions";
 import { useDispatch } from "react-redux";
 
 export default function Login() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(hasToken())
+  }, []);
+
   const [formData, setFormData] = useState<IUserLogin>({
     userId: "",
     password: "",
   });
 
+  // const url = 'http://localhost:8080/user/login'
   const url = `${process.env.NEXT_BASE_URL}/user/login`
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -43,36 +49,33 @@ export default function Login() {
 
     try {
       const rawFormData = new FormData(e.currentTarget)
-      let jsonData = {}
+      const jsonData = {}
 
       for (const pair of rawFormData.entries()) {
         jsonData[pair[0]] = `${pair[1]}`;
       }
 
-      jsonData = {token: 'jjj', ...jsonData}
-
       const data = JSON.stringify(jsonData)
-      dispatch(setAuthToken(jsonData));
 
-      // const response = await axios.post(
-      //   "#",
-      //   data
-      // ).then((response) => {
-      //   // setIsLoading(false)
-      //   // if (response.status !== 200) {
-      //   //   setFormSuccess(false)
-      //   //   setFormSuccessMessage(response.data.message)
-      //   // } else {
-      //   //   setFormData({
-      //   //     userId: "",
-      //   //     password: "",
-      //   //   });
-      //     setFormSuccess(true);
-      //     setFormSuccessMessage('Loggin in...')
-      //     dispatch(setAuthToken({}));
-      //     router.push('/mockuser')
-      //   // }
-      // })
+      const response = await axios.post(
+        url,
+        data
+      ).then((response) => {
+        setIsLoading(false)
+        if (response.status !== 200) {
+          setFormSuccess(false)
+          setFormSuccessMessage(response.data.message)
+        } else {
+          setFormData({
+            userId: "",
+            password: "",
+          });
+          setFormSuccess(true);
+          setFormSuccessMessage('Logging in...')
+          router.push('/'+ response.data.username)
+          dispatch(setAuthToken(response.data));
+        }
+      })
 
       
     } catch (error) {

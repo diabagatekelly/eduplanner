@@ -15,6 +15,15 @@ export function removeAuthToken() {
   };
 }
 
-export function isAuthenticated() {
-  return sessionStorage.getItem('user_token') !== null;
+export function hasToken() {
+  const hasToken = sessionStorage.getItem('user_token') !== null;
+  if (hasToken) {
+    return {
+      type: 'AUTH'
+    };
+  } else {
+    return {
+      type: 'UNAUTH'
+    };
+  }
 }
