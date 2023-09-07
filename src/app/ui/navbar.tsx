@@ -22,7 +22,6 @@ function classNames(...classes) {
 export default function Navbar() {
   const isAuthenticated = authReducer.getState().authReducer.isAuthenticated;
   const dispatch = useDispatch();
-  console.log(isAuthenticated)
 
   const logout = () => {
     dispatch(removeAuthToken())

@@ -16,7 +16,7 @@ export default function Login() {
 
   useEffect(() => {
     dispatch(hasToken())
-  }, []);
+  }, [dispatch]);
 
   const [formData, setFormData] = useState<IUserRegister>({
     firstName: "",

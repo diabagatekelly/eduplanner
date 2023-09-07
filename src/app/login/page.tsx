@@ -15,7 +15,7 @@ export default function Login() {
 
   useEffect(() => {
     dispatch(hasToken())
-  }, []);
+  }, [dispatch]);
 
   const [formData, setFormData] = useState<IUserLogin>({
     userId: "",
