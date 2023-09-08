@@ -2,27 +2,18 @@
 
 import Navbar from "../ui/navbar";
 import LoginForm from "../ui/login-form";
-import React, { useState, FormEvent, useEffect } from "react";
+import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserLogin } from "../interfaces/IUser";
 import axios from "axios";
 import Link from "next/link";
-import { hasToken, setAuthToken } from "../actions/authActions";
-import { useDispatch } from "react-redux";
 
 export default function Login() {
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    dispatch(hasToken())
-  }, [dispatch]);
-
   const [formData, setFormData] = useState<IUserLogin>({
-    username: "",
+    userId: "",
     password: "",
   });
 
-  // const url = 'http://localhost:8080/user/login'
   const url = `${process.env.NEXT_BASE_URL}/user/login`
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -67,13 +58,12 @@ export default function Login() {
           setFormSuccessMessage(response.data.message)
         } else {
           setFormData({
-            username: "",
+            userId: "",
             password: "",
           });
           setFormSuccess(true);
-          setFormSuccessMessage('Logging in...')
+          setFormSuccessMessage('Loggin in...')
           router.push('/'+ response.data.username)
-          dispatch(setAuthToken(response.data));
         }
       })
 
