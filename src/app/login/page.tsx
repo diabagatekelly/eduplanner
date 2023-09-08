@@ -18,7 +18,7 @@ export default function Login() {
   }, [dispatch]);
 
   const [formData, setFormData] = useState<IUserLogin>({
-    userId: "",
+    username: "",
     password: "",
   });
 
@@ -67,7 +67,7 @@ export default function Login() {
           setFormSuccessMessage(response.data.message)
         } else {
           setFormData({
-            userId: "",
+            username: "",
             password: "",
           });
           setFormSuccess(true);

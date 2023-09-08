@@ -61,7 +61,7 @@ test('Mock user creating an account', async ({ page }) => {
   await expect(page).toHaveURL(`${siteUrl}/mockuser`)
 });
 
-test.skip('Mock user login into an existing account', async ({ page }) => {
+test('Mock user login into an existing account', async ({ page }) => {
   // Mock the api call before navigating
   const loginApiUrl = `${process.env.NEXT_BASE_URL}/user/login`;
   const siteUrl = 'https://eduplanner-jade.vercel.app';
