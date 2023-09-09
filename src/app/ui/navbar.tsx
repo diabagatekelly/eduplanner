@@ -10,7 +10,6 @@ import { resetUser } from "../actions/userActions";
 
 const navigation = [
   { name: 'Home', href: '/', current: true },
-  { name: 'About Us', href: '/about-us', current: false },
 ]
 
 function classNames(...classes) {
@@ -27,7 +26,7 @@ export const Navbar = ({isAuthenticated, username}) => {
   }
 
   return (
-    <Disclosure as="nav" className="bg-gray-800">
+    <Disclosure as="nav" className="fixed top w-full bg-gray-800">
       {({ open }) => (
         <>
           <div className="mx-auto px-2 sm:px-6 lg:px-8">
@@ -60,6 +59,19 @@ export const Navbar = ({isAuthenticated, username}) => {
                         {item.name}
                       </Link>
                     ))}
+                    {isAuthenticated ? 
+                      <Link
+                        key="Dashboard"
+                        href={`/${username}`}
+                        className={classNames(
+                          true ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                          'rounded-md px-3 py-2 text-sm font-medium'
+                        )}
+                        aria-current={true ? 'page' : undefined}
+                      >
+                        Dashboard
+                      </Link>
+                    : ''}
                   </div>
                   
                 </div>
@@ -153,6 +165,21 @@ export const Navbar = ({isAuthenticated, username}) => {
                   {item.name}
                 </Disclosure.Button>
               ))}
+              {
+                isAuthenticated ? 
+                <Disclosure.Button
+                  key="Dashboard"
+                  as="a"
+                  href={`/${username}`}
+                  className={classNames(
+                    true ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    'block rounded-md px-3 py-2 text-base font-medium'
+                  )}
+                  aria-current={true ? 'page' : undefined}
+                >
+                  Dashboard
+                </Disclosure.Button> : ""
+              }
               {
                 !isAuthenticated ? 
                 <Disclosure.Button

@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google'
 import { Provider, useDispatch } from "react-redux";
 import store from "./store";
 import {Navbar} from './ui/navbar';
+import {Footer} from './ui/footer';
 import { Suspense, useEffect, useState } from 'react';
 import { hasToken } from './actions/authActions';
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -19,10 +20,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-white`}>
         <Provider store={store}>
           <Reloader />
-          {children}
+          <div className="py-20 px-5">
+            {children}
+          </div>
+          <Footer />
         </Provider>
       </body>
     </html>

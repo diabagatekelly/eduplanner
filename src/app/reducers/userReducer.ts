@@ -3,7 +3,7 @@ const INITIAL_STATE = {}
 export default function user(userData = INITIAL_STATE, action: {type: string, userInfo?: string, editProps?: {propKey: any}[],  allData?: {}}) {
     switch(action.type) {
         case 'SCAN':
-            return userData
+            return {...userData}
 
         case 'QUERY':
             return userData[action.userInfo]
