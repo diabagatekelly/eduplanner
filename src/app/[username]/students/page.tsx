@@ -4,14 +4,16 @@ import NestedLayout from "@/app/nested-layout";
 import store from "@/app/store";
 import { useEffect, useState } from "react"
 
-const DashboardContent = ({ params }: { params: { username: string } }) => {
+const StudentsContent = ({user}) => {
+
   return (
-    <div>Welcome to your dashboard {params.username}. This will display all the relevant activity cards.</div>
+    <div className="flex flex-col px-3">
+      Manage my students here.
+    </div>
   )
 }
 
-export default function Dashboard({ params }: { params: { username: string } }) {
-
+export default function Students() {
   let args;
   const [user, getUserData] = useState({ ...args })
 
@@ -21,12 +23,12 @@ export default function Dashboard({ params }: { params: { username: string } }) 
     getUserData(userReducer);
   }, [])
 
+  const username = user.username
   const isTeacher = user.accountType?.includes('teacher')
-  const username = params.username
   
   return (
     <NestedLayout {...{username, isTeacher}}>
-      <DashboardContent {...{params}} />
+      <StudentsContent {...{user}} />
     </NestedLayout>
   )
 }

@@ -7,10 +7,8 @@ import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react
 import { useDispatch } from "react-redux";
 import { removeAuthToken } from "../actions/authActions";
 import { resetUser } from "../actions/userActions";
+import { usePathname } from 'next/navigation'
 
-const navigation = [
-  { name: 'Home', href: '/', current: true },
-]
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -19,6 +17,11 @@ function classNames(...classes) {
 
 export const Navbar = ({isAuthenticated, username}) => {
   const dispatch = useDispatch();
+  const pathname = usePathname()
+
+  const navigation = [
+    { name: 'Home', href: '/', current: pathname === '/' },
+  ]
 
   const logout = () => {
     dispatch(removeAuthToken())
@@ -59,15 +62,15 @@ export const Navbar = ({isAuthenticated, username}) => {
                         {item.name}
                       </Link>
                     ))}
-                    {isAuthenticated ? 
+                    {isAuthenticated && !pathname.includes(`${username}`) ? 
                       <Link
                         key="Dashboard"
                         href={`/${username}`}
                         className={classNames(
-                          true ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                          pathname === `/${username}` ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                           'rounded-md px-3 py-2 text-sm font-medium'
                         )}
-                        aria-current={true ? 'page' : undefined}
+                        aria-current={pathname === `/${username}` ? 'page' : undefined}
                       >
                         Dashboard
                       </Link>
@@ -137,10 +140,10 @@ export const Navbar = ({isAuthenticated, username}) => {
                       key="Login"
                       href="/login"
                       className={classNames(
-                        true ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                        pathname === '/login' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                         'rounded-md px-3 py-2 text-sm font-medium'
                       )}
-                      aria-current={true ? 'page' : undefined}
+                      aria-current={pathname === '/login' ? 'page' : undefined}
                     >
                       Login
                     </Link>
@@ -166,16 +169,16 @@ export const Navbar = ({isAuthenticated, username}) => {
                 </Disclosure.Button>
               ))}
               {
-                isAuthenticated ? 
+                isAuthenticated && !pathname.includes(`${username}`) ? 
                 <Disclosure.Button
                   key="Dashboard"
                   as="a"
                   href={`/${username}`}
                   className={classNames(
-                    true ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    pathname === `/${username}` ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                     'block rounded-md px-3 py-2 text-base font-medium'
                   )}
-                  aria-current={true ? 'page' : undefined}
+                  aria-current={pathname === `/${username}` ? 'page' : undefined}
                 >
                   Dashboard
                 </Disclosure.Button> : ""
@@ -187,10 +190,10 @@ export const Navbar = ({isAuthenticated, username}) => {
                   as="a"
                   href="/login"
                   className={classNames(
-                    true ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    pathname === '/login' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                     'block rounded-md px-3 py-2 text-base font-medium'
                   )}
-                  aria-current={true ? 'page' : undefined}
+                  aria-current={pathname === '/login' ? 'page' : undefined}
                 >
                   Login
                 </Disclosure.Button> : ""
