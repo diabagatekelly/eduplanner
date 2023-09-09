@@ -42,7 +42,6 @@ export default function Profile() {
 
   useEffect(() => {
     const { userReducer } = store.getState()
-    console.log(userReducer)
     getUserData(userReducer);
   }, [])
 

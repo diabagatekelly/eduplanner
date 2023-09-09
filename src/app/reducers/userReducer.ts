@@ -9,12 +9,13 @@ export default function user(userData = INITIAL_STATE, action: {type: string, us
             return userData[action.userInfo]
         
         case 'EDIT':
+            const newUserData = {...userData}
             action.editProps.forEach((prop) => {
                 const key = Object.keys(prop)
-                const value = Object.keys(prop)
-                userData[key[0]] = value[0]
+                const value = Object.values(prop)
+                newUserData[key[0]] = value[0]
             })
-            return {...userData}
+            return {...newUserData}
 
         case 'POPULATE': 
             return {...userData, ...action.allData}

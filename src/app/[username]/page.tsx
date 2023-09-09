@@ -17,7 +17,6 @@ export default function Dashboard({ params }: { params: { username: string } }) 
 
   useEffect(() => {
     const { userReducer } = store.getState()
-    console.log(userReducer)
     getUserData(userReducer);
   }, [])
 

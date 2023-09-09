@@ -1,7 +1,7 @@
 "use client"
 
 import LoginForm from "../ui/login-form";
-import React, { useState, FormEvent, useEffect } from "react";
+import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserLogin } from "../interfaces/IUser";
 import axios from "axios";
