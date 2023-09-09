@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "vercel build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "playwright test",
