@@ -1,13 +1,12 @@
 "use client"
 
 import Link from "next/link";
-import Image from "next/image";
 import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import authReducer from "../store";
+import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useDispatch } from "react-redux";
 import { removeAuthToken } from "../actions/authActions";
+import { resetUser } from "../actions/userActions";
 
 const navigation = [
   { name: 'Home', href: '/', current: true },
@@ -19,13 +18,12 @@ function classNames(...classes) {
 }
 
 
-
-export default function Navbar() {
-  const isAuthenticated = authReducer.getState().authReducer.isAuthenticated;
+export const Navbar = ({isAuthenticated, username}) => {
   const dispatch = useDispatch();
 
   const logout = () => {
     dispatch(removeAuthToken())
+    dispatch(resetUser())
   }
 
   return (
@@ -79,9 +77,10 @@ export default function Navbar() {
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
                   <div>
-                    <Menu.Button className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                    <Menu.Button className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                       <span className="absolute -inset-1.5" />
                       <span className="sr-only">Open user menu</span>
+                      <UserCircleIcon className="h-6 w-6" aria-hidden="true" />
                     </Menu.Button>
                   </div>
                   <Transition
@@ -97,20 +96,10 @@ export default function Navbar() {
                       <Menu.Item>
                         {({ active }) => (
                           <Link
-                            href="#"
+                            href={`/${username}/profile`}
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                           >
                             Your Profile
-                          </Link>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
-                          <Link
-                            href="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                          >
-                            Settings
                           </Link>
                         )}
                       </Menu.Item>

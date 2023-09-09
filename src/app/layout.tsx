@@ -1,10 +1,14 @@
 'use client'
 
 import './globals.css'
-import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import store from "./store";
+import {Navbar} from './ui/navbar';
+import { Suspense, useEffect, useState } from 'react';
+import { hasToken } from './actions/authActions';
+import { usePathname, useSearchParams } from 'next/navigation'
+import { populateUser } from './actions/userActions';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,9 +21,36 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Provider store={store}>
+          <Reloader />
           {children}
         </Provider>
       </body>
     </html>
   )
+}
+
+const Reloader = () => {
+  let args;
+  const dispatch = useDispatch()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  
+  const [userState, setUserState] = useState({isAuthenticated: false, userReducer: {...args}})
+
+  useEffect(() => {
+    dispatch(hasToken())
+    dispatch(populateUser())
+    const {authReducer, userReducer} = store.getState()
+    const isAuthenticated = authReducer.isAuthenticated;
+    setUserState({isAuthenticated, userReducer})
+  }, [pathname, searchParams])
+
+  const username = userState.userReducer.username;
+  const isAuthenticated = userState.isAuthenticated;
+
+  return ( 
+    <Suspense fallback={null}>
+        <Navbar {...{isAuthenticated, username}} />
+    </Suspense>
+  );
 }

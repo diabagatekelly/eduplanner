@@ -1,9 +1,8 @@
-import Navbar from "../ui/navbar"
+"use client"
 
 export default function Dashboard({ params }: { params: { username: string } }) {
   return (
     <>
-      <Navbar />
       <div>Welcome to your dashboard {params.username}</div>
     </>
   )

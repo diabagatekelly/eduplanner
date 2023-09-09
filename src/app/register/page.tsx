@@ -1,22 +1,15 @@
 "use client"
 
-import Navbar from "../ui/navbar";
 import RegisterForm from "../ui/register-form";
-import React, { useState, FormEvent, useEffect } from "react";
+import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserRegister } from "../interfaces/IUser";
 import axios from "axios";
-import dotenv from "dotenv";
-import { hasToken, setAuthToken } from "../actions/authActions";
+import { setAuthToken } from "../actions/authActions";
 import { useDispatch } from "react-redux";
-dotenv.config()
 
-export default function Login() {
+export default function Register() {
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(hasToken())
-  }, [dispatch]);
 
   const [formData, setFormData] = useState<IUserRegister>({
     firstName: "",
@@ -98,20 +91,17 @@ export default function Login() {
   }
 
   return (
-    <>
-      <Navbar />
-      <div>
-        <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-          <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-            <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Create an account</h2>
-          </div>
+    <div>
+      <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Create an account</h2>
+        </div>
 
-          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <RegisterForm {...{ handleInput, formData, isLoading, submitForm }} />
-            <div>{formSuccessMessage}</div>
-          </div>
+        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+          <RegisterForm {...{ handleInput, formData, isLoading, submitForm }} />
+          <div>{formSuccessMessage}</div>
         </div>
       </div>
-    </>
+    </div>
   )
 }

@@ -1,21 +1,17 @@
 "use client"
 
-import Navbar from "../ui/navbar";
 import LoginForm from "../ui/login-form";
 import React, { useState, FormEvent, useEffect } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserLogin } from "../interfaces/IUser";
 import axios from "axios";
 import Link from "next/link";
-import { hasToken, setAuthToken } from "../actions/authActions";
+import { setAuthToken } from "../actions/authActions";
 import { useDispatch } from "react-redux";
+import { populateUser } from "../actions/userActions";
 
 export default function Login() {
   const dispatch = useDispatch()
-
-  useEffect(() => {
-    dispatch(hasToken())
-  }, [dispatch]);
 
   const [formData, setFormData] = useState<IUserLogin>({
     username: "",
@@ -74,6 +70,7 @@ export default function Login() {
           setFormSuccessMessage('Logging in...')
           router.push('/'+ response.data.username)
           dispatch(setAuthToken(response.data));
+          dispatch(populateUser());
         }
       })
 
@@ -90,28 +87,25 @@ export default function Login() {
   }
 
   return (
-    <>
-      <Navbar />
-      <div>
-        {formSuccess ?
-          <div>{formSuccessMessage}</div>
-          :
-          <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-              <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
-            </div>
-
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-              <LoginForm {...{handleInput, formData, isLoading, submitForm}}  />
-
-              <p className="mt-10 text-center text-sm text-gray-500">
-                <span>No account yet? </span>
-                <Link href="/register" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Create an account</Link>
-              </p>
-            </div>
+    <div>
+      {formSuccess ?
+        <div>{formSuccessMessage}</div>
+        :
+        <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+          <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+            <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
           </div>
-        }
-      </div>
-    </>
+
+          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+            <LoginForm {...{handleInput, formData, isLoading, submitForm}}  />
+
+            <p className="mt-10 text-center text-sm text-gray-500">
+              <span>No account yet? </span>
+              <Link href="/register" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Create an account</Link>
+            </p>
+          </div>
+        </div>
+      }
+    </div>
   )
 }
