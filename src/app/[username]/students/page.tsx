@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import { addNewStudent } from "@/app/actions/userActions";
 import {useRouter } from "next/navigation";
 
-const addStudent = (user, sendStudentData) => {
+const AddStudent = (user, sendStudentData) => {
   const router = useRouter()
   const [formData, setFormData] = useState({
     username: ""
@@ -71,7 +71,6 @@ const addStudent = (user, sendStudentData) => {
           } else {
             sendStudentData(response.data)
             setFormSuccessMessage('Successfully added a new student')
-            router.refresh()
           }
           
         }
@@ -109,8 +108,8 @@ const StudentsContent = ({user, sendStudentData}) => {
     <div className="flex flex-col px-3">
       <div className="justify-items-start">
         <h3 className="text-3xl py-3 font-bold">Add a new student:</h3>
-        <p>Enter your studen't username.</p>
-        {addStudent(user, sendStudentData)}
+        <p>Enter your student username.</p>
+        {AddStudent(user, sendStudentData)}
       </div>
       <hr className="mt-4"></hr>
       <div className="justify-items-start">
