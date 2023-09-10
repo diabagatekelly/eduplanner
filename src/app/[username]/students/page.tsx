@@ -6,9 +6,10 @@ import { useEffect, useState, FormEvent } from "react"
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addNewStudent } from "@/app/actions/userActions";
-import {useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import Popup from "@/app/ui/modal";
 
-const AddStudent = (user, sendStudentData) => {
+const AddStudent = (user, sendStudentData, setShowModal, getData) => {
   const router = useRouter()
   const [formData, setFormData] = useState({
     username: ""
@@ -33,6 +34,13 @@ const AddStudent = (user, sendStudentData) => {
 
   }
 
+  const reset = () => {
+    setFormData({
+      username: ""
+    });
+    setFormSuccessMessage("")
+  }
+
   async function submitForm(e: FormEvent<HTMLFormElement>) {
     // We don't want the page to refresh
     e.preventDefault()
@@ -40,39 +48,50 @@ const AddStudent = (user, sendStudentData) => {
 
     try {
       const rawFormData = new FormData(e.currentTarget)
-      const jsonData = {username: ''}
+      const jsonData = { username: '' }
 
       for (const pair of rawFormData.entries()) {
         jsonData[pair[0]] = `${pair[1]}`;
       }
 
+      if (jsonData.username === user.username) {
+        setFormSuccess(false)
+        setFormSuccessMessage("You can't add yourself as a student.");
+        setTimeout(() => {
+          reset()
+        }, 3000)
+        return;
+      }
+
       const response = await axios.get(
-        url, 
+        url,
         {
           params: {
             username: jsonData.username
           }
         }
-        
+
       ).then(async (response) => {
         setIsLoading(false)
         if (response.status !== 200) {
           setFormSuccess(false)
           setFormSuccessMessage(response.data.message)
         } else {
-          
-          setFormData({
-            username: ""
-          });
           setFormSuccess(true);
-          
           if (user.studentIds && user.studentIds.includes(response.data.username)) {
             setFormSuccessMessage('This is already one of your students.')
+            setTimeout(() => {
+              reset()
+            }, 3000)
           } else {
-            sendStudentData(response.data)
-            setFormSuccessMessage('Successfully added a new student')
+            setShowModal(true)
+            getData(response.data)
+            reset()
+            // sendStudentData(response.data)
+            // setFormSuccessMessage('Successfully added a new student')
+            // router.push(`/${user.username}/students`)
           }
-          
+
         }
       })
 
@@ -93,7 +112,7 @@ const AddStudent = (user, sendStudentData) => {
       <form className="space-y-6" onSubmit={submitForm} method="POST">
         <input onChange={handleInput} value={formData.username} id="username" name="username" type="text" autoComplete="username" required className="inline-block  rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
         <span>
-          <button type="submit" disabled={isLoading} className="ml-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{isLoading ? 'Loading...' : 'Sign In'}</button>
+          <button type="submit" disabled={isLoading} className="ml-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Find Student</button>
         </span>
       </form>
 
@@ -102,14 +121,14 @@ const AddStudent = (user, sendStudentData) => {
   )
 }
 
-const StudentsContent = ({user, sendStudentData}) => {
+const StudentsContent = ({ user, sendStudentData, setShowModal, getData }) => {
 
   return (
     <div className="flex flex-col px-3">
       <div className="justify-items-start">
         <h3 className="text-3xl py-3 font-bold">Add a new student:</h3>
-        <p>Enter your student username.</p>
-        {AddStudent(user, sendStudentData)}
+        <p>Enter your student&#39;s username.</p>
+        {AddStudent(user, sendStudentData, setShowModal, getData)}
       </div>
       <hr className="mt-4"></hr>
       <div className="justify-items-start">
@@ -129,22 +148,26 @@ export default function Students() {
   let args;
   const dispatch = useDispatch()
   const [user, getUserData] = useState({ ...args })
+  const [showModal, setShowModal] = useState(false);
+  const [newStudent, getData] = useState()
 
   const sendStudentData = (data) => {
     dispatch(addNewStudent(data));
-  } 
+  }
 
   useEffect(() => {
     const { userReducer } = store.getState()
     getUserData(userReducer);
-  })
+  }, [])
 
   const username = user.username
   const isTeacher = user.accountType?.includes('teacher')
+  const messageHeader = 'Are you sure you want to add this student?'
 
   return (
     <NestedLayout {...{ username, isTeacher }}>
-      <StudentsContent {...{user, sendStudentData}} />
+      <StudentsContent {...{ user, sendStudentData, setShowModal, getData }} />
+      <Popup {...{ showModal, newStudent, messageHeader }} onClose={() => setShowModal(false)} />
     </NestedLayout>
   )
 }
