@@ -11,36 +11,30 @@ export const findUser = async (options) => {
 }
 
 export const editUser = async (rawData) => {
-  const data = JSON.stringify(rawData);
-
   // const url = 'http://localhost:8080/user/edit'
   const url = `${process.env.NEXT_BASE_URL}/user/edit`
 
-  return await postApi(url, data)
+  return await postApi(url, rawData)
     .then(async (response) => {
       return response;
     })
 }
 
 export const loginUser = async (rawData) => {
-  const data = JSON.stringify(rawData);
-
   // const url = 'http://localhost:8080/user/login'
   const url = `${process.env.NEXT_BASE_URL}/user/login`
 
-  return await postApi(url, data)
+  return await postApi(url, rawData)
     .then(async (response) => {
       return response;
     })
 }
 
 export const registerUser = async (rawData) => {
-  const data = JSON.stringify(rawData);
-
   const url = `${process.env.NEXT_BASE_URL}/user/register`
   // const url = 'http://localhost:8080/user/register'
 
-  return await postApi(url, data)
+  return await postApi(url, rawData)
     .then(async (response) => {
       return response;
     })
