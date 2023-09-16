@@ -10,8 +10,7 @@ export const findUser = async (options) => {
 }
 
 export const editUser = async (rawData) => {
-  // const url = 'http://localhost:8080/user/edit'
-  const url = `${process.env.NEXT_BASE_URL}/user/edit`
+  const url = process.env.NEXT_EDIT_USER_URL
 
   return await postApi(url, rawData)
     .then(async (response) => {
@@ -20,7 +19,7 @@ export const editUser = async (rawData) => {
 }
 
 export const loginUser = async (rawData) => {
-  const url = process.env.NEXT_USER_LOGIN_URL
+  const url = process.env.NEXT_LOGIN_USER_URL
 
   return await postApi(url, rawData)
     .then(async (response) => {
@@ -29,8 +28,7 @@ export const loginUser = async (rawData) => {
 }
 
 export const registerUser = async (rawData) => {
-  const url = `${process.env.NEXT_BASE_URL}/user/register`
-  // const url = 'http://localhost:8080/user/register'
+  const url = process.env.NEXT_REGISTER_USER_URL
 
   return await postApi(url, rawData)
     .then(async (response) => {

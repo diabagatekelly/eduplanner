@@ -4,9 +4,8 @@ dotenv.config()
 
 test('Mock user creating an account', async ({ page }) => {
   // Mock the api call before navigating
-  
-  const registerApiUrl = `${process.env.NEXT_BASE_URL}/user/register`
-  const siteUrl = 'https://eduplanner-jade.vercel.app';
+  const registerApiUrl = process.env.NEXT_REGISTER_USER_URL
+  const siteUrl = process.env.NEXT_SITE_URL;
 
   await page.route(registerApiUrl, async route => {
     const response = {
@@ -63,8 +62,10 @@ test('Mock user creating an account', async ({ page }) => {
 
 test('Mock user login into an existing account', async ({ page }) => {
   // Mock the api call before navigating
-  const loginApiUrl = `${process.env.NEXT_BASE_URL}/user/login`;
-  const siteUrl = 'https://eduplanner-jade.vercel.app';
+  const loginApiUrl = process.env.NEXT_LOGIN_USER_URL;
+  const siteUrl = process.env.NEXT_SITE_URL;
+
+  console.log(siteUrl)
   await page.route(loginApiUrl, async route => {
     const response = {
       body: '{ \
