@@ -68,13 +68,13 @@ export default function Login() {
           });
           setFormSuccess(true);
           setFormSuccessMessage('Logging in...')
-          router.push('/'+ response.data.username)
+          router.push('/' + response.data.username)
           dispatch(setAuthToken(response.data));
           dispatch(populateUser());
         }
       })
 
-      
+
     } catch (error) {
       console.error(error)
       setIsLoading(false)
@@ -82,30 +82,25 @@ export default function Login() {
       if (error.response) {
         setFormSuccessMessage(error.response.data.message)
       }
-      
+
     }
   }
 
   return (
-    <div>
-      {formSuccess ?
-        <div>{formSuccessMessage}</div>
-        :
-        <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-          <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-            <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
-          </div>
+    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
+      </div>
 
-          <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <LoginForm {...{handleInput, formData, isLoading, submitForm}}  />
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <LoginForm {...{ handleInput, formData, isLoading, submitForm }} />
+        <div className="mt-3 text-center">{formSuccessMessage}</div>
 
-            <p className="mt-10 text-center text-sm text-gray-500">
-              <span>No account yet? </span>
-              <Link href="/register" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Create an account</Link>
-            </p>
-          </div>
-        </div>
-      }
+        <p className="mt-10 text-center text-sm text-gray-500">
+          <span>No account yet? </span>
+          <Link href="/register" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Create an account</Link>
+        </p>
+      </div>
     </div>
   )
 }

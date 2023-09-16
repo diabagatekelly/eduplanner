@@ -73,12 +73,11 @@ export default function Register() {
           });
           setFormSuccess(true);
           setFormSuccessMessage('New user created.')
-          router.push('/'+ response.data.username)
+          router.push('/' + response.data.username)
           dispatch(setAuthToken(response.data));
         }
       })
 
-      
     } catch (error) {
       console.error(error)
       setIsLoading(false)
@@ -86,7 +85,6 @@ export default function Register() {
       if (error.response) {
         setFormSuccessMessage(error.response.data.message)
       }
-      
     }
   }
 

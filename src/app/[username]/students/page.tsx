@@ -8,15 +8,15 @@ import { useDispatch } from "react-redux";
 import { addNewStudent } from "@/app/actions/userActions";
 import { useRouter } from "next/navigation";
 import Popup from "@/app/ui/modal";
+import Link from "next/link";
 
-const AddStudent = (user, sendStudentData, setShowModal, getData) => {
-  const router = useRouter()
+const AddStudent = (user, setShowModal, getData) => {
   const [formData, setFormData] = useState({
     username: ""
   });
 
-  const url = 'http://localhost:8080/user'
-  // const url = `${process.env.NEXT_BASE_URL}/user`
+  // const url = 'http://localhost:8080/user'
+  const url = `${process.env.NEXT_BASE_URL}/user`
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -35,10 +35,12 @@ const AddStudent = (user, sendStudentData, setShowModal, getData) => {
   }
 
   const reset = () => {
-    setFormData({
-      username: ""
-    });
-    setFormSuccessMessage("")
+    setTimeout(() => {
+      setFormData({
+        username: ""
+      });
+      setFormSuccessMessage("")
+    }, 3000)
   }
 
   async function submitForm(e: FormEvent<HTMLFormElement>) {
@@ -57,9 +59,7 @@ const AddStudent = (user, sendStudentData, setShowModal, getData) => {
       if (jsonData.username === user.username) {
         setFormSuccess(false)
         setFormSuccessMessage("You can't add yourself as a student.");
-        setTimeout(() => {
-          reset()
-        }, 3000)
+        reset()
         return;
       }
 
@@ -76,22 +76,17 @@ const AddStudent = (user, sendStudentData, setShowModal, getData) => {
         if (response.status !== 200) {
           setFormSuccess(false)
           setFormSuccessMessage(response.data.message)
+          reset()
         } else {
           setFormSuccess(true);
           if (user.studentIds && user.studentIds.includes(response.data.username)) {
             setFormSuccessMessage('This is already one of your students.')
-            setTimeout(() => {
-              reset()
-            }, 3000)
+            reset()
           } else {
             setShowModal(true)
             getData(response.data)
             reset()
-            // sendStudentData(response.data)
-            // setFormSuccessMessage('Successfully added a new student')
-            // router.push(`/${user.username}/students`)
           }
-
         }
       })
 
@@ -103,7 +98,7 @@ const AddStudent = (user, sendStudentData, setShowModal, getData) => {
       if (error.response) {
         setFormSuccessMessage(error.response.data.message)
       }
-
+      reset()
     }
   }
 
@@ -121,14 +116,14 @@ const AddStudent = (user, sendStudentData, setShowModal, getData) => {
   )
 }
 
-const StudentsContent = ({ user, sendStudentData, setShowModal, getData }) => {
+const StudentsContent = ({ user, setShowModal, getData }) => {
 
   return (
     <div className="flex flex-col px-3">
       <div className="justify-items-start">
         <h3 className="text-3xl py-3 font-bold">Add a new student:</h3>
         <p>Enter your student&#39;s username.</p>
-        {AddStudent(user, sendStudentData, setShowModal, getData)}
+        {AddStudent(user, setShowModal, getData)}
       </div>
       <hr className="mt-4"></hr>
       <div className="justify-items-start">
@@ -136,7 +131,7 @@ const StudentsContent = ({ user, sendStudentData, setShowModal, getData }) => {
         {user.studentIds ?
           <ul>
             {user.studentIds.map((student) => (
-              <li key={student}>{student}</li>
+              <Link href={`/${user.username}/students/${student}`} key={student}>{student}</Link>
             ))}
           </ul> : <p>You have no active students.</p>}
       </div>
@@ -147,12 +142,40 @@ const StudentsContent = ({ user, sendStudentData, setShowModal, getData }) => {
 export default function Students() {
   let args;
   const dispatch = useDispatch()
+  const router = useRouter()
   const [user, getUserData] = useState({ ...args })
   const [showModal, setShowModal] = useState(false);
-  const [newStudent, getData] = useState()
+  const [newStudent, getData] = useState();
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const sendStudentData = (data) => {
-    dispatch(addNewStudent(data));
+  // const url = 'http://localhost:8080/user/edit'
+  const url = `${process.env.NEXT_BASE_URL}/user/edit`
+
+  const modalNext = async (newStudentData) => {
+    try {
+      const data = JSON.stringify({ studentIds: newStudentData.username, username: user.username, firstName: user.firstName })
+      const response = await axios.post(
+        url,
+        data
+      ).then(async (response) => {
+        if (response.status !== 200) {
+          console.log(response)
+          setErrorMessage(response.data.message)
+        } else {
+          dispatch(addNewStudent(newStudentData));
+          setErrorMessage('Successfully added a new student')
+          setShowModal(false)
+          const { userReducer } = store.getState()
+          getUserData(userReducer);
+        }
+      })
+
+    } catch (error) {
+      console.error(error)
+      if (error.response) {
+        setErrorMessage(error.response.data.message)
+      }
+    }
   }
 
   useEffect(() => {
@@ -163,11 +186,12 @@ export default function Students() {
   const username = user.username
   const isTeacher = user.accountType?.includes('teacher')
   const messageHeader = 'Are you sure you want to add this student?'
+  const student = null;
 
   return (
-    <NestedLayout {...{ username, isTeacher }}>
-      <StudentsContent {...{ user, sendStudentData, setShowModal, getData }} />
-      <Popup {...{ showModal, newStudent, messageHeader }} onClose={() => setShowModal(false)} />
+    <NestedLayout {...{ username, student, isTeacher }}>
+      <StudentsContent {...{ user, setShowModal, getData }} />
+      <Popup {...{ showModal, newStudent, messageHeader, errorMessage }} executeNext={() => modalNext(newStudent)} onClose={() => setShowModal(false)} />
     </NestedLayout>
   )
 }

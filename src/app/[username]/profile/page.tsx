@@ -4,7 +4,7 @@ import NestedLayout from "@/app/nested-layout";
 import store from "@/app/store";
 import { useEffect, useState } from "react"
 
-const ProfileContent = ({user}) => {
+const ProfileContent = ({ user }) => {
   const getStudentListOrTeacher = () => {
     let linkedAccounts = 'None'
     if (user.accountType?.includes('student') && user.teacherId) {
@@ -47,10 +47,11 @@ export default function Profile() {
 
   const username = user.username
   const isTeacher = user.accountType?.includes('teacher')
-  
+  const student = null;
+
   return (
-    <NestedLayout {...{username, isTeacher}}>
-      <ProfileContent {...{user}} />
+    <NestedLayout {...{ username, student, isTeacher }}>
+      <ProfileContent {...{ user }} />
     </NestedLayout>
   )
 }
