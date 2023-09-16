@@ -4,9 +4,9 @@ import RegisterForm from "../ui/register-form";
 import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserRegister } from "../interfaces/IUser";
-import axios from "axios";
 import { setAuthToken } from "../actions/authActions";
 import { useDispatch } from "react-redux";
+import { postApi } from "../api/service";
 
 export default function Register() {
   const dispatch = useDispatch();
@@ -52,31 +52,27 @@ export default function Register() {
         jsonData[pair[0]] = `${pair[1]}`;
       }
 
-      const data = JSON.stringify(jsonData)
-
-      const response = await axios.post(
-        url,
-        data
-      ).then((response) => {
-        setIsLoading(false)
-        if (response.status !== 200) {
-          setFormSuccess(false)
-          setFormSuccessMessage(response.data.message)
-        } else {
-          setFormData({
-            firstName: "",
-            lastName: "",
-            username: "",
-            email: "",
-            password: "",
-            accountType: "",
-          });
-          setFormSuccess(true);
-          setFormSuccessMessage('New user created.')
-          router.push('/' + response.data.username)
-          dispatch(setAuthToken(response.data));
-        }
-      })
+      const response = await postApi(url, jsonData)
+        .then((response) => {
+          setIsLoading(false)
+          if (response.status !== 200) {
+            setFormSuccess(false)
+            setFormSuccessMessage(response.data.message)
+          } else {
+            setFormData({
+              firstName: "",
+              lastName: "",
+              username: "",
+              email: "",
+              password: "",
+              accountType: "",
+            });
+            setFormSuccess(true);
+            setFormSuccessMessage('New user created.')
+            router.push('/' + response.data.username)
+            dispatch(setAuthToken(response.data));
+          }
+        })
 
     } catch (error) {
       console.error(error)

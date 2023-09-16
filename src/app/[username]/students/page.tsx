@@ -3,12 +3,12 @@
 import NestedLayout from "@/app/nested-layout";
 import store from "@/app/store";
 import { useEffect, useState, FormEvent } from "react"
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { addNewStudent } from "@/app/actions/userActions";
 import { useRouter } from "next/navigation";
 import Popup from "@/app/ui/modal";
 import Link from "next/link";
+import { getApi, postApi } from "@/app/api/service";
 
 const AddStudent = (user, setShowModal, getData) => {
   const [formData, setFormData] = useState({
@@ -63,33 +63,31 @@ const AddStudent = (user, setShowModal, getData) => {
         return;
       }
 
-      const response = await axios.get(
-        url,
-        {
-          params: {
-            username: jsonData.username
-          }
+      const options = {
+        params: {
+          username: jsonData.username
         }
+      }
 
-      ).then(async (response) => {
-        setIsLoading(false)
-        if (response.status !== 200) {
-          setFormSuccess(false)
-          setFormSuccessMessage(response.data.message)
-          reset()
-        } else {
-          setFormSuccess(true);
-          if (user.studentIds && user.studentIds.includes(response.data.username)) {
-            setFormSuccessMessage('This is already one of your students.')
+      const response = await getApi(url, options)
+        .then(async (response) => {
+          setIsLoading(false)
+          if (response.status !== 200) {
+            setFormSuccess(false)
+            setFormSuccessMessage(response.data.message)
             reset()
           } else {
-            setShowModal(true)
-            getData(response.data)
-            reset()
+            setFormSuccess(true);
+            if (user.studentIds && user.studentIds.includes(response.data.username)) {
+              setFormSuccessMessage('This is already one of your students.')
+              reset()
+            } else {
+              setShowModal(true)
+              getData(response.data)
+              reset()
+            }
           }
-        }
-      })
-
+        })
 
     } catch (error) {
       console.error(error)
@@ -153,22 +151,20 @@ export default function Students() {
 
   const modalNext = async (newStudentData) => {
     try {
-      const data = JSON.stringify({ studentIds: newStudentData.username, username: user.username, firstName: user.firstName })
-      const response = await axios.post(
-        url,
-        data
-      ).then(async (response) => {
-        if (response.status !== 200) {
-          console.log(response)
-          setErrorMessage(response.data.message)
-        } else {
-          dispatch(addNewStudent(newStudentData));
-          setErrorMessage('Successfully added a new student')
-          setShowModal(false)
-          const { userReducer } = store.getState()
-          getUserData(userReducer);
-        }
-      })
+      const rawData = { studentIds: newStudentData.username, username: user.username, firstName: user.firstName }
+      const response = await postApi(url, rawData)
+        .then(async (response) => {
+          if (response.status !== 200) {
+            console.log(response)
+            setErrorMessage(response.data.message)
+          } else {
+            dispatch(addNewStudent(newStudentData));
+            setErrorMessage('Successfully added a new student')
+            setShowModal(false)
+            const { userReducer } = store.getState()
+            getUserData(userReducer);
+          }
+        })
 
     } catch (error) {
       console.error(error)

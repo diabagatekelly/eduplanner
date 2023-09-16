@@ -78,7 +78,7 @@ test('Mock user login into an existing account', async ({ page }) => {
   const loginPageText = await page.getByText('Sign in to your account')
   expect(loginPageText).toBeVisible()
 
-  const userId = await page.getByLabel('Username or Email:')
+  const userId = await page.getByLabel('Username:')
   await userId.fill('mockuser');
   const userIdVal = await userId.inputValue()
   expect(userIdVal).toEqual('mockuser');

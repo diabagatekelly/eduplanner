@@ -4,11 +4,11 @@ import LoginForm from "../ui/login-form";
 import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
 import { IUserLogin } from "../interfaces/IUser";
-import axios from "axios";
 import Link from "next/link";
 import { setAuthToken } from "../actions/authActions";
 import { useDispatch } from "react-redux";
 import { populateUser } from "../actions/userActions";
+import { postApi } from "../api/service";
 
 export default function Login() {
   const dispatch = useDispatch()
@@ -51,28 +51,24 @@ export default function Login() {
         jsonData[pair[0]] = `${pair[1]}`;
       }
 
-      const data = JSON.stringify(jsonData)
-
-      const response = await axios.post(
-        url,
-        data
-      ).then((response) => {
-        setIsLoading(false)
-        if (response.status !== 200) {
-          setFormSuccess(false)
-          setFormSuccessMessage(response.data.message)
-        } else {
-          setFormData({
-            username: "",
-            password: "",
-          });
-          setFormSuccess(true);
-          setFormSuccessMessage('Logging in...')
-          router.push('/' + response.data.username)
-          dispatch(setAuthToken(response.data));
-          dispatch(populateUser());
-        }
-      })
+      const response = await postApi(url, jsonData)
+        .then((response) => {
+          setIsLoading(false)
+          if (response.status !== 200) {
+            setFormSuccess(false)
+            setFormSuccessMessage(response.data.message)
+          } else {
+            setFormData({
+              username: "",
+              password: "",
+            });
+            setFormSuccess(true);
+            setFormSuccessMessage('Logging in...')
+            router.push('/' + response.data.username)
+            dispatch(setAuthToken(response.data));
+            dispatch(populateUser());
+          }
+        })
 
 
     } catch (error) {
