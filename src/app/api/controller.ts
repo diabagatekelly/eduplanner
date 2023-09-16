@@ -1,8 +1,7 @@
 import { getApi, postApi } from "@/app/api/service";
 
 export const findUser = async (options) => {
-  // const url = 'http://localhost:8080/user'
-  const url = `${process.env.NEXT_BASE_URL}/user`
+  const url = process.env.NEXT_GET_USER_URL
 
   return await getApi(url, options)
     .then(async (response) => {
@@ -21,8 +20,7 @@ export const editUser = async (rawData) => {
 }
 
 export const loginUser = async (rawData) => {
-  // const url = 'http://localhost:8080/user/login'
-  const url = `${process.env.NEXT_BASE_URL}/user/login`
+  const url = process.env.NEXT_USER_LOGIN_URL
 
   return await postApi(url, rawData)
     .then(async (response) => {
