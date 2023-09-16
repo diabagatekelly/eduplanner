@@ -10,7 +10,6 @@ export const getApi = async (url, options) => {
 }
 
 export const postApi = async (url, rawData) => {
-  console.log(url)
   const data = JSON.stringify(rawData)
   return await axios.post(
     url,

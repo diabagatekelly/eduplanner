@@ -1,6 +1,4 @@
 import { test, expect } from '@playwright/test';
-import dotenv from "dotenv";
-dotenv.config()
 
 test('Mock user creating an account', async ({ page }) => {
   // Mock the api call before navigating
