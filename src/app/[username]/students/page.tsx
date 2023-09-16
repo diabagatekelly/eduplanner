@@ -8,15 +8,12 @@ import { addNewStudent } from "@/app/actions/userActions";
 import { useRouter } from "next/navigation";
 import Popup from "@/app/ui/modal";
 import Link from "next/link";
-import { getApi, postApi } from "@/app/api/service";
+import { editUser, findUser } from "@/app/api/controller";
 
 const AddStudent = (user, setShowModal, getData) => {
   const [formData, setFormData] = useState({
     username: ""
   });
-
-  // const url = 'http://localhost:8080/user'
-  const url = `${process.env.NEXT_BASE_URL}/user`
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -69,7 +66,7 @@ const AddStudent = (user, setShowModal, getData) => {
         }
       }
 
-      const response = await getApi(url, options)
+      const response = await findUser(options)
         .then(async (response) => {
           setIsLoading(false)
           if (response.status !== 200) {
@@ -146,13 +143,10 @@ export default function Students() {
   const [newStudent, getData] = useState();
   const [errorMessage, setErrorMessage] = useState('')
 
-  // const url = 'http://localhost:8080/user/edit'
-  const url = `${process.env.NEXT_BASE_URL}/user/edit`
-
   const modalNext = async (newStudentData) => {
     try {
       const rawData = { studentIds: newStudentData.username, username: user.username, firstName: user.firstName }
-      const response = await postApi(url, rawData)
+      const response = await editUser(rawData)
         .then(async (response) => {
           if (response.status !== 200) {
             console.log(response)

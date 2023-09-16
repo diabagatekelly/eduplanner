@@ -38,10 +38,6 @@ next-env.d.ts
 /test-results/**/*.zip
 
 .vercel
-/environments.ts
 
 .env*.local
-.env
-
-.env*.local
-.vercel
+next.config.js

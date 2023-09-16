@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { IUserRegister } from "../interfaces/IUser";
 import { setAuthToken } from "../actions/authActions";
 import { useDispatch } from "react-redux";
-import { postApi } from "../api/service";
+import { registerUser } from "../api/controller";
 
 export default function Register() {
   const dispatch = useDispatch();
@@ -19,9 +19,6 @@ export default function Register() {
     password: "",
     accountType: "",
   });
-
-  const url = `${process.env.NEXT_BASE_URL}/user/register`
-  // const url = 'http://localhost:8080/user/register'
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const router = useRouter()
@@ -52,7 +49,7 @@ export default function Register() {
         jsonData[pair[0]] = `${pair[1]}`;
       }
 
-      const response = await postApi(url, jsonData)
+      const response = await registerUser(jsonData)
         .then((response) => {
           setIsLoading(false)
           if (response.status !== 200) {

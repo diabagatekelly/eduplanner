@@ -8,7 +8,7 @@ import Link from "next/link";
 import { setAuthToken } from "../actions/authActions";
 import { useDispatch } from "react-redux";
 import { populateUser } from "../actions/userActions";
-import { postApi } from "../api/service";
+import { loginUser } from "../api/controller";
 
 export default function Login() {
   const dispatch = useDispatch()
@@ -17,9 +17,6 @@ export default function Login() {
     username: "",
     password: "",
   });
-
-  // const url = 'http://localhost:8080/user/login'
-  const url = `${process.env.NEXT_BASE_URL}/user/login`
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const router = useRouter()
@@ -51,7 +48,7 @@ export default function Login() {
         jsonData[pair[0]] = `${pair[1]}`;
       }
 
-      const response = await postApi(url, jsonData)
+      const response = await loginUser(jsonData)
         .then((response) => {
           setIsLoading(false)
           if (response.status !== 200) {
