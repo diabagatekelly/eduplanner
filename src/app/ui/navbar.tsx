@@ -1,13 +1,15 @@
 "use client"
 
 import Link from "next/link";
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useDispatch } from "react-redux";
 import { removeAuthToken } from "../actions/authActions";
 import { resetUser } from "../actions/userActions";
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { editUser } from "../api/controller";
+import store from "../store";
 
 
 function classNames(...classes) {
@@ -15,17 +17,39 @@ function classNames(...classes) {
 }
 
 
-export const Navbar = ({isAuthenticated, username}) => {
+export const Navbar = ({ isAuthenticated, username }) => {
+  let args;
   const dispatch = useDispatch();
-  const pathname = usePathname()
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [user, getUserData] = useState({ ...args })
+
+  useEffect(() => {
+    const { userReducer } = store.getState()
+    getUserData(userReducer);
+  }, [])
 
   const navigation = [
     { name: 'Home', href: '/', current: pathname === '/' },
   ]
 
-  const logout = () => {
-    dispatch(removeAuthToken())
-    dispatch(resetUser())
+  const logout = async () => {
+    try {
+      const res = await editUser({ email: user.email, editData: {lastWorkedOn: Date.now()}})
+        .then(async (response) => {
+          if (response.status !== 200) {
+            console.log('Failed to update and logout!')
+          } else {
+            dispatch(removeAuthToken())
+            dispatch(resetUser())
+            router.push('/login');
+          }
+        })
+    } catch (e) {
+      console.log("Oops, something went wrong in updating and logging out" + e)
+    }
+
   }
 
   return (
@@ -62,7 +86,7 @@ export const Navbar = ({isAuthenticated, username}) => {
                         {item.name}
                       </Link>
                     ))}
-                    {isAuthenticated && !pathname.includes(`${username}`) ? 
+                    {isAuthenticated && !pathname.includes(`${username}`) ?
                       <Link
                         key="Dashboard"
                         href={`/${username}`}
@@ -74,9 +98,9 @@ export const Navbar = ({isAuthenticated, username}) => {
                       >
                         Dashboard
                       </Link>
-                    : ''}
+                      : ''}
                   </div>
-                  
+
                 </div>
               </div>
               <div className={classNames(isAuthenticated ? "absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0" : "hidden")}>
@@ -120,10 +144,10 @@ export const Navbar = ({isAuthenticated, username}) => {
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          
+
                           <Link
                             onClick={logout}
-                            href="/login"
+                            href="#"
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                           >
                             Sign out
@@ -135,20 +159,20 @@ export const Navbar = ({isAuthenticated, username}) => {
                 </Menu>
               </div>
               <div className={classNames(!isAuthenticated ? "hidden inset-y-0 right-0 flex items-center sm:ml-6 sm:block" : "hidden")}>
-                  <div className="flex space-x-4">
-                    <Link
-                      key="Login"
-                      href="/login"
-                      className={classNames(
-                        pathname === '/login' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                        'rounded-md px-3 py-2 text-sm font-medium'
-                      )}
-                      aria-current={pathname === '/login' ? 'page' : undefined}
-                    >
-                      Login
-                    </Link>
-                  </div>
+                <div className="flex space-x-4">
+                  <Link
+                    key="Login"
+                    href="/login"
+                    className={classNames(
+                      pathname === '/login' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                      'rounded-md px-3 py-2 text-sm font-medium'
+                    )}
+                    aria-current={pathname === '/login' ? 'page' : undefined}
+                  >
+                    Login
+                  </Link>
                 </div>
+              </div>
             </div>
           </div>
 
@@ -169,36 +193,36 @@ export const Navbar = ({isAuthenticated, username}) => {
                 </Disclosure.Button>
               ))}
               {
-                isAuthenticated && !pathname.includes(`${username}`) ? 
-                <Disclosure.Button
-                  key="Dashboard"
-                  as="a"
-                  href={`/${username}`}
-                  className={classNames(
-                    pathname === `/${username}` ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                    'block rounded-md px-3 py-2 text-base font-medium'
-                  )}
-                  aria-current={pathname === `/${username}` ? 'page' : undefined}
-                >
-                  Dashboard
-                </Disclosure.Button> : ""
+                isAuthenticated && !pathname.includes(`${username}`) ?
+                  <Disclosure.Button
+                    key="Dashboard"
+                    as="a"
+                    href={`/${username}`}
+                    className={classNames(
+                      pathname === `/${username}` ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                      'block rounded-md px-3 py-2 text-base font-medium'
+                    )}
+                    aria-current={pathname === `/${username}` ? 'page' : undefined}
+                  >
+                    Dashboard
+                  </Disclosure.Button> : ""
               }
               {
-                !isAuthenticated ? 
-                <Disclosure.Button
-                  key="Login"
-                  as="a"
-                  href="/login"
-                  className={classNames(
-                    pathname === '/login' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                    'block rounded-md px-3 py-2 text-base font-medium'
-                  )}
-                  aria-current={pathname === '/login' ? 'page' : undefined}
-                >
-                  Login
-                </Disclosure.Button> : ""
+                !isAuthenticated ?
+                  <Disclosure.Button
+                    key="Login"
+                    as="a"
+                    href="/login"
+                    className={classNames(
+                      pathname === '/login' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                      'block rounded-md px-3 py-2 text-base font-medium'
+                    )}
+                    aria-current={pathname === '/login' ? 'page' : undefined}
+                  >
+                    Login
+                  </Disclosure.Button> : ""
               }
-              
+
             </div>
           </Disclosure.Panel>
         </>

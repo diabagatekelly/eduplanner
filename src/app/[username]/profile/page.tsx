@@ -17,7 +17,6 @@ const ProfileContent = ({ user }) => {
   const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   
-
   const getStudentListOrTeacher = () => {
     let linkedAccounts = 'None'
     if (user.accountType?.includes('student') && user.teacherId) {
@@ -63,10 +62,10 @@ const ProfileContent = ({ user }) => {
           <p className="py-1"><span className="font-bold">Email:</span> {user.email}</p>
           <p className="py-1"><span className="font-bold">Account Type(s):</span> {user.accountType?.join(', ')}</p>
           <p className="py-1"><span className="font-bold">Linked Accounts:</span> {getStudentListOrTeacher()}</p>
+          <p className="py-1"><span className="font-bold">Last logged in:</span> {new Date(user.lastWorkedOn).toDateString()}</p>
         </div>
       </div>
       <div className="flex flex-row py-3">
-        <button className="flex w-auto justify-center rounded-md bg-green-600 px-3 mx-1 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Edit Account</button>
         <button onClick={() => setShowModal(true)} className="flex w-auto justify-center rounded-md bg-red-600 px-3 mx-1 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Delete Account</button>
       </div>
       <Popup {...{ showModal, account, messageHeader, errorMessage }} executeNext={() => modalNext()} onClose={() => setShowModal(false)} />

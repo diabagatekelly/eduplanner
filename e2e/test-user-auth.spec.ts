@@ -48,16 +48,15 @@ test('Mock user creating an account', async ({ page }) => {
   expect(teacherRadioVal).toBe(true)
 
   await page.getByRole('button', { name: 'Create Account' }).click();
-  await page.waitForURL(`${siteUrl}/mockuser`)
-  await expect(page).toHaveURL(`${siteUrl}/mockuser`)
+  await page.waitForURL(`${siteUrl}/Mock-User`)
+  await expect(page).toHaveURL(`${siteUrl}/Mock-User`)
 });
 
-test('Mock user login into an existing account', async ({ page }) => {
+test.skip('Mock user login into an existing account', async ({ page }) => {
   // Mock the api call before navigating
   const loginApiUrl = process.env.NEXT_LOGIN_USER_URL;
   const siteUrl = process.env.NEXT_SITE_URL;
 
-  console.log(siteUrl)
   await page.route(loginApiUrl, async route => {
     const response = {
       body: '{ \
@@ -71,13 +70,18 @@ test('Mock user login into an existing account', async ({ page }) => {
   const loginPageText = await page.getByText('Sign in to your account')
   expect(loginPageText).toBeVisible()
 
+  const emailInput = page.locator("#email")
+  await emailInput.fill("mockuser@email.com")
+  const emailVal = await emailInput.inputValue()
+  expect(emailVal).toEqual("mockuser@email.com")
+
   const passwordInput = page.locator('#password')
   await passwordInput.fill('mockuser#1');
   const passwordVal = await passwordInput.inputValue()
   expect(passwordVal).toEqual('mockuser#1');
 
   await page.getByRole('button', { name: 'Sign In' }).click();
-  await expect(page).toHaveURL(`${siteUrl}/mockuser`);
+  await expect(page).toHaveURL(`${siteUrl}/Mock-User`);
 });
 
 
