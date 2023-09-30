@@ -12,12 +12,13 @@ export function resetUser() {
 }
 
 export function addNewStudent(newStudent) {
-    const username = newStudent.username
+    newStudent.username = `${newStudent.firstName}-${newStudent.lastName}`
+    const studentName = `${newStudent.studentName}${newStudent.lastName}`
     const newStudentObj = {
-        [username]: newStudent
+        [studentName]: newStudent
     }
     const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
-    const updatedStudentIds = currentUserData.studentIds ? [...currentUserData.studentIds, newStudent.username] : [newStudent.username]
+    const updatedStudentIds = currentUserData.studentIds ? [...currentUserData.studentIds, newStudent.email] : [newStudent.email]
     const updatedStudents = currentUserData ? {...currentUserData.students, ...newStudentObj} : {...newStudentObj}
     currentUserData.studentIds = updatedStudentIds;
     currentUserData.students = updatedStudents;

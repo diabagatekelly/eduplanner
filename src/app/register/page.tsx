@@ -14,7 +14,6 @@ export default function Register() {
   const [formData, setFormData] = useState<IUserRegister>({
     firstName: "",
     lastName: "",
-    username: "",
     email: "",
     password: "",
     accountType: "",
@@ -59,14 +58,14 @@ export default function Register() {
             setFormData({
               firstName: "",
               lastName: "",
-              username: "",
               email: "",
               password: "",
               accountType: "",
             });
             setFormSuccess(true);
             setFormSuccessMessage('New user created.')
-            router.push('/' + response.data.username)
+            const url = `${response.data.firstName}-${response.data.lastName}`
+            router.push('/' + url )
             dispatch(setAuthToken(response.data));
           }
         })

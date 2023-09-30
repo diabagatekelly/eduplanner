@@ -10,7 +10,6 @@ test('Mock user creating an account', async ({ page }) => {
       body: '{ \
         "firstName": "Mock",\
         "lastName": "User",\
-        "username": "mockuser",\
         "email": "mockuser@email.com",\
         "password": "m/o/c/k/u/s/e/r#1",\
         "accountType": "teacher",\
@@ -32,11 +31,6 @@ test('Mock user creating an account', async ({ page }) => {
   await lastNameInput.fill('User');
   const lastNameVal = await lastNameInput.inputValue()
   expect(lastNameVal).toEqual('User');
-
-  const usernameInput = page.locator('#username')
-  await usernameInput.fill('mockuser');
-  const usernameVal = await usernameInput.inputValue()
-  expect(usernameVal).toEqual('mockuser');
 
   const passwordInput = page.locator('#password')
   await passwordInput.fill('mockuser#1');
@@ -67,7 +61,7 @@ test('Mock user login into an existing account', async ({ page }) => {
   await page.route(loginApiUrl, async route => {
     const response = {
       body: '{ \
-        "username": "mockuser",\
+        "email": "mockuser@email.com",\
         "password": "m/o/c/k/u/s/e/r#1"}'
     };
     await route.fulfill(response);
@@ -76,11 +70,6 @@ test('Mock user login into an existing account', async ({ page }) => {
   await page.goto(`${siteUrl}/login`);
   const loginPageText = await page.getByText('Sign in to your account')
   expect(loginPageText).toBeVisible()
-
-  const userId = await page.getByLabel('Username:')
-  await userId.fill('mockuser');
-  const userIdVal = await userId.inputValue()
-  expect(userIdVal).toEqual('mockuser');
 
   const passwordInput = page.locator('#password')
   await passwordInput.fill('mockuser#1');

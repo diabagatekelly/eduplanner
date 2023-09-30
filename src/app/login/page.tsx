@@ -14,7 +14,7 @@ export default function Login() {
   const dispatch = useDispatch()
 
   const [formData, setFormData] = useState<IUserLogin>({
-    username: "",
+    email: "",
     password: "",
   });
 
@@ -56,12 +56,13 @@ export default function Login() {
             setFormSuccessMessage(response.data.message)
           } else {
             setFormData({
-              username: "",
+              email: "",
               password: "",
             });
             setFormSuccess(true);
             setFormSuccessMessage('Logging in...')
-            router.push('/' + response.data.username)
+            const url = `${response.data.firstName}-${response.data.lastName}`
+            router.push('/' + url)
             dispatch(setAuthToken(response.data));
             dispatch(populateUser());
           }

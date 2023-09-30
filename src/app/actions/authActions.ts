@@ -1,5 +1,6 @@
 export function setAuthToken(user) {
   sessionStorage.setItem("user_token", user.token)
+  user.username = `${user.firstName}-${user.lastName}`
   sessionStorage.setItem("user_data", JSON.stringify(user))
   return {
     type: 'AUTH'

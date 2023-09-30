@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 
-const Popup = ({ onClose, showModal, newStudent, messageHeader, executeNext }) => {
+const Popup = ({ onClose, showModal, account, messageHeader, executeNext }) => {
   const [modalMessage, getModalMessage] = useState(<span></span>);
 
   useEffect(() => {
     const message = `
-      ${newStudent?.firstName} ${newStudent?.lastName} - ${newStudent?.username} - ${newStudent?.email}`;
+      ${account?.firstName} ${account?.lastName} - ${account?.email}`;
 
     const messageWrapper = <span>{`${message}`} </span>
 
     getModalMessage(messageWrapper)
-  }, [newStudent])
+  }, [account])
 
 
   return (

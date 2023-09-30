@@ -18,6 +18,15 @@ export const editUser = async (rawData) => {
     })
 }
 
+export const deleteUser = async (rawData) => {
+  const url = process.env.NEXT_DELETE_USER_URL
+
+  return await postApi(url, rawData)
+    .then(async (response) => {
+      return response;
+    })
+}
+
 export const loginUser = async (rawData) => {
   const url = process.env.NEXT_LOGIN_USER_URL
 

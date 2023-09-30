@@ -7,7 +7,6 @@ function classNames(...classes) {
 export default function NestedLayout({ children, username, student, isTeacher }) {
   const pathname = usePathname()
 
-
   return (
     <>
 
