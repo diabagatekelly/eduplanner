@@ -44,3 +44,21 @@ export const registerUser = async (rawData) => {
       return response;
     })
 }
+
+export const linkAccount = async (rawData) => {
+  const url = process.env.NEXT_ADD_LINKED_ACCOUNT_URL
+
+  return await postApi(url, rawData)
+    .then(async (response) => {
+      return response;
+    })
+}
+
+export const unlinkAccount = async (rawData) => {
+  const url = process.env.NEXT_DELETE_LINKED_ACCOUNT_URL
+
+  return await postApi(url, rawData)
+    .then(async (response) => {
+      return response;
+    })
+}

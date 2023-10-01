@@ -21,7 +21,7 @@ const ProfileContent = ({ user }) => {
     let linkedAccounts = 'None'
     if (user.accountType?.includes('student') && user.teacherId) {
       linkedAccounts = `${user.teacherId} (teacher)`
-    } else if (user.accountType?.includes('teacher') && user.studentIds) {
+    } else if (user.accountType?.includes('teacher') && user.studentIds?.length) {
       linkedAccounts = `${user.studentIds?.join(', ')} (students)`
     }
     return linkedAccounts
