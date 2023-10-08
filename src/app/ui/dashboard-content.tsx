@@ -18,7 +18,7 @@ export const DashboardContent = ({ params, userDetails }: { params: { username: 
         <div>
           <div className="pb-5">
             {userDetails?.teacherId ?
-              <h5>Your teacher's email is {userDetails?.teacherId}</h5> :
+              <h5>Your teacher&#39;s email is {userDetails?.teacherId}</h5> :
               <h5>Ask your teacher or parent to add you and create some activities for you!</h5>
             }
           </div>

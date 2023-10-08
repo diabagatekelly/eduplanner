@@ -26,7 +26,7 @@ const Popup = ({ onClose, showModal, modalType, newStudent={...args}, isMain }) 
     getUserData(userReducer);
 
     isMain ? getUserInfo(user) : getUserInfo(newStudent)
-  }, [isMain, newStudent, showModal])
+  }, [isMain, newStudent, showModal, user])
 
   const onError = (message) => {
     setErrorMessage(message)

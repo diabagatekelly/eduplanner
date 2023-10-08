@@ -27,7 +27,7 @@ const ListsUi = ({ listType }) => {
       const studentIds = user.studentIds || []
       setListData([...studentIds])
     }
-  }, [user])
+  }, [user, listType])
 
   const onError = (message) => {
     setErrorMessage(message)
