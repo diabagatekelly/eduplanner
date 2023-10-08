@@ -1,14 +1,14 @@
 import { FormEvent } from "react";
-import { IUserLogin } from "../interfaces/IUser";
+import { IFindUser } from "../interfaces/IUser";
 
-const LoginForm = ({ 
+const LoginForm = ({
   handleInput,
   formData,
   isLoading,
-  submitForm }: 
+  submitForm }:
   {
     handleInput: (e: any) => void,
-    formData: IUserLogin,
+    formData: IFindUser,
     isLoading: boolean,
     submitForm: (e: FormEvent<HTMLFormElement>) => void
   }) => {

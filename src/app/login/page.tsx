@@ -3,7 +3,7 @@
 import LoginForm from "../ui/login-form";
 import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
-import { IUserLogin } from "../interfaces/IUser";
+import { IFindUser } from "../interfaces/IUser";
 import Link from "next/link";
 import { setAuthToken } from "../actions/authActions";
 import { useDispatch } from "react-redux";
@@ -12,15 +12,14 @@ import { loginUser } from "../api/controller";
 
 export default function Login() {
   const dispatch = useDispatch()
+  const router = useRouter()
 
-  const [formData, setFormData] = useState<IUserLogin>({
+  const [formData, setFormData] = useState<IFindUser>({
     email: "",
     password: "",
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const router = useRouter()
-
   const [formSuccess, setFormSuccess] = useState(false)
   const [formSuccessMessage, setFormSuccessMessage] = useState("")
 

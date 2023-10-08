@@ -1,6 +1,6 @@
-export interface IUserLogin {
+export interface IFindUser {
   email: string,
-  password: string
+  password?: string
 }
 
 export interface IUserRegister {
