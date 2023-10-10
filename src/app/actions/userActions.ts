@@ -71,3 +71,19 @@ export function removeStudent(studentEmail) {
   }
 
 }
+
+export function createUserActivity(activityData) {
+  const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
+  const currentActivities = currentUserData.activities || []
+  currentActivities.push(activityData)
+  currentUserData.activities = currentActivities
+  sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
+  return {
+    type: 'EDIT',
+    editProps: [
+      {
+        activities: currentUserData.activities
+      }
+    ]
+  }
+}

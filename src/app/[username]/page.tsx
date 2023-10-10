@@ -57,12 +57,10 @@ export default function Dashboard({ params }: { params: { username: string } }) 
   }, [])
 
   const isTeacher = user.accountType?.includes('teacher')
-  const username = user.username
-  const student = null
   const userDetails = user;
 
   return (
-    <NestedLayout {...{ username, student, isTeacher }}>
+    <NestedLayout {...{ isTeacher }}>
       <DashboardContent {...{ params, userDetails }} />
     </NestedLayout>
   )

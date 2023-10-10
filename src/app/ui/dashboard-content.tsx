@@ -1,4 +1,7 @@
-import Link from "next/link"
+"use client"
+
+import ListUi from "@/app/ui/lists-ui";
+import AddActivity from "./add-activity";
 
 export const DashboardContent = ({ params, userDetails }: { params: { username: string }, userDetails }) => {
   const fullName = `${userDetails?.username?.split("-")[0]} ${userDetails?.username?.split("-")[1]}`
@@ -7,11 +10,8 @@ export const DashboardContent = ({ params, userDetails }: { params: { username: 
       <h3 className="py-2.5">Welcome to your dashboard {fullName}.</h3>
       {userDetails?.accountType?.includes('teacher') ?
         <div className="pt-5">
-          {!userDetails?.cards ? <h5>You have no activity cards yet.</h5> :
-            userDetails?.cards.foreach((card) => {
-              <Link href="#" key="card">card.name</Link>
-            })
-          }
+          <AddActivity />
+          <ListUi {...{listType:'activities'}} />
         </div>
         :
 
@@ -24,11 +24,7 @@ export const DashboardContent = ({ params, userDetails }: { params: { username: 
           </div>
           <hr />
           <div className="pt-5">
-            {!userDetails?.cards ? <h5>You have no activity cards yet. Ask your parent or teacher to create some for you.</h5> :
-              userDetails?.cards.foreach((card) => {
-                <Link href="#" key="card">card.name</Link>
-              })
-            }
+            <ListUi {...{listType:'activities'}} />
           </div>
         </div>
       }

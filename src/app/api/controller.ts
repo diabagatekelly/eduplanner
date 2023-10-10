@@ -62,3 +62,12 @@ export const unlinkAccount = async (rawData) => {
       return response;
     })
 }
+
+export const createActivity = async (rawData) => {
+  const url = process.env.NEXT_CREATE_ACTIVITY_URL
+
+  return await postApi(url, rawData)
+    .then(async (response) => {
+      return response;
+    })
+}
