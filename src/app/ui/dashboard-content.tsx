@@ -3,7 +3,7 @@
 import ListUi from "@/app/ui/lists-ui";
 import AddActivity from "./add-activity";
 
-export const DashboardContent = ({ params, userDetails }: { params: { username: string }, userDetails }) => {
+export const DashboardContent = ({ params, userDetails, isMain }: { params: { username: string }, userDetails, isMain }) => {
   const fullName = `${userDetails?.username?.split("-")[0]} ${userDetails?.username?.split("-")[1]}`
   return (
     <>
@@ -11,7 +11,7 @@ export const DashboardContent = ({ params, userDetails }: { params: { username: 
       {userDetails?.accountType?.includes('teacher') ?
         <div className="pt-5">
           <AddActivity />
-          <ListUi {...{listType:'activities'}} />
+          <ListUi {...{listType:'activities', isMain}} />
         </div>
         :
 
@@ -24,7 +24,7 @@ export const DashboardContent = ({ params, userDetails }: { params: { username: 
           </div>
           <hr />
           <div className="pt-5">
-            <ListUi {...{listType:'activities'}} />
+            <ListUi {...{listType:'activities', isMain}} />
           </div>
         </div>
       }

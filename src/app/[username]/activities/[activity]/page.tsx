@@ -3,9 +3,12 @@
 import NestedLayout from "@/app/nested-layout";
 import store from "@/app/store";
 import { useEffect, useState } from "react"
-import { DashboardContent } from "@/app/ui/dashboard-content";
+import { ActivityContent } from "@/app/ui/activity-content";
+import { usePathname, useSearchParams } from 'next/navigation'
 
 export default function Dashboard({ params }: { params: { username: string, student: string } }) {
+  const pathname = usePathname();
+  const activityName = pathname.split('/')[3]
 
   let args;
   const [user, getUserData] = useState({ ...args })
@@ -16,15 +19,12 @@ export default function Dashboard({ params }: { params: { username: string, stud
   }, [])
 
   const isTeacher = user.accountType?.includes('teacher')
-  const student = params.student
 
-  const allStudents = user.students
-  const userDetails = allStudents?.[student]
-  const isMain = false
+  const activityDetails = user.activities?.find((activity) => activity?.name === activityName)
 
   return (
     <NestedLayout {...{ isTeacher }}>
-      <DashboardContent {...{ params, userDetails, isMain }} />
+      <ActivityContent {...{ activityDetails }} />
     </NestedLayout>
   )
 }

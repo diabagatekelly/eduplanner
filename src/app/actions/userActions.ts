@@ -87,3 +87,24 @@ export function createUserActivity(activityData) {
     ]
   }
 }
+
+export function removeUserActivity(userInfo, activityName) {
+  const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
+  let activitiesToKeep;
+  const isMain = userInfo.username === currentUserData.username
+
+  if (isMain) {
+    activitiesToKeep = currentUserData.activities.filter(activity => activity.name !== activityName)
+  }
+
+  currentUserData.activities = activitiesToKeep;
+  sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
+  return {
+    type: 'EDIT',
+    editProps: [
+      {
+        activities: currentUserData.activities
+      }
+    ]
+  }
+}

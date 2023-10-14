@@ -3,14 +3,15 @@ import store from "../store";
 import PopupDeleteAccount from "../popupActions/deleteAccout";
 import { useRouter } from "next/navigation";
 import { removeAuthToken } from "../actions/authActions";
-import { addNewStudent, removeStudent, resetUser, updateStudentData } from "../actions/userActions";
+import { addNewStudent, removeStudent, removeUserActivity, resetUser, updateStudentData } from "../actions/userActions";
 import { useDispatch } from "react-redux";
 import PopupLinkAccount from "../popupActions/linkAccount";
 import PopupUnlinkAccount from "../popupActions/unlinkAccount";
+import PopupDeleteActivity from "../popupActions/deleteActivity";
 
 let args;
 
-const Popup = ({ onClose, showModal, modalType, newStudent={...args}, isMain }) => {
+const Popup = ({ onClose, showModal, modalType, newStudent = { ...args }, isMain, activityName = '' }) => {
   let args;
   let modalActionClass;
   let messageHeader;
@@ -19,14 +20,16 @@ const Popup = ({ onClose, showModal, modalType, newStudent={...args}, isMain }) 
 
   const [user, getUserData] = useState({ ...args });
   const [errorMessage, setErrorMessage] = useState('');
-  const [userInfo, getUserInfo] = useState({...args})
+  const [userInfo, getUserInfo] = useState({ ...args });
 
   useEffect(() => {
     const { userReducer } = store.getState()
     getUserData(userReducer);
 
     isMain ? getUserInfo(user) : getUserInfo(newStudent)
-  }, [isMain, newStudent, showModal, user])
+
+  }, [isMain, newStudent, showModal, user, activityName])
+
 
   const onError = (message) => {
     setErrorMessage(message)
@@ -56,6 +59,14 @@ const Popup = ({ onClose, showModal, modalType, newStudent={...args}, isMain }) 
     getUserData(userReducer);
   }
 
+  const onDeleteActivitySuccess = () => {
+    dispatch(removeUserActivity(userInfo, activityName))
+    setErrorMessage('Successfully removed student')
+    onClose();
+    const { userReducer } = store.getState()
+    getUserData(userReducer);
+  }
+
   if (modalType === 'deleteAccount') {
     modalActionClass = new PopupDeleteAccount(onError, onDelteAccountSuccess, user)
     messageHeader = modalActionClass.messageHeader
@@ -64,6 +75,9 @@ const Popup = ({ onClose, showModal, modalType, newStudent={...args}, isMain }) 
     messageHeader = modalActionClass.messageHeader
   } else if (modalType === 'removeStudent') {
     modalActionClass = new PopupUnlinkAccount(onError, onUnlinkAccountSuccess, user, newStudent)
+    messageHeader = modalActionClass.messageHeader
+  } else if (modalType === 'removeActivity') {
+    modalActionClass = new PopupDeleteActivity(onError, onDeleteActivitySuccess, userInfo, activityName)
     messageHeader = modalActionClass.messageHeader
   }
 
@@ -86,7 +100,7 @@ const Popup = ({ onClose, showModal, modalType, newStudent={...args}, isMain }) 
               </svg>
               <div className="modal-message">
                 <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">{messageHeader}</h3>
-                <h5 className="mb-5">{userInfo.firstName} {userInfo.lastName} - {userInfo.email}</h5>
+                <h5 className="mb-5">{activityName !== '' ? activityName : <span>{userInfo.firstName} {userInfo.lastName} - {userInfo.email}</span>}</h5>
               </div>
 
               <button onClick={modalAction} data-modal-hide="popup-modal" type="button" className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">

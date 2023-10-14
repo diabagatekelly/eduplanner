@@ -77,7 +77,7 @@ const AddActivity = () => {
         jsonData[pair[0]] = `${pair[1]}`;
       }
 
-      if (user.activities?.find(activity => activity.name === jsonData.name).length) {
+      if (user.activities?.find(activity => activity.name === jsonData.name)) {
         setFormSuccess(false)
         setFormSuccessMessage("This is already one of your activities.");
         reset()

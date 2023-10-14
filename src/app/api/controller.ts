@@ -71,3 +71,12 @@ export const createActivity = async (rawData) => {
       return response;
     })
 }
+
+export const deleteActivity = async (rawData) => {
+  const url = process.env.NEXT_DELETE_ACTIVITY_URL
+
+  return await postApi(url, rawData)
+    .then(async (response) => {
+      return response;
+    })
+}
