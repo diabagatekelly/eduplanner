@@ -79,12 +79,26 @@ const ListsUi = ({ listType, isMain }) => {
     return typeof dataPt === 'string' ? dataPt : dataPt.name
   }
 
+  const getBorderColor = (dataPt) => {
+    let borderColor = 'orange'
+    if (listType === 'activities') {
+      if (dataPt.completionStatus === 'pending') {
+        borderColor = 'orange'
+      } else if (dataPt.completionStatus === 'completed') {
+        borderColor = 'green'
+      } else {
+        borderColor = 'red'
+      }
+    }
+    return borderColor;
+  }
+
   return (
     <>
       {listData?.length ?
         <ul>
           {listData?.map((dataPt) => (
-            <li className="flex justify-between" key={setDataPt(dataPt)}>
+            <li style={{borderColor: getBorderColor(dataPt)}} className="flex justify-between border-4" key={setDataPt(dataPt)}>
               <p className="hover:cursor-pointer" onClick={() => fetchListItem(setDataPt(dataPt))}>{setDataPt(dataPt).split('-').join(' ')}</p>
               <span onClick={() => deleteItem(setDataPt(dataPt))}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">

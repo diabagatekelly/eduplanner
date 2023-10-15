@@ -93,7 +93,8 @@ const AddActivity = () => {
           description: jsonData.description,
           points: jsonData.points,
           hasDecks: jsonData.hasDecks,
-          userEmail: userEmail
+          userEmail: userEmail,
+          completionStatus: 'pending'
         }
       }
 

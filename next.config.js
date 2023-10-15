@@ -11,6 +11,7 @@ const nextConfig = {
         NEXT_DELETE_LINKED_ACCOUNT_URL: process.env.NEXT_DELETE_LINKED_ACCOUNT_URL,
         NEXT_CREATE_ACTIVITY_URL: process.env.NEXT_CREATE_ACTIVITY_URL,
         NEXT_DELETE_ACTIVITY_URL: process.env.NEXT_DELETE_ACTIVITY_URL,
+        NEXT_EDIT_ACTIVITY_URL: process.env.NEXT_EDIT_ACTIVITY_URL,
         CI: false
     },
 }
