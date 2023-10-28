@@ -5,13 +5,16 @@ import AddActivity from "./add-activity";
 
 export const DashboardContent = ({ params, userDetails, isMain }: { params: { username: string }, userDetails, isMain }) => {
   const fullName = `${userDetails?.username?.split("-")[0]} ${userDetails?.username?.split("-")[1]}`
+  // const user = userDetails
   return (
     <>
-      <h3 className="py-2.5">Welcome to your dashboard {fullName}.</h3>
-      {userDetails?.accountType?.includes('teacher') ?
+      {isMain ? 
+      <div>
+        <h3 className="py-2.5">Welcome to your dashboard {fullName}.</h3> 
+        {userDetails?.accountType?.includes('teacher') ?
         <div className="pt-5">
-          <AddActivity />
-          <ListUi {...{listType:'activities', isMain}} />
+          <AddActivity {...{userDetails}} />
+          <ListUi {...{listType:'activities', isMain, userDetails}} />
         </div>
         :
 
@@ -24,10 +27,24 @@ export const DashboardContent = ({ params, userDetails, isMain }: { params: { us
           </div>
           <hr />
           <div className="pt-5">
-            <ListUi {...{listType:'activities', isMain}} />
+            <ListUi {...{listType:'activities', isMain, userDetails}} />
           </div>
         </div>
       }
+      </div>
+        
+        : 
+        
+        <div>
+          <h3 className="py-2.5">Manage student {fullName}.</h3>
+          <div className="pt-5">
+            <AddActivity {...{userDetails}} />
+            <ListUi {...{listType:'activities', isMain, userDetails}} />
+          </div>
+        </div>
+        
+      }
+      
 
     </>
 

@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import PopupLinkAccount from "../popupActions/linkAccount";
 import PopupUnlinkAccount from "../popupActions/unlinkAccount";
 import PopupDeleteActivity from "../popupActions/deleteActivity";
+import { usePathname } from 'next/navigation'
 
 let args;
 
@@ -17,6 +18,7 @@ const Popup = ({ onClose, showModal, modalType, newStudent = { ...args }, isMain
   let messageHeader;
   const router = useRouter()
   const dispatch = useDispatch()
+  const pathName = usePathname()
 
   const [user, getUserData] = useState({ ...args });
   const [errorMessage, setErrorMessage] = useState('');
@@ -26,7 +28,15 @@ const Popup = ({ onClose, showModal, modalType, newStudent = { ...args }, isMain
     const { userReducer } = store.getState()
     getUserData(userReducer);
 
-    isMain ? getUserInfo(user) : getUserInfo(newStudent)
+    if (isMain && !user?.teacherId) {
+      getUserInfo(user)
+    } else if (!isMain && user?.teacherId) {
+      getUserInfo(newStudent)
+    } else {
+      let nonMainUser = pathName.split('/')[3]
+      const student = user?.students?.[nonMainUser]
+      getUserInfo(student)
+    }
 
   }, [isMain, newStudent, showModal, user, activityName])
 
@@ -100,7 +110,7 @@ const Popup = ({ onClose, showModal, modalType, newStudent = { ...args }, isMain
               </svg>
               <div className="modal-message">
                 <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">{messageHeader}</h3>
-                <h5 className="mb-5">{activityName !== '' ? activityName : <span>{userInfo.firstName} {userInfo.lastName} - {userInfo.email}</span>}</h5>
+                <h5 className="mb-5">{activityName !== '' ? activityName : <span>{userInfo?.firstName} {userInfo?.lastName} - {userInfo?.email}</span>}</h5>
               </div>
 
               <button onClick={modalAction} data-modal-hide="popup-modal" type="button" className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">

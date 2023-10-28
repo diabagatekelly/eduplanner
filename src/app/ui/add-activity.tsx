@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import { createUserActivity } from "../actions/userActions";
 import { IActivity } from "../interfaces/IActivity";
 
-const AddActivity = () => {
+const AddActivity = ({ userDetails }) => {
   const dispatch = useDispatch()
   const pathName = usePathname()
   
@@ -22,15 +22,8 @@ const AddActivity = () => {
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [user, getUserData] = useState({ ...args });
   const [formSuccess, setFormSuccess] = useState(false)
   const [formSuccessMessage, setFormSuccessMessage] = useState("")
-
-
-  useEffect(() => {
-    const { userReducer } = store.getState()
-    getUserData(userReducer);
-  }, [])
 
   const handleInput = (e: any) => {
     const fieldName: string = e.target.name;
@@ -55,14 +48,6 @@ const AddActivity = () => {
     }, 3000)
   }
 
-  const getUserEmail = () => {
-    const isMain = pathName.includes(user.username)
-    if (isMain) {
-      return user.email
-    } else {
-      ''
-    }
-  }
 
   async function submitForm(e: FormEvent<HTMLFormElement>): Promise<any> {
     // We don't want the page to refresh
@@ -77,14 +62,13 @@ const AddActivity = () => {
         jsonData[pair[0]] = `${pair[1]}`;
       }
 
-      if (user.activities?.find(activity => activity.name === jsonData.name)) {
+      if (userDetails.activities?.find(activity => activity.name === jsonData.name)) {
         setFormSuccess(false)
         setFormSuccessMessage("This is already one of your activities.");
         reset()
         return;
       }
 
-      const userEmail = getUserEmail()
       const activityName = jsonData.name.trim().split(' ').join('-')
 
       const options = {
@@ -93,7 +77,8 @@ const AddActivity = () => {
           description: jsonData.description,
           points: jsonData.points,
           hasDecks: jsonData.hasDecks,
-          userEmail: userEmail,
+          userEmail: userDetails.email,
+          username: userDetails.username,
           completionStatus: 'pending'
         }
       }

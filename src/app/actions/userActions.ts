@@ -74,9 +74,18 @@ export function removeStudent(studentEmail) {
 
 export function createUserActivity(activityData) {
   const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
-  const currentActivities = currentUserData.activities || []
-  currentActivities.push(activityData)
-  currentUserData.activities = currentActivities
+  const isMain = activityData.userEmail === currentUserData.email
+  if (isMain) {
+    const currentActivities = currentUserData.activities || []
+    currentActivities.push(activityData)
+    currentUserData.activities = currentActivities
+  } else {
+    const student = currentUserData.students[activityData.username]
+    const studentActivities = student.activities || []
+    studentActivities.push(activityData)
+    currentUserData.students[activityData.username].activities = studentActivities
+  }
+  
   sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
   return {
     type: 'EDIT',
@@ -95,14 +104,19 @@ export function editUserActivity(updateData) {
 
   if (isMain) {
     activityToUpdate = currentUserData.activities.find(activity => activity.name === updateData.name)
+    let activityIndex = currentUserData.activities.indexOf(activityToUpdate)
+    activityToUpdate.completionStatus = updateData.completionStatus
+    activityToUpdate.dateLastCompleted
+
+    currentUserData.activities[activityIndex] = activityToUpdate;
+  } else {
+    const student = currentUserData.students[updateData.username]
+    activityToUpdate = student.activities.find(activity => activity.name === updateData.name)
+    let activityIndex = student.activities.indexOf(activityToUpdate)
+    activityToUpdate.completionStatus = updateData.completionStatus
+    activityToUpdate.dateLastCompleted
+    currentUserData.students[updateData.username].activities = activityToUpdate
   }
-
-  let activityIndex = currentUserData.activities.indexOf(activityToUpdate)
-
-  activityToUpdate.completionStatus = updateData.completionStatus
-  activityToUpdate.dateLastCompleted
-
-  currentUserData.activities[activityIndex] = activityToUpdate;
 
   sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
   return {
@@ -122,9 +136,13 @@ export function removeUserActivity(userInfo, activityName) {
 
   if (isMain) {
     activitiesToKeep = currentUserData.activities.filter(activity => activity.name !== activityName)
+    currentUserData.activities = activitiesToKeep;
+  } else {
+    const student = currentUserData.students[userInfo.username]
+    activitiesToKeep = student.activities.filter(activity => activity.name !== activityName)
+    currentUserData.students[userInfo.username].activities = activitiesToKeep
   }
-
-  currentUserData.activities = activitiesToKeep;
+  
   sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
   return {
     type: 'EDIT',

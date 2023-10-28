@@ -16,6 +16,7 @@ export default function Students() {
 
   const isTeacher = user.accountType?.includes('teacher')
   const isMain = true;
+  const userDetails = user;
 
   return (
     <NestedLayout {...{ isTeacher }}>
@@ -24,7 +25,7 @@ export default function Students() {
         <hr className="mt-4"></hr>
         <div className="justify-items-start">
           <h3 className="text-3xl py-3 font-bold">Current Students</h3>
-          <ListUi {...{ listType: 'students', isMain }} />
+          <ListUi {...{ listType: 'students', isMain, userDetails }} />
         </div>
       </div>
     </NestedLayout>

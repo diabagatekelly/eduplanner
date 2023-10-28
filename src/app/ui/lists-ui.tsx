@@ -5,12 +5,14 @@ import ListFetchStudent from "../listItemActions/fetchStudent";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { updateStudentData } from "../actions/userActions";
+import { usePathname } from 'next/navigation'
 
-const ListsUi = ({ listType, isMain }) => {
+const ListsUi = ({ listType, isMain, userDetails }) => {
   let args;
   let listActionClass;
   const dispatch = useDispatch()
   const router = useRouter()
+  const pathName = usePathname()
 
   const [listData, setListData] = useState([])
   const [user, getUserData] = useState({ ...args });
@@ -21,17 +23,16 @@ const ListsUi = ({ listType, isMain }) => {
   const [activityName, setActivity] = useState('')
 
   useEffect(() => {
-    const { userReducer } = store.getState()
-    getUserData(userReducer);
+    getUserData(userDetails);
 
     if (listType === 'students') {
-      const studentIds = user.studentIds || []
+      const studentIds = userDetails?.studentIds || []
       setListData([...studentIds])
     } else if (listType === 'activities') {
-      const activities = user.activities || []
+      const activities = userDetails?.activities || []
       setListData([...activities])
     }
-  }, [user, listType])
+  }, [userDetails, listType])
 
   const onError = (message) => {
     setErrorMessage(message)
@@ -50,8 +51,16 @@ const ListsUi = ({ listType, isMain }) => {
       listActionClass.listAction(dataPt)
     } else if (listType === 'activities') {
       setShowModal(false)
-      const url = isMain ? `/activities/${dataPt}` : `/students/${newStudent.username}/activities/${dataPt}`
-      router.push(`/${user.username}/${url}`);
+      let url;
+      if (isMain) {
+        url = `/activities/${dataPt}`
+        router.push(`/${user.username}/${url}`);
+      } else {
+        let mainUser = pathName.split('/')[1]
+        url = `/students/${user.username}/activities/${dataPt}`
+        router.push(`/${mainUser}/${url}`);
+      } 
+      
     }
   }
 
