@@ -93,7 +93,7 @@ export default function NestedLayout({ children, isTeacher }) {
         </div>
       </aside>
 
-      <div className="sm:ml-64">
+      <div className="sm:ml-64 mb-10">
         {children}
       </div>
     </>

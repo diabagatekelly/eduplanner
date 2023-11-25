@@ -2,7 +2,7 @@ import { useState, FormEvent, useEffect } from "react";
 import { findUser } from "../api/controller";
 import SearchUserForm from "./search-user-form";
 import store from "../store";
-import Popup from "./popup";
+import Popup from "./popups/popup";
 
 const AddStudent = () => {
   let args;
@@ -12,7 +12,7 @@ const AddStudent = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [user, getUserData] = useState({ ...args });
-  const [newStudent, getData] = useState({...args});
+  const [newStudent, getData] = useState({ ...args });
   const [showModal, setShowModal] = useState(false);
   const [formSuccess, setFormSuccess] = useState(false)
   const [formSuccessMessage, setFormSuccessMessage] = useState("")
@@ -84,8 +84,8 @@ const AddStudent = () => {
               setFormSuccessMessage('This is already one of your students.')
               reset()
             } else {
-              setShowModal(true)
               getData(response.data)
+              setShowModal(true)
               reset()
             }
           }
@@ -107,7 +107,7 @@ const AddStudent = () => {
       <h3 className="text-3xl py-3 font-bold">Add a new student:</h3>
       <p>Enter your student&#39;s email:</p>
       <SearchUserForm {...{ handleInput, formData, isLoading, submitForm }} />
-      <Popup {...{ showModal, modalType, newStudent, isMain }} onClose={() => setShowModal(false)} />
+      <Popup {...{ showModal, modalType, isMain, newStudent}} onClose={() => setShowModal(false)} />
       <div>{formSuccessMessage}</div>
     </div>
   )

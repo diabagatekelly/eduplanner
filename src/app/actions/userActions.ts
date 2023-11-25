@@ -153,3 +153,34 @@ export function removeUserActivity(userInfo, activityName) {
     ]
   }
 }
+
+export function createUserCard(cardData) {
+  const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
+  const isMain = cardData[0].email === currentUserData.email
+  if (isMain) {
+    const currentActivities = currentUserData.activities
+    let currentActivity = currentActivities.find(activity => activity.name === cardData[0].activityName)
+    const currentActivityCards = currentActivity.cards || []
+    const updatedActivityCards = [...currentActivityCards, ...cardData]
+    currentActivity.cards = updatedActivityCards
+    currentUserData.activities = currentActivities
+  } else {
+    const student = currentUserData.students[cardData[0].username]
+    const studentActivities = student.activities || []
+    let studentCurrentActivity = studentActivities.find(activity => activity.name === cardData[0].activityName)
+    const studentActivityCards = studentCurrentActivity.cards || []
+    const updatedStudentActivityCards = [...studentActivityCards, ...cardData]
+    studentCurrentActivity.cards = updatedStudentActivityCards
+    currentUserData.students[cardData[0].username].activities = studentActivities
+  }
+  
+  sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
+  return {
+    type: 'EDIT',
+    editProps: [
+      {
+        activities: currentUserData.activities
+      }
+    ]
+  }
+}

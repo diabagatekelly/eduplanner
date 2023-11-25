@@ -1,9 +1,5 @@
 import { useState, FormEvent, useEffect } from "react";
 import { createActivity } from "../api/controller";
-import SearchUserForm from "./search-user-form";
-import store from "../store";
-import Popup from "./popup";
-import { usePathname, useSearchParams } from 'next/navigation'
 import AddActivityForm from "./add-activity-form";
 import { useDispatch } from "react-redux";
 import { createUserActivity } from "../actions/userActions";
@@ -11,14 +7,12 @@ import { IActivity } from "../interfaces/IActivity";
 
 const AddActivity = ({ userDetails }) => {
   const dispatch = useDispatch()
-  const pathName = usePathname()
-  
-  let args;
+
   const [formData, setFormData] = useState<IActivity>({
     name: "",
     description: "",
     points: 0,
-    hasDecks: ""
+    hasCards: ""
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -42,7 +36,7 @@ const AddActivity = ({ userDetails }) => {
         name: "",
         description: "",
         points: 0,
-        hasDecks: ""
+        hasCards: ""
       });
       setFormSuccessMessage("")
     }, 3000)
@@ -56,7 +50,7 @@ const AddActivity = ({ userDetails }) => {
 
     try {
       const rawFormData = new FormData(e.currentTarget)
-      const jsonData = { name: '', description: '', points: 0, hasDecks: '' }
+      const jsonData = { name: '', description: '', points: 0, hasCards: '' }
 
       for (const pair of rawFormData.entries()) {
         jsonData[pair[0]] = `${pair[1]}`;
@@ -76,7 +70,7 @@ const AddActivity = ({ userDetails }) => {
           name: activityName,
           description: jsonData.description,
           points: jsonData.points,
-          hasDecks: jsonData.hasDecks,
+          hasCards: jsonData.hasCards,
           userEmail: userDetails.email,
           username: userDetails.username,
           completionStatus: 'pending'

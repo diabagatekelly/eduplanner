@@ -2,7 +2,7 @@
 
 import NestedLayout from "@/app/nested-layout";
 import store from "@/app/store";
-import Popup from "@/app/ui/popup";
+import Popup from "@/app/ui/popups/popup";
 import { useEffect, useState } from "react"
 import { UserProfile } from "@/app/ui/user-profile";
 import { OpenModalButton } from "@/app/ui/open-modal-button";
@@ -27,7 +27,7 @@ export default function Profile() {
     <NestedLayout {...{ isTeacher }}>
       <UserProfile />
       <OpenModalButton {...{ buttonTxt, setShowModal }} />
-      <Popup {...{ showModal, modalType, isMain }} onClose={() => setShowModal(false)} />
+      <Popup {...{ showModal, modalType, isMain, user }} onClose={() => setShowModal(false)} />
     </NestedLayout>
   )
 }

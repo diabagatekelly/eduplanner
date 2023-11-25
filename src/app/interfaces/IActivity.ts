@@ -1,6 +1,6 @@
 export interface IActivity {
   name: string,
   description: string,
-  hasDecks: string,
+  hasCards: string,
   points?: number,
 }

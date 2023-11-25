@@ -89,3 +89,30 @@ export const deleteActivity = async (rawData) => {
       return response;
     })
 }
+
+export const createCard = async (rawData) => {
+  const url = process.env.NEXT_CREATE_CARD_URL
+
+  return await postApi(url, rawData)
+    .then(async (response) => {
+      return response;
+    })
+}
+
+export const editCard = async (rawData) => {
+  const url = process.env.NEXT_EDIT_CARD_URL
+
+  return await postApi(url, rawData)
+    .then(async (response) => {
+      return response;
+    })
+}
+
+export const deleteCard = async (rawData) => {
+  const url = process.env.NEXT_DELETE_CARD_URL
+
+  return await postApi(url, rawData)
+    .then(async (response) => {
+      return response;
+    })
+}
