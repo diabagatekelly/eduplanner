@@ -1,6 +1,6 @@
 "use client"
 
-import ListUi from "@/app/ui/lists-ui";
+import ListUi from "@/app/ui/lists/lists-ui";
 import AddActivity from "./add-activity";
 
 export const DashboardContent = ({ params, userDetails, isMain }: { params: { username: string }, userDetails, isMain }) => {
@@ -8,43 +8,43 @@ export const DashboardContent = ({ params, userDetails, isMain }: { params: { us
   // const user = userDetails
   return (
     <>
-      {isMain ? 
-      <div>
-        <h3 className="py-2.5">Welcome to your dashboard {fullName}.</h3> 
-        {userDetails?.accountType?.includes('teacher') ?
-        <div className="pt-5">
-          <AddActivity {...{userDetails}} />
-          <ListUi {...{listType:'activities', isMain, userDetails}} />
+      {isMain ?
+        <div>
+          <h3 className="py-2.5">Welcome to your dashboard {fullName}.</h3>
+          {userDetails?.accountType?.includes('teacher') ?
+            <div className="pt-5">
+              <AddActivity {...{ userDetails }} />
+              <ListUi {...{ listType: 'activities', isMain, userDetails }} />
+            </div>
+            :
+
+            <div>
+              <div className="pb-5">
+                {userDetails?.teacherId ?
+                  <h5>Your teacher&#39;s email is {userDetails?.teacherId}</h5> :
+                  <h5>Ask your teacher or parent to add you and create some activities for you!</h5>
+                }
+              </div>
+              <hr />
+              <div className="pt-5">
+                <ListUi {...{ listType: 'activities', isMain, userDetails }} />
+              </div>
+            </div>
+          }
         </div>
+
         :
 
         <div>
-          <div className="pb-5">
-            {userDetails?.teacherId ?
-              <h5>Your teacher&#39;s email is {userDetails?.teacherId}</h5> :
-              <h5>Ask your teacher or parent to add you and create some activities for you!</h5>
-            }
-          </div>
-          <hr />
-          <div className="pt-5">
-            <ListUi {...{listType:'activities', isMain, userDetails}} />
-          </div>
-        </div>
-      }
-      </div>
-        
-        : 
-        
-        <div>
           <h3 className="py-2.5">Manage student {fullName}.</h3>
           <div className="pt-5">
-            <AddActivity {...{userDetails}} />
-            <ListUi {...{listType:'activities', isMain, userDetails}} />
+            <AddActivity {...{ userDetails }} />
+            <ListUi {...{ listType: 'activities', isMain, userDetails }} />
           </div>
         </div>
-        
+
       }
-      
+
 
     </>
 

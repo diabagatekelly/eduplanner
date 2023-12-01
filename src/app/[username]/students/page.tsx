@@ -4,7 +4,7 @@ import NestedLayout from "@/app/nested-layout";
 import store from "@/app/store";
 import { useEffect, useState } from "react"
 import AddStudent from "@/app/ui/add-student";
-import ListUi from "@/app/ui/lists-ui";
+import ListUi from "@/app/ui/lists/lists-ui";
 
 export default function Students() {
   let args;
