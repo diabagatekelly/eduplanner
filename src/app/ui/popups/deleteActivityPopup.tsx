@@ -40,7 +40,7 @@ const DeleteActivityPopup = ({onClose, showModal, ...childArgs}) => {
   const onDeleteActivitySuccess = () => {
     dispatch(removeUserActivity(userInfo, activityName))
     setErrorMessage('Successfully deleted activity')
-    onClose();;
+    onClose();
   }
   
   return (
