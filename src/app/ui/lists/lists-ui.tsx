@@ -21,7 +21,7 @@ const ListsUi = ({ listType, isMain, userDetails, ...childArgs }) => {
   return (
     <>
       {listType === 'students' && <StudentsList {...{isMain, userDetails, getBorderColor}}/>}
-      {listType === 'activities' && <ActivitiesList {...{isMain, userDetails, getBorderColor}} />}
+      {listType === 'activities' && <ActivitiesList {...{isMain, userDetails, getBorderColor, ...childArgs}} />}
       {listType === 'cards' && <CardsList {...{isMain, userDetails, getBorderColor, ...childArgs}} />}
     </>
   )

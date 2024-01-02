@@ -184,3 +184,42 @@ export function createUserCard(cardData) {
     ]
   }
 }
+
+export function editUserCard(cardData) {
+  const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
+  const isMain = cardData.email === currentUserData.email
+  if (isMain) {
+    const currentActivities = currentUserData.activities
+    let currentActivity = currentActivities.find(activity => activity.name === cardData.activityName)
+    const currentActivityCards = currentActivity.cards
+    let cardToUpdate = currentActivityCards.find(card => card.front === cardData.previous.front && card.back === cardData.previous.back)
+    let cardToUpdateIdx = currentActivityCards.indexOf(cardToUpdate)
+    currentActivityCards[cardToUpdateIdx].front = cardData.updated.front
+    currentActivityCards[cardToUpdateIdx].back = cardData.updated.back
+    const updatedActivityCards = [...currentActivityCards]
+    currentActivity.cards = updatedActivityCards
+    currentUserData.activities = currentActivities
+  } else {
+    const student = currentUserData.students[cardData.username]
+    const studentActivities = student.activities || []
+    let studentCurrentActivity = studentActivities.find(activity => activity.name === cardData.activityName)
+    const studentActivityCards = studentCurrentActivity.cards
+    let cardToUpdate = studentActivityCards.find(card => card.front === cardData.previous.front && card.back === cardData.previous.back)
+    let cardToUpdateIdx = studentActivityCards.indexOf(cardToUpdate)
+    studentActivityCards[cardToUpdateIdx].front = cardData.updated.front
+    studentActivityCards[cardToUpdateIdx].back = cardData.updated.back
+    const updatedStudentActivityCards = [...studentActivityCards]
+    studentCurrentActivity.cards = updatedStudentActivityCards
+    currentUserData.students[cardData.username].activities = studentActivities
+  }
+  
+  sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
+  return {
+    type: 'EDIT',
+    editProps: [
+      {
+        activities: currentUserData.activities
+      }
+    ]
+  }
+}

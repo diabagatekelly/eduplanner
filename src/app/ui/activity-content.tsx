@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { editActivity } from "../api/controller"
 import { useDispatch } from "react-redux"
 import { editUserActivity } from "../actions/userActions"
-import AddCard from "./add-card"
 import ListUi from "@/app/ui/lists/lists-ui";
 
 export const ActivityContent = ({ activityDetails, isMain }) => {
@@ -15,20 +14,10 @@ export const ActivityContent = ({ activityDetails, isMain }) => {
   const [formSuccessMessage, setFormSuccessMessage] = useState("")
   const [activity, setActivityDetails] = useState({ name: '', userEmail: '', hasCards: false, description: '', points: 0, completionStatus: 'pending', username: '', cards: [] })
   const [userDetails, getUserDetails] = useState({ ...args })
-  const [cardsOfTheDay, getCardsOfTheDay] = useState([])
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     setActivityDetails(activityDetails)
     getUserDetails({ username: activityDetails.username, email: activityDetails.userEmail })
-
-    const todayCards = activityDetails?.cards?.filter((card) => {
-      const nextShowDate = new Date(card.nextShowDate).getDate()
-      const createdOn = new Date(card.createdOn).getDate()
-      return Date.now() === createdOn || nextShowDate
-    })
-
-    getCardsOfTheDay(todayCards)
 
   }, [activityDetails])
 
@@ -61,6 +50,7 @@ export const ActivityContent = ({ activityDetails, isMain }) => {
       }
     }
   }
+  
   return (
     <>
       <h3>{activity?.name}</h3>
@@ -85,28 +75,7 @@ export const ActivityContent = ({ activityDetails, isMain }) => {
       {activity?.hasCards ?
         <>
           <hr className="my-5" />
-          <AddCard {...{ activity }} />
-          <hr className="my-5" />
-          <h3><u><b>Cards of the day</b></u></h3>
           <ListUi {...{ listType: 'cards', isMain, userDetails, activity: activity }} />
-          {/* {activity?.cards?.map((card) => (
-            
-            // <div className="mb-2" key={Math.random() * 1000}>
-            //   <OpenModalButton  {...{ buttonTxt: `${card?.front} - ${card?.back}`, setShowModal }} />
-            //   <Popup2 {...{ isMain, showModal, type: 'card' }} onClose={() => setShowModal(false)} />
-
-            // </div>
-          ))} */}
-          {/* {activity.cards?.length ? activity?.cards?.map((card) => (
-            <div className="mb-2" key={Math.random() * 1000}>
-              <OpenModalButton  {...{ buttonTxt: `${card?.front} - ${card?.back}`, setShowModal }} />
-              <Popup2>
-                <CardPopup />
-              </Popup2>
-              
-            </div>
-          ))
-            : <p>There are no cads to review today.</p>} */}
         </>
         : ''
       }

@@ -5,7 +5,6 @@ import AddActivity from "./add-activity";
 
 export const DashboardContent = ({ params, userDetails, isMain }: { params: { username: string }, userDetails, isMain }) => {
   const fullName = `${userDetails?.username?.split("-")[0]} ${userDetails?.username?.split("-")[1]}`
-  // const user = userDetails
   return (
     <>
       {isMain ?
@@ -14,6 +13,7 @@ export const DashboardContent = ({ params, userDetails, isMain }: { params: { us
           {userDetails?.accountType?.includes('teacher') ?
             <div className="pt-5">
               <AddActivity {...{ userDetails }} />
+              <hr className="my-5" />
               <ListUi {...{ listType: 'activities', isMain, userDetails }} />
             </div>
             :
@@ -42,12 +42,7 @@ export const DashboardContent = ({ params, userDetails, isMain }: { params: { us
             <ListUi {...{ listType: 'activities', isMain, userDetails }} />
           </div>
         </div>
-
       }
-
-
     </>
-
-
   )
 }
