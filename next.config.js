@@ -15,6 +15,7 @@ const nextConfig = {
         NEXT_CREATE_CARD_URL: process.env.NEXT_CREATE_CARD_URL,
         NEXT_DELETE_CARD_URL: process.env.NEXT_DELETE_CARD_URL,
         NEXT_EDIT_CARD_URL: process.env.NEXT_EDIT_CARD_URL,
+        NEXT_EDIT_CARD_STAGE_URL: process.env.NEXT_EDIT_CARD_STAGE_URL,
         CI: false
     },
 }

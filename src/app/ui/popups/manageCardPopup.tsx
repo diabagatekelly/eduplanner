@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { removeUserActivity } from "@/app/actions/userActions";
-import { deleteActivity } from "../../api/controller";
+import { removeUserCard } from "@/app/actions/userActions";
+import { editCardStage } from "../../api/controller";
 import store from "@/app/store";
 
 const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
-  // const dispatch = useDispatch()
+  const dispatch = useDispatch()
   let args;
 
   const [userInfo, getUserInfo] = useState({ ...args });
   const [card, getCardDetails] = useState({...childArgs});
-  const [errorMessage, setErrorMessage] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [formSuccess, setFormSuccess] = useState(false)
 
   useEffect(() => {
     const cardDetails = childArgs.item
@@ -24,42 +26,46 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
     throw new Error("Function not implemented.");
   }
 
-  function promoteToNextStage(event: any): void {
-    throw new Error("Function not implemented.");
+  function promoteToNextStage(): void {
+    submitEditStage(true)
   }
 
-  function demoteToFirstStage(event: any): void {
-    throw new Error("Function not implemented.");
+  function demoteToFirstStage(): void {
+    submitEditStage(false)
   }
 
   function submitForReview(event: any): void {
     throw new Error("Function not implemented.");
   }
 
-  // const deleteUserActivity = async () => {
-  //   try {
-  //     const activityData = { email: userInfo.email, activityName }
-  //     const response = await deleteActivity(activityData)
-  //       .then(async (response) => {
-  //         if (response.status !== 200) {
-  //           setErrorMessage(response.data.message)
-  //         } else {
-  //           onDeleteActivitySuccess()
-  //         }
-  //       })
-  //   } catch (error) {
-  //     console.error(error)
-  //     if (error.response) {
-  //       setErrorMessage(error.response.data.message)
-  //     }
-  //   }
-  // }
+  async function submitEditStage(newStageStatus) {
+    const jsonData = { 
+      username: card.username, 
+      email: card.email, 
+      activityName: card.activityName, 
+      completionStatus: card.completionStatus,
+      stage: card.stage,
+      promote: newStageStatus,
+      id: card.id 
+    }
 
-  // const onDeleteActivitySuccess = () => {
-  //   dispatch(removeUserActivity(userInfo, activityName))
-  //   setErrorMessage('Successfully deleted activity')
-  //   onClose();;
-  // }
+    const response = await editCardStage(jsonData)
+      .then(async (response) => {
+        setIsLoading(false)
+        if (response.status !== 200) {
+          setFormSuccess(false)
+          setStatusMessage(response.data.message)
+        } else {
+          setFormSuccess(true);
+          dispatch(removeUserCard(response.data))
+          reset();
+        }
+      })
+  }
+
+  function reset() {
+    window.location.reload()
+  }
   
   return (
     <>
@@ -92,6 +98,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                 {!userInfo?.teacherId && 
                   <div className="teacher-actions">
                     <button 
+                      disabled={card.completionStatus === 'completed'}
                       onClick={resetStage} 
                       data-modal-hide="popup-modal" 
                       type="button" 
@@ -100,6 +107,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                     </button>
 
                     <button 
+                      disabled={card.completionStatus === 'completed'}
                       onClick={promoteToNextStage} 
                       data-modal-hide="popup-modal" 
                       type="button" 
@@ -108,6 +116,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                     </button>
 
                     <button 
+                      disabled={card.completionStatus === 'completed'}
                       onClick={demoteToFirstStage} 
                       data-modal-hide="popup-modal" 
                       type="button" 
@@ -120,6 +129,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                 {userInfo?.teacherId && 
                   <div className="student-actions">
                     <button 
+                      disabled={card.completionStatus === 'completed'}
                       onClick={submitForReview} 
                       data-modal-hide="popup-modal" 
                       type="button" 
@@ -131,7 +141,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                 
               </div>
               <button onClick={onClose} data-modal-hide="popup-modal" type="button" className="text-white-500 bg-red hover:bg-red-100 focus:ring-4 focus:outline-none focus:ring-red-200 rounded-lg border border-red-200 text-sm font-medium px-5 py-2.5 hover:text-red-900 focus:z-10 dark:bg-red-700 dark:text-white-300 dark:border-red-500 dark:hover:text-black dark:hover:bg-gray-600 dark:focus:ring-red-600">Cancel</button>
-              <p>{errorMessage}</p>
+              <p>{statusMessage}</p>
             </div>
           </div>
         </div>

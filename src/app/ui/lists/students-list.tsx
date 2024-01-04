@@ -66,7 +66,7 @@ const StudentsList = ({isMain, userDetails, getBorderColor}) => {
       {studentsList?.length ?
         <ul>
           {studentsList?.map((students) => (
-            <li style={{ borderColor: getBorderColor('students') }} className="flex justify-between border-4" key={students}>
+            <li style={{ borderColor: getBorderColor(students) }} className="flex justify-between border-4" key={students}>
               <p className="hover:cursor-pointer" onClick={() => fetchStudent(students)}>{students?.split('-').join(' ')}</p>
               <span onClick={() => deleteStudent(students)}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">

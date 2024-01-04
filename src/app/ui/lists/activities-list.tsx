@@ -46,7 +46,7 @@ const ActivitiesList = ({isMain, userDetails, getBorderColor}) => {
       {activitiesList?.length ?
         <ul>
           {activitiesList?.map((activity) => (
-            <li style={{ borderColor: getBorderColor('activities') }} className="flex justify-between border-4" key={activity.name}>
+            <li style={{ borderColor: getBorderColor(activity) }} className="flex justify-between border-4" key={activity.name}>
               <p className="hover:cursor-pointer" onClick={() => fetchActivity(activity.name)}>{activity.name}</p>
               <span onClick={() => deleteActivity(activity.name)}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">

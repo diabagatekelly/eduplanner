@@ -108,6 +108,15 @@ export const editCard = async (rawData) => {
     })
 }
 
+export const editCardStage = async (rawData) => {
+  const url = process.env.NEXT_EDIT_CARD_STAGE_URL
+
+  return await postApi(url, rawData)
+    .then(async (response) => {
+      return response;
+    })
+}
+
 export const deleteCard = async (rawData) => {
   const url = process.env.NEXT_DELETE_CARD_URL
 
