@@ -126,6 +126,15 @@ export const resetCardStage = async (rawData) => {
     })
 }
 
+export const requestCardReview = async (rawData) => {
+  const url = process.env.NEXT_REQUEST_REVIEW_CARD_URL
+
+  return await postApi(url, rawData)
+    .then(async (response) => {
+      return response;
+    })
+}
+
 export const deleteCard = async (rawData) => {
   const url = process.env.NEXT_DELETE_CARD_URL
 

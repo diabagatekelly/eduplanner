@@ -17,6 +17,7 @@ const nextConfig = {
         NEXT_EDIT_CARD_URL: process.env.NEXT_EDIT_CARD_URL,
         NEXT_EDIT_CARD_STAGE_URL: process.env.NEXT_EDIT_CARD_STAGE_URL,
         NEXT_RESET_CARD_STAGE_URL: process.env.NEXT_RESET_CARD_STAGE_URL,
+        NEXT_REQUEST_REVIEW_CARD_URL: process.env.NEXT_REQUEST_REVIEW_CARD_URL,
         CI: false
     },
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { editUserCard } from "@/app/actions/userActions";
-import { editCardStage, resetCardStage } from "../../api/controller";
+import { editCardStage, requestCardReview, resetCardStage } from "../../api/controller";
 import store from "@/app/store";
 
 const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
@@ -13,6 +13,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
   const [statusMessage, setStatusMessage] = useState('');
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formSuccess, setFormSuccess] = useState(false)
+  const [completed, setCompletedStatus] = useState(false)
 
   useEffect(() => {
     const cardDetails = childArgs.item
@@ -20,7 +21,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
 
     const { userReducer } = store.getState()
     getUserInfo(userReducer);
-  }, [showModal, childArgs, card])
+  }, [showModal, childArgs, card, completed, statusMessage])
 
   async function resetStage() {
     const jsonData = { 
@@ -44,8 +45,32 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
       })
   }
 
-  function submitForReview(event: any): void {
-    throw new Error("Function not implemented.");
+  async function submitForReview(e) {
+    e.preventDefault()
+    const jsonData = {
+      teacherId: userInfo.teacherId,
+      email: card.email,
+      username: card.username, 
+      studentName: `${userInfo.firstName} ${userInfo.lastName}`,
+      activityName: card.activityName,
+      front: card.front,
+      back: card.back,
+      id: card.id
+    }
+
+    const response = await requestCardReview(jsonData)
+      .then((response) => {
+        setIsLoading(false)
+        console.log(response)
+        if (response.status !== 200) {
+          setFormSuccess(false)
+          setStatusMessage(response.data.message)
+        } else {
+          setFormSuccess(true);
+          setCompletedStatus(true);
+          setStatusMessage('Request for review successfully sent.')
+        }
+      })
   }
 
   async function submitEditStage(newStageStatus) {
@@ -104,7 +129,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                 {!userInfo?.teacherId && 
                   <div className="teacher-actions">
                     <button 
-                      onClick={async () => resetStage()} 
+                      onClick={async () => await resetStage()} 
                       data-modal-hide="popup-modal" 
                       type="button" 
                       className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
@@ -112,7 +137,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                     </button>
                     <button 
                       disabled={false}  //TODO - revert to card.completionStatus === completed once pending reset automatically
-                      onClick={async () => submitEditStage(true)} 
+                      onClick={async () => await submitEditStage(true)} 
                       data-modal-hide="popup-modal" 
                       type="button" 
                       className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
@@ -121,24 +146,25 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
 
                     <button 
                       disabled={false} //TODO - revert to card.completionStatus === completed once pending reset automatically
-                      onClick={async () => submitEditStage(false)} 
+                      onClick={async () => await submitEditStage(false)} 
                       data-modal-hide="popup-modal" 
                       type="button" 
                       className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                         Demote
                     </button>
+                    <p>{statusMessage}</p>
                   </div>
                 }
 
                 {userInfo?.teacherId && 
                   <div className="student-actions">
                     <button 
-                      disabled={card.completionStatus === 'completed'}
+                      disabled={completed}
                       onClick={submitForReview} 
                       data-modal-hide="popup-modal" 
                       type="button" 
                       className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                        Submit for Review
+                        {completed ? 'Waiting for teacher to review' : 'Submit for Review'}
                     </button>
                   </div>
                 }
