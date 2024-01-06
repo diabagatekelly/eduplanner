@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { removeUserCard } from "@/app/actions/userActions";
-import { editCardStage } from "../../api/controller";
+import { editCardStage, resetCardStage } from "../../api/controller";
 import store from "@/app/store";
 
 const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
@@ -22,16 +22,26 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
     getUserInfo(userReducer);
   }, [showModal, childArgs, card])
 
-  function resetStage(event: any): void {
-    throw new Error("Function not implemented.");
-  }
+  async function resetStage() {
+    const jsonData = { 
+      username: card.username, 
+      email: card.email, 
+      activityName: card.activityName, 
+      id: card.id 
+    }
 
-  function promoteToNextStage(): void {
-    submitEditStage(true)
-  }
-
-  function demoteToFirstStage(): void {
-    submitEditStage(false)
+    const response = await resetCardStage(jsonData)
+      .then(async (response) => {
+        setIsLoading(false)
+        if (response.status !== 200) {
+          setFormSuccess(false)
+          setStatusMessage(response.data.message)
+        } else {
+          setFormSuccess(true);
+          dispatch(removeUserCard(response.data))
+          window.location.reload()
+        }
+      })
   }
 
   function submitForReview(event: any): void {
@@ -58,13 +68,9 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
         } else {
           setFormSuccess(true);
           dispatch(removeUserCard(response.data))
-          reset();
+          window.location.reload()
         }
       })
-  }
-
-  function reset() {
-    window.location.reload()
   }
   
   return (
@@ -90,7 +96,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                   <hr />
                   <h6>Owner: {card.username}</h6>
                   <h6>Activity: {card.activityName || card.activity}</h6>
-                  <h6>Created On: {new Date(card.createdOn).toDateString()}</h6>
+                  <h6>Created On: {new Date(Number(card.createdOn)).toDateString()}</h6>
                   <hr />
                   <h6>Current Stage: {card.stage}</h6>
                   <h6>Current Status: {card.completionStatus}</h6>
@@ -98,8 +104,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                 {!userInfo?.teacherId && 
                   <div className="teacher-actions">
                     <button 
-                      disabled={card.completionStatus === 'completed'}
-                      onClick={resetStage} 
+                      onClick={async () => resetStage()} 
                       data-modal-hide="popup-modal" 
                       type="button" 
                       className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
@@ -108,7 +113,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
 
                     <button 
                       disabled={card.completionStatus === 'completed'}
-                      onClick={promoteToNextStage} 
+                      onClick={async () => submitEditStage(true)} 
                       data-modal-hide="popup-modal" 
                       type="button" 
                       className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
@@ -117,7 +122,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
 
                     <button 
                       disabled={card.completionStatus === 'completed'}
-                      onClick={demoteToFirstStage} 
+                      onClick={async () => submitEditStage(false)} 
                       data-modal-hide="popup-modal" 
                       type="button" 
                       className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
