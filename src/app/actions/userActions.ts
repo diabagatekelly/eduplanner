@@ -192,10 +192,12 @@ export function editUserCard(cardData) {
     const currentActivities = currentUserData.activities
     let currentActivity = currentActivities.find(activity => activity.name === cardData.activityName)
     const currentActivityCards = currentActivity.cards
-    let cardToUpdate = currentActivityCards.find(card => card.front === cardData.previous.front && card.back === cardData.previous.back)
+    let cardToUpdate = currentActivityCards.find(card => card.id === cardData.id)
     let cardToUpdateIdx = currentActivityCards.indexOf(cardToUpdate)
-    currentActivityCards[cardToUpdateIdx].front = cardData.updated.front
-    currentActivityCards[cardToUpdateIdx].back = cardData.updated.back
+    for (let item in cardData.updated) {
+      currentActivityCards[cardToUpdateIdx][item] = cardData.updated[item]
+      currentActivityCards[cardToUpdateIdx][item] = cardData.updated[item]
+    }
     const updatedActivityCards = [...currentActivityCards]
     currentActivity.cards = updatedActivityCards
     currentUserData.activities = currentActivities
@@ -204,10 +206,12 @@ export function editUserCard(cardData) {
     const studentActivities = student.activities || []
     let studentCurrentActivity = studentActivities.find(activity => activity.name === cardData.activityName)
     const studentActivityCards = studentCurrentActivity.cards
-    let cardToUpdate = studentActivityCards.find(card => card.front === cardData.previous.front && card.back === cardData.previous.back)
+    let cardToUpdate = studentActivityCards.find(card => card.id === cardData.id)
     let cardToUpdateIdx = studentActivityCards.indexOf(cardToUpdate)
-    studentActivityCards[cardToUpdateIdx].front = cardData.updated.front
-    studentActivityCards[cardToUpdateIdx].back = cardData.updated.back
+    for (let item in cardData.updated) {
+      studentActivityCards[cardToUpdateIdx][item] = cardData.updated[item]
+      studentActivityCards[cardToUpdateIdx][item] = cardData.updated[item]
+    }
     const updatedStudentActivityCards = [...studentActivityCards]
     studentCurrentActivity.cards = updatedStudentActivityCards
     currentUserData.students[cardData.username].activities = studentActivities

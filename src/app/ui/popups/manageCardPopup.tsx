@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { removeUserCard } from "@/app/actions/userActions";
+import { editUserCard } from "@/app/actions/userActions";
 import { editCardStage, resetCardStage } from "../../api/controller";
 import store from "@/app/store";
 
@@ -38,7 +38,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
           setStatusMessage(response.data.message)
         } else {
           setFormSuccess(true);
-          dispatch(removeUserCard(response.data))
+          dispatch(editUserCard(response.data))
           window.location.reload()
         }
       })
@@ -54,7 +54,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
       email: card.email, 
       activityName: card.activityName, 
       completionStatus: card.completionStatus,
-      stage: card.stage,
+      stage: Number(card.stage),
       promote: newStageStatus,
       id: card.id 
     }
@@ -67,7 +67,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
           setStatusMessage(response.data.message)
         } else {
           setFormSuccess(true);
-          dispatch(removeUserCard(response.data))
+          dispatch(editUserCard(response.data))
           window.location.reload()
         }
       })
@@ -110,9 +110,8 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                       className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                         Reset Stage
                     </button>
-
                     <button 
-                      disabled={card.completionStatus === 'completed'}
+                      disabled={false}  //TODO - revert to card.completionStatus === completed once pending reset automatically
                       onClick={async () => submitEditStage(true)} 
                       data-modal-hide="popup-modal" 
                       type="button" 
@@ -121,7 +120,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                     </button>
 
                     <button 
-                      disabled={card.completionStatus === 'completed'}
+                      disabled={false} //TODO - revert to card.completionStatus === completed once pending reset automatically
                       onClick={async () => submitEditStage(false)} 
                       data-modal-hide="popup-modal" 
                       type="button" 
