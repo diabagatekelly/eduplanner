@@ -1,16 +1,19 @@
 import StudentsList from "./students-list";
 import ActivitiesList from "./activities-list";
 import CardsList from "./cards-list";
+import { CompletionStatus } from "@/app/interfaces/EnumCompletionStatus";
 
 const ListsUi = ({ listType, isMain, userDetails, ...childArgs }) => {
 
   const getBorderColor = (listItem) => {
     let borderColor = 'orange'
     if (['activities', 'cards'].includes(listType)) {
-      if (listItem?.completionStatus === 'pending') {
+      if (listItem?.completionStatus === CompletionStatus.PENDING) {
         borderColor = 'orange'
-      } else if (listItem?.completionStatus === 'completed') {
+      } else if (listItem?.completionStatus === CompletionStatus.COMPLETED) {
         borderColor = 'green'
+      } else if (listItem?.completionStatus === CompletionStatus.REVIEW) {
+        borderColor = 'gray'
       } else {
         borderColor = 'red'
       }

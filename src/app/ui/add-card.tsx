@@ -105,7 +105,13 @@ const AddCard = ({ activity, ...args }) => {
     }
 
     const jsonData = indivCardFormData.map((card) => {
-      return { front: card.front, back: card.back, username: activity?.username, email: activity?.email, activityName: activity.name, completionStatus: 'pending' }
+      return { 
+        front: card.front, 
+        back: card.back, 
+        username: activity?.username, 
+        email: activity?.email, 
+        activityName: activity.name, 
+      }
     })
 
     const response = await createCard(jsonData)

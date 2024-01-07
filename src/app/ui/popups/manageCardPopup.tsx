@@ -76,7 +76,6 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
       username: card.username, 
       email: card.email, 
       activityName: card.activityName, 
-      completionStatus: card.completionStatus,
       stage: Number(card.stage),
       promote: newStageStatus,
       id: card.id 
@@ -119,7 +118,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                   <hr />
                   <h6>Owner: {card.username}</h6>
                   <h6>Activity: {card.activityName || card.activity}</h6>
-                  <h6>Created On: {new Date(Number(card.createdOn)).toDateString()}</h6>
+                  <h6>Created On: {card.createdOn?.split('T')[0]}</h6>
                   <hr />
                   <h6>Current Stage: {card.stage}</h6>
                   <h6>Current Status: {card.completionStatus}</h6>
@@ -161,7 +160,7 @@ const ManageCardPopup = ({onClose, showModal, ...childArgs}) => {
                       data-modal-hide="popup-modal" 
                       type="button" 
                       className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                        'Submit for Review'
+                        Submit for Review
                     </button>
                   </div>
                 }

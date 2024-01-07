@@ -32,7 +32,7 @@ export const UserProfile = () => {
           <p className="py-1"><span className="font-bold">Email:</span> {user.email}</p>
           <p className="py-1"><span className="font-bold">Account Type(s):</span> {user.accountType?.join(', ')}</p>
           <p className="py-1"><span className="font-bold">Linked Accounts:</span> {getStudentListOrTeacher()}</p>
-          <p className="py-1"><span className="font-bold">Last logged in:</span> {new Date(user.lastWorkedOn).toDateString()}</p>
+          <p className="py-1"><span className="font-bold">Last logged in:</span> {user.lastWorkedOn?.split('T')[0]}</p>
         </div>
       </div>
     </div>

@@ -99,14 +99,14 @@ export function createUserActivity(activityData) {
 
 export function editUserActivity(updateData) {
   const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
-  const isMain = updateData.userEmail === currentUserData.email
+  const isMain = updateData.email === currentUserData.email
   let activityToUpdate;
 
   if (isMain) {
     activityToUpdate = currentUserData.activities.find(activity => activity.name === updateData.name)
     let activityIndex = currentUserData.activities.indexOf(activityToUpdate)
     activityToUpdate.completionStatus = updateData.completionStatus
-    activityToUpdate.dateLastCompleted
+    activityToUpdate.lastUpdatedOn = updateData.lastUpdatedOn
 
     currentUserData.activities[activityIndex] = activityToUpdate;
   } else {
@@ -114,7 +114,7 @@ export function editUserActivity(updateData) {
     activityToUpdate = student.activities.find(activity => activity.name === updateData.name)
     let activityIndex = student.activities.indexOf(activityToUpdate)
     activityToUpdate.completionStatus = updateData.completionStatus
-    activityToUpdate.dateLastCompleted
+    activityToUpdate.lastUpdatedOn = updateData.lastUpdatedOn
     currentUserData.students[updateData.username].activities = activityToUpdate
   }
 

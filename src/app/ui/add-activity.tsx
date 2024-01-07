@@ -72,8 +72,7 @@ const AddActivity = ({ userDetails }) => {
           points: jsonData.points,
           hasCards: jsonData.hasCards,
           userEmail: userDetails.email,
-          username: userDetails.username,
-          completionStatus: 'pending'
+          username: userDetails.username
         }
       }
 

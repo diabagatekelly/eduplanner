@@ -25,9 +25,9 @@ const CardsList = ({isMain, userDetails, getBorderColor, ...childArgs}) => {
     getCardsList([...cards])
 
     const todayCards = cards?.filter((card) => {
-      const nextShowDate = new Date(card.nextShowDate).getDate()
-      const createdOn = new Date(card.createdOn).getDate()
-      return Date.now() === createdOn || nextShowDate
+      const nextShowDate = card.nextShowDate.split('T')[0]
+      const createdOn = card.createdOn.split('T')[0]
+      return (new Date()).toISOString().split('T')[0] === (createdOn.split('T')[0] || nextShowDate.split('T')[0])
     })
     getCardsOfTheDay(todayCards)
   }, [userDetails, childArgs?.activity?.cards])

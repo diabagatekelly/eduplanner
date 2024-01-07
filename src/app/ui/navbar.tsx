@@ -36,7 +36,7 @@ export const Navbar = ({ isAuthenticated, username }) => {
 
   const logout = async () => {
     try {
-      const res = await editUser({ email: user.email, editData: {lastWorkedOn: Date.now()}})
+      const res = await editUser({ email: user.email, editData: {lastWorkedOn: new Date()}})
         .then(async (response) => {
           if (response.status !== 200) {
             console.log('Failed to update and logout!')

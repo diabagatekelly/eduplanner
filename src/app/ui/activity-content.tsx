@@ -5,6 +5,7 @@ import { editActivity } from "../api/controller"
 import { useDispatch } from "react-redux"
 import { editUserActivity } from "../actions/userActions"
 import ListUi from "@/app/ui/lists/lists-ui";
+import { CompletionStatus } from "../interfaces/EnumCompletionStatus"
 
 export const ActivityContent = ({ activityDetails, isMain }) => {
   const dispatch = useDispatch()
@@ -12,7 +13,17 @@ export const ActivityContent = ({ activityDetails, isMain }) => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formSuccessMessage, setFormSuccessMessage] = useState("")
-  const [activity, setActivityDetails] = useState({ name: '', userEmail: '', hasCards: false, description: '', points: 0, completionStatus: 'pending', username: '', cards: [] })
+  const [activity, setActivityDetails] = useState({ 
+    name: '', 
+    userEmail: '', 
+    hasCards: false, 
+    description: '', 
+    points: 0, 
+    completionStatus: CompletionStatus.PENDING, 
+    username: '', 
+    cards: [],
+    lastUpdatedOn: '' 
+  })
   const [userDetails, getUserDetails] = useState({ ...args })
 
   useEffect(() => {
@@ -26,8 +37,7 @@ export const ActivityContent = ({ activityDetails, isMain }) => {
       const options = {
         params: {
           ...activityDetails,
-          completionStatus: 'completed',
-          dateLastCompleted: Date.now()
+          lastUpdatedOn: new Date()
         }
       }
 
@@ -37,7 +47,7 @@ export const ActivityContent = ({ activityDetails, isMain }) => {
           if (response.status !== 200) {
             setFormSuccessMessage(response.data.message)
           } else {
-            dispatch(editUserActivity(options.params))
+            dispatch(editUserActivity(response.data.params))
             setFormSuccessMessage('Activity status changed to completed.')
           }
         })
@@ -57,17 +67,18 @@ export const ActivityContent = ({ activityDetails, isMain }) => {
       <p>Directions: {activity?.description}</p>
       <p>Points: {activity?.points} points</p>
       <p>Status: {activity?.completionStatus}</p>
+      <p>Last Updated: {activity?.lastUpdatedOn?.split('T')[0] || 'Never'}</p>
       <button
-        disabled={activity?.completionStatus === 'completed'}
+        disabled={activity?.completionStatus === CompletionStatus.COMPLETED}
         type="button"
-        className={activity?.completionStatus !== "completed" ?
+        className={activity?.completionStatus !== CompletionStatus.COMPLETED ?
           "text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
           :
           "text-white bg-gray-600 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
         }
 
         onClick={updateActivity}>
-        {activity?.completionStatus === 'completed' ? 'Already completed' : 'Mark completed'}
+        {activity?.completionStatus === CompletionStatus.COMPLETED ? 'Already completed' : 'Mark completed'}
       </button>
 
 
