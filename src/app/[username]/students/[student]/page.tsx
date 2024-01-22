@@ -1,11 +1,11 @@
 "use client"
 
 import NestedLayout from "@/app/nested-layout";
-import store from "@/app/store";
+import store from "@/store/store";
 import { useEffect, useState } from "react"
-import { DashboardContent } from "@/app/ui/dashboard-content";
+import { Dashboard } from "@/components/dashboard";
 
-export default function Dashboard({ params }: { params: { username: string, student: string } }) {
+export default function Main({ params }: { params: { username: string, student: string } }) {
 
   let args;
   const [user, getUserData] = useState({ ...args })
@@ -24,7 +24,7 @@ export default function Dashboard({ params }: { params: { username: string, stud
 
   return (
     <NestedLayout {...{ isTeacher }}>
-      <DashboardContent {...{ params, userDetails, isMain }} />
+      <Dashboard {...{ params, userDetails, isMain }} />
     </NestedLayout>
   )
 }

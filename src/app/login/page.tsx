@@ -1,20 +1,20 @@
 "use client"
 
-import LoginForm from "../ui/login-form";
+import LoginForm from "@/components/forms/login-form";
 import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
-import { IFindUser } from "../interfaces/IUser";
+import { ILogin } from "@/interfaces/IUser";
 import Link from "next/link";
-import { setAuthToken } from "../actions/authActions";
+import { setAuthToken } from "@/store/actions/authActions";
 import { useDispatch } from "react-redux";
-import { populateUser } from "../actions/userActions";
-import { loginUser } from "../api/controller";
+import { populateUser } from "@/store/actions/userActions";
+import { loginUser } from "@/api/controller";
 
 export default function Login() {
   const dispatch = useDispatch()
   const router = useRouter()
 
-  const [formData, setFormData] = useState<IFindUser>({
+  const [formData, setFormData] = useState<ILogin>({
     email: "",
     password: "",
   });

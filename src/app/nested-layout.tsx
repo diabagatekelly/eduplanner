@@ -1,6 +1,7 @@
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react';
-import store from './store';
+import store from '@/store/store';
+import { IUser } from '@/interfaces/IUser';
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -10,7 +11,8 @@ export default function NestedLayout({ children, isTeacher }) {
   const pathname = usePathname();
   let args;
 
-  const [user, getUserData] = useState({ ...args })
+  const [user, getUserData] = useState<IUser>({ ...args })
+  
   useEffect(() => {
     const { userReducer } = store.getState()
     getUserData(userReducer);

@@ -13,7 +13,7 @@ test('Mock user creating an account', async ({ page }) => {
         "email": "mockuser@email.com",\
         "password": "m/o/c/k/u/s/e/r#1",\
         "accountType": "teacher",\
-        "lastWorkedOn": "778876558"}'
+        "lastLogin": "778876558"}'
     };
     await route.fulfill(response);
   });

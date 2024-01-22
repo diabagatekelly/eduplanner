@@ -3,13 +3,13 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { Provider, useDispatch } from "react-redux";
-import store from "./store";
-import {Navbar} from './ui/navbar';
-import {Footer} from './ui/footer';
+import store from "@/store/store";
+import {Navbar} from '@/components/navbar';
+import {Footer} from '@/components/footer';
 import { Suspense, useEffect, useState } from 'react';
-import { hasExpired, hasToken } from './actions/authActions';
+import { hasExpired, hasToken } from '@/store/actions/authActions';
 import { usePathname, useSearchParams } from 'next/navigation'
-import { populateUser } from './actions/userActions';
+import { populateUser } from '@/store/actions/userActions';
 
 const inter = Inter({ subsets: ['latin'] })
 

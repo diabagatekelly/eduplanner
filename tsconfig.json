@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/page.tsx"
-  ],
+, "src/__mocks__/axios.ts"  ],
   "exclude": [
     "node_modules"
   ]

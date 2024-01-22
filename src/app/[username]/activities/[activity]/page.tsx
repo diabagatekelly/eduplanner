@@ -1,12 +1,12 @@
 "use client"
 
 import NestedLayout from "@/app/nested-layout";
-import store from "@/app/store";
+import store from "@/store/store";
 import { useEffect, useState } from "react"
-import { ActivityContent } from "@/app/ui/activity-content";
+import { ViewActivity } from "@/components/activities/view-activity";
 import { usePathname } from 'next/navigation'
 
-export default function Dashboard({ params }: { params: { username: string, student: string } }) {
+export default function Main({ params }: { params: { username: string, student: string } }) {
   const pathname = usePathname();
   const activityName = pathname.split('/')[3]
   const isMain = true;
@@ -26,7 +26,7 @@ export default function Dashboard({ params }: { params: { username: string, stud
 
   return (
     <NestedLayout {...{ isTeacher }}>
-      <ActivityContent {...{ activityDetails, isMain }} />
+      <ViewActivity {...{ activityDetails, isMain }} />
     </NestedLayout>
   )
 }

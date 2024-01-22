@@ -39,4 +39,5 @@ next-env.d.ts
 /test-results/**/*.zip
 
 .vercel
-
+.vscode
+e2e-test-results

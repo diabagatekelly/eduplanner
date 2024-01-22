@@ -1,33 +1,39 @@
 "use client"
 
-import RegisterForm from "../ui/register-form";
 import React, { useState, FormEvent } from "react";
-import { useRouter } from 'next/navigation'
-import { IUserRegister } from "../interfaces/IUser";
-import { setAuthToken } from "../actions/authActions";
+import { useRouter } from 'next/navigation';
 import { useDispatch } from "react-redux";
-import { registerUser } from "../api/controller";
+import RegisterForm from "@/components/forms/register-form";
+import { IUser, IUserFormData } from "@/interfaces/IUser";
+import { setAuthToken } from "@/store/actions/authActions";
+import { registerUser } from "@/api/controller";
+import { ISODateString } from "@/interfaces/isoDateType";
+import { formatISODate } from "@/utils/formatDate";
 
-export default function Register() {
+interface IRegister {
+  handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
+  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
+}
+
+export default function Register<IRegister>() {
   const dispatch = useDispatch();
+  const router = useRouter();
 
-  const [formData, setFormData] = useState<IUserRegister>({
+  const [formData, setFormData] = useState<IUserFormData>({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
-    accountType: "",
+    accountType: ""
   });
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
+  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
 
-  const [formSuccess, setFormSuccess] = useState(false)
-  const [formSuccessMessage, setFormSuccessMessage] = useState("")
-
-  const handleInput = (e: any) => {
-    const fieldName: string = e.target.name;
-    const fieldValue: any = e.target.value;
+  function handleInput(e: React.FormEvent<HTMLInputElement>) {
+    const target = e.target as HTMLInputElement
+    const fieldName = target.name;
+    const fieldValue = target.value;
 
     setFormData((prevState) => ({
       ...prevState,
@@ -42,18 +48,34 @@ export default function Register() {
 
     try {
       const rawFormData = new FormData(e.currentTarget)
-      const jsonData = {}
+      const jsonData: IUserFormData = {
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        accountType: ""
+      }
 
       for (const pair of rawFormData.entries()) {
         jsonData[pair[0]] = `${pair[1]}`;
       }
 
-      const response = await registerUser(jsonData)
+      const userId = btoa(jsonData.email)
+      const username = `${jsonData.firstName}-${jsonData.lastName}`
+
+      const userData: IUser = {
+        ...jsonData,
+        userId,
+        username,
+        lastLogin: formatISODate(new Date().toISOString() as ISODateString) 
+      };
+
+      await registerUser(userData)
         .then((response) => {
           setIsLoading(false)
           if (response.status !== 200) {
-            setFormSuccess(false)
-            setFormSuccessMessage(response.data.message)
+            console.log(response)
+            setFormSubmitOutcomeMessage('Unable to create new user.')
           } else {
             setFormData({
               firstName: "",
@@ -62,20 +84,18 @@ export default function Register() {
               password: "",
               accountType: "",
             });
-            setFormSuccess(true);
-            setFormSuccessMessage('New user created.')
-            const url = `${response.data.firstName}-${response.data.lastName}`
-            router.push('/' + url )
+            setFormSubmitOutcomeMessage('New user successfully created.')
+            router.push('/' + response.data.username )
             dispatch(setAuthToken(response.data));
           }
         })
 
     } catch (error) {
-      console.error(error)
+      console.log(error)
       setIsLoading(false)
-      setFormSuccess(false)
+
       if (error.response) {
-        setFormSuccessMessage(error.response.data.message)
+        setFormSubmitOutcomeMessage(error.response.data.message)
       }
     }
   }
@@ -89,7 +109,7 @@ export default function Register() {
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <RegisterForm {...{ handleInput, formData, isLoading, submitForm }} />
-          <div>{formSuccessMessage}</div>
+          <div className="submit-form-outcome-message">{formSubmitOutcomeMessage}</div>
         </div>
       </div>
     </div>
