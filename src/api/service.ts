@@ -10,7 +10,7 @@ export const getApi = async (url, options) => {
 }
 
 
-export const postApi = async (url: string, jsonData: Record<string, any>) => {
+export const postCommand = async (url: string, jsonData: Record<string, any>) => {
   return await axios.post(url, jsonData)
 }
 

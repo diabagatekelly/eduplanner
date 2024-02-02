@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1705965575215" clover="3.2.0">
-  <project timestamp="1705965575215" name="All files">
-    <metrics statements="1096" coveredstatements="88" conditionals="239" coveredconditionals="10" methods="227" coveredmethods="14" elements="1562" coveredelements="112" complexity="0" loc="1096" ncloc="1096" packages="22" files="43" classes="43"/>
+<coverage generated="1705966045901" clover="3.2.0">
+  <project timestamp="1705966045901" name="All files">
+    <metrics statements="1097" coveredstatements="89" conditionals="239" coveredconditionals="10" methods="227" coveredmethods="14" elements="1563" coveredelements="113" complexity="0" loc="1097" ncloc="1097" packages="22" files="43" classes="43"/>
     <package name="api">
       <metrics statements="70" coveredstatements="25" conditionals="0" coveredconditionals="0" methods="34" coveredmethods="4"/>
       <file name="controller.ts" path="C:\Users\kelly\Documents\Development\Portfolio\education-suite\eduplanner\src\api\controller.ts">
@@ -303,13 +303,13 @@
       </file>
     </package>
     <package name="app.register">
-      <metrics statements="38" coveredstatements="38" conditionals="3" coveredconditionals="3" methods="5" coveredmethods="5"/>
+      <metrics statements="39" coveredstatements="39" conditionals="3" coveredconditionals="3" methods="5" coveredmethods="5"/>
       <file name="page.tsx" path="C:\Users\kelly\Documents\Development\Portfolio\education-suite\eduplanner\src\app\register\page.tsx">
-        <metrics statements="38" coveredstatements="38" conditionals="3" coveredconditionals="3" methods="5" coveredmethods="5"/>
+        <metrics statements="39" coveredstatements="39" conditionals="3" coveredconditionals="3" methods="5" coveredmethods="5"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
         <line num="5" count="1" type="stmt"/>
-        <line num="7" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
         <line num="9" count="1" type="stmt"/>
         <line num="11" count="1" type="stmt"/>
@@ -321,29 +321,30 @@
         <line num="31" count="29" type="stmt"/>
         <line num="34" count="16" type="stmt"/>
         <line num="35" count="16" type="stmt"/>
-        <line num="37" count="16" type="stmt"/>
-        <line num="45" count="4" type="stmt"/>
-        <line num="48" count="4" type="stmt"/>
+        <line num="36" count="16" type="stmt"/>
+        <line num="38" count="16" type="stmt"/>
+        <line num="46" count="4" type="stmt"/>
         <line num="49" count="4" type="stmt"/>
         <line num="50" count="4" type="stmt"/>
-        <line num="58" count="4" type="stmt"/>
-        <line num="59" count="20" type="stmt"/>
-        <line num="62" count="4" type="stmt"/>
+        <line num="51" count="4" type="stmt"/>
+        <line num="59" count="4" type="stmt"/>
+        <line num="60" count="20" type="stmt"/>
         <line num="63" count="4" type="stmt"/>
-        <line num="65" count="4" type="stmt"/>
-        <line num="72" count="4" type="stmt"/>
-        <line num="74" count="3" type="stmt"/>
-        <line num="75" count="3" type="cond" truecount="2" falsecount="0"/>
-        <line num="76" count="2" type="stmt"/>
+        <line num="64" count="4" type="stmt"/>
+        <line num="66" count="4" type="stmt"/>
+        <line num="73" count="4" type="stmt"/>
+        <line num="75" count="3" type="stmt"/>
+        <line num="76" count="3" type="cond" truecount="2" falsecount="0"/>
         <line num="77" count="2" type="stmt"/>
-        <line num="79" count="1" type="stmt"/>
-        <line num="86" count="1" type="stmt"/>
+        <line num="78" count="2" type="stmt"/>
+        <line num="80" count="1" type="stmt"/>
         <line num="87" count="1" type="stmt"/>
         <line num="88" count="1" type="stmt"/>
-        <line num="93" count="1" type="stmt"/>
+        <line num="89" count="1" type="stmt"/>
         <line num="94" count="1" type="stmt"/>
-        <line num="96" count="1" type="cond" truecount="1" falsecount="0"/>
-        <line num="97" count="1" type="stmt"/>
+        <line num="95" count="1" type="stmt"/>
+        <line num="97" count="1" type="cond" truecount="1" falsecount="0"/>
+        <line num="98" count="1" type="stmt"/>
       </file>
     </package>
     <package name="components">

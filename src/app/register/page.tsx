@@ -15,6 +15,16 @@ interface IRegister {
   submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
 }
 
+interface IResponse {
+  statusCode: number,
+  body: IResponseBody
+}
+
+interface IResponseBody {
+  status: string,
+  message: string
+}
+
 export default function Register<IRegister>() {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -74,8 +84,8 @@ export default function Register<IRegister>() {
         .then((response) => {
           setIsLoading(false)
           if (response.status !== 200) {
-            console.log(response)
-            setFormSubmitOutcomeMessage('Unable to create new user.')
+            console.error(response)
+            setFormSubmitOutcomeMessage(response)
           } else {
             setFormData({
               firstName: "",

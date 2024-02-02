@@ -3,7 +3,6 @@ import '@testing-library/jest-dom'
 import { screen, fireEvent, act } from '@testing-library/react'
 import { render } from '../../util';
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import { registerUser } from '@/api/controller';
 import { mockUser } from '@/specs/mocks';
 
@@ -16,17 +15,6 @@ jest.mock('next/navigation', () => {
   }
 });
 jest.mock('../../../api/controller');
-// jest.mock('../../api/service');
-// useRouter: jest.fn(() => ({
-//   push: jest.fn(),
-//   replace: jest.fn(),
-// })),
-// useSearchParams: jest.fn(() => ({
-//   // get: jest.fn(),
-// })),
-// usePathname: jest.fn(() => {
-
-// })
 
 describe('Register page', () => {
   it('should render the page with its form', async () => {
