@@ -29,7 +29,7 @@ describe('Register page', () => {
 
   it('should invoke registerUser controller when form is submitted', async () => {
     (registerUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({status: null, data: {message: null}})
+      return Promise.resolve({status: 200, data: {message: null, details: {user: mockUser}}})
     })
     render(<Register />)
 
@@ -68,7 +68,7 @@ describe('Register page', () => {
 
   it('should reset form when response is successful and display success message', async () => {
     (registerUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({status: 200, data: {message: 'New user successfully created.'}})
+      return Promise.resolve({status: 200, data: {status: 'success', message: 'New user successfully created.', details: {user: mockUser} }})
     })
     render(<Register />)
 
@@ -117,11 +117,12 @@ describe('Register page', () => {
     
   })
 
-  it('should not reset form when response is not 200 and display error message', async () => {
+  it('should not reset form when response is not 200 or 500 and display error message', async () => {
+    const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
     (registerUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({status: 400, data: {message: 'Erroneous response'}})
+      return Promise.resolve({status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}})
     })
-    jest.spyOn(console, 'log')
+
     render(<Register />)
 
     const firstName = screen.getByLabelText(/First Name:/i)
@@ -160,20 +161,73 @@ describe('Register page', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(/Unable to create new user./i)
+    const errorMessage = await screen.findByText(/Erroneous response/i)
   
     expect(firstName).toHaveValue('mock')
     expect(lastName).toHaveValue('user')
     expect(password).toHaveValue('password')
     expect(email).toHaveValue('mock.user@email.com')
     expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith({status: 400, data: {message: 'Erroneous response'}})
   })
 
-  it('should console and display error message if submitting form returns error with response', async () => {
+  it('should not reset form when response is 500 and display error message', async () => {
+    const error = {response: {status: 500, data: {status: 'internalServerError', message: 'Server error'}}};
     (registerUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.reject({status: 500, response: {data: {message: 'Error thrown and caught.'}}})
+      return Promise.reject(error)
     })
+    jest.spyOn(console, 'log')
+    render(<Register />)
+
+    const firstName = screen.getByLabelText(/First Name:/i)
+    const lastName = screen.getByLabelText(/Last Name:/i)
+    const password = screen.getByLabelText(/Password:/i)
+    const email = screen.getByLabelText(/Email:/i)
+    const studentRadio = screen.getByDisplayValue(/Student/i)
+    const submitButton = screen.getByText(/Create Account/i)
+
+    await act(() => {
+      // fill out the form
+      fireEvent.change(firstName, {
+        target: {value: 'mock'},
+      })
+      fireEvent.change(lastName, {
+        target: {value: 'user'},
+      })
+      fireEvent.change(password, {
+        target: {value: 'password'},
+      })
+      fireEvent.change(email, {
+        target: {value: 'mock.user@email.com'},
+      })
+      fireEvent.change(studentRadio, {
+        target: {value: 'student'},
+      })
+    })
+
+
+    expect(firstName).toHaveValue('mock')
+    expect(lastName).toHaveValue('user')
+    expect(password).toHaveValue('password')
+    expect(email).toHaveValue('mock.user@email.com')
+
+    await act(async () => {
+      await fireEvent.click(submitButton)
+    })
+
+    const errorMessage = await screen.getByText(/Failed to create user due to an internal error. Please try again later./i)
+  
+    expect(firstName).toHaveValue('mock')
+    expect(lastName).toHaveValue('user')
+    expect(password).toHaveValue('password')
+    expect(email).toHaveValue('mock.user@email.com')
+    expect(errorMessage).toBeInTheDocument()
+    expect(console.log).toHaveBeenCalledWith(error)
+  })
+
+  it('should not reset form when error is thrown with no response', async () => {
+    (registerUser as jest.Mock).mockImplementationOnce(() => {
+      return Promise.reject({status: 500, message: 'Error thrown and caught.'});
+    });
     jest.spyOn(console, 'log')
     render(<Register />)
 
@@ -214,8 +268,8 @@ describe('Register page', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(/Error thrown and caught./i)
+    const errorMessage = await screen.getByText(/Server is down. Try again later./i)
     expect(errorMessage).toBeInTheDocument()  
-    expect(console.log).toHaveBeenCalledWith({status: 500, response: {data: {message: 'Error thrown and caught.'}}})
+    expect(console.log).toHaveBeenCalledWith({status: 500, message: 'Error thrown and caught.'})
   })
 })

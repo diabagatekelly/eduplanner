@@ -1,4 +1,4 @@
-import {getApi, postApi} from '@/api/service';
+import {getApi, postCommand} from '@/api/service';
 import axios from 'axios';
 import { mockUser } from '../mocks';
 jest.mock('axios');
@@ -28,7 +28,7 @@ describe('Service', () => {
       points : "0"
     }
 
-    const res = await postApi(mockUrl, mockJsonData)
+    const res = await postCommand(mockUrl, mockJsonData)
     expect(mockAxios.post).toHaveBeenCalledWith(mockUrl, mockJsonData);
     expect(res).toEqual(mockPostResponse);
   })

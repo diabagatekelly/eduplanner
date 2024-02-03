@@ -1,15 +1,14 @@
 version: 2.1
 orbs:
   node: circleci/node@5.1.0
-executors:
-  pw-jammy-development:
-    docker:
-      - image: mcr.microsoft.com/playwright:v1.37.0-jammy
+# executors:
+#   pw-jammy-development:
+#     docker:
+#       - image: mcr.microsoft.com/playwright:v1.37.0-jammy
 
 jobs:
   test_frontend:
-    executor: pw-jammy-development
-    parallelism: 4
+    executor: node/default
     steps:
       - checkout
       - run:
@@ -17,10 +16,8 @@ jobs:
           command: npm install
       - run:
           name: Run frontend tests
-          command: | 
-            npm ci
-            npx playwright install --with-deps
-            SHARD="$((${CIRCLE_NODE_INDEX}+1))"; npx playwright test --shard=${SHARD}/${CIRCLE_NODE_TOTAL}
+          command: npm run test
+          test-results-for: jest
             
 
 workflows:

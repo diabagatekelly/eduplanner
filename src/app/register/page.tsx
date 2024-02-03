@@ -16,13 +16,14 @@ interface IRegister {
 }
 
 interface IResponse {
-  statusCode: number,
-  body: IResponseBody
+  status: number,
+  data: IResponseBody
 }
 
 interface IResponseBody {
   status: string,
-  message: string
+  message: string,
+  details?: Record<any, any>
 }
 
 export default function Register<IRegister>() {
@@ -80,33 +81,37 @@ export default function Register<IRegister>() {
         lastLogin: formatISODate(new Date().toISOString() as ISODateString) 
       };
 
-      await registerUser(userData)
-        .then((response) => {
-          setIsLoading(false)
-          if (response.status !== 200) {
-            console.error(response)
-            setFormSubmitOutcomeMessage(response)
-          } else {
-            setFormData({
-              firstName: "",
-              lastName: "",
-              email: "",
-              password: "",
-              accountType: "",
-            });
-            setFormSubmitOutcomeMessage('New user successfully created.')
-            router.push('/' + response.data.username )
-            dispatch(setAuthToken(response.data));
-          }
-        })
-
-    } catch (error) {
-      console.log(error)
+      const response = await registerUser(userData) as unknown as IResponse;
+      const {status, data} = response;
       setIsLoading(false)
 
-      if (error.response) {
-        setFormSubmitOutcomeMessage(error.response.data.message)
+      if (status !== 200) {
+        setFormSubmitOutcomeMessage(response.data.message)
+      } else {
+        const {message, details} = data;
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          password: "",
+          accountType: "",
+        });
+        setFormSubmitOutcomeMessage(message)
+        router.push('/' + details.user.username )
+        dispatch(setAuthToken(details));
       }
+
+    } catch (error) {
+      setIsLoading(false)
+      console.log(error)
+
+      if (!error.response) {
+        setFormSubmitOutcomeMessage('Server is down. Try again later.')
+        return
+      }
+
+      const {status, data} = error.response;
+      setFormSubmitOutcomeMessage('Failed to create user due to an internal error. Please try again later.')
     }
   }
 
@@ -124,4 +129,4 @@ export default function Register<IRegister>() {
       </div>
     </div>
   )
-}
+};

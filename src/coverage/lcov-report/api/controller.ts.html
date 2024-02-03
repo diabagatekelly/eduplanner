@@ -345,7 +345,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { getApi, postApi } from "@/api/service";
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { getApi, postCommand } from "@/api/service";
 import { IUser } from "@/interfaces/IUser";
 &nbsp;
 export const findUser = <span class="fstat-no" title="function not covered" >async (o</span>ptions) =&gt; {
@@ -360,7 +360,7 @@ export const findUser = <span class="fstat-no" title="function not covered" >asy
 export const editUser = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_EDIT_USER_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -369,7 +369,7 @@ export const editUser = <span class="fstat-no" title="function not covered" >asy
 export const deleteUser = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_DELETE_USER_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -378,7 +378,7 @@ export const deleteUser = <span class="fstat-no" title="function not covered" >a
 export const loginUser = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_LOGIN_USER_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -386,13 +386,13 @@ export const loginUser = <span class="fstat-no" title="function not covered" >as
 &nbsp;
 export const registerUser = async (userJsonData: IUser) =&gt; {
   const url = process.env.NEXT_REGISTER_USER_URL
-  return await postApi(url, userJsonData)
+  return await postCommand(url, userJsonData)
 }
 &nbsp;
 export const linkAccount = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_ADD_LINKED_ACCOUNT_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -401,7 +401,7 @@ export const linkAccount = <span class="fstat-no" title="function not covered" >
 export const unlinkAccount = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_DELETE_LINKED_ACCOUNT_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -410,7 +410,7 @@ export const unlinkAccount = <span class="fstat-no" title="function not covered"
 export const createActivity = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_CREATE_ACTIVITY_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -419,7 +419,7 @@ export const createActivity = <span class="fstat-no" title="function not covered
 export const editActivity = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_EDIT_ACTIVITY_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -428,7 +428,7 @@ export const editActivity = <span class="fstat-no" title="function not covered" 
 export const deleteActivity = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_DELETE_ACTIVITY_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -437,7 +437,7 @@ export const deleteActivity = <span class="fstat-no" title="function not covered
 export const createCard = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_CREATE_CARD_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -446,7 +446,7 @@ export const createCard = <span class="fstat-no" title="function not covered" >a
 export const editCard = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_EDIT_CARD_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -455,7 +455,7 @@ export const editCard = <span class="fstat-no" title="function not covered" >asy
 export const editCardStage = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_EDIT_CARD_STAGE_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -464,7 +464,7 @@ export const editCardStage = <span class="fstat-no" title="function not covered"
 export const resetCardStage = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_RESET_CARD_STAGE_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -473,7 +473,7 @@ export const resetCardStage = <span class="fstat-no" title="function not covered
 export const requestCardReview = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_REQUEST_REVIEW_CARD_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -482,7 +482,7 @@ export const requestCardReview = <span class="fstat-no" title="function not cove
 export const deleteCard = <span class="fstat-no" title="function not covered" >async (r</span>awData) =&gt; {
   const url = <span class="cstat-no" title="statement not covered" >process.env.NEXT_DELETE_CARD_URL</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return await postApi(url, rawData)</span>
+<span class="cstat-no" title="statement not covered" >  return await postCommand(url, rawData)</span>
     .then(<span class="fstat-no" title="function not covered" >async (r</span>esponse) =&gt; {
 <span class="cstat-no" title="statement not covered" >      return response;</span>
     })
@@ -493,7 +493,7 @@ export const deleteCard = <span class="fstat-no" title="function not covered" >a
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-01-22T23:27:24.907Z
+                at 2024-02-03T06:25:38.993Z
             </div>
         <script src="../prettify.js"></script>
         <script>
