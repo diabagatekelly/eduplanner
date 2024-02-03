@@ -8,7 +8,7 @@ const SearchUserForm = ({
   submitForm }:
   {
     handleInput: (e: any) => void,
-    formData: ILogin,
+    formData: any,
     isLoading: boolean,
     submitForm: (e: FormEvent<HTMLFormElement>) => void
   }) => {

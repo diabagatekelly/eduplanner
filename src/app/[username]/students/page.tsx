@@ -1,10 +1,10 @@
 "use client"
 
 import NestedLayout from "@/app/nested-layout";
-import store from "@/app/store/store";
+import store from "@/store/store";
 import { useEffect, useState } from "react"
-import AddStudent from "@/app/components/add-student";
-import ListUi from "@/app/components/lists/lists-ui";
+import AddStudent from "@/components/students/add-student";
+import ListUi from "@/components/lists/lists-ui";
 
 export default function Students() {
   let args;
