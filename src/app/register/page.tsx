@@ -53,11 +53,11 @@ export default function Register<IRegister>() {
   }
 
   async function submitForm(e: FormEvent<HTMLFormElement>) {
-    // We don't want the page to refresh
-    e.preventDefault()
-    setIsLoading(true) // Set loading to true when the request starts
-
     try {
+      // We don't want the page to refresh
+      e.preventDefault()
+      setIsLoading(true) // Set loading to true when the request starts
+
       const rawFormData = new FormData(e.currentTarget)
       const jsonData: IUserFormData = {
         firstName: "",
@@ -85,22 +85,17 @@ export default function Register<IRegister>() {
       const {status, data} = response;
       setIsLoading(false)
 
-      if (status !== 200) {
-        setFormSubmitOutcomeMessage(response.data.message)
-      } else {
-        const {message, details} = data;
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          password: "",
-          accountType: "",
-        });
-        setFormSubmitOutcomeMessage(message)
-        router.push('/' + details.user.username )
-        dispatch(setAuthToken(details));
-      }
-
+      const {message, details} = data;
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        accountType: "",
+      });
+      setFormSubmitOutcomeMessage(message)
+      router.push('/' + details.user.username )
+      dispatch(setAuthToken(details));
     } catch (error) {
       setIsLoading(false)
       console.log(error)
@@ -111,7 +106,13 @@ export default function Register<IRegister>() {
       }
 
       const {status, data} = error.response;
-      setFormSubmitOutcomeMessage('Failed to create user due to an internal error. Please try again later.')
+
+      if (status === 500) {
+        setFormSubmitOutcomeMessage('Failed to create user due to an internal error. Please try again later.')
+      } else {
+        setFormSubmitOutcomeMessage(data.message)
+      }
+      
     }
   }
 

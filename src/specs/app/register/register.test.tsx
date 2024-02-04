@@ -120,7 +120,7 @@ describe('Register page', () => {
   it('should not reset form when response is not 200 or 500 and display error message', async () => {
     const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
     (registerUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}})
+      return Promise.reject(error)
     })
 
     render(<Register />)
