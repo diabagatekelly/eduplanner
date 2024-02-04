@@ -2,15 +2,16 @@
 
 import ListUi from "@/components/lists/lists-ui";
 import AddActivity from "./activities/add-activity";
+import { IUser } from "@/interfaces/IUser";
 
-export const Dashboard = ({ params, userDetails, isMain }: { params: { username: string }, userDetails, isMain }) => {
-  const fullName = `${userDetails?.username?.split("-")[0]} ${userDetails?.username?.split("-")[1]}`
+export default function Dashboard({ userDetails, isMain, isTeacher }: { userDetails: IUser, isMain: boolean, isTeacher: boolean }) {
+  const fullName = `${userDetails?.firstName} ${userDetails?.lastName}`
   return (
     <>
       {isMain ?
         <div>
           <h3 className="py-2.5">Welcome to your dashboard {fullName}.</h3>
-          {userDetails?.accountType?.includes('teacher') ?
+          {isTeacher ?
             <div className="pt-5">
               <AddActivity {...{ userDetails }} />
               <hr className="my-5" />
@@ -20,7 +21,7 @@ export const Dashboard = ({ params, userDetails, isMain }: { params: { username:
 
             <div>
               <div className="pb-5">
-                {userDetails?.teacherId ?
+                {isTeacher ?
                   <h5>Your teacher&#39;s email is {userDetails?.teacherId}</h5> :
                   <h5>Ask your teacher or parent to add you and create some activities for you!</h5>
                 }

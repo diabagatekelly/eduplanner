@@ -1,7 +1,9 @@
+import { IUser } from "@/interfaces/IUser";
+
 export function populateUser() {
   return {
     type: 'POPULATE',
-    allData: JSON.parse(sessionStorage.getItem('user_data')) || {}
+    allData: <IUser>(JSON.parse(sessionStorage.getItem('user_data'))) || {}
   }
 }
 

@@ -3,7 +3,7 @@
 import NestedLayout from "@/app/nested-layout";
 import store from "@/store/store";
 import { useEffect, useState } from "react"
-import { Dashboard } from "@/components/dashboard";
+import Dashboard from "@/components/dashboard";
 
 export default function Main({ params }: { params: { username: string, student: string } }) {
 
@@ -24,7 +24,7 @@ export default function Main({ params }: { params: { username: string, student: 
 
   return (
     <NestedLayout {...{ isTeacher }}>
-      <Dashboard {...{ params, userDetails, isMain }} />
+      <Dashboard {...{ params, userDetails, isMain, isTeacher }} />
     </NestedLayout>
   )
 }

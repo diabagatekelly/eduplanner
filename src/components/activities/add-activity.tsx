@@ -106,7 +106,7 @@ const AddActivity = ({ userDetails }) => {
 
   return (
     <div className="justify-items-start">
-      <h3 className="text-3xl py-3 font-bold">Add a new activty:</h3>
+      <h3 className="text-3xl py-3 font-bold">Add a new activity:</h3>
       <AddActivityForm {...{ handleInput, formData, isLoading, submitForm }} />
       <div>{formSuccessMessage}</div>
     </div>

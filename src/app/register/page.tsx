@@ -23,7 +23,7 @@ interface IResponse {
 interface IResponseBody {
   status: string,
   message: string,
-  details?: Record<any, any>
+  details?: {token: string, user: IUser}
 }
 
 export default function Register<IRegister>() {
@@ -82,7 +82,8 @@ export default function Register<IRegister>() {
       };
 
       const response = await registerUser(userData) as unknown as IResponse;
-      const {status, data} = response;
+      console.log(response)
+      const {data} = response;
       setIsLoading(false)
 
       const {message, details} = data;
