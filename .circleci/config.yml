@@ -1,11 +1,7 @@
 version: 2.1
 orbs:
-  node: circleci/node@5.1.0
-# executors:
-#   pw-jammy-development:
-#     docker:
-#       - image: mcr.microsoft.com/playwright:v1.37.0-jammy
-
+  node: circleci/node@5.2.0
+  cypress: cypress-io/cypress@3.3.0
 jobs:
   test_frontend:
     executor: node/default
@@ -18,9 +14,33 @@ jobs:
           name: Run frontend tests
           command: npm run test
           test-results-for: jest
+  install-and-persist:
+    executor: cypress/default
+    steps:
+      - cypress/install
+      - persist_to_workspace:
+          paths:
+            - .cache/Cypress
+            - project
+          root: ~/
+  run-tests-in-parallel:
+    executor: cypress/default
+    parallelism: 8
+    steps:
+      - attach_workspace:
+          at: ~/
+      - cypress/run-tests:
+          start-command: npm run start
+          cypress-command: npx nyc cypress run --browser chrome
             
 
 workflows:
   test_my_app:
     jobs:
       - test_frontend
+      - install-and-persist:
+          name: Install & Persist To Workspace
+      - run-tests-in-parallel:
+          name: Run Tests in Parallel
+          requires:
+            - Install & Persist To Workspace

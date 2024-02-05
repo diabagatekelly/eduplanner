@@ -82,7 +82,7 @@ export default function Register<IRegister>() {
       };
 
       const response = await registerUser(userData) as unknown as IResponse;
-      console.log(response)
+
       const {data} = response;
       setIsLoading(false)
 

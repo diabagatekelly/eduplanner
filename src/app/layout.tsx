@@ -55,7 +55,13 @@ const Reloader = () => {
 
   return ( 
     <Suspense fallback={null}>
-        <Navbar {...{isAuthenticated, username}} />
+      <Navbar {...{isAuthenticated, username}} />
     </Suspense>
   );
+}
+
+
+if (window.Cypress) {
+  //@ts-ignore
+  window.store = store
 }
