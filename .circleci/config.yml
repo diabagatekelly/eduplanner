@@ -2,7 +2,6 @@ version: 2.1
 orbs:
   node: circleci/node@5.2.0
   cypress: cypress-io/cypress@3.3.0
-  browser-tools: circleci/browser-tools@1.4.6
 jobs:
   test_frontend:
     executor: node/default
@@ -25,13 +24,13 @@ jobs:
           root: ~/
   run-tests-in-parallel:
     executor: cypress/default
-    parallelism: 8
+    parallelism: 4
     steps:
       - attach_workspace:
           at: ~/
       - cypress/run-tests:
-          start-command: npm run dev
-          cypress-command: npx nyc cypress run
+          start-command: npm run dev & wait-on http://localhost:3000
+          cypress-command: npx nyc cypress run --environment production
             
 
 workflows:

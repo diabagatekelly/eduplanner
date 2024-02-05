@@ -5,7 +5,7 @@ import { ISODateString } from '../../src/interfaces/isoDateType';
 describe('Register user', () => {
   const user: IUser = {...mockUser, lastLogin: (mockUser.lastLogin as ISODateString)};
   beforeEach(() => {
-    cy.intercept(Cypress.env('DEV')['REGISTER_USER_URL'], {
+    cy.intercept(Cypress.env('REGISTER_USER_URL'), {
       statusCode: 200,
       body: {
         status: 'success',
