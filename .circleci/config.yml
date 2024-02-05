@@ -18,8 +18,6 @@ jobs:
     executor: cypress/default
     steps:
       - cypress/install
-      - browser-tools/install-chrome
-      - browser-tools/install-chromedriver
       - persist_to_workspace:
           paths:
             - .cache/Cypress
@@ -33,7 +31,7 @@ jobs:
           at: ~/
       - cypress/run-tests:
           start-command: npm run dev
-          cypress-command: npx nyc cypress run --browser chrome
+          cypress-command: npx nyc cypress run
             
 
 workflows:
