@@ -13,7 +13,6 @@ jobs:
       - run:
           name: Run frontend tests
           command: npm run test
-          test-results-for: jest
   install-and-persist:
     executor: cypress/default
     steps:
