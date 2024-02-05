@@ -42,6 +42,10 @@ const Reloader = () => {
   const [userState, setUserState] = useState({isAuthenticated: false, userReducer: {...args}})
 
   useEffect(() => {
+    if (window.Cypress) {
+      //@ts-ignore
+      window.store = store
+    }
     dispatch(hasExpired())
     dispatch(hasToken())
     dispatch(populateUser())
@@ -58,10 +62,4 @@ const Reloader = () => {
       <Navbar {...{isAuthenticated, username}} />
     </Suspense>
   );
-}
-
-
-if (window.Cypress) {
-  //@ts-ignore
-  window.store = store
 }
