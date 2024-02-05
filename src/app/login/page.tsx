@@ -91,7 +91,7 @@ export default function Login() {
 
         <p className="mt-10 text-center text-sm text-gray-500">
           <span>No account yet? </span>
-          <Link data-test="register-link" href="/register" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Create an account</Link>
+          <Link data-testid="register-link" href="/register" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Create an account</Link>
         </p>
       </div>
     </div>

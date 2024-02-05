@@ -15,7 +15,7 @@ const RegisterForm = ({
 
   return (
     <>
-      <form data-test="register-form" className="space-y-6" onSubmit={submitForm} method="POST">
+      <form data-testid="register-form" className="space-y-6" onSubmit={submitForm} method="POST">
         <div>
           <label htmlFor="firstName" className="block text-sm font-medium leading-6 text-gray-900">First Name:</label>
           <div className="mt-2">

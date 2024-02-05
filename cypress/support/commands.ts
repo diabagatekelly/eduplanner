@@ -29,7 +29,7 @@ import { IUser } from '@/interfaces/IUser'
 //
 
 Cypress.Commands.add('register', (mockUser: IUser) => { 
-  cy.get('[data-test="register-form"]').within(() => {
+  cy.get('[data-testid="register-form"]').within(() => {
     cy.get('input[name="firstName"]').type(mockUser.firstName)
     cy.get('input[name="lastName"]').type(mockUser.lastName)
     cy.get('input[name="password"]').type(mockUser.password)
@@ -41,8 +41,8 @@ Cypress.Commands.add('register', (mockUser: IUser) => {
 
 Cypress.Commands.add('navigateToRegisterPage', () => {
   cy.visit('/')
-  cy.get('[data-test="login-btn"]').click()
-  cy.get('[data-test="register-link"]').click()
+  cy.get('[data-testid="login-btn"]').click()
+  cy.get('[data-testid="register-link"]').click()
 })
 
 declare global {

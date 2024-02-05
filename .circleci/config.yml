@@ -30,7 +30,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - cypress/run-tests:
-          start-command: npm run start
+          start-command: npm run dev
           cypress-command: npx nyc cypress run --browser chrome
             
 

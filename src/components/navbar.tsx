@@ -161,7 +161,7 @@ export const Navbar = ({ isAuthenticated, username }) => {
               <div className={classNames(!isAuthenticated ? "hidden inset-y-0 right-0 flex items-center sm:ml-6 sm:block" : "hidden")}>
                 <div className="flex space-x-4">
                   <Link
-                    data-test="login-btn"
+                    data-testid="login-btn"
                     key="Login"
                     href="/login"
                     className={classNames(
