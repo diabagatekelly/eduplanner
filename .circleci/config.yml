@@ -28,7 +28,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - cypress/run-tests:
-          start-command: npm run dev & wait-on http://localhost:3000
+          start-command: npm run dev
           cypress-command: NODE_ENV=production npx nyc cypress run
             
 workflows:
