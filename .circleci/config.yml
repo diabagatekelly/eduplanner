@@ -30,7 +30,7 @@ jobs:
           at: ~/
       - cypress/run-tests:
           start-command: npm run dev & wait-on http://localhost:3000
-          cypress-command: npx nyc cypress run --environment production
+          cypress-command: NODE_ENV=production npx nyc cypress run
             
 workflows:
   test_my_app:

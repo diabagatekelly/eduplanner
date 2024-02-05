@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:ui": "nyc cypress run --browser chrome --environment development",
-    "test:ui:open": "nyc cypress open --environment development"
+    "test:ui": "NODE_ENV=development cypress run --browser chrome",
+    "test:ui:open": "NODE_ENV=development nyc cypress open"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
