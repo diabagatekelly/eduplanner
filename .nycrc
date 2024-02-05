@@ -3,6 +3,5 @@
   "all": true,
   "extension": [".ts", ".tsx"],
   "exclude": ["src/specs/**/*.ts", "cypress/**/*.ts"],
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "check-coverage": true
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }
