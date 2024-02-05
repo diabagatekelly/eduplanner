@@ -34,10 +34,11 @@ jobs:
 workflows:
   test_frontend_app:
     jobs:
-      - run-unit-tests
+      - run-unit-tests:
+          name: Run Unit Tests
       - install-and-persist:
           name: Install & Persist To Workspace
       - run-integration-tests:
-          name: Run Tests in Parallel
+          name: Run Integration Tests
           requires:
             - Install & Persist To Workspace
