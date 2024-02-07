@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDispatch } from "react-redux";
 import RegisterForm from "@/components/forms/register-form";
 import { IUser, IUserFormData } from "@/interfaces/IUser";
+import { IResponse } from "@/interfaces/IApiResponse";
 import { setAuthToken } from "@/store/actions/authActions";
 import { registerUser } from "@/api/controller";
 import { ISODateString } from "@/interfaces/isoDateType";
@@ -13,17 +14,6 @@ import { formatISODate } from "@/utils/formatDate";
 interface IRegister {
   handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
   submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
-}
-
-interface IResponse {
-  status: number,
-  data: IResponseBody
-}
-
-interface IResponseBody {
-  status: string,
-  message: string,
-  details?: {token: string, user: IUser}
 }
 
 export default function Register<IRegister>() {
@@ -87,6 +77,7 @@ export default function Register<IRegister>() {
       setIsLoading(false)
 
       const {message, details} = data;
+
       setFormData({
         firstName: "",
         lastName: "",

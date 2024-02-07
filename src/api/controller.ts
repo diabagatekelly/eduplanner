@@ -1,10 +1,10 @@
-import { getApi, postCommand } from "@/api/service";
-import { IUser } from "@/interfaces/IUser";
+import { getCommand, postCommand } from "@/api/service";
+import { IUser, IUserLogin } from "@/interfaces/IUser";
 
 export const findUser = async (options) => {
   const url = process.env.NEXT_GET_USER_URL
 
-  return await getApi(url, options)
+  return await getCommand(url, options)
     .then(async (response) => {
       return response;
     })
@@ -28,13 +28,9 @@ export const deleteUser = async (rawData) => {
     })
 }
 
-export const loginUser = async (rawData) => {
+export const loginUser = async (params: IUserLogin) => {
   const url = process.env.NEXT_LOGIN_USER_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  return await getCommand(url, params)
 }
 
 export const registerUser = async (userJsonData: IUser) => {

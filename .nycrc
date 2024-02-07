@@ -1,7 +1,0 @@
-{
-  "extends": ["@istanbuljs/nyc-config-typescript", "nyc-config-tsx"],
-  "all": true,
-  "extension": [".ts", ".tsx"],
-  "exclude": ["src/specs/**/*.ts", "cypress/**/*.ts"],
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
-}

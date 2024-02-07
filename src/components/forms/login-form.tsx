@@ -1,5 +1,5 @@
 import { FormEvent } from "react";
-import { ILogin } from "../../interfaces/IUser";
+import { IUserLogin } from "../../interfaces/IUser";
 
 const LoginForm = ({
   handleInput,
@@ -7,15 +7,15 @@ const LoginForm = ({
   isLoading,
   submitForm }:
   {
-    handleInput: (e: any) => void,
-    formData: ILogin,
+    handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
+    formData: IUserLogin,
     isLoading: boolean,
     submitForm: (e: FormEvent<HTMLFormElement>) => void
   }) => {
 
   return (
     <>
-      <form className="space-y-6" onSubmit={submitForm} method="POST">
+      <form data-testid="login-form" className="space-y-6" onSubmit={submitForm} method="POST">
         <div>
           <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">Email:</label>
           <div className="mt-2">

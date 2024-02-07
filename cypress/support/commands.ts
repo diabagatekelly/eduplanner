@@ -27,6 +27,11 @@ import { IUser } from '@/interfaces/IUser'
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
+Cypress.Commands.add('navigateToRegisterPage', () => {
+  cy.visit('/')
+  cy.get('[data-testid="login-btn"]').click()
+  cy.get('[data-testid="register-link"]').click()
+})
 
 Cypress.Commands.add('register', (mockUser: IUser) => { 
   cy.get('[data-testid="register-form"]').within(() => {
@@ -39,17 +44,22 @@ Cypress.Commands.add('register', (mockUser: IUser) => {
   })
 })
 
-Cypress.Commands.add('navigateToRegisterPage', () => {
+Cypress.Commands.add('login', (credentials: {email: string, password: string}) => { 
   cy.visit('/')
   cy.get('[data-testid="login-btn"]').click()
-  cy.get('[data-testid="register-link"]').click()
+  cy.get('[data-testid="login-form"]').within(() => {
+    cy.get('input[name="email"]').type(credentials.email)
+    cy.get('input[name="password"]').type(credentials.password)
+    cy.root().submit()
+  })
 })
 
 declare global {
   namespace Cypress {
     interface Chainable {
-      register(user: IUser): void,
       navigateToRegisterPage(): void
+      register(user: IUser): void,
+      login(credentials: {email: string, password: string}): void,
       // drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
       // dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
       // visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>

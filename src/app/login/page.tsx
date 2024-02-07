@@ -3,29 +3,34 @@
 import LoginForm from "@/components/forms/login-form";
 import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
-import { ILogin } from "@/interfaces/IUser";
+import { IUserLogin } from "@/interfaces/IUser";
+import { IResponse } from "@/interfaces/IApiResponse";
 import Link from "next/link";
 import { setAuthToken } from "@/store/actions/authActions";
 import { useDispatch } from "react-redux";
 import { populateUser } from "@/store/actions/userActions";
 import { loginUser } from "@/api/controller";
 
-export default function Login() {
+interface ILogin {
+
+}
+
+export default function Login<ILogin>() {
   const dispatch = useDispatch()
   const router = useRouter()
 
-  const [formData, setFormData] = useState<ILogin>({
+  const [formData, setFormData] = useState<IUserLogin>({
     email: "",
     password: "",
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formSuccess, setFormSuccess] = useState(false)
-  const [formSuccessMessage, setFormSuccessMessage] = useState("")
+  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
 
-  const handleInput = (e: any) => {
-    const fieldName: string = e.target.name;
-    const fieldValue: any = e.target.value;
+  const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement
+    const fieldName: string = target.name;
+    const fieldValue: any = target.value;
 
     setFormData((prevState) => ({
       ...prevState,
@@ -35,45 +40,52 @@ export default function Login() {
   }
 
   async function submitForm(e: FormEvent<HTMLFormElement>) {
-    // We don't want the page to refresh
-    e.preventDefault()
-    setIsLoading(true) // Set loading to true when the request starts
-
     try {
-      const rawFormData = new FormData(e.currentTarget)
-      const jsonData = {}
+      // We don't want the page to refresh
+      e.preventDefault()
+      setIsLoading(true) // Set loading to true when the request starts
 
-      for (const pair of rawFormData.entries()) {
-        jsonData[pair[0]] = `${pair[1]}`;
+      const rawFormData = new FormData(e.currentTarget)
+      const userCredentials: IUserLogin = {
+        email: "",
+        password: ""
       }
 
-      const response = await loginUser(jsonData)
-        .then((response) => {
-          setIsLoading(false)
-          if (response.status !== 200) {
-            setFormSuccess(false)
-            setFormSuccessMessage(response.data.message)
-          } else {
-            setFormData({
-              email: "",
-              password: "",
-            });
-            setFormSuccess(true);
-            setFormSuccessMessage('Logging in...')
-            const url = `${response.data.firstName}-${response.data.lastName}`
-            router.push('/' + url)
-            dispatch(setAuthToken(response.data));
-            dispatch(populateUser());
-          }
-        })
+      for (const pair of rawFormData.entries()) {
+        userCredentials[pair[0]] = `${pair[1]}`;
+      }
 
+      const response = await loginUser(userCredentials) as unknown as IResponse;
 
-    } catch (error) {
-      console.error(error)
+      const {data} = response;
       setIsLoading(false)
-      setFormSuccess(false)
-      if (error.response) {
-        setFormSuccessMessage(error.response.data.message)
+
+      const {message, details} = data;
+
+      setFormData({
+        email: "",
+        password: ""
+      });
+      setFormSubmitOutcomeMessage('Logging in ...')
+      router.push('/' + details.user.username )
+      dispatch(setAuthToken(details));
+      dispatch(populateUser());
+    } catch (error) {
+      setIsLoading(false)
+      console.error(error)
+
+
+      if (!error.response) {
+        setFormSubmitOutcomeMessage('Server is down. Try again later.')
+        return
+      }
+
+      const {status, data} = error.response;
+
+      if (status === 500) {
+        setFormSubmitOutcomeMessage('Failed to login due to an internal error. Please try again later.')
+      } else {
+        setFormSubmitOutcomeMessage(data.message)
       }
 
     }
@@ -87,7 +99,7 @@ export default function Login() {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <LoginForm {...{ handleInput, formData, isLoading, submitForm }} />
-        <div className="mt-3 text-center">{formSuccessMessage}</div>
+        <div className="mt-3 text-center">{formSubmitOutcomeMessage}</div>
 
         <p className="mt-10 text-center text-sm text-gray-500">
           <span>No account yet? </span>

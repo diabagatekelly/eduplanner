@@ -1,4 +1,4 @@
-import {getApi, postCommand} from '@/api/service';
+import {getCommand, postCommand} from '../../api/service';
 import axios from 'axios';
 import { mockUser } from '../mocks';
 jest.mock('axios');
@@ -12,9 +12,9 @@ mockAxios.get.mockResolvedValue(mockGetResponse);
 mockAxios.post.mockResolvedValue(mockPostResponse);
 
 describe('Service', () => {
-  it('should call getApi as expected', async () => {
+  it('should call getCommand as expected', async () => {
     const mockOptions = { params: { email: 'mock@email.com' }}
-    const res = await getApi(mockUrl, mockOptions);
+    const res = await getCommand(mockUrl, mockOptions);
 
     expect(mockAxios.get).toHaveBeenCalledWith(mockUrl, mockOptions);
     expect(res).toEqual(mockGetResponse)

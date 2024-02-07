@@ -1,5 +1,5 @@
 import { FormEvent } from "react";
-import { ILogin } from "../../interfaces/IUser";
+import { IUserLogin } from "../../interfaces/IUser";
 
 const SearchUserForm = ({
   handleInput,

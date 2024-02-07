@@ -2,32 +2,31 @@ import * as mockUser from '../fixtures/mock-user.json';
 import { IUser } from '../../src/interfaces/IUser';
 import { ISODateString } from '../../src/interfaces/isoDateType';
 
-describe('Register user', () => {
+
+describe('Login User', () => {
   const user: IUser = {...mockUser, lastLogin: (mockUser.lastLogin as ISODateString)};
-  
-  describe('Successful registration', () => {
+
+  describe('Successful login', () => {
     beforeEach(() => {
-      cy.intercept(Cypress.env('REGISTER_USER_URL'), {
+      cy.intercept(Cypress.env('LOGIN_USER_URL'), {
         statusCode: 200,
         body: {
           status: 'success',
-          message: 'User created',
+          message: 'User found',
           details: {token: 'xxxxxx', user}
         }
       })
     })
-    it('should register user and navigate to Dashboard', () => {
-      cy.navigateToRegisterPage()
-      cy.contains('Create an account').should('exist')
-      cy.register(user)
+    it('should login user', () => {
+      cy.login({email: user.email, password: user.password})
       cy.wait(100)
       cy.contains(`Welcome to your dashboard ${mockUser.firstName} ${mockUser.lastName}.`)
       cy.url().should('include', `${mockUser.username}`) 
     })
-  
+
     it('should update store values as expected', () => {
-      cy.navigateToRegisterPage()
-      cy.register(user)
+      cy.login({email: user.email, password: user.password})
+      cy.wait(100)
       cy.window().its('store').invoke('getState').should('deep.equal', {
         authReducer: {isAuthenticated: true},
         userReducer: { default: user, ...user}
@@ -35,29 +34,26 @@ describe('Register user', () => {
     })
   })
 
-  describe('Unsuccessful registration', () => {
+  describe('Unsuccessful login', () => {
     beforeEach(() => {
-      cy.intercept(Cypress.env('REGISTER_USER_URL'), {
-        statusCode: 400,
+      cy.intercept(Cypress.env('LOGIN_USER_URL'), {
+        statusCode: 500,
         body: {
-          status: 'conflict',
-          message: 'This user altready exists.',
+          status: 'error',
+          message: 'Some error message which should be overriden by default.'
         }
       })
     })
 
-    it('should display error message and stay on the same page if registration fails', () => {
-      cy.navigateToRegisterPage()
-      cy.register(user)
+    it('should display error message and stay on the same page if login fails', () => {
+      cy.login({email: user.email, password: user.password})
       cy.wait(100)
-      cy.contains('This user altready exists.')
+      cy.contains('Failed to login due to an internal error. Please try again later.')
       cy.url().should('not.include', `${mockUser.username}`) 
     })
 
-    it('should not populate store when registration fails', () => {
-      cy.navigateToRegisterPage()
-      cy.register(user)
-
+    it('should not populate store when login fails', () => {
+      cy.login({email: user.email, password: user.password})
       cy.window().its('store').invoke('getState').should('deep.equal', {
         authReducer: {isAuthenticated: false},
         userReducer: {}
@@ -65,6 +61,3 @@ describe('Register user', () => {
     })
   })
 })
-
-
-

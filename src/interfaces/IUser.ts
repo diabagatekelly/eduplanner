@@ -1,9 +1,9 @@
 import { ISODateString } from "./isoDateType";
 
-export interface ILogin {
-  email: string,
-  password: string
-}
+// export interface ILogin {
+//   email: string,
+//   password: string
+// }
 
 export interface IUser {
   userId: string,
@@ -19,3 +19,4 @@ export interface IUser {
 
 export type IUserFormData = Required<Omit<IUser, 'userId'|'username'|'lastLogin'|'teacherId'>>
 
+export type IUserLogin = Pick<IUser, 'email'|'password'>;

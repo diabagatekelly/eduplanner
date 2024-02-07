@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
-    "test:ui": "NODE_ENV=development cypress run --browser chrome",
-    "test:ui:open": "NODE_ENV=development nyc cypress open"
+    "test:ui": "cross-env NODE_ENV=development cypress run --browser chrome",
+    "test:ui:open": "cross-env NODE_ENV=development cypress open"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
@@ -19,6 +19,7 @@
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
     "axios": "^1.5.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
     "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",
