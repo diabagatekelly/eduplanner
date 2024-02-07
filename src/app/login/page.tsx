@@ -72,7 +72,7 @@ export default function Login<ILogin>() {
       dispatch(populateUser());
     } catch (error) {
       setIsLoading(false)
-      console.error(error)
+      console.log(error)
 
 
       if (!error.response) {

@@ -1,10 +1,10 @@
-import Register from '@/app/register/page'
+import Register from '../../../app/register/page'
 import '@testing-library/jest-dom'
 import { screen, fireEvent, act } from '@testing-library/react'
 import { render } from '../../util';
 import * as React from 'react';
-import { registerUser } from '@/api/controller';
-import { mockUser } from '@/specs/mocks';
+import { registerUser } from '../../../api/controller';
+import { mockUser } from '../../../specs/mocks';
 
 jest.mock('next/navigation', () => {
   return {
