@@ -18,13 +18,18 @@ jest.mock('next/navigation', () => {
 
 describe('Add activity', () => {
   const userDetails = {...mockUser}
+  const reload = window.location.reload;
 
   beforeAll(() => {
     sessionStorage.setItem("user_data", JSON.stringify(userDetails))
+    Object.defineProperty(window, 'location', {
+      value: { reload: jest.fn() }
+    });
   })
 
   afterAll(() => {
     sessionStorage.clear()
+    window.location.reload = reload;
   })
 
   it('should render form to add an activity', async () => {
@@ -52,7 +57,6 @@ describe('Add activity', () => {
     const userActivityDTO = {userActivity: mockActivity, userId: userDetails.userId}
 
     await act(() => {
-      // fill out the form
       fireEvent.change(name, {
         target: {value: 'Quran'}
       })
@@ -85,7 +89,6 @@ describe('Add activity', () => {
     const submitMessage = await screen.findByTestId('add-activity-submit-message');
 
     await act(() => {
-      // fill out the form
       fireEvent.change(name, {
         target: {value: 'Quran'}
       })
@@ -124,7 +127,6 @@ describe('Add activity', () => {
     const submitMessage = await screen.findByTestId('add-activity-submit-message');
 
     await act(() => {
-      // fill out the form
       fireEvent.change(name, {
         target: {value: 'Quran'}
       })
@@ -162,7 +164,6 @@ describe('Add activity', () => {
     const submitButton = screen.getByTestId('add-activity-btn')
 
     await act(() => {
-      // fill out the form
       fireEvent.change(name, {
         target: {value: 'Quran'}
       })
@@ -210,7 +211,6 @@ describe('Add activity', () => {
     const submitButton = screen.getByTestId('add-activity-btn')
 
     await act(() => {
-      // fill out the form
       fireEvent.change(name, {
         target: {value: 'Quran'}
       })
@@ -259,7 +259,6 @@ describe('Add activity', () => {
     const submitButton = screen.getByTestId('add-activity-btn')
 
     await act(() => {
-      // fill out the form
       fireEvent.change(name, {
         target: {value: 'Quran'}
       })
