@@ -29,7 +29,7 @@ jobs:
           at: ~/
       - cypress/run-tests:
           start-command: npm run dev
-          cypress-command: npx nyc cypress run
+          cypress-command: NODE_ENV=production npx nyc cypress run
             
 workflows:
   test_frontend_app:

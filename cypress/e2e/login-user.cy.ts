@@ -5,10 +5,11 @@ import { ISODateString } from '../../src/interfaces/isoDateType';
 
 describe('Login User', () => {
   const user: IUser = {...mockUser, lastLogin: (mockUser.lastLogin as ISODateString)};
+  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?email=mock.user%40email.com&password=password&userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D`
 
   describe('Successful login', () => {
     beforeEach(() => {
-      cy.intercept(Cypress.env('LOGIN_USER_URL'), {
+      cy.intercept(loginUrl, {
         statusCode: 200,
         body: {
           status: 'success',
@@ -36,7 +37,7 @@ describe('Login User', () => {
 
   describe('Unsuccessful login', () => {
     beforeEach(() => {
-      cy.intercept(Cypress.env('LOGIN_USER_URL'), {
+      cy.intercept(loginUrl, {
         statusCode: 500,
         body: {
           status: 'error',

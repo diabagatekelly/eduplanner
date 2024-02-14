@@ -4,7 +4,7 @@ import { ISODateString } from "./isoDateType";
 
 
 export interface IUser {
-  userId: string,
+  userId: string, // btoa(email)
   firstName: string,
   lastName: string,
   username: string,

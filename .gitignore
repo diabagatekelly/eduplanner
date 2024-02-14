@@ -42,3 +42,5 @@ next-env.d.ts
 .vercel
 .vscode
 e2e-test-results
+cypress/downloads
+cypress/screenshots
