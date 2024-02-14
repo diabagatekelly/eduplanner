@@ -8,9 +8,9 @@ export default defineConfig({
     baseUrl: 'http://localhost:3000',
     setupNodeEvents(on, config) {
       config.env.REGISTER_USER_URL =
-        process.env.NODE_ENV !== 'development' ? `${prod}/user/register` : `${local}/user/register`;
+        process.env.CYPRESS_ENV !== 'development' ? `${prod}/user/register` : `${local}/user/register`;
       config.env.LOGIN_USER_URL = 
-        process.env.NODE_ENV !== 'development' ? `${prod}/user/login` : `${local}/user/login`;
+        process.env.CYPRESS_ENV !== 'development' ? `${prod}/user/login` : `${local}/user/login`;
       config.env.SITE_URL = "https://eduplanner-jade.vercel.app";
 
       return config
