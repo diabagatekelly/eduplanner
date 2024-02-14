@@ -1,3 +1,4 @@
+import { IActivity } from "@/interfaces/IActivity";
 import { IUser } from "@/interfaces/IUser";
 
 export function populateUser() {
@@ -74,18 +75,18 @@ export function removeStudent(studentEmail) {
 
 }
 
-export function createUserActivity(activityData) {
+export function createUserActivity(activityData: {activityDetails: IActivity, userId: string}) {
   const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
-  const isMain = activityData.userEmail === currentUserData.email
+  const isMain = activityData?.userId === currentUserData.userId
   if (isMain) {
     const currentActivities = currentUserData.activities || []
     currentActivities.push(activityData)
     currentUserData.activities = currentActivities
   } else {
-    const student = currentUserData.students[activityData.username]
+    const student = currentUserData.students[activityData.userId]
     const studentActivities = student.activities || []
     studentActivities.push(activityData)
-    currentUserData.students[activityData.username].activities = studentActivities
+    currentUserData.students[activityData.userId].activities = studentActivities
   }
   
   sessionStorage.setItem('user_data', JSON.stringify(currentUserData))

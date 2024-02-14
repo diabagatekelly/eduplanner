@@ -1,4 +1,6 @@
-import { useState, FormEvent, useEffect } from "react";
+"use client"
+
+import { useState, FormEvent } from "react";
 import { createActivity } from "../../api/controller";
 import AddActivityForm from "../forms/add-activity-form";
 import { useDispatch } from "react-redux";
@@ -6,8 +8,17 @@ import { createUserActivity } from "../../store/actions/userActions";
 import { IActivity, IActivityFormData } from "../../interfaces/IActivity";
 import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
 import { ISODateString } from "@/interfaces/isoDateType";
+import { IUser } from "@/interfaces/IUser";
+import { toDbFormat } from "@/utils/formatActivityName";
+import { formatISODate } from "@/utils/formatDate";
+import { IResponse } from "@/interfaces/IApiResponse";
 
-const AddActivity = ({ userDetails }) => {
+interface IAddActivity {
+  handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
+  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
+}
+
+export default function AddActivity<IAddActivity>({ userDetails }: {userDetails: IUser}) {
   const dispatch = useDispatch()
 
   const [formData, setFormData] = useState<IActivityFormData>({
@@ -18,99 +29,95 @@ const AddActivity = ({ userDetails }) => {
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formSuccess, setFormSuccess] = useState(false)
-  const [formSuccessMessage, setFormSuccessMessage] = useState("")
+  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
 
-  const handleInput = (e: any) => {
-    const fieldName: string = e.target.name;
-    const fieldValue: any = e.target.value;
+  function handleInput(e: React.FormEvent<HTMLInputElement>) {
+    const target = e.target as HTMLInputElement
+    const fieldName: string = target.name;
+    const fieldValue: any = target.value;
 
     setFormData((prevState) => ({
       ...prevState,
       [fieldName]: fieldValue
     }));
-
   }
 
-  const reset = () => {
-    setTimeout(() => {
-      setFormData({
-        name: "",
-        description: "",
-        points: 0,
-        hasCards: ""
-      });
-      setFormSuccessMessage("")
-    }, 3000)
+  function _resetForm() {
+    setFormData({
+      name: "",
+      description: "",
+      points: 0,
+      hasCards: ""
+    });
   }
 
-
-  async function submitForm(e: FormEvent<HTMLFormElement>): Promise<any> {
-    // We don't want the page to refresh
-    e.preventDefault()
-    setIsLoading(true) // Set loading to true when the request starts
-
+  async function submitForm(e: FormEvent<HTMLFormElement>): Promise<void> {
     try {
+      // We don't want the page to refresh
+      e.preventDefault()
+      setIsLoading(true) // Set loading to true when the request starts
+
       const formData = new FormData(e.currentTarget)
-      const rawData: IActivityFormData = { name: '', description: '', points: 0, hasCards: '' }
+      const activityFormInfo: IActivityFormData = { name: '', description: '', points: 0, hasCards: '' }
 
       for (const pair of formData.entries()) {
-        rawData[pair[0]] = `${pair[1]}`;
+        activityFormInfo[pair[0]] = `${pair[1]}`;
       }
 
-      if (userDetails.activities?.find(activity => activity.name === rawData.name)) {
-        setFormSuccess(false)
-        setFormSuccessMessage("This is already one of your activities.");
-        reset()
+      if (userDetails.activities?.find(activity => activity.name === activityFormInfo.name)) {
+        setFormSubmitOutcomeMessage("This is already one of your activities.");
+        _resetForm()
         return;
       }
 
-      const activityName = rawData.name.trim().split(' ').join('-')
-      const hasCards = rawData.hasCards === 'true' ? true : false
-      const activityId = btoa(`${userDetails.email}-${activityName}`)
+      const dbActivityName = toDbFormat(activityFormInfo.name)
 
-      const activityJsonData: IActivity = {
-        ...rawData, 
-        name: activityName,
-        activityId, 
+      const userActivity: IActivity = {
+        ...activityFormInfo,
+        activityId: btoa(`${userDetails.email}-${dbActivityName}`),
+        name: dbActivityName,
+        points: Number(activityFormInfo.points),
         completionStatus: CompletionStatus.PENDING,
-        createdOn: new Date().toISOString() as ISODateString,
-        lastUpdatedOn: null,
-        hasCards,
-        userId: userDetails.userId
-      }
+        hasCards: activityFormInfo.hasCards === 'true' ? true : false,
+        createdOn: formatISODate(new Date().toISOString() as ISODateString), 
+        lastUpdatedOn: null
+      } 
 
-      const response = await createActivity(activityJsonData)
-        .then(async (response) => {
-          setIsLoading(false)
-          if (response.status !== 200) {
-            setFormSuccess(false)
-            setFormSuccessMessage(response.data.message)
-            reset()
-          } else {
-            setFormSuccess(true);
-            dispatch(createUserActivity(response.data))
-          }
-        })
+      const response = await createActivity({userActivity, userId: userDetails.userId}) as unknown as IResponse;
+      const {data} = response;
+      const {message, details}: {message: string, details: {userId: string, activityDetails: IActivity}} = data;
+
+      dispatch(createUserActivity(details))
+      setFormSubmitOutcomeMessage(message)
+      _resetForm()
+      setIsLoading(false)  
+      window.location.reload()
 
     } catch (error) {
-      console.error(error)
       setIsLoading(false)
-      setFormSuccess(false)
-      if (error.response) {
-        setFormSuccessMessage(error.response.data.message)
+      console.log(error)
+
+      if (!error.response) {
+        setFormSubmitOutcomeMessage('Server is down. Try again later.')
+        return
       }
-      reset()
+
+      const {status, data} = error.response;
+
+      if (status === 500) {
+        setFormSubmitOutcomeMessage('Failed to create activity due to an internal error. Please try again later.')
+      } else {
+        setFormSubmitOutcomeMessage(data.message)
+      }
     }
   }
+  
 
   return (
     <div className="justify-items-start">
       <h3 className="text-3xl py-3 font-bold">Add a new activity:</h3>
       <AddActivityForm {...{ handleInput, formData, isLoading, submitForm }} />
-      <div>{formSuccessMessage}</div>
+      <div data-testid="add-activity-submit-message">{formSubmitOutcomeMessage}</div>
     </div>
   )
 }
-
-export default AddActivity;

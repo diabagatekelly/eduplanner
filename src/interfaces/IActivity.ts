@@ -1,8 +1,9 @@
 import { CompletionStatus } from "./CompletionStatusEnum"
+import { ICard } from "./ICard";
 import { ISODateString } from "./isoDateType"
 
 export interface IActivity {
-  activityId: string, // btoa(name-email)
+  activityId: string, // btoa(userEmail-activityName)
   name: string,
   points: number,
   description: string,
@@ -10,9 +11,8 @@ export interface IActivity {
   hasCards: boolean | string,
   createdOn: ISODateString,
   lastUpdatedOn: ISODateString,
-  userId: string 
+  cards?: ICard[] | []
 }
 
 
-export type IActivityFormData = Omit<IActivity, 'userId'|'activityId'|'completionStatus'|'createdOn'|'lastUpdatedOn'>;
-// 'activityId, completionStatus, createdOn, lastUpdatedOn'
+export type IActivityFormData = Omit<IActivity, 'activityId'|'completionStatus'|'createdOn'|'lastUpdatedOn'|'cards'>;

@@ -10,7 +10,7 @@ const LoginForm = ({
     handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
     formData: IUserLogin,
     isLoading: boolean,
-    submitForm: (e: FormEvent<HTMLFormElement>) => void
+    submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
   }) => {
 
   return (

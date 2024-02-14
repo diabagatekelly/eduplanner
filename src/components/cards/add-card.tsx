@@ -8,7 +8,7 @@ import { createCard, editCard } from "../../api/controller";
 const AddCard = ({ activity, ...args }) => {
   const dispatch = useDispatch()
 
-  const [formData, setFormData] = useState<ICard[]>([
+  const [formData, setFormData] = useState([
     {
       front: "",
       back: ""

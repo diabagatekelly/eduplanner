@@ -1,9 +1,7 @@
+import { IActivity } from "./IActivity";
+import { ILinkedAccounts } from "./ILinkedAccounts";
 import { ISODateString } from "./isoDateType";
 
-// export interface ILogin {
-//   email: string,
-//   password: string
-// }
 
 export interface IUser {
   userId: string,
@@ -14,9 +12,10 @@ export interface IUser {
   password: string,
   accountType: string,
   lastLogin: ISODateString,
-  teacherId?: string,
+  activities?: IActivity[],
+  linkedAccountsData?: ILinkedAccounts
 }
 
-export type IUserFormData = Required<Omit<IUser, 'userId'|'username'|'lastLogin'|'teacherId'>>
+export type IUserFormData = Required<Omit<IUser, 'userId'|'username'|'lastLogin'|'activities'|'linkedAccountsData'>>
 
-export type IUserLogin = Pick<IUser, 'email'|'password'>;
+export type IUserLogin = Pick<IUser, 'email'|'password'> & Partial<Pick<IUser, 'userId'>>;

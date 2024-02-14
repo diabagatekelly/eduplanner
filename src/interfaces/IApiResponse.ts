@@ -1,5 +1,3 @@
-import { IUser } from "./IUser"
-
 export interface IResponse {
   status: number,
   data: IResponseBody
@@ -8,5 +6,5 @@ export interface IResponse {
 interface IResponseBody {
   status: string,
   message: string,
-  details?: {token: string, user: IUser}
+  details: any
 }

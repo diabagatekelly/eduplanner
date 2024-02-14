@@ -1,16 +1,12 @@
-import Main from '@/app/[username]/page'
+import Main from '../../../app/[username]/page'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
 import { render } from '../../util';
 import * as React from 'react';
-import { mockUser } from '@/specs/mocks';
-import NestedLayout from '@/app/nested-layout';
-import store from '@/store/store';
-import Dashboard from '@/components/dashboard';
+import { mockUser } from '../../../specs/mocks';
+import NestedLayout from '../../../app/nested-layout';
+import store from '../../../store/store';
 
 jest.mock('../../../app/nested-layout');
-jest.mock('../../../components/dashboard');
-
 
 describe('Main user page', () => {
   beforeEach(() => {

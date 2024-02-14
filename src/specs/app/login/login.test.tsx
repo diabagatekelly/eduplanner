@@ -36,7 +36,11 @@ describe('Login page', () => {
     const email = screen.getByLabelText(/Email:/i)
     const password = screen.getByLabelText(/Password:/i)
     const submitButton = screen.getByTestId('login-button')
-    const userCredentials = {email: mockUser.email, password: mockUser.password}
+    const userCredentials = {
+      email: mockUser.email,
+      password: mockUser.password, 
+      userId: mockUser.userId
+    }
 
     await act(() => {
       // fill out the form

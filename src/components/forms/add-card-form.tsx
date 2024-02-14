@@ -33,7 +33,7 @@ const AddCardForm = ({
   mode }:
   {
     handleInput: (e: any, index: number) => void,
-    formData: ICard[],
+    formData: any
     isLoading: boolean,
     submitForm: (e: FormEvent<HTMLFormElement>) => Promise<any>,
     addCardFieldset: () => void,

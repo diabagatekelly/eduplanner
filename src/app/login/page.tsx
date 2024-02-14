@@ -12,7 +12,8 @@ import { populateUser } from "@/store/actions/userActions";
 import { loginUser } from "@/api/controller";
 
 interface ILogin {
-
+  handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
+  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
 }
 
 export default function Login<ILogin>() {
@@ -27,7 +28,7 @@ export default function Login<ILogin>() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
 
-  const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
+  function handleInput(e: React.FormEvent<HTMLInputElement>) {
     const target = e.target as HTMLInputElement
     const fieldName: string = target.name;
     const fieldValue: any = target.value;
@@ -36,7 +37,6 @@ export default function Login<ILogin>() {
       ...prevState,
       [fieldName]: fieldValue
     }));
-
   }
 
   async function submitForm(e: FormEvent<HTMLFormElement>) {
@@ -46,22 +46,22 @@ export default function Login<ILogin>() {
       setIsLoading(true) // Set loading to true when the request starts
 
       const rawFormData = new FormData(e.currentTarget)
-      const userCredentials: IUserLogin = {
+      const userFormInfo: IUserLogin = {
         email: "",
         password: ""
       }
 
       for (const pair of rawFormData.entries()) {
-        userCredentials[pair[0]] = `${pair[1]}`;
+        userFormInfo[pair[0]] = `${pair[1]}`;
       }
 
+      const userCredentials: IUserLogin = {...userFormInfo, userId: btoa(userFormInfo.email)}
+
       const response = await loginUser(userCredentials) as unknown as IResponse;
-
       const {data} = response;
+      const {details} = data;
+
       setIsLoading(false)
-
-      const {message, details} = data;
-
       setFormData({
         email: "",
         password: ""

@@ -10,7 +10,7 @@ export default function Dashboard({ userDetails, isMain, isTeacher }: { userDeta
     <>
       {isMain ?
         <div>
-          <h3 className="py-2.5">Welcome to your dashboard {fullName}.</h3>
+          <h3 data-testid="dashboard-header" className="py-2.5">Welcome to your dashboard {fullName}.</h3>
           {isTeacher ?
             <div className="pt-5">
               <AddActivity {...{ userDetails }} />
@@ -21,9 +21,9 @@ export default function Dashboard({ userDetails, isMain, isTeacher }: { userDeta
 
             <div>
               <div className="pb-5">
-                {isTeacher ?
-                  <h5>Your teacher&#39;s email is {userDetails?.teacherId}</h5> :
-                  <h5>Ask your teacher or parent to add you and create some activities for you!</h5>
+                {userDetails.linkedAccountsData?.teacher ?
+                  <h5 data-testid="student-instructions">Your teacher&#39;s email is {userDetails?.linkedAccountsData?.teacher}.</h5> :
+                  <h5 data-testid="student-instructions">Ask your teacher or parent to add you and create some activities for you!</h5>
                 }
               </div>
               <hr />
@@ -37,7 +37,7 @@ export default function Dashboard({ userDetails, isMain, isTeacher }: { userDeta
         :
 
         <div>
-          <h3 className="py-2.5">Manage student {fullName}.</h3>
+          <h3 data-testid="dashboard-header" className="py-2.5">Manage student {fullName}.</h3>
           <div className="pt-5">
             <AddActivity {...{ userDetails }} />
             <ListUi {...{ listType: 'activities', isMain, userDetails }} />

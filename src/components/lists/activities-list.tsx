@@ -43,6 +43,7 @@ const ActivitiesList = ({isMain, userDetails, getBorderColor}) => {
 
   return (
     <>
+    <div data-testid="activities-list">
       {activitiesList?.length ?
         <ul>
           {activitiesList?.map((activity) => (
@@ -58,6 +59,7 @@ const ActivitiesList = ({isMain, userDetails, getBorderColor}) => {
         </ul> :
         <p>You have no activities yet.</p>
       }
+    </div>
       <Popup {...{ showModal, modalType, isMain, user: popupUserDetails, item: popupItem }} onClose={() => setShowModal(false)} />
       
     </>

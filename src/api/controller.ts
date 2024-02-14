@@ -1,4 +1,5 @@
 import { getCommand, postCommand } from "@/api/service";
+import { IActivity } from "@/interfaces/IActivity";
 import { IUser, IUserLogin } from "@/interfaces/IUser";
 
 export const findUser = async (options) => {
@@ -30,7 +31,7 @@ export const deleteUser = async (rawData) => {
 
 export const loginUser = async (params: IUserLogin) => {
   const url = process.env.NEXT_LOGIN_USER_URL
-  return await getCommand(url, params)
+  return await getCommand(url, {params})
 }
 
 export const registerUser = async (userJsonData: IUser) => {
@@ -56,13 +57,9 @@ export const unlinkAccount = async (rawData) => {
     })
 }
 
-export const createActivity = async (rawData) => {
+export const createActivity = async (data: {userActivity: IActivity, userId: string}) => {
   const url = process.env.NEXT_CREATE_ACTIVITY_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  return await postCommand(url, data)
 }
 
 export const editActivity = async (rawData) => {
