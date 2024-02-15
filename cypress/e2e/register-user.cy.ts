@@ -1,9 +1,8 @@
-import * as mockUser from '../fixtures/mock-user.json';
+import { mockUser } from '../../src/specs/mocks';
 import { IUser } from '../../src/interfaces/IUser';
-import { ISODateString } from '../../src/interfaces/isoDateType';
 
 describe('Register user', () => {
-  const user: IUser = {...mockUser, lastLogin: (mockUser.lastLogin as ISODateString)};
+  const user: IUser = {...mockUser};
   
   describe('Successful registration', () => {
     beforeEach(() => {
@@ -30,7 +29,7 @@ describe('Register user', () => {
       cy.register(user)
       cy.window().its('store').invoke('getState').should('deep.equal', {
         authReducer: {isAuthenticated: true},
-        userReducer: { default: user, ...user}
+        userReducer: { ...user}
       })
     })
   })

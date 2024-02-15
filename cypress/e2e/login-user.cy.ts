@@ -1,10 +1,9 @@
-import * as mockUser from '../fixtures/mock-user.json';
+import { mockUser } from '../../src/specs/mocks';
 import { IUser } from '../../src/interfaces/IUser';
-import { ISODateString } from '../../src/interfaces/isoDateType';
 
 
 describe('Login User', () => {
-  const user: IUser = {...mockUser, lastLogin: (mockUser.lastLogin as ISODateString)};
+  const user: IUser = {...mockUser};
   const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?email=mock.user%40email.com&password=password&userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D`
 
   describe('Successful login', () => {
@@ -30,7 +29,7 @@ describe('Login User', () => {
       cy.wait(100)
       cy.window().its('store').invoke('getState').should('deep.equal', {
         authReducer: {isAuthenticated: true},
-        userReducer: { default: user, ...user}
+        userReducer: {...user}
       })
     })
   })

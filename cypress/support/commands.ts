@@ -54,12 +54,23 @@ Cypress.Commands.add('login', (credentials: {email: string, password: string}) =
   })
 })
 
+Cypress.Commands.add('createActivity', () => { 
+  cy.get('[data-testid="add-activity-form"]').within(() => {
+    cy.get('input[name="name"]').type('Quran')
+    cy.get('input[name="description"]').type('Quran memorization')
+    cy.get('input[name="points"]').clear().type('15')
+    cy.get('input[id="yesDecks"]').click()
+    cy.root().submit()
+  })
+})
+
 declare global {
   namespace Cypress {
     interface Chainable {
       navigateToRegisterPage(): void
       register(user: IUser): void,
       login(credentials: {email: string, password: string}): void,
+      createActivity(): void,
       // drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
       // dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
       // visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>

@@ -11,6 +11,8 @@ export default defineConfig({
         process.env.CYPRESS_ENV !== 'development' ? `${prod}/user/register` : `${local}/user/register`;
       config.env.LOGIN_USER_URL = 
         process.env.CYPRESS_ENV !== 'development' ? `${prod}/user/login` : `${local}/user/login`;
+      config.env.ADD_ACTIVITY_URL = 
+        process.env.CYPRESS_ENV !== 'development' ? `${prod}/user/activities/add` : `${local}/user/activities/add`;
       config.env.SITE_URL = "https://eduplanner-jade.vercel.app";
 
       return config

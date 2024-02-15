@@ -80,12 +80,12 @@ export function createUserActivity(activityData: {activityDetails: IActivity, us
   const isMain = activityData?.userId === currentUserData.userId
   if (isMain) {
     const currentActivities = currentUserData.activities || []
-    currentActivities.push(activityData)
+    currentActivities.push(activityData.activityDetails)
     currentUserData.activities = currentActivities
   } else {
     const student = currentUserData.students[activityData.userId]
     const studentActivities = student.activities || []
-    studentActivities.push(activityData)
+    studentActivities.push(activityData.activityDetails)
     currentUserData.students[activityData.userId].activities = studentActivities
   }
   

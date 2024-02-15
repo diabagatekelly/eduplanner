@@ -1,6 +1,6 @@
-import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
-import { ISODateString } from "@/interfaces/isoDateType";
-import { formatISODate } from "@/utils/formatDate";
+import { CompletionStatus } from "../../src/interfaces/CompletionStatusEnum";
+import { ISODateString } from "../../src/interfaces/isoDateType";
+import { formatISODate } from "../../src/utils/formatDate";
 
 export const mockUser = {
   userId: btoa('mock.user@email.com'),
