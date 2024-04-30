@@ -2,13 +2,9 @@ import { getCommand, postCommand } from "@/api/service";
 import { IActivity } from "@/interfaces/IActivity";
 import { IUser, IUserLogin } from "@/interfaces/IUser";
 
-export const findUser = async (options) => {
+export const findUser = async (params: {userId: string}) => {
   const url = process.env.NEXT_GET_USER_URL
-
-  return await getCommand(url, options)
-    .then(async (response) => {
-      return response;
-    })
+  return await getCommand(url, {params})
 }
 
 export const editUser = async (rawData) => {
@@ -39,13 +35,9 @@ export const registerUser = async (userJsonData: IUser) => {
   return await postCommand(url, userJsonData)
 }
 
-export const linkAccount = async (rawData) => {
+export const linkAccount = async (accountsData: {teacherId: string, studentId: string}) => {
   const url = process.env.NEXT_ADD_LINKED_ACCOUNT_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  return await postCommand(url, accountsData)
 }
 
 export const unlinkAccount = async (rawData) => {

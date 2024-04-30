@@ -9,6 +9,7 @@ import ListUi from "@/components/lists/lists-ui";
 export default function Students() {
   let args;
   const [user, getUserData] = useState({ ...args })
+  
   useEffect(() => {
     const { userReducer } = store.getState()
     getUserData(userReducer);
@@ -21,7 +22,7 @@ export default function Students() {
   return (
     <NestedLayout {...{ isTeacher }}>
       <div className="flex flex-col px-3">
-        <AddStudent />
+        <AddStudent {...{user}} />
         <hr className="mt-4"></hr>
         <div className="justify-items-start">
           <h3 className="text-3xl py-3 font-bold">Current Students</h3>

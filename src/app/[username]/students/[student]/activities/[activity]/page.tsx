@@ -25,11 +25,11 @@ export default function Main({ params }: { params: { username: string, student: 
 
   const isTeacher = user.accountType?.includes('teacher')
 
-  const activityDetails = {...userDetails?.activities?.find((activity) => activity?.name === activityName), username: userDetails?.username, email: userDetails?.email}
+  const userActivity = {...userDetails?.activities?.find((activity) => activity?.name === activityName), username: userDetails?.username, email: userDetails?.email}
 
   return (
     <NestedLayout {...{ isTeacher }}>
-      <ViewActivity {...{ activityDetails, isMain }} />
+      <ViewActivity {...{ userActivity, isMain }} />
     </NestedLayout>
   )
 }

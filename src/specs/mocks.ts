@@ -1,16 +1,32 @@
+import { IUser } from "../../src/interfaces/IUser";
 import { CompletionStatus } from "../../src/interfaces/CompletionStatusEnum";
 import { ISODateString } from "../../src/interfaces/isoDateType";
 import { formatISODate } from "../../src/utils/formatDate";
 
-export const mockUser = {
+export const mockUser: IUser = {
   userId: btoa('mock.user@email.com'),
   firstName: 'mock',
   lastName: 'user',
   username: 'mock-user',
   email: 'mock.user@email.com',
   password: 'password',
+  accountType: 'teacher',
+  linkedAccountsData: {students: []},
+  lastLogin: formatISODate(new Date().toISOString() as ISODateString), 
+  activities: []
+}
+
+export const mockStudent: IUser = {
+  userId: btoa('mock.student@email.com'),
+  firstName: 'mock',
+  lastName: 'student',
+  username: 'mock-student',
+  email: 'mock.student@email.com',
+  password: 'password',
   accountType: 'student',
-  lastLogin: formatISODate(new Date().toISOString() as ISODateString) 
+  linkedAccountsData: {teacher: null},
+  lastLogin: formatISODate(new Date().toISOString() as ISODateString),
+  activities: [] 
 }
 
 export const mockActivity = {

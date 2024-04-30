@@ -4,7 +4,7 @@ import { screen, fireEvent, act } from '@testing-library/react'
 import { render } from '../../util';
 import * as React from 'react';
 import { registerUser } from '../../../api/controller';
-import { mockUser } from '../../../specs/mocks';
+import { mockStudent } from '../../../specs/mocks';
 
 jest.mock('next/navigation', () => {
   return {
@@ -15,6 +15,33 @@ jest.mock('next/navigation', () => {
   }
 });
 jest.mock('../../../api/controller');
+
+async function fillRegisterForm() {
+  const firstName = screen.getByLabelText(/First Name:/i)
+  const lastName = screen.getByLabelText(/Last Name:/i)
+  const password = screen.getByLabelText(/Password:/i)
+  const email = screen.getByLabelText(/Email:/i)
+  const studentRadio = screen.getByDisplayValue(/Student/i)
+
+  await act(() => {
+    // fill out the form
+    fireEvent.change(firstName, {
+      target: {value: 'mock'},
+    })
+    fireEvent.change(lastName, {
+      target: {value: 'student'},
+    })
+    fireEvent.change(password, {
+      target: {value: 'password'},
+    })
+    fireEvent.change(email, {
+      target: {value: 'mock.student@email.com'},
+    })
+    fireEvent.change(studentRadio, {
+      target: {value: 'student'},
+    })
+  })
+}
 
 describe('Register page', () => {
   it('should render the page with its form', async () => {
@@ -29,46 +56,24 @@ describe('Register page', () => {
 
   it('should invoke registerUser controller when form is submitted', async () => {
     (registerUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({status: 200, data: {message: null, details: {user: mockUser}}})
+      return Promise.resolve({status: 200, data: {message: null, details: {user: mockStudent}}})
     })
     render(<Register />)
 
-    const firstName = screen.getByLabelText(/First Name:/i)
-    const lastName = screen.getByLabelText(/Last Name:/i)
-    const password = screen.getByLabelText(/Password:/i)
-    const email = screen.getByLabelText(/Email:/i)
-    const studentRadio = screen.getByDisplayValue(/Student/i)
     const submitButton = screen.getByText(/Create Account/i)
 
-    await act(() => {
-      // fill out the form
-      fireEvent.change(firstName, {
-        target: {value: 'mock'},
-      })
-      fireEvent.change(lastName, {
-        target: {value: 'user'},
-      })
-      fireEvent.change(password, {
-        target: {value: 'password'},
-      })
-      fireEvent.change(email, {
-        target: {value: 'mock.user@email.com'},
-      })
-      fireEvent.change(studentRadio, {
-        target: {value: 'student'},
-      })
-    })
+    await fillRegisterForm()
 
     await act(async () => {
       await fireEvent.click(submitButton)
     })
     
-    await expect(registerUser).toHaveBeenCalledWith(mockUser)
+    await expect(registerUser).toHaveBeenCalledWith(mockStudent)
   })
 
-  it('should reset form when response is successful and display success message', async () => {
+  it('should reset form when response is successful and display success message, then reset message when form in focus', async () => {
     (registerUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({status: 200, data: {status: 'success', message: 'New user successfully created.', details: {user: mockUser} }})
+      return Promise.resolve({status: 200, data: {status: 'success', message: 'New user successfully created.', details: {user: mockStudent} }})
     })
     render(<Register />)
 
@@ -76,32 +81,14 @@ describe('Register page', () => {
     const lastName = screen.getByLabelText(/Last Name:/i)
     const password = screen.getByLabelText(/Password:/i)
     const email = screen.getByLabelText(/Email:/i)
-    const studentRadio = screen.getByDisplayValue(/Student/i)
     const submitButton = screen.getByText(/Create Account/i)
 
-    await act(() => {
-      // fill out the form
-      fireEvent.change(firstName, {
-        target: {value: 'mock'},
-      })
-      fireEvent.change(lastName, {
-        target: {value: 'user'},
-      })
-      fireEvent.change(password, {
-        target: {value: 'password'},
-      })
-      fireEvent.change(email, {
-        target: {value: 'mock.user@email.com'},
-      })
-      fireEvent.change(studentRadio, {
-        target: {value: 'student'},
-      })
-    })
+    await fillRegisterForm()
 
     expect(firstName).toHaveValue('mock')
-    expect(lastName).toHaveValue('user')
+    expect(lastName).toHaveValue('student')
     expect(password).toHaveValue('password')
-    expect(email).toHaveValue('mock.user@email.com')
+    expect(email).toHaveValue('mock.student@email.com')
 
     await act(async () => {
       await fireEvent.click(submitButton)
@@ -114,6 +101,14 @@ describe('Register page', () => {
     expect(password).toHaveValue('')
     expect(email).toHaveValue('')
     expect(successMessage).toBeInTheDocument()
+
+    await act(() => {
+      fireEvent.change(firstName, {
+        target: {value: 'mock'},
+      })
+    })
+
+    expect(successMessage).toHaveTextContent('')
     
   })
 
@@ -129,33 +124,14 @@ describe('Register page', () => {
     const lastName = screen.getByLabelText(/Last Name:/i)
     const password = screen.getByLabelText(/Password:/i)
     const email = screen.getByLabelText(/Email:/i)
-    const studentRadio = screen.getByDisplayValue(/Student/i)
     const submitButton = screen.getByText(/Create Account/i)
 
-    await act(() => {
-      // fill out the form
-      fireEvent.change(firstName, {
-        target: {value: 'mock'},
-      })
-      fireEvent.change(lastName, {
-        target: {value: 'user'},
-      })
-      fireEvent.change(password, {
-        target: {value: 'password'},
-      })
-      fireEvent.change(email, {
-        target: {value: 'mock.user@email.com'},
-      })
-      fireEvent.change(studentRadio, {
-        target: {value: 'student'},
-      })
-    })
-
+    await fillRegisterForm()
 
     expect(firstName).toHaveValue('mock')
-    expect(lastName).toHaveValue('user')
+    expect(lastName).toHaveValue('student')
     expect(password).toHaveValue('password')
-    expect(email).toHaveValue('mock.user@email.com')
+    expect(email).toHaveValue('mock.student@email.com')
 
     await act(async () => {
       await fireEvent.click(submitButton)
@@ -164,9 +140,9 @@ describe('Register page', () => {
     const errorMessage = await screen.findByText(/Erroneous response/i)
   
     expect(firstName).toHaveValue('mock')
-    expect(lastName).toHaveValue('user')
+    expect(lastName).toHaveValue('student')
     expect(password).toHaveValue('password')
-    expect(email).toHaveValue('mock.user@email.com')
+    expect(email).toHaveValue('mock.student@email.com')
     expect(errorMessage).toBeInTheDocument()
   })
 
@@ -182,33 +158,14 @@ describe('Register page', () => {
     const lastName = screen.getByLabelText(/Last Name:/i)
     const password = screen.getByLabelText(/Password:/i)
     const email = screen.getByLabelText(/Email:/i)
-    const studentRadio = screen.getByDisplayValue(/Student/i)
     const submitButton = screen.getByText(/Create Account/i)
 
-    await act(() => {
-      // fill out the form
-      fireEvent.change(firstName, {
-        target: {value: 'mock'},
-      })
-      fireEvent.change(lastName, {
-        target: {value: 'user'},
-      })
-      fireEvent.change(password, {
-        target: {value: 'password'},
-      })
-      fireEvent.change(email, {
-        target: {value: 'mock.user@email.com'},
-      })
-      fireEvent.change(studentRadio, {
-        target: {value: 'student'},
-      })
-    })
-
+    await fillRegisterForm()
 
     expect(firstName).toHaveValue('mock')
-    expect(lastName).toHaveValue('user')
+    expect(lastName).toHaveValue('student')
     expect(password).toHaveValue('password')
-    expect(email).toHaveValue('mock.user@email.com')
+    expect(email).toHaveValue('mock.student@email.com')
 
     await act(async () => {
       await fireEvent.click(submitButton)
@@ -217,9 +174,9 @@ describe('Register page', () => {
     const errorMessage = await screen.getByText(/Failed to create user due to an internal error. Please try again later./i)
   
     expect(firstName).toHaveValue('mock')
-    expect(lastName).toHaveValue('user')
+    expect(lastName).toHaveValue('student')
     expect(password).toHaveValue('password')
-    expect(email).toHaveValue('mock.user@email.com')
+    expect(email).toHaveValue('mock.student@email.com')
     expect(errorMessage).toBeInTheDocument()
     expect(console.log).toHaveBeenCalledWith(error)
   })
@@ -236,33 +193,14 @@ describe('Register page', () => {
     const lastName = screen.getByLabelText(/Last Name:/i)
     const password = screen.getByLabelText(/Password:/i)
     const email = screen.getByLabelText(/Email:/i)
-    const studentRadio = screen.getByDisplayValue(/Student/i)
     const submitButton = screen.getByText(/Create Account/i)
 
-    await act(() => {
-      // fill out the form
-      fireEvent.change(firstName, {
-        target: {value: 'mock'},
-      })
-      fireEvent.change(lastName, {
-        target: {value: 'user'},
-      })
-      fireEvent.change(password, {
-        target: {value: 'password'},
-      })
-      fireEvent.change(email, {
-        target: {value: 'mock.user@email.com'},
-      })
-      fireEvent.change(studentRadio, {
-        target: {value: 'student'},
-      })
-    })
-
+    await fillRegisterForm()
 
     expect(firstName).toHaveValue('mock')
-    expect(lastName).toHaveValue('user')
+    expect(lastName).toHaveValue('student')
     expect(password).toHaveValue('password')
-    expect(email).toHaveValue('mock.user@email.com')
+    expect(email).toHaveValue('mock.student@email.com')
 
     await act(async () => {
       await fireEvent.click(submitButton)

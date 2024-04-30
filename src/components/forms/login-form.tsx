@@ -1,5 +1,4 @@
 import { FormEvent } from "react";
-import { IUserLogin } from "../../interfaces/IUser";
 
 const LoginForm = ({
   handleInput,
@@ -8,7 +7,7 @@ const LoginForm = ({
   submitForm }:
   {
     handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
-    formData: IUserLogin,
+    formData: {email: string, password: string},
     isLoading: boolean,
     submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
   }) => {

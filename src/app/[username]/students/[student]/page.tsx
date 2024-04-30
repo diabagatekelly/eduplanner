@@ -4,18 +4,18 @@ import NestedLayout from "@/app/nested-layout";
 import store from "@/store/store";
 import { useEffect, useState } from "react"
 import Dashboard from "@/components/dashboard";
+import {IUser} from "@/interfaces/IUser";
 
-export default function Main({ params }: { params: { username: string, student: string } }) {
-
+export default function Main({ params }: { params: { student: string } }) {
   let args;
-  const [user, getUserData] = useState({ ...args })
+  const [user, getUserData] = useState<IUser>({ ...args })
 
   useEffect(() => {
     const { userReducer } = store.getState()
     getUserData(userReducer);
   }, [])
 
-  const isTeacher = user.accountType?.includes('teacher')
+  const isTeacher = true;
   const student = params.student
 
   const allStudents = user.students
@@ -24,7 +24,7 @@ export default function Main({ params }: { params: { username: string, student: 
 
   return (
     <NestedLayout {...{ isTeacher }}>
-      <Dashboard {...{ params, userDetails, isMain, isTeacher }} />
+      <Dashboard {...{ userDetails, isMain, isTeacher }} />
     </NestedLayout>
   )
 }

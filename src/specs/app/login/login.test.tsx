@@ -37,7 +37,6 @@ describe('Login page', () => {
     const password = screen.getByLabelText(/Password:/i)
     const submitButton = screen.getByTestId('login-button')
     const userCredentials = {
-      email: mockUser.email,
       password: mockUser.password, 
       userId: mockUser.userId
     }
@@ -59,7 +58,7 @@ describe('Login page', () => {
     await expect(loginUser).toHaveBeenCalledWith(userCredentials)
   })
 
-  it('should reset form when response is successful and display success message', async () => {
+  it('should reset form when response is successful and display success message, then reset message when form in focus', async () => {
     (loginUser as jest.Mock).mockImplementationOnce(() => {
       return Promise.resolve({status: 200, data: {status: 'success', message: 'Found user', details: {user: mockUser} }})
     })
@@ -91,6 +90,14 @@ describe('Login page', () => {
     expect(password).toHaveValue('')
     expect(email).toHaveValue('')
     expect(successMessage).toBeInTheDocument()
+
+    await act(() => {
+      fireEvent.change(email, {
+        target: {value: 'mock.user@email.com'},
+      })
+    })
+
+    expect(successMessage).toHaveTextContent('')
   })
 
   it('should not reset form when response is not 200 or 500 and display error message', async () => {

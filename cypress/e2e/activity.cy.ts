@@ -45,7 +45,7 @@ describe('Add Activity', () => {
         body: {
           status: 'success',
           message: 'Activity creaed.',
-          details: {activityDetails: mockActivity, userId: user.userId}
+          details: {userActivity: mockActivity, userId: user.userId}
         }
       })
     })

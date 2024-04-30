@@ -1,104 +1,104 @@
-import { useState, FormEvent, useEffect } from "react";
+"use client"
+
+import { useState, FormEvent } from "react";
 import { findUser } from "../../api/controller";
 import SearchUserForm from "../forms/search-user-form";
-import store from "../../store/store";
 import Popup from "../popups/popup";
+import { IUser } from "@/interfaces/IUser";
 
-const AddStudent = () => {
+interface IAddStudent {
+  handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
+  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
+}
+
+export default function AddStudent<IAddStudent>({ user }: {user: IUser}) {
   let args;
+
   const [formData, setFormData] = useState({
     email: ""
   });
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [user, getUserData] = useState({ ...args });
-  const [newStudent, getData] = useState({ ...args });
+  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
+  const [newStudent, getStudentInfo] = useState<IUser>({ ...args });
   const [showModal, setShowModal] = useState(false);
-  const [formSuccess, setFormSuccess] = useState(false)
-  const [formSuccessMessage, setFormSuccessMessage] = useState("")
 
   const modalType = 'addStudent';
-  const isMain = false;
 
-  useEffect(() => {
-    const { userReducer } = store.getState()
-    getUserData(userReducer);
-  }, [])
+  function handleInput(e: React.FormEvent<HTMLInputElement>) {
+    if (formSubmitOutcomeMessage.length) {
+      setFormSubmitOutcomeMessage('')
+    }
 
-  const handleInput = (e: any) => {
-    const fieldName: string = e.target.name;
-    const fieldValue: any = e.target.value;
+    const target = e.target as HTMLInputElement
+    const fieldName: string = target.name;
+    const fieldValue: any = target.value;
 
     setFormData((prevState) => ({
       ...prevState,
       [fieldName]: fieldValue
     }));
-
   }
 
-  const reset = () => {
-    setTimeout(() => {
-      setFormData({
-        email: ""
-      });
-      setFormSuccessMessage("")
-    }, 3000)
+  function _resetForm() {
+    setFormData({
+      email: ""
+    });
+    setIsLoading(false)
   }
 
-  async function submitForm(e: FormEvent<HTMLFormElement>) {
-    // We don't want the page to refresh
-    e.preventDefault()
-    setIsLoading(true) // Set loading to true when the request starts
-
+  async function submitForm(e: FormEvent<HTMLFormElement>): Promise<void> {
     try {
-      const rawFormData = new FormData(e.currentTarget)
-      const jsonData = { email: '' }
+      // We don't want the page to refresh
+      e.preventDefault()
+      setIsLoading(true) // Set loading to true when the request starts
 
-      for (const pair of rawFormData.entries()) {
-        jsonData[pair[0]] = `${pair[1]}`;
+      const formData = new FormData(e.currentTarget)
+      const newStudent = { email: '' }
+
+      for (const pair of formData.entries()) {
+        newStudent[pair[0]] = `${pair[1]}`;
       }
 
-      if (jsonData.email === user.email) {
-        setFormSuccess(false)
-        setFormSuccessMessage("You can't add yourself as a student.");
-        reset()
+      if (newStudent.email === user.email) {
+        setFormSubmitOutcomeMessage("You can't add yourself as a student.");
+        _resetForm()
         return;
       }
 
-      const options = {
-        params: {
-          email: jsonData.email
-        }
-      }
+      const currentStudents = user?.linkedAccountsData?.students
+      if (currentStudents?.includes(newStudent.email)) {
+        setFormSubmitOutcomeMessage('This is already one of your students.')
+        _resetForm()
+        return
+      } 
 
-      const response = await findUser(options)
-        .then(async (response) => {
-          setIsLoading(false)
-          if (response.status !== 200) {
-            setFormSuccess(false)
-            setFormSuccessMessage(response.data.message)
-            reset()
-          } else {
-            setFormSuccess(true);
-            if (user.studentIds && user.studentIds.includes(response.data.email)) {
-              setFormSuccessMessage('This is already one of your students.')
-              reset()
-            } else {
-              getData(response.data)
-              setShowModal(true)
-              reset()
-            }
-          }
-        })
+      const newStudentUserId = {userId: btoa(newStudent.email)}
+
+      const response = await findUser(newStudentUserId)
+      const {data} = response;
+      const {details}: {message: string, details: {student: IUser}} = data;
+      setIsLoading(false)
+      getStudentInfo(details.student)
+      setShowModal(true)
+      
 
     } catch (error) {
-      console.error(error)
       setIsLoading(false)
-      setFormSuccess(false)
-      if (error.response) {
-        setFormSuccessMessage(error.response.data.message)
+      console.log(error)
+
+      if (!error.response) {
+        setFormSubmitOutcomeMessage('Server is down. Try again later.')
+        return
       }
-      reset()
+
+      const {status, data} = error.response;
+
+      if (status === 500) {
+        setFormSubmitOutcomeMessage('Failed to add new student due to an internal error. Please try again later.')
+      } else {
+        setFormSubmitOutcomeMessage(data.message)
+      }
     }
   }
 
@@ -107,10 +107,8 @@ const AddStudent = () => {
       <h3 className="text-3xl py-3 font-bold">Add a new student:</h3>
       <p>Enter your student&#39;s email:</p>
       <SearchUserForm {...{ handleInput, formData, isLoading, submitForm }} />
-      <Popup {...{ showModal, modalType, isMain, newStudent}} onClose={() => setShowModal(false)} />
-      <div>{formSuccessMessage}</div>
+      <Popup {...{ showModal, modalType, user, newStudent}} onClose={() => {console.log('called on closed??'); setShowModal(false)}} />
+      <div data-testid="find-student-submit-message">{formSubmitOutcomeMessage}</div>
     </div>
   )
 }
-
-export default AddStudent;

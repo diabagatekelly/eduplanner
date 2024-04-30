@@ -20,7 +20,7 @@ export default function Login<ILogin>() {
   const dispatch = useDispatch()
   const router = useRouter()
 
-  const [formData, setFormData] = useState<IUserLogin>({
+  const [formData, setFormData] = useState<{email: string, password: string}>({
     email: "",
     password: "",
   });
@@ -29,6 +29,10 @@ export default function Login<ILogin>() {
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
 
   function handleInput(e: React.FormEvent<HTMLInputElement>) {
+    if (formSubmitOutcomeMessage.length) {
+      setFormSubmitOutcomeMessage('')
+    }
+    
     const target = e.target as HTMLInputElement
     const fieldName: string = target.name;
     const fieldValue: any = target.value;
@@ -46,7 +50,7 @@ export default function Login<ILogin>() {
       setIsLoading(true) // Set loading to true when the request starts
 
       const rawFormData = new FormData(e.currentTarget)
-      const userFormInfo: IUserLogin = {
+      const userFormInfo: {email: string, password: string} = {
         email: "",
         password: ""
       }
@@ -55,7 +59,7 @@ export default function Login<ILogin>() {
         userFormInfo[pair[0]] = `${pair[1]}`;
       }
 
-      const userCredentials: IUserLogin = {...userFormInfo, userId: btoa(userFormInfo.email)}
+      const userCredentials: IUserLogin = {userId: btoa(userFormInfo.email), password: userFormInfo.password}
 
       const response = await loginUser(userCredentials) as unknown as IResponse;
       const {data} = response;

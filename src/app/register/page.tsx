@@ -32,6 +32,10 @@ export default function Register<IRegister>() {
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
 
   function handleInput(e: React.FormEvent<HTMLInputElement>) {
+    if (formSubmitOutcomeMessage.length) {
+      setFormSubmitOutcomeMessage('')
+    }
+    
     const target = e.target as HTMLInputElement
     const fieldName = target.name;
     const fieldValue = target.value;
@@ -63,12 +67,15 @@ export default function Register<IRegister>() {
 
       const userId = btoa(jsonData.email)
       const username = `${jsonData.firstName}-${jsonData.lastName}`
+      const linkedAccountsData = jsonData.accountType === 'teacher' ? {students: []} : {teacher: null}
 
       const userData: IUser = {
         ...jsonData,
         userId,
         username,
-        lastLogin: formatISODate(new Date().toISOString() as ISODateString) 
+        lastLogin: formatISODate(new Date().toISOString() as ISODateString),
+        activities: [],
+        linkedAccountsData 
       };
 
       const response = await registerUser(userData) as unknown as IResponse;

@@ -1,58 +1,66 @@
 import { linkAccount } from "../../api/controller";
 import { useEffect, useState } from "react";
-import store from "../../store/store";
 import { useDispatch } from "react-redux";
-import { addNewStudent, updateStudentData } from "@/store/actions/userActions";
+import { addNewStudent, saveStudentDetails } from "@/store/actions/userActions";
+import { IUser } from "@/interfaces/IUser";
 
-const LinkAccountPopup = ({onClose, showModal, ...childArgs}) => {
+export default function LinkAccountPopup({onClose, showModal, ...childArgs}: {onClose: any, showModal: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>}) {
   const dispatch = useDispatch()
-  let args;
 
-  const [studentInfo, getStudentInfo] = useState({ ...childArgs });
-  const [user, getUserData] = useState({ ...args });
-  const [errorMessage, setErrorMessage] = useState('');
+  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.newStudent });
+  const [user, getUserData] = useState<IUser | Partial<IUser>>({ ...childArgs.user });
+  const [outcomeMessage, setOutcomeMessage] = useState('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const student = childArgs.newStudent
     getStudentInfo(student)
 
-    const { userReducer } = store.getState()
-    getUserData(userReducer);
+    const teacher = childArgs.user
+    getUserData(teacher);
 
-  }, [showModal, childArgs, studentInfo])
+  }, [showModal, childArgs, studentInfo, user])
 
   const addStudent = async () => {
     try {
-      const teacherRawData = { teacher: { email: user.email, addStudent: studentInfo.email } }
-      const teacherResponse = await linkAccount(teacherRawData)
-        .then(async (response) => {
-          if (response.status !== 200) {
-            setErrorMessage(response.data.message)
-          } else {
-            onLinkAccountSuccess()
-          }
-        })
+      setIsLoading(true)
+      const linkAccountsData = { teacherId: user.userId, studentId: studentInfo.userId }
+      await linkAccount(linkAccountsData)
+      onLinkAccountSuccess()
+      setIsLoading(false)
+
     } catch (error) {
-      console.error(error)
-      if (error.response) {
-        setErrorMessage(error.response.data.message)
+      setIsLoading(false)
+      console.log(error)
+
+      if (!error.response) {
+        setOutcomeMessage('Server is down. Try again later.')
+        return
+      }
+
+      const {status, data} = error.response;
+
+      if (status === 500) {
+        setOutcomeMessage('Failed to add new student due to an internal error. Please try again later.')
+      } else {
+        setOutcomeMessage(data.message)
       }
     }
   }
 
   const onLinkAccountSuccess = () => {
-    dispatch(addNewStudent(studentInfo));
-    dispatch(updateStudentData(studentInfo))
-    setErrorMessage('Successfully added a new student')
+    dispatch(addNewStudent(studentInfo as IUser));
+    dispatch(saveStudentDetails(studentInfo as IUser))
+    setOutcomeMessage('Successfully added a new student')
     onClose();
   }
   
   return (
     <>
-      <dialog open={showModal} id="popup-modal" className="fixed top-0 left-0 right-0 z-50 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full border-4 border-gray-800 rounded-lg">
+      <dialog data-testid="link-account-popup" open={showModal} id="popup-modal" className="fixed top-0 left-0 right-0 z-50 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full border-4 border-gray-800 rounded-lg">
         <div className="relative w-full max-w-md max-h-full">
           <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-            <button onClick={onClose} type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="popup-modal">
+            <button data-testid="close-link-account-popup" onClick={onClose} type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="popup-modal">
               <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
               </svg>
@@ -67,11 +75,11 @@ const LinkAccountPopup = ({onClose, showModal, ...childArgs}) => {
                 <h5 className="mb-5"><span>{studentInfo?.firstName} {studentInfo?.lastName} - {studentInfo?.email} </span></h5>
               </div>
 
-              <button onClick={addStudent} data-modal-hide="popup-modal" type="button" className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+              <button data-testid="link-accounts-btn" onClick={addStudent} data-modal-hide="popup-modal" type="button" className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                 Yes, I&#39;m sure
               </button>
               <button onClick={onClose} data-modal-hide="popup-modal" type="button" className="text-white-500 bg-red hover:bg-red-100 focus:ring-4 focus:outline-none focus:ring-red-200 rounded-lg border border-red-200 text-sm font-medium px-5 py-2.5 hover:text-red-900 focus:z-10 dark:bg-red-700 dark:text-white-300 dark:border-red-500 dark:hover:text-black dark:hover:bg-gray-600 dark:focus:ring-red-600">No, cancel</button>
-              <p>{errorMessage}</p>
+              <p data-testid="add-student-outcome-message">{outcomeMessage}</p>
             </div>
           </div>
         </div>
@@ -79,5 +87,3 @@ const LinkAccountPopup = ({onClose, showModal, ...childArgs}) => {
     </>
   )
 }
-
-export default LinkAccountPopup;

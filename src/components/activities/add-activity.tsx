@@ -32,6 +32,10 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
 
   function handleInput(e: React.FormEvent<HTMLInputElement>) {
+    if (formSubmitOutcomeMessage.length) {
+      setFormSubmitOutcomeMessage('')
+    }
+
     const target = e.target as HTMLInputElement
     const fieldName: string = target.name;
     const fieldValue: any = target.value;
@@ -49,6 +53,7 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
       points: 0,
       hasCards: ""
     });
+    setIsLoading(false)
   }
 
   async function submitForm(e: FormEvent<HTMLFormElement>): Promise<void> {
@@ -85,12 +90,11 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
 
       const response = await createActivity({userActivity, userId: userDetails.userId}) as unknown as IResponse;
       const {data} = response;
-      const {message, details}: {message: string, details: {userId: string, activityDetails: IActivity}} = data;
+      const {message, details}: {message: string, details: {userId: string, userActivity: IActivity}} = data;
 
       dispatch(createUserActivity(details))
       setFormSubmitOutcomeMessage(message)
       _resetForm()
-      setIsLoading(false)  
       window.location.reload()
 
     } catch (error) {

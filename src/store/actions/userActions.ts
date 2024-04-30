@@ -14,29 +14,28 @@ export function resetUser() {
   }
 }
 
-export function addNewStudent(newStudent) {
-  const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
-  const updatedStudentIds = currentUserData.studentIds ? [...currentUserData.studentIds, newStudent.email] : [newStudent.email]
-  currentUserData.studentIds = updatedStudentIds;
+export function addNewStudent(newStudent: IUser) {
+  let currentUserData: IUser = JSON.parse(sessionStorage.getItem('user_data'))
+  const hasStudents = currentUserData.linkedAccountsData?.students?.length
+  const updatedStudentIds = hasStudents ? [...currentUserData.linkedAccountsData?.students, newStudent.userId] : [newStudent.userId]
+  currentUserData.linkedAccountsData.students = updatedStudentIds;
   sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
   return {
     type: 'EDIT',
     editProps: [
       {
-        studentIds: updatedStudentIds
+        linkedAccountsData: { students: updatedStudentIds }
       }
     ]
   }
-
 }
 
-export function updateStudentData(newStudent) {
-  newStudent.username = `${newStudent.firstName}-${newStudent.lastName}`
+export function saveStudentDetails(newStudent: IUser) {
   const newStudentObj = {
-    [`${newStudent.firstName}-${newStudent.lastName}`]: newStudent
+    [`${newStudent.username}`]: newStudent
   }
   const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
-  const updatedStudents = currentUserData ? { ...currentUserData.students, ...newStudentObj } : { ...newStudentObj }
+  const updatedStudents = currentUserData.students ? { ...currentUserData.students, ...newStudentObj } : { ...newStudentObj }
   currentUserData.students = updatedStudents;
   sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
   return {
@@ -47,16 +46,15 @@ export function updateStudentData(newStudent) {
       }
     ]
   }
-
 }
 
-export function removeStudent(studentEmail) {
+export function removeStudent(studentUserId: string) {
   const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
   let studentToDelete;
   if (currentUserData.students) {
-    studentToDelete = Object.values(currentUserData.students).find((student: any) => student.email === studentEmail)
+    studentToDelete = Object.values(currentUserData.students).find((student: any) => student.userId === studentUserId)
   }
-  const updatedStudentIds = currentUserData.studentIds.filter(id => id !== studentEmail)
+  const updatedStudentIds = currentUserData.studentIds.filter(id => id !== studentUserId)
   delete currentUserData.students[studentToDelete.username]
   currentUserData.studentIds = updatedStudentIds;
 
@@ -75,17 +73,17 @@ export function removeStudent(studentEmail) {
 
 }
 
-export function createUserActivity(activityData: {activityDetails: IActivity, userId: string}) {
+export function createUserActivity(activityData: {userActivity: IActivity, userId: string}) {
   const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
   const isMain = activityData?.userId === currentUserData.userId
   if (isMain) {
     const currentActivities = currentUserData.activities || []
-    currentActivities.push(activityData.activityDetails)
+    currentActivities.push(activityData.userActivity)
     currentUserData.activities = currentActivities
   } else {
     const student = currentUserData.students[activityData.userId]
     const studentActivities = student.activities || []
-    studentActivities.push(activityData.activityDetails)
+    studentActivities.push(activityData.userActivity)
     currentUserData.students[activityData.userId].activities = studentActivities
   }
   

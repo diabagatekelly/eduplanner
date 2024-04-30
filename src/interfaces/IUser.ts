@@ -12,10 +12,11 @@ export interface IUser {
   password: string,
   accountType: string,
   lastLogin: ISODateString,
-  activities?: IActivity[],
-  linkedAccountsData?: ILinkedAccounts
+  linkedAccountsData: ILinkedAccounts,
+  activities: IActivity[] | [],
+  students?: Record<string, IUser> 
 }
 
 export type IUserFormData = Required<Omit<IUser, 'userId'|'username'|'lastLogin'|'activities'|'linkedAccountsData'>>
 
-export type IUserLogin = Pick<IUser, 'email'|'password'> & Partial<Pick<IUser, 'userId'>>;
+export type IUserLogin = Pick<IUser, 'userId'|'password'> & Partial<Pick<IUser, 'userId'>>;

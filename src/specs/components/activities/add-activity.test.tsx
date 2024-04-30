@@ -111,9 +111,9 @@ describe('Add activity', () => {
     expect(points).toHaveValue(0)
   })
 
-  it('should reset form when response is successful and display success message', async () => {
+  it('should reset form when response is successful and display success message, then reset message when form in focus', async () => {
     (createActivity as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({status: 200, data: {message: 'Successfully created activity.', details: {userId: userDetails.userId, activityDetails: mockActivity}}})
+      return Promise.resolve({status: 200, data: {message: 'Successfully created activity.', details: {userId: userDetails.userId, userActivity: mockActivity}}})
     })
   
     render(<AddActivity {...{userDetails}} />)
@@ -147,6 +147,13 @@ describe('Add activity', () => {
     expect(name).toHaveValue('')
     expect(description).toHaveValue('')
     expect(points).toHaveValue(0)
+
+    await act(() => {
+      fireEvent.change(name, {
+        target: {value: 'Quran'}
+      })
+    })
+    expect(submitMessage).toHaveTextContent("")
   })
 
   it('should not reset form when response is not 200 or 500 and display error message', async () => {

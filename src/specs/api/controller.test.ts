@@ -1,6 +1,6 @@
-import {createActivity, loginUser, registerUser} from '../../api/controller'
+import {createActivity, findUser, linkAccount, loginUser, registerUser} from '../../api/controller'
 import { getCommand, postCommand } from '../../api/service'
-import { mockActivity, mockUser } from '../mocks';
+import { mockActivity, mockStudent, mockUser } from '../mocks';
 
 jest.mock('../../api/service');
 
@@ -28,6 +28,24 @@ describe('Controller', () => {
 
     expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_CREATE_ACTIVITY_URL, {userActivity: mockActivity, userId: 'someuserid'})
     expect(res).toEqual(mockActivity)
+  })
+
+  it('should make a getCommand to find a user', async () => {
+    (getCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(mockUser))
+    const params = {userId: mockUser.userId}
+    const res = await findUser(params)
+
+    expect(getCommand).toHaveBeenCalledWith(process.env.NEXT_GET_USER_URL, {params})
+    expect(res).toEqual(mockUser)
+  })
+
+  it('should make a postCommand to link user accounts', async () => {
+    (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve({}))
+    const params = {teacherId: mockUser.userId, studentId: mockStudent.userId}
+    const res = await linkAccount(params)
+
+    expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_ADD_LINKED_ACCOUNT_URL, params)
+    expect(res).toEqual({})
   })
 })
 

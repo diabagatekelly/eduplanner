@@ -7,13 +7,13 @@ import { editUserActivity } from "../../store/actions/userActions"
 import ListUi from "@/components/lists/lists-ui";
 import { CompletionStatus } from "../../interfaces/CompletionStatusEnum"
 
-export const ViewActivity = ({ activityDetails, isMain }) => {
+export const ViewActivity = ({ userActivity, isMain }) => {
   const dispatch = useDispatch()
   let args;
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formSuccessMessage, setFormSuccessMessage] = useState("")
-  const [activity, setActivityDetails] = useState({ 
+  const [activity, setuserActivity] = useState({ 
     name: '', 
     userEmail: '', 
     hasCards: false, 
@@ -27,16 +27,16 @@ export const ViewActivity = ({ activityDetails, isMain }) => {
   const [userDetails, getUserDetails] = useState({ ...args })
 
   useEffect(() => {
-    setActivityDetails(activityDetails)
-    getUserDetails({ username: activityDetails.username, email: activityDetails.userEmail })
+    setuserActivity(userActivity)
+    getUserDetails({ username: userActivity.username, email: userActivity.userEmail })
 
-  }, [activityDetails])
+  }, [userActivity])
 
   const updateActivity = async () => {
     try {
       const options = {
         params: {
-          ...activityDetails,
+          ...userActivity,
           lastUpdatedOn: new Date()
         }
       }
