@@ -17,6 +17,6 @@ export interface IUser {
   students?: Record<string, IUser> 
 }
 
-export type IUserFormData = Required<Omit<IUser, 'userId'|'username'|'lastLogin'|'activities'|'linkedAccountsData'>>
+export type IUserFormData = Required<Omit<IUser, 'userId'|'username'|'lastLogin'|'activities'|'linkedAccountsData'|'students'>>
 
 export type IUserLogin = Pick<IUser, 'userId'|'password'> & Partial<Pick<IUser, 'userId'>>;
