@@ -13,7 +13,7 @@ export interface IUser {
   accountType: string,
   lastLogin: ISODateString,
   linkedAccountsData: ILinkedAccounts,
-  activities: IActivity[] | [],
+  activities: IActivity[],
   students?: Record<string, IUser> 
 }
 
