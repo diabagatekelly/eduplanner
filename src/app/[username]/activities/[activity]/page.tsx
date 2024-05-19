@@ -1,32 +1,28 @@
 "use client"
 
 import NestedLayout from "@/app/nested-layout";
+import ViewActivity from "@/components/activities/view-activity";
+import { IUser } from "@/interfaces/IUser";
 import store from "@/store/store";
 import { useEffect, useState } from "react"
-import { ViewActivity } from "@/components/activities/view-activity";
-import { usePathname } from 'next/navigation'
 
-export default function Main({ params }: { params: { username: string, student: string } }) {
-  const pathname = usePathname();
-  const activityName = pathname.split('/')[3]
+export default function Main({ params }: { params: { activity: string } }) {
   const isMain = true;
 
   let args;
-  const [user, getUserData] = useState({ ...args })
-  const [showModal, setShowModal] = useState(false);
+  const [user, getUserData] = useState<IUser>({ ...args })
 
   useEffect(() => {
     const { userReducer } = store.getState()
     getUserData(userReducer);
   }, [])
 
-  const isTeacher = user.accountType?.includes('teacher')
-
-  const userActivity = { ...user.activities?.find((activity) => activity?.name === activityName), username: user?.username, email: user?.email }
+  const isTeacher: boolean = user.accountType === 'teacher';
+  const userActivity = user.activities?.find((activity) => activity?.name === params.activity)
 
   return (
     <NestedLayout {...{ isTeacher }}>
-      <ViewActivity {...{ userActivity, isMain }} />
+      <ViewActivity {...{ userDetails: user, userActivity, isMain }} />
     </NestedLayout>
   )
 }

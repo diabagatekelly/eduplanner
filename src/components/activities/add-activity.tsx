@@ -92,7 +92,8 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
       const {data} = response;
       const {message, details}: {message: string, details: {userId: string, userActivity: IActivity}} = data;
 
-      dispatch(createUserActivity(details))
+      let augmentedDetails = {...details, username: userDetails.username}
+      dispatch(createUserActivity(augmentedDetails))
       setFormSubmitOutcomeMessage(message)
       _resetForm()
       window.location.reload()

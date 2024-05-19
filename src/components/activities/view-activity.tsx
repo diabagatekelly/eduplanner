@@ -6,38 +6,39 @@ import { useDispatch } from "react-redux"
 import { editUserActivity } from "../../store/actions/userActions"
 import ListUi from "@/components/lists/lists-ui";
 import { CompletionStatus } from "../../interfaces/CompletionStatusEnum"
+import { IActivity } from "@/interfaces/IActivity"
+import { IUser } from "@/interfaces/IUser"
+import { ISODateString } from "@/interfaces/isoDateType"
+import store from "@/store/store"
+import { formatISODate } from "@/utils/formatDate"
 
-export const ViewActivity = ({ userActivity, isMain }) => {
+interface IViewActivity {
+  updateActivity: () => Promise<void>
+}
+
+export default function ViewActivity<IViewActivity>({ userDetails, userActivity, isMain }: {userDetails: IUser, userActivity: IActivity, isMain: boolean}) {
   const dispatch = useDispatch()
-  let args;
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formSuccessMessage, setFormSuccessMessage] = useState("")
-  const [activity, setuserActivity] = useState({ 
+  const [isLoading, setIsLoading] = useState(false)
+  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")  
+  const [activity, setUserActivity] = useState<IActivity>({
+    activityId: '',
     name: '', 
-    userEmail: '', 
-    hasCards: false, 
-    description: '', 
     points: 0, 
+    description: '', 
     completionStatus: CompletionStatus.PENDING, 
-    username: '', 
-    cards: [],
-    lastUpdatedOn: '' 
+    hasCards: false,
+    createdOn: '' as ISODateString,
+    lastUpdatedOn: '' as ISODateString, 
+    cards: []
   })
-  const [userDetails, getUserDetails] = useState({ ...args })
 
-  useEffect(() => {
-    setuserActivity(userActivity)
-    getUserDetails({ username: userActivity.username, email: userActivity.userEmail })
-
-  }, [userActivity])
-
-  const updateActivity = async () => {
+  async function updateActivity(): Promise<void> {
     try {
       const options = {
         params: {
           ...userActivity,
-          lastUpdatedOn: new Date()
+          lastUpdatedOn: formatISODate(new Date().toISOString() as ISODateString)
         }
       }
 
@@ -45,10 +46,10 @@ export const ViewActivity = ({ userActivity, isMain }) => {
         .then(async (response) => {
           setIsLoading(false)
           if (response.status !== 200) {
-            setFormSuccessMessage(response.data.message)
+            setFormSubmitOutcomeMessage(response.data.message)
           } else {
             dispatch(editUserActivity(response.data.params))
-            setFormSuccessMessage('Activity status changed to completed.')
+            setFormSubmitOutcomeMessage('Activity status changed to completed.')
           }
         })
 
@@ -56,22 +57,22 @@ export const ViewActivity = ({ userActivity, isMain }) => {
       console.error(error)
       setIsLoading(false)
       if (error.response) {
-        setFormSuccessMessage(error.response.data.message)
+        setFormSubmitOutcomeMessage(error.response.data.message)
       }
     }
   }
   
   return (
     <>
-      <h3>{activity?.name}</h3>
-      <p>Directions: {activity?.description}</p>
-      <p>Points: {activity?.points} points</p>
-      <p>Status: {activity?.completionStatus}</p>
-      <p>Last Updated: {activity?.lastUpdatedOn?.split('T')[0] || 'Never'}</p>
+      <h3>{userActivity?.name}</h3>
+      <p>Directions: {userActivity?.description}</p>
+      <p>Points: {userActivity?.points} points</p>
+      <p>Status: {userActivity?.completionStatus}</p>
+      <p>Last Updated: {userActivity?.lastUpdatedOn?.split('T')[0] || 'Never'}</p>
       <button
-        disabled={activity?.completionStatus === CompletionStatus.COMPLETED}
+        disabled={userActivity?.completionStatus === CompletionStatus.COMPLETED}
         type="button"
-        className={activity?.completionStatus !== CompletionStatus.COMPLETED ?
+        className={userActivity?.completionStatus !== CompletionStatus.COMPLETED ?
           "text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
           :
           "text-white bg-gray-600 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 dark:focus:ring-gray-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2"
@@ -82,8 +83,8 @@ export const ViewActivity = ({ userActivity, isMain }) => {
       </button>
 
 
-      <p>{formSuccessMessage}</p>
-      {activity?.hasCards ?
+      <p>{formSubmitOutcomeMessage}</p>
+      {userActivity?.hasCards ?
         <>
           <hr className="my-5" />
           <ListUi {...{ listType: 'cards', isMain, userDetails, activity: activity }} />

@@ -1,0 +1,66 @@
+import Main from '../../../../../app/[username]/activities/[activity]/page'
+import '@testing-library/jest-dom'
+import { render } from '../../../../util';
+import * as React from 'react';
+import { mockUser, mockStudent, mockActivity } from '../../../../../specs/mocks';
+import NestedLayout from '../../../../../app/nested-layout';
+import store from '../../../../../store/store';
+
+jest.mock('../../../../../app/nested-layout');
+
+describe('Main user page', () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2024-02-04'))
+    window.sessionStorage.setItem('user', JSON.stringify(mockUser))
+    window.sessionStorage.setItem('token', 'xxxxxx')
+    window.sessionStorage.setItem('created_on', '2024-02-04')
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+    window.sessionStorage.clear()
+    jest.useRealTimers()
+  })
+
+  describe('Main - Student', () => {
+    const mockStudentWithActivity = {...mockStudent, activities: [mockActivity]}
+    beforeEach(() => {
+      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: mockStudentWithActivity}
+      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
+      (NestedLayout as jest.Mock).mockImplementation(() => null);
+    })
+
+    it('should pass the correct isTeacher values for student to NestedLayout', () => {
+      render(<Main {...{params: {activity: 'Quran'}}}/>)
+      expect((NestedLayout as jest.Mock).mock.calls[1][0]).toEqual(expect.objectContaining({isTeacher: false}))
+    })
+
+    it('should pass the correct userDetails, userActivity, isMain values for student to ViewActivity', () => {
+      render(<Main {...{params: {activity: 'Quran'}}}/>)
+      const expectedViewActivityArgs = {isMain: true, userDetails: mockStudentWithActivity, userActivity: mockActivity}
+      expect((NestedLayout as jest.Mock).mock.calls[1][0].children.props).toMatchObject(expectedViewActivityArgs)
+    })
+  })
+
+  describe('Main - Teacher', () => {
+    const mockUserWithActivity = {...mockUser, activities: [mockActivity]}
+    beforeEach(() => {
+      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: mockUserWithActivity}
+      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
+      (NestedLayout as jest.Mock).mockImplementation(() => null);
+    })
+
+    it('should pass the correct isTeacher values for teacher on own page to NestedLayout', () => {
+      render(<Main {...{params: {activity: 'Quran'}}}/>)
+      expect((NestedLayout as jest.Mock).mock.calls[1][0]).toEqual(expect.objectContaining({isTeacher: true}))
+    })
+
+    it('should pass the correct userDetails, isMain, isTeacher values for teacher on own page to ViewActivity', () => {
+      render(<Main {...{params: {activity: 'Quran'}}}/>)
+      const expectedViewActivityArgs = {isMain: true, userDetails: mockUserWithActivity, userActivity: mockActivity}
+      expect((NestedLayout as jest.Mock).mock.calls[1][0].children.props).toMatchObject(expectedViewActivityArgs)
+    })
+  })  
+})
+
