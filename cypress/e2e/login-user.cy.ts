@@ -4,7 +4,7 @@ import { IUser } from '../../src/interfaces/IUser';
 
 describe('Login User', () => {
   const user: IUser = {...mockUser};
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?email=mock.user%40email.com&password=password&userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D`
+  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   describe('Successful login', () => {
     beforeEach(() => {
