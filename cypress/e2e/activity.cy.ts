@@ -1,11 +1,11 @@
 import { IUser } from "../../src/interfaces/IUser";
 import { ISODateString } from "../../src/interfaces/isoDateType";
-import { mockActivity, mockUser } from "../../src/specs/mocks";
+import { mockActivity, mockStudent, mockUser } from "../../src/specs/mocks";
 
 describe('Add Activity', () => {
   describe('Student view', () => {
-    const user: IUser = {...mockUser, lastLogin: (mockUser.lastLogin as ISODateString)};
-    const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?email=mock.user%40email.com&password=password&userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D`
+    const user: IUser = {...mockStudent, lastLogin: (mockStudent.lastLogin as ISODateString)};
+    const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay5zdHVkZW50QGVtYWlsLmNvbQ%3D%3D&password=password`
     beforeEach(() => {
       cy.intercept(loginUrl, {
         statusCode: 200,
@@ -26,8 +26,8 @@ describe('Add Activity', () => {
   })
 
   describe('Teacher view', () => {
-    const user: IUser = {...mockUser, accountType: 'teacher', lastLogin: (mockUser.lastLogin as ISODateString)};
-    const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?email=mock.user%40email.com&password=password&userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D`
+    const user: IUser = {...mockUser, lastLogin: (mockUser.lastLogin as ISODateString)};
+    const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
     const addActivityUrl = Cypress.env('ADD_ACTIVITY_URL')
     
     beforeEach(() => {
@@ -70,8 +70,8 @@ describe('Add Activity', () => {
   })
 
   describe('Unsuccessful activity creation', () => {
-    const user: IUser = {...mockUser, accountType: 'teacher', lastLogin: (mockUser.lastLogin as ISODateString)};
-    const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?email=mock.user%40email.com&password=password&userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D`
+    const user: IUser = {...mockUser, lastLogin: (mockUser.lastLogin as ISODateString)};
+    const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
     const addActivityUrl = Cypress.env('ADD_ACTIVITY_URL')
     
     beforeEach(() => {
