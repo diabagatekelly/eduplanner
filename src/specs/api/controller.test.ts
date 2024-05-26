@@ -1,5 +1,5 @@
-import {createActivity, findUser, linkAccount, loginUser, registerUser} from '../../api/controller'
-import { getCommand, postCommand } from '../../api/service'
+import {createActivity, editUser, findUser, linkAccount, loginUser, registerUser} from '../../api/controller'
+import { getCommand, patchCommand, postCommand } from '../../api/service'
 import { mockActivity, mockStudent, mockUser } from '../mocks';
 
 jest.mock('../../api/service');
@@ -37,6 +37,16 @@ describe('Controller', () => {
 
     expect(getCommand).toHaveBeenCalledWith(process.env.NEXT_GET_USER_URL, {params})
     expect(res).toEqual(mockUser)
+  })
+
+  it('should make a patchCommand to edit a user', async () => {
+    const editedUser = {...mockUser, lastLogin: '5/24/24'};
+    (patchCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(editedUser))
+    const params = {userId: mockUser.userId, editData: {lastLogin: '5/24/24'}}
+    const res = await editUser(params)
+
+    expect(patchCommand).toHaveBeenCalledWith(process.env.NEXT_EDIT_USER_URL, params)
+    expect(res).toEqual(editedUser)
   })
 
   it('should make a postCommand to link user accounts', async () => {

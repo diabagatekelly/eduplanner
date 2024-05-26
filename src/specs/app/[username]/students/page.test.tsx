@@ -14,7 +14,7 @@ describe('Students list', () => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2024-02-04'))
     window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
-    window.sessionStorage.setItem('token', 'xxxxxx')
+    window.sessionStorage.setItem('user_token', 'xxxxxx')
     window.sessionStorage.setItem('created_on', '2024-02-04')
   
     const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}

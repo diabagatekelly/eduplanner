@@ -1,4 +1,4 @@
-import {getCommand, postCommand} from '../../api/service';
+import {getCommand, postCommand, patchCommand} from '../../api/service';
 import axios from 'axios';
 import { mockUser } from '../mocks';
 jest.mock('axios');
@@ -7,9 +7,11 @@ const mockAxios = axios as jest.Mocked<typeof axios>;
 const mockUrl = 'http://some-mock-url.com'
 const mockGetResponse = { data: [ { id: 1, name: 'Joe Doe' } ] }
 const mockPostResponse = mockUser
+const mockPatchResponse = {...mockUser, lastLogin: '5/25/24'}
 
 mockAxios.get.mockResolvedValue(mockGetResponse);
 mockAxios.post.mockResolvedValue(mockPostResponse);
+mockAxios.patch.mockResolvedValue(mockPatchResponse);
 
 describe('Service', () => {
   it('should call getCommand as expected', async () => {
@@ -20,7 +22,7 @@ describe('Service', () => {
     expect(res).toEqual(mockGetResponse)
   })
 
-  it('should call axios post with jsonData', async () => {
+  it('should call axios postCommand with jsonData', async () => {
     const mockJsonData = {
       description: "some description",
       hasCards: "yes",
@@ -33,5 +35,17 @@ describe('Service', () => {
     expect(res).toEqual(mockPostResponse);
   })
 
+  it('should call axios patchCommand with jsonData', async () => {
+    const mockJsonData = {
+      userId: mockUser.userId, 
+      editData: {
+        lastLogin: '5/25/24'
+      }
+    }
 
+    const headers = {"Content-Type": "application/json"}
+    const res = await patchCommand(mockUrl, mockJsonData)
+    expect(mockAxios.patch).toHaveBeenCalledWith(mockUrl, mockJsonData, {headers});
+    expect(res).toEqual(mockPatchResponse);
+  })
 })

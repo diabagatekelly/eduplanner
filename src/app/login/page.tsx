@@ -78,7 +78,6 @@ export default function Login<ILogin>() {
       setIsLoading(false)
       console.log(error)
 
-
       if (!error.response) {
         setFormSubmitOutcomeMessage('Server is down. Try again later.')
         return

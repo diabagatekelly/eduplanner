@@ -10,20 +10,21 @@ import { resetUser } from "../store/actions/userActions";
 import { usePathname, useRouter } from 'next/navigation'
 import { editUser } from "../api/controller";
 import store from "../store/store";
-
+import { IUser } from "@/interfaces/IUser";
+import { formatISODate } from "@/utils/formatDate";
+import { ISODateString } from "@/interfaces/isoDateType";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-
-export const Navbar = ({ isAuthenticated, username }) => {
+export default function Navbar({ isAuthenticated, username }: {isAuthenticated: boolean, username: string}) {
   let args;
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
 
-  const [user, getUserData] = useState({ ...args })
+  const [user, getUserData] = useState<IUser>({ ...args })
 
   useEffect(() => {
     const { userReducer } = store.getState()
@@ -31,23 +32,31 @@ export const Navbar = ({ isAuthenticated, username }) => {
   }, [])
 
   const navigation = [
-    { name: 'Home', href: '/', current: pathname === '/' },
+    { name: 'Home', href: '/', current: pathname === '/', dataTestId: 'home-btn' },
   ]
 
-  const logout = async () => {
+  async function logout() {
     try {
-      const res = await editUser({ email: user.email, editData: {lastLogin: new Date()}})
-        .then(async (response) => {
-          if (response.status !== 200) {
-            console.log('Failed to update and logout!')
-          } else {
-            dispatch(removeAuthToken())
-            dispatch(resetUser())
-            router.push('/login');
-          }
-        })
-    } catch (e) {
-      console.log("Oops, something went wrong in updating and logging out" + e)
+      await editUser({ userId: user.userId, editData: {lastLogin: formatISODate(new Date().toISOString() as ISODateString)}})
+      dispatch(removeAuthToken())
+      dispatch(resetUser())
+      router.push('/login');
+            
+    } catch (error) {
+      console.log(error)
+
+      if (!error.response) {
+        console.log('Server is down. Try again later.')
+        return
+      }
+
+      const {status, data} = error.response;
+
+      if (status === 500) {
+        console.log('Oops, something went wrong in updating and logging out. Please try again later.')
+      } else {
+        console.log(data.message)
+      }
     }
 
   }
@@ -75,6 +84,7 @@ export const Navbar = ({ isAuthenticated, username }) => {
                   <div className="flex space-x-4">
                     {navigation.map((item) => (
                       <Link
+                        data-testid={item.dataTestId}
                         key={item.name}
                         href={item.href}
                         className={classNames(
@@ -116,7 +126,7 @@ export const Navbar = ({ isAuthenticated, username }) => {
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
                   <div>
-                    <Menu.Button className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                    <Menu.Button data-testid="user-icon" className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                       <span className="absolute -inset-1.5" />
                       <span className="sr-only">Open user menu</span>
                       <UserCircleIcon className="h-6 w-6" aria-hidden="true" />
@@ -135,6 +145,7 @@ export const Navbar = ({ isAuthenticated, username }) => {
                       <Menu.Item>
                         {({ active }) => (
                           <Link
+                            data-testid="profile-link"
                             href={`/${username}/profile`}
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                           >
@@ -146,6 +157,7 @@ export const Navbar = ({ isAuthenticated, username }) => {
                         {({ active }) => (
 
                           <Link
+                            data-testid="logout-link"
                             onClick={logout}
                             href="#"
                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}

@@ -7,3 +7,7 @@ export const getCommand = async (url: string, params: Record<any, any>) => {
 export const postCommand = async (url: string, jsonData: Record<string, any>) => {
   return await axios.post(url, jsonData)
 }
+
+export const patchCommand = async (url: string, jsonData: Record<string, any>) => {
+  return await axios.patch(url, jsonData, {headers: {"Content-Type": "application/json"}})
+}

@@ -12,8 +12,8 @@ describe('Main user page', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2024-02-04'))
-    window.sessionStorage.setItem('user', JSON.stringify(mockUser))
-    window.sessionStorage.setItem('token', 'xxxxxx')
+    window.sessionStorage.setItem('user_data', JSON.stringify(mockUser))
+    window.sessionStorage.setItem('user_token', 'xxxxxx')
     window.sessionStorage.setItem('created_on', '2024-02-04')
   })
 

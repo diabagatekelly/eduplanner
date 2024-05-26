@@ -107,7 +107,7 @@ export default function AddStudent<IAddStudent>({ user }: {user: IUser}) {
       <h3 className="text-3xl py-3 font-bold">Add a new student:</h3>
       <p>Enter your student&#39;s email:</p>
       <SearchUserForm {...{ handleInput, formData, isLoading, submitForm }} />
-      <Popup {...{ showModal, modalType, user, newStudent}} onClose={() => {console.log('called on closed??'); setShowModal(false)}} />
+      <Popup {...{ showModal, modalType, user, newStudent}} onClose={() => setShowModal(false)} />
       <div data-testid="find-student-submit-message">{formSubmitOutcomeMessage}</div>
     </div>
   )
