@@ -3,7 +3,7 @@ import '@testing-library/jest-dom'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { render } from '../util';
 import * as React from 'react';
-import {mockUser} from '../mocks';
+import { mockUser } from '../mocks';
 import { editUser } from '../../api/controller';
 import { ISODateString } from '../../interfaces/isoDateType';
 import { formatISODate } from '../../utils/formatDate';
