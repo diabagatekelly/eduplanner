@@ -1,6 +1,6 @@
 "use client"
 
-import DeleteAccountPopup from "./deleteAccoutPopup";
+import DeleteAccountPopup from "./deleteAccountPopup";
 import LinkAccountPopup from "./linkAccountPopup";
 import UnlinkAccountPopup from "./unlinkAccountPopup";
 import DeleteActivityPopup from "./deleteActivityPopup";
