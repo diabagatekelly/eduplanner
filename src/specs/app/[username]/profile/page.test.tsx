@@ -40,12 +40,13 @@ describe('Profile', () => {
       const profile = await screen.findByTestId('profile-info')
 
       const studentWithNoLinkedAccounts = 
-        '<p class="py-1"><span class="font-bold">First Name:</span> mock</p>'+
-        '<p class="py-1"><span class="font-bold">Last Name:</span> student</p>'+
-        '<p class="py-1"><span class="font-bold">Email:</span> mock.student@email.com</p>'+
-        '<p class="py-1"><span class="font-bold">Account Type(s):</span> student</p>'+
-        '<p class="py-1"><span class="font-bold">Linked Accounts:</span> None</p>'+
-        `<p class="py-1"><span class="font-bold">Last logged in:</span> 2024-02-16</p>`
+        '<p data-testid="profile-first" class="py-1"><span class="font-bold">First Name:</span> mock</p>'+
+        '<p data-testid="profile-last" class="py-1"><span class="font-bold">Last Name:</span> student</p>'+
+        '<p data-testid="profile-email" class="py-1"><span class="font-bold">Email:</span> mock.student@email.com</p>'+
+        '<p data-testid="profile-accountType" class="py-1"><span class="font-bold">Account Type(s):</span> student</p>'+
+        '<p data-testid="profile-linkedAccounts" class="py-1"><span class="font-bold">Linked Accounts:</span> None</p>'+
+        `<p data-testid="profile-login" class="py-1"><span class="font-bold">Last logged in:</span> 2024-02-16</p>`
+
       expect(profile).toContainHTML(studentWithNoLinkedAccounts)
     })
 
@@ -58,12 +59,13 @@ describe('Profile', () => {
       const profile = await screen.findByTestId('profile-info')
 
       const studentWithLinkedAccounts = 
-        '<p class="py-1"><span class="font-bold">First Name:</span> mock</p>'+
-        '<p class="py-1"><span class="font-bold">Last Name:</span> student</p>'+
-        '<p class="py-1"><span class="font-bold">Email:</span> mock.student@email.com</p>'+
-        '<p class="py-1"><span class="font-bold">Account Type(s):</span> student</p>'+
-        '<p class="py-1"><span class="font-bold">Linked Accounts:</span> some-teacher@email.com (teacher)</p>'+
-        `<p class="py-1"><span class="font-bold">Last logged in:</span> 2024-02-16</p>`
+        '<p data-testid="profile-first" class="py-1"><span class="font-bold">First Name:</span> mock</p>'+
+        '<p data-testid="profile-last" class="py-1"><span class="font-bold">Last Name:</span> student</p>'+
+        '<p data-testid="profile-email" class="py-1"><span class="font-bold">Email:</span> mock.student@email.com</p>'+
+        '<p data-testid="profile-accountType" class="py-1"><span class="font-bold">Account Type(s):</span> student</p>'+
+        '<p data-testid="profile-linkedAccounts" class="py-1"><span class="font-bold">Linked Accounts:</span> some-teacher@email.com (teacher)</p>'+
+        `<p data-testid="profile-login" class="py-1"><span class="font-bold">Last logged in:</span> 2024-02-16</p>`
+
       expect(profile).toContainHTML(studentWithLinkedAccounts)
     })
   })
@@ -78,17 +80,18 @@ describe('Profile', () => {
       const profile = await screen.findByTestId('profile-info')
 
       const teacherWithNoLinkedAccounts = 
-        '<p class="py-1"><span class="font-bold">First Name:</span> mock</p>'+
-        '<p class="py-1"><span class="font-bold">Last Name:</span> user</p>'+
-        '<p class="py-1"><span class="font-bold">Email:</span> mock.user@email.com</p>'+
-        '<p class="py-1"><span class="font-bold">Account Type(s):</span> teacher</p>'+
-        '<p class="py-1"><span class="font-bold">Linked Accounts:</span> None</p>'+
-        `<p class="py-1"><span class="font-bold">Last logged in:</span> 2024-02-16</p>`
+        '<p data-testid="profile-first" class="py-1"><span class="font-bold">First Name:</span> mock</p>'+
+        '<p data-testid="profile-last" class="py-1"><span class="font-bold">Last Name:</span> user</p>'+
+        '<p data-testid="profile-email" class="py-1"><span class="font-bold">Email:</span> mock.user@email.com</p>'+
+        '<p data-testid="profile-accountType" class="py-1"><span class="font-bold">Account Type(s):</span> teacher</p>'+
+        '<p data-testid="profile-linkedAccounts" class="py-1"><span class="font-bold">Linked Accounts:</span> None</p>'+
+        `<p data-testid="profile-login" class="py-1"><span class="font-bold">Last logged in:</span> 2024-02-16</p>`
+      
       expect(profile).toContainHTML(teacherWithNoLinkedAccounts)
     })
 
     it('should display teacher with one student', async () => {
-      const user = {...mockUser, lastLogin: formatISODate(new Date().toISOString() as ISODateString), linkedAccountsData: {students: ['student1@email.com']}}
+      const user = {...mockUser, lastLogin: formatISODate(new Date().toISOString() as ISODateString), linkedAccountsData: {students: [btoa('student1@email.com')]}}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
 
@@ -96,17 +99,18 @@ describe('Profile', () => {
       const profile = await screen.findByTestId('profile-info')
 
       const teacherWithOneLinkedAccounts = 
-        '<p class="py-1"><span class="font-bold">First Name:</span> mock</p>'+
-        '<p class="py-1"><span class="font-bold">Last Name:</span> user</p>'+
-        '<p class="py-1"><span class="font-bold">Email:</span> mock.user@email.com</p>'+
-        '<p class="py-1"><span class="font-bold">Account Type(s):</span> teacher</p>'+
-        '<p class="py-1"><span class="font-bold">Linked Accounts:</span> student1@email.com (students)</p>'+
-        `<p class="py-1"><span class="font-bold">Last logged in:</span> 2024-02-16</p>`
+        '<p data-testid="profile-first" class="py-1"><span class="font-bold">First Name:</span> mock</p>'+
+        '<p data-testid="profile-last" class="py-1"><span class="font-bold">Last Name:</span> user</p>'+
+        '<p data-testid="profile-email" class="py-1"><span class="font-bold">Email:</span> mock.user@email.com</p>'+
+        '<p data-testid="profile-accountType" class="py-1"><span class="font-bold">Account Type(s):</span> teacher</p>'+
+        '<p data-testid="profile-linkedAccounts" class="py-1"><span class="font-bold">Linked Accounts:</span> student1@email.com (students)</p>'+
+        `<p data-testid="profile-login" class="py-1"><span class="font-bold">Last logged in:</span> 2024-02-16</p>`
+      
       expect(profile).toContainHTML(teacherWithOneLinkedAccounts)
     })
 
     it('should display teacher with multiple students', async () => {
-      const user = {...mockUser, lastLogin: formatISODate(new Date().toISOString() as ISODateString), linkedAccountsData: {students: ['student1@email.com', 'student2@email.com']}}
+      const user = {...mockUser, lastLogin: formatISODate(new Date().toISOString() as ISODateString), linkedAccountsData: {students: [btoa('student1@email.com'), btoa('student2@email.com')]}}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
 
@@ -114,19 +118,20 @@ describe('Profile', () => {
       const profile = await screen.findByTestId('profile-info')
 
       const teacherWithMultipleLinkedAccounts = 
-        '<p class="py-1"><span class="font-bold">First Name:</span> mock</p>'+
-        '<p class="py-1"><span class="font-bold">Last Name:</span> user</p>'+
-        '<p class="py-1"><span class="font-bold">Email:</span> mock.user@email.com</p>'+
-        '<p class="py-1"><span class="font-bold">Account Type(s):</span> teacher</p>'+
-        '<p class="py-1"><span class="font-bold">Linked Accounts:</span> student1@email.com, student2@email.com (students)</p>'+
-        `<p class="py-1"><span class="font-bold">Last logged in:</span> 2024-02-16</p>`
+        '<p data-testid="profile-first" class="py-1"><span class="font-bold">First Name:</span> mock</p>'+
+        '<p data-testid="profile-last" class="py-1"><span class="font-bold">Last Name:</span> user</p>'+
+        '<p data-testid="profile-email" class="py-1"><span class="font-bold">Email:</span> mock.user@email.com</p>'+
+        '<p data-testid="profile-accountType" class="py-1"><span class="font-bold">Account Type(s):</span> teacher</p>'+
+        '<p data-testid="profile-linkedAccounts" class="py-1"><span class="font-bold">Linked Accounts:</span> student1@email.com, student2@email.com (students)</p>'+
+        `<p data-testid="profile-login" class="py-1"><span class="font-bold">Last logged in:</span> 2024-02-16</p>`
+      
       expect(profile).toContainHTML(teacherWithMultipleLinkedAccounts)
     })
   })
 
   describe('Modal behavior', () => {
     it('should show profile', async () => {
-      const user = {...mockUser, lastLogin: formatISODate(new Date().toISOString() as ISODateString), linkedAccountsData: {students: ['student1@email.com', 'student2@email.com']}}
+      const user = {...mockUser, lastLogin: formatISODate(new Date().toISOString() as ISODateString), linkedAccountsData: {students: [btoa('student1@email.com'), btoa('student2@email.com')]}}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
 
