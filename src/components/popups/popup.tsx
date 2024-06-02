@@ -10,7 +10,7 @@ import { IUser } from "@/interfaces/IUser";
 const Popup = ({ onClose, showModal, modalType, isMain=true, ...childArgs }: {onClose: any, showModal: boolean, modalType: string, isMain?: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>}) => {
   if (modalType === 'deleteAccount') {
     return (
-      <DeleteAccountPopup {...{onClose, showModal, isMain, ...childArgs}}/>
+      <DeleteAccountPopup {...{onClose, showModal, ...childArgs}}/>
     )
   } else if (modalType === 'addStudent') {
     return (

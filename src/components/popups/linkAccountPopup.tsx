@@ -21,7 +21,7 @@ export default function LinkAccountPopup({onClose, showModal, ...childArgs}: {on
 
   }, [showModal, childArgs, studentInfo, user])
 
-  const addStudent = async () => {
+  async function addStudent() {
     try {
       setIsLoading(true)
       const linkAccountsData = { teacherId: user.userId, studentId: studentInfo.userId }
@@ -48,7 +48,7 @@ export default function LinkAccountPopup({onClose, showModal, ...childArgs}: {on
     }
   }
 
-  const onLinkAccountSuccess = () => {
+  function onLinkAccountSuccess() {
     dispatch(addNewStudent(studentInfo as IUser));
     dispatch(saveStudentDetails(studentInfo as IUser))
     setOutcomeMessage('Successfully added a new student')
