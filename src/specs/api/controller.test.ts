@@ -1,5 +1,5 @@
-import {createActivity, editUser, findUser, linkAccount, loginUser, registerUser} from '../../api/controller'
-import { getCommand, patchCommand, postCommand } from '../../api/service'
+import {createActivity, deleteUser, editUser, findUser, linkAccount, loginUser, registerUser} from '../../api/controller'
+import { deleteCommand, getCommand, patchCommand, postCommand } from '../../api/service'
 import { mockActivity, mockStudent, mockUser } from '../mocks';
 
 jest.mock('../../api/service');
@@ -22,7 +22,7 @@ describe('Controller', () => {
     expect(res).toEqual(mockUser)
   })
 
-  it('should make a postCommand to create an activity', async () => {
+  it('should make a postCommand call to create an activity', async () => {
     (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(mockActivity))
     const res = await createActivity({userActivity: mockActivity, userId: 'someuserid'})
 
@@ -30,7 +30,7 @@ describe('Controller', () => {
     expect(res).toEqual(mockActivity)
   })
 
-  it('should make a getCommand to find a user', async () => {
+  it('should make a getCommand call to find a user', async () => {
     (getCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(mockUser))
     const params = {userId: mockUser.userId}
     const res = await findUser(params)
@@ -39,7 +39,7 @@ describe('Controller', () => {
     expect(res).toEqual(mockUser)
   })
 
-  it('should make a patchCommand to edit a user', async () => {
+  it('should make a patchCommand call to edit a user', async () => {
     const editedUser = {...mockUser, lastLogin: '5/24/24'};
     (patchCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(editedUser))
     const params = {userId: mockUser.userId, editData: {lastLogin: '5/24/24'}}
@@ -49,7 +49,14 @@ describe('Controller', () => {
     expect(res).toEqual(editedUser)
   })
 
-  it('should make a postCommand to link user accounts', async () => {
+  it('should make a deleteCommand call to delete user', async () => {
+    (deleteCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve({}))
+  
+    const res = await deleteUser(mockUser.userId)
+    expect(res).toEqual({})
+  })
+
+  it('should make a postCommand call to link user accounts', async () => {
     (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve({}))
     const params = {teacherId: mockUser.userId, studentId: mockStudent.userId}
     const res = await linkAccount(params)

@@ -1,4 +1,4 @@
-import { getCommand, patchCommand, postCommand } from "@/api/service";
+import { deleteCommand, getCommand, patchCommand, postCommand } from "@/api/service";
 import { IActivity } from "@/interfaces/IActivity";
 import { IUser, IUserLogin } from "@/interfaces/IUser";
 
@@ -12,13 +12,9 @@ export const editUser = async (params: {userId: string, editData: Record<string,
   return await patchCommand(url, params)
 }
 
-export const deleteUser = async (rawData) => {
+export const deleteUser = async (userId: string) => {
   const url = process.env.NEXT_DELETE_USER_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  return await deleteCommand(url, userId)
 }
 
 export const loginUser = async (params: IUserLogin) => {

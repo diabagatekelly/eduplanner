@@ -4,35 +4,41 @@ import { useRouter } from "next/navigation";
 import { deleteUser } from "../../api/controller";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { IUser } from "@/interfaces/IUser";
+import { IResponse } from "@/interfaces/IApiResponse";
 
-const DeleteAccountPopup = ({onClose, showModal, isMain, ...childArgs}) => {
+const DeleteAccountPopup = ({onClose, showModal, ...childArgs}: {onClose: any, showModal: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>}) => {
   const dispatch = useDispatch()
   const router = useRouter()
 
-  const [userInfo, getUserInfo] = useState({ ...childArgs });
-  const [errorMessage, setErrorMessage] = useState('');
+  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user });
+  const [outcomeMessage, setOutcomeMessage] = useState('');
 
   useEffect(() => {
     const user = childArgs.user
     getUserInfo(user)
 
-  }, [showModal, isMain, childArgs])
+  }, [showModal, childArgs])
 
-  const deleteAccount = async () => {
+  async function deleteAccount() {
     try {
-      const userDetails = { email: userInfo.email }
-      const response = await deleteUser(userDetails)
-        .then(async (response) => {
-          if (response.status !== 200) {
-            setErrorMessage(response.data.message)
-          } else {
-            onDeleteAccountSuccess()
-          }
-        })
+      await deleteUser(userInfo.userId) as unknown as IResponse;
+      onDeleteAccountSuccess();
+
     } catch (error) {
-      console.error(error)
-      if (error.response) {
-        setErrorMessage(error.response.data.message)
+      console.log(error)
+
+      if (!error.response) {
+        setOutcomeMessage('Server is down. Try again later.')
+        return
+      }
+
+      const {status, data} = error.response;
+
+      if (status === 500) {
+        setOutcomeMessage('Failed to delete account due to an internal error. Please try again later.')
+      } else {
+        setOutcomeMessage(data.message)
       }
     }
   }
@@ -61,14 +67,14 @@ const DeleteAccountPopup = ({onClose, showModal, isMain, ...childArgs}) => {
               </svg>
               <div className="modal-message">
                 <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to delete this account forever?</h3>
-                <h5 className="mb-5"><span>{isMain ? `${userInfo?.firstName} ${userInfo?.lastName} - ${userInfo?.email}` : `${userInfo?.email}`} </span></h5>
+                <h5 className="mb-5"><span>{`${userInfo?.firstName} ${userInfo?.lastName} - ${userInfo?.email}`} </span></h5>
               </div>
 
-              <button onClick={deleteAccount} data-modal-hide="popup-modal" type="button" className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+              <button data-testid="delete-account-btn" onClick={deleteAccount} data-modal-hide="popup-modal" type="button" className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                 Yes, I&#39;m sure
               </button>
               <button onClick={onClose} data-modal-hide="popup-modal" type="button" className="text-white-500 bg-red hover:bg-red-100 focus:ring-4 focus:outline-none focus:ring-red-200 rounded-lg border border-red-200 text-sm font-medium px-5 py-2.5 hover:text-red-900 focus:z-10 dark:bg-red-700 dark:text-white-300 dark:border-red-500 dark:hover:text-black dark:hover:bg-gray-600 dark:focus:ring-red-600">No, cancel</button>
-              <p>{errorMessage}</p>
+              <p>{outcomeMessage}</p>
             </div>
           </div>
         </div>

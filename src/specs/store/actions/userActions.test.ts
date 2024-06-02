@@ -1,5 +1,5 @@
 import { mockActivity, mockStudent, mockUser } from "../../mocks";
-import {addNewStudent, createUserActivity, populateUser, saveStudentDetails} from '../../../store/actions/userActions';
+import {addNewStudent, createUserActivity, populateUser, resetUser, saveStudentDetails} from '../../../store/actions/userActions';
 import { ISODateString } from '../../../interfaces/isoDateType';
 import { formatISODate } from '../../../utils/formatDate';
 
@@ -26,6 +26,11 @@ describe('User actions', () => {
     it('should call POPULATE reducer with user data (login)', () => {
       const reducer = populateUser()
       expect(reducer).toMatchObject({type: 'POPULATE', allData: teacher})
+    })
+
+    it('should call RESET reducer when deleting user', () => {
+      const reducer = resetUser();
+      expect(reducer).toMatchObject({type: 'RESET'})
     })
   })
 

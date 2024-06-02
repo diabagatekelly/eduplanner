@@ -11,3 +11,8 @@ export const postCommand = async (url: string, jsonData: Record<string, any>) =>
 export const patchCommand = async (url: string, jsonData: Record<string, any>) => {
   return await axios.patch(url, jsonData, {headers: {"Content-Type": "application/json"}})
 }
+
+export const deleteCommand = async (url: string, userId: string) => {
+  const finalUrl = `${url}&userId=${userId}`
+  return await axios.delete(finalUrl)
+}

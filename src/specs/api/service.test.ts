@@ -1,4 +1,4 @@
-import {getCommand, postCommand, patchCommand} from '../../api/service';
+import {getCommand, postCommand, patchCommand, deleteCommand} from '../../api/service';
 import axios from 'axios';
 import { mockUser } from '../mocks';
 jest.mock('axios');
@@ -8,10 +8,12 @@ const mockUrl = 'http://some-mock-url.com'
 const mockGetResponse = { data: [ { id: 1, name: 'Joe Doe' } ] }
 const mockPostResponse = mockUser
 const mockPatchResponse = {...mockUser, lastLogin: '5/25/24'}
+const mockDeleteResponse = {}
 
 mockAxios.get.mockResolvedValue(mockGetResponse);
 mockAxios.post.mockResolvedValue(mockPostResponse);
 mockAxios.patch.mockResolvedValue(mockPatchResponse);
+mockAxios.delete.mockResolvedValue(mockDeleteResponse);
 
 describe('Service', () => {
   it('should call getCommand as expected', async () => {
@@ -47,5 +49,13 @@ describe('Service', () => {
     const res = await patchCommand(mockUrl, mockJsonData)
     expect(mockAxios.patch).toHaveBeenCalledWith(mockUrl, mockJsonData, {headers});
     expect(res).toEqual(mockPatchResponse);
+  })
+
+  it('should call axios deletCommand with jsonData', async () => {
+    const finalUrl = `${mockUrl}&userId=${mockUser.userId}`
+
+    const res = await deleteCommand(mockUrl, mockUser.userId)
+    expect(mockAxios.delete).toHaveBeenCalledWith(finalUrl);
+    expect(res).toEqual(mockDeleteResponse);
   })
 })
