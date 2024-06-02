@@ -187,6 +187,3 @@ describe('Delete Account Popup', () => {
   })
 })
 
-function populateUser(): any {
-  throw new Error('Function not implemented.');
-}
