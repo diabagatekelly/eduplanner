@@ -52,7 +52,7 @@ describe('Service', () => {
   })
 
   it('should call axios deletCommand with jsonData', async () => {
-    const finalUrl = `${mockUrl}&userId=${mockUser.userId}`
+    const finalUrl = `${mockUrl}/${mockUser.userId}`
 
     const res = await deleteCommand(mockUrl, mockUser.userId)
     expect(mockAxios.delete).toHaveBeenCalledWith(finalUrl);

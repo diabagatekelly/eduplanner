@@ -13,6 +13,6 @@ export const patchCommand = async (url: string, jsonData: Record<string, any>) =
 }
 
 export const deleteCommand = async (url: string, userId: string) => {
-  const finalUrl = `${url}&userId=${userId}`
+  const finalUrl = `${url}/${userId}`
   return await axios.delete(finalUrl)
 }
