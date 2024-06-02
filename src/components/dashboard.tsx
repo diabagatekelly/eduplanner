@@ -3,9 +3,13 @@
 import ListUi from "@/components/lists/lists-ui";
 import AddActivity from "./activities/add-activity";
 import { IUser } from "@/interfaces/IUser";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Dashboard({ userDetails, isMain, isTeacher }: { userDetails: IUser, isMain: boolean, isTeacher: boolean }) {
   const fullName = `${userDetails?.firstName} ${userDetails?.lastName}`
+  const currentPath = usePathname()
+
   return (
     <>
       {isMain ?
@@ -37,7 +41,8 @@ export default function Dashboard({ userDetails, isMain, isTeacher }: { userDeta
         :
 
         <div>
-          <h3 data-testid="dashboard-header" className="py-2.5">Manage student {fullName}.</h3>
+          <h2 data-testid="dashboard-header" className="py-2.5">Manage student {fullName}.</h2>
+          <p><Link href={`${currentPath}/profile`}>View student profile</Link></p>
           <div className="pt-5">
             <AddActivity {...{ userDetails }} />
             <ListUi {...{ listType: 'activities', isMain, userDetails }} />
