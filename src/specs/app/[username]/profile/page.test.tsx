@@ -51,7 +51,7 @@ describe('Profile', () => {
     })
 
     it('should display student with a teacher', async () => {
-      const user = {...mockStudent, lastLogin: formatISODate(new Date().toISOString() as ISODateString), linkedAccountsData: {teacher: 'some-teacher@email.com'}}
+      const user = {...mockStudent, lastLogin: formatISODate(new Date().toISOString() as ISODateString), linkedAccountsData: {teacher: btoa('some-teacher@email.com')}}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
 
