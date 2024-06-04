@@ -1,4 +1,4 @@
-import {createActivity, deleteUser, editUser, findUser, linkAccount, loginUser, registerUser} from '../../api/controller'
+import {createActivity, deleteUser, editUser, findUser, linkAccount, loginUser, registerUser, unlinkAccount} from '../../api/controller'
 import { deleteCommand, getCommand, patchCommand, postCommand } from '../../api/service'
 import { mockActivity, mockStudent, mockUser } from '../mocks';
 
@@ -62,6 +62,13 @@ describe('Controller', () => {
     const res = await linkAccount(params)
 
     expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_ADD_LINKED_ACCOUNT_URL, params)
+    expect(res).toEqual({})
+  })
+
+  it('should make a deleteCommand call to unlink accounts', async () => {
+    (deleteCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve({}))
+  
+    const res = await unlinkAccount({teacherId: mockUser.userId, studentId: mockStudent.userId})
     expect(res).toEqual({})
   })
 })

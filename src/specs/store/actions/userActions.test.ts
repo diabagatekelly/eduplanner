@@ -1,5 +1,5 @@
 import { mockActivity, mockStudent, mockUser } from "../../mocks";
-import {addNewStudent, createUserActivity, populateUser, resetUser, saveStudentDetails} from '../../../store/actions/userActions';
+import {addNewStudent, createUserActivity, populateUser, removeStudent, resetUser, saveStudentDetails} from '../../../store/actions/userActions';
 import { ISODateString } from '../../../interfaces/isoDateType';
 import { formatISODate } from '../../../utils/formatDate';
 
@@ -54,6 +54,40 @@ describe('User actions', () => {
       })
       expect(updatedUser).toMatchObject(expectedUpdatedUser)
       expect(updatedUser.linkedAccountsData.students.includes(mockStudent.userId)).toBe(true)
+    })
+
+    it('should call EDIT reducer with the user_data updated with old student account removed (remove student)', () => {
+      const currentUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+      const currentUserStudents = currentUser.linkedAccountsData?.students?.length
+      expect(currentUser).toMatchObject(teacher)
+      expect(currentUserStudents).toBeFalsy()
+  
+      addNewStudent(mockStudent)
+      saveStudentDetails(mockStudent)
+
+      const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+      expect(updatedUser.linkedAccountsData.students.includes(mockStudent.userId)).toBe(true)
+      expect(updatedUser.students[mockStudent.username]).toMatchObject(mockStudent)
+
+      const reducer = removeStudent(mockStudent.userId)
+      const expectedUpdatedUser = {...teacher, students: {}, linkedAccountsData: {students: []}}
+      const updatedUserWithNoStudent = JSON.parse(mockSessionStorage.getItem('user_data'))
+
+      expect(reducer).toMatchObject({
+        type: 'EDIT',
+        editProps: [
+          {
+            linkedAccountsData: {students: []}
+          },
+          {
+            students: {}
+          }
+        ]
+      })
+
+      expect(updatedUserWithNoStudent).toMatchObject(expectedUpdatedUser)
+      expect(updatedUserWithNoStudent.students).toMatchObject({})
+      expect(updatedUserWithNoStudent.linkedAccountsData.students.length).toEqual(0)
     })
   
     it('should call EDIT reducer with the user_data updated with new student details (save student details)', () => {

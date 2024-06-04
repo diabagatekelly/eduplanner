@@ -53,17 +53,17 @@ export function removeStudent(studentUserId: string) {
   let studentToDelete;
   if (currentUserData.students) {
     studentToDelete = Object.values(currentUserData.students).find((student: any) => student.userId === studentUserId)
+    delete currentUserData.students[studentToDelete.username]
   }
-  const updatedStudentIds = currentUserData.studentIds.filter(id => id !== studentUserId)
-  delete currentUserData.students[studentToDelete.username]
-  currentUserData.studentIds = updatedStudentIds;
+  const updatedStudentIds = currentUserData.linkedAccountsData.students?.filter(id => id !== studentUserId)
+  currentUserData.linkedAccountsData.students = updatedStudentIds;
 
   sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
   return {
     type: 'EDIT',
     editProps: [
       {
-        studentIds: updatedStudentIds
+        linkedAccountsData: currentUserData.linkedAccountsData
       },
       {
         students: currentUserData.students

@@ -3,14 +3,15 @@ import store from "../../store/store";
 import { useDispatch } from "react-redux";
 import { removeStudent } from "@/store/actions/userActions";
 import { unlinkAccount } from "../../api/controller";
+import { IUser } from "@/interfaces/IUser";
 
-const UnlinkAccountPopup = ({onClose, showModal, ...childArgs}) => {
+export default function UnlinkAccountPopup({onClose, showModal, ...childArgs}: {onClose: any, showModal: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>}) {
   const dispatch = useDispatch()
   let args;
 
-  const [studentInfo, getStudentInfo] = useState({ ...childArgs });
-  const [user, getUserData] = useState({ ...args });
-  const [errorMessage, setErrorMessage] = useState('');
+  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user });
+  const [user, getUserData] = useState<IUser | Partial<IUser>>({ ...args });
+  const [outcomeMessage, setOutcomeMessage] = useState('');
 
   useEffect(() => {
     const student = childArgs.user
@@ -19,30 +20,34 @@ const UnlinkAccountPopup = ({onClose, showModal, ...childArgs}) => {
     const { userReducer } = store.getState()
     getUserData(userReducer);
 
-  }, [showModal, childArgs, studentInfo])
+  }, [showModal, childArgs, studentInfo, user])
 
-  const removeOldStudent = async () => {
+  async function removeOldStudent() {
     try {
-      const teacherRawData = { teacher: { email: user.email, removedStudent: studentInfo.email } }
-      const teacherResponse = await unlinkAccount(teacherRawData)
-        .then(async (response) => {
-          if (response.status !== 200) {
-            setErrorMessage(response.data.message)
-          } else {
-            onUnlinkAccountSuccess()
-          }
-        })
+      await unlinkAccount({teacherId: user.userId, studentId: studentInfo.userId})
+      onUnlinkAccountSuccess()
+      
     } catch (error) {
-      console.error(error)
-      if (error.response) {
-        setErrorMessage(error.response.data.message)
+      console.log(error)
+
+      if (!error.response) {
+        setOutcomeMessage('Server is down. Try again later.')
+        return
+      }
+
+      const {status, data} = error.response;
+
+      if (status === 500) {
+        setOutcomeMessage('Failed to unlink accounts due to an internal error. Please try again later.')
+      } else {
+        setOutcomeMessage(data.message)
       }
     }
   }
 
-  const onUnlinkAccountSuccess = () => {
-    dispatch(removeStudent(studentInfo.email));
-    setErrorMessage('Successfully removed student')
+  function onUnlinkAccountSuccess() {
+    dispatch(removeStudent(studentInfo.userId));
+    setOutcomeMessage('Successfully removed student.')
     onClose();
   }
   
@@ -63,14 +68,14 @@ const UnlinkAccountPopup = ({onClose, showModal, ...childArgs}) => {
               </svg>
               <div className="modal-message">
                 <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to remove this student?</h3>
-                <h5 className="mb-5"><span>{studentInfo?.email} </span></h5>
+                <h5 className="mb-5"><span>{`${atob(studentInfo?.userId)}`} </span></h5>
               </div>
 
-              <button onClick={removeOldStudent} data-modal-hide="popup-modal" type="button" className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+              <button data-testid="unlink-accounts-btn" onClick={removeOldStudent} data-modal-hide="popup-modal" type="button" className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                 Yes, I&#39;m sure
               </button>
               <button data-testid="unlink-account-popup-close-btn" onClick={onClose} data-modal-hide="popup-modal" type="button" className="text-white-500 bg-red hover:bg-red-100 focus:ring-4 focus:outline-none focus:ring-red-200 rounded-lg border border-red-200 text-sm font-medium px-5 py-2.5 hover:text-red-900 focus:z-10 dark:bg-red-700 dark:text-white-300 dark:border-red-500 dark:hover:text-black dark:hover:bg-gray-600 dark:focus:ring-red-600">No, cancel</button>
-              <p>{errorMessage}</p>
+              <p data-testid="remove-student-outcome-message">{outcomeMessage}</p>
             </div>
           </div>
         </div>
@@ -78,5 +83,3 @@ const UnlinkAccountPopup = ({onClose, showModal, ...childArgs}) => {
     </>
   )
 }
-
-export default UnlinkAccountPopup;

@@ -29,7 +29,6 @@ describe('Non-main Profile', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2024-02-16'))
-
     window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
   })
 

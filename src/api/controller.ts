@@ -32,13 +32,10 @@ export const linkAccount = async (accountsData: {teacherId: string, studentId: s
   return await postCommand(url, accountsData)
 }
 
-export const unlinkAccount = async (rawData) => {
+export const unlinkAccount = async (accounts: {teacherId: string, studentId}) => {
   const url = process.env.NEXT_DELETE_LINKED_ACCOUNT_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  const params = `${accounts.teacherId}/${accounts.studentId}`
+  return await deleteCommand(url, params)
 }
 
 export const createActivity = async (data: {userActivity: IActivity, userId: string}) => {
