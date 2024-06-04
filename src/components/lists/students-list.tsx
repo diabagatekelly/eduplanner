@@ -15,7 +15,7 @@ export default function StudentsList({userDetails, getBorderColor}: {userDetails
   const [errorMessage, setErrorMessage] = useState('')
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
-  const [popupUserDetails, getPopupUserDetails] = useState<{email: string}>({ ...args });
+  const [popupUserDetails, getPopupUserDetails] = useState<{userId: string}>({ ...args });
 
   useEffect(() => {
     const studentIds = userDetails?.linkedAccountsData?.students || []
@@ -24,7 +24,7 @@ export default function StudentsList({userDetails, getBorderColor}: {userDetails
 
 
    function deleteStudent(studentId: string) {
-    getPopupUserDetails({ email: atob(studentId) })
+    getPopupUserDetails({ userId: studentId })
     setModalType('removeStudent')
     setShowModal(true);
   }
