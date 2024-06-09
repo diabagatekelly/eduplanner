@@ -1,7 +1,8 @@
 import { mockActivity, mockStudent, mockUser } from "../../mocks";
-import {addNewStudent, createUserActivity, populateUser, removeStudent, resetUser, saveStudentDetails} from '../../../store/actions/userActions';
+import {addNewStudent, createUserActivity, editUserActivity, populateUser, removeStudent, resetUser, saveStudentDetails} from '../../../store/actions/userActions';
 import { ISODateString } from '../../../interfaces/isoDateType';
 import { formatISODate } from '../../../utils/formatDate';
+import { CompletionStatus } from "../../../interfaces/CompletionStatusEnum";
 
 describe('User actions', () => {
   let mockSessionStorage;
@@ -160,6 +161,65 @@ describe('User actions', () => {
       expect(updatedUser).toMatchObject(expectedUpdatedUser)
       expect(updatedUser.students['mock-student'].activities).not.toMatchObject([])
       expect(JSON.stringify(updatedUser.students['mock-student'].activities[0])).toEqual(JSON.stringify(mockActivity))
+    })
+
+    describe('With activity', () => {
+      const student = {...mockStudent, activities: [mockActivity]}
+      const teacher = {...mockUser, students: {[student.username]: student}, linkedAccountsData: {students: [student.userId]}, lastLogin: formatISODate(new Date().toISOString() as ISODateString), activities: [mockActivity]}
+      const updatedActivity = {...mockActivity, lastUpdatedOn: formatISODate(new Date().toISOString() as ISODateString), completionStatus: CompletionStatus.COMPLETED}
+      
+      beforeEach(() => {
+        jest.useFakeTimers()
+        jest.setSystemTime(new Date('2024-02-04'))
+    
+        sessionStorage.clear()
+        mockSessionStorage = sessionStorage;
+        mockSessionStorage.setItem('user_data', JSON.stringify(teacher))
+      })
+    
+      afterEach(() => {
+        mockSessionStorage.clear()
+        jest.clearAllMocks()
+        jest.useRealTimers()
+      })
+
+      it('should call EDIT with user_data updated with main user updated activity (edit activity for main user)', () => {
+        const currentUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        const currentUserActivities = currentUser.activities
+        expect(currentUserActivities[0]).toEqual(mockActivity)
+        expect(currentUserActivities[0]).not.toEqual(updatedActivity)
+
+        const reducer = editUserActivity({username: teacher.username, updatedActivity})
+        const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        expect(reducer).toMatchObject({
+          type: 'EDIT',
+          editProps: [
+            {
+              activities: [updatedActivity]
+            }
+          ]
+        })
+        expect(updatedUser.activities[0]).toMatchObject(updatedActivity)
+      })
+    
+      it('should call EDIT with user_data updated with student updated activity (edit activity for student)', () => {
+        const currentUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        const currentUserStudentActivities = currentUser.students[student.username].activities
+        expect(currentUserStudentActivities[0]).toEqual(mockActivity)
+        expect(currentUserStudentActivities[0]).not.toEqual(updatedActivity)
+
+        const reducer = editUserActivity({username: student.username, updatedActivity})
+        const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        expect(reducer).toMatchObject({
+          type: 'EDIT',
+          editProps: [
+            {
+              students: updatedUser.students
+            }
+          ]
+        })
+        expect(updatedUser.students[student.username].activities[0]).toMatchObject(updatedActivity)
+      })
     })
   })
 })

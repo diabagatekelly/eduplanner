@@ -43,13 +43,9 @@ export const createActivity = async (data: {userActivity: IActivity, userId: str
   return await postCommand(url, data)
 }
 
-export const editActivity = async (rawData) => {
+export const editActivity = async (params: {userId: string, updatedActivity: IActivity}) => {
   const url = process.env.NEXT_EDIT_ACTIVITY_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  return await patchCommand(url, params)
 }
 
 export const deleteActivity = async (rawData) => {
