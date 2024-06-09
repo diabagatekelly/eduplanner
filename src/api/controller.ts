@@ -32,7 +32,7 @@ export const linkAccount = async (accountsData: {teacherId: string, studentId: s
   return await postCommand(url, accountsData)
 }
 
-export const unlinkAccount = async (accounts: {teacherId: string, studentId}) => {
+export const unlinkAccount = async (accounts: {teacherId: string, studentId: string}) => {
   const url = process.env.NEXT_DELETE_LINKED_ACCOUNT_URL
   const params = `${accounts.teacherId}/${accounts.studentId}`
   return await deleteCommand(url, params)
@@ -48,13 +48,10 @@ export const editActivity = async (params: {userId: string, updatedActivity: IAc
   return await patchCommand(url, params)
 }
 
-export const deleteActivity = async (rawData) => {
+export const deleteActivity = async (activityDetails: {userId: string, activityName: string}) => {
   const url = process.env.NEXT_DELETE_ACTIVITY_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  const params = `${activityDetails.userId}/${activityDetails.activityName}`
+  return await deleteCommand(url, params)
 }
 
 export const createCard = async (rawData) => {

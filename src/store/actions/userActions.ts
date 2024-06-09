@@ -131,28 +131,27 @@ export function editUserActivity({username, updatedActivity}: {username: string,
   }
 }
 
-export function removeUserActivity(userInfo, activityName) {
+export function removeUserActivity(username: string, activityName: string) {
   const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
   let activitiesToKeep;
-  const isMain = userInfo.username === currentUserData.username
+  let editObject;
+  const isMain = username === currentUserData.username
 
   if (isMain) {
     activitiesToKeep = currentUserData.activities.filter(activity => activity.name !== activityName)
     currentUserData.activities = activitiesToKeep;
+    editObject = { activities: currentUserData.activities }
   } else {
-    const student = currentUserData.students[userInfo.username]
+    const student = currentUserData.students[username]
     activitiesToKeep = student.activities.filter(activity => activity.name !== activityName)
-    currentUserData.students[userInfo.username].activities = activitiesToKeep
+    currentUserData.students[username].activities = activitiesToKeep
+    editObject = { students: currentUserData.students }
   }
   
   sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
   return {
     type: 'EDIT',
-    editProps: [
-      {
-        activities: currentUserData.activities
-      }
-    ]
+    editProps: [editObject]
   }
 }
 
