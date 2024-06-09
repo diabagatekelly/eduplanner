@@ -11,6 +11,7 @@ import { IUser } from "@/interfaces/IUser"
 import { ISODateString } from "@/interfaces/isoDateType"
 import store from "@/store/store"
 import { formatISODate } from "@/utils/formatDate"
+import { IResponse } from "@/interfaces/IApiResponse"
 
 interface IViewActivity {
   updateActivity: () => Promise<void>
@@ -21,55 +22,51 @@ export default function ViewActivity<IViewActivity>({ userDetails, userActivity,
 
   const [isLoading, setIsLoading] = useState(false)
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")  
-  const [activity, setUserActivity] = useState<IActivity>({
-    activityId: '',
-    name: '', 
-    points: 0, 
-    description: '', 
-    completionStatus: CompletionStatus.PENDING, 
-    hasCards: false,
-    createdOn: '' as ISODateString,
-    lastUpdatedOn: '' as ISODateString, 
-    cards: []
-  })
 
   async function updateActivity(): Promise<void> {
     try {
-      const options = {
-        params: {
-          ...userActivity,
-          lastUpdatedOn: formatISODate(new Date().toISOString() as ISODateString)
-        }
+      const updatedActivity: IActivity = {
+        ...userActivity,
+        lastUpdatedOn: formatISODate(new Date().toISOString() as ISODateString)
       }
 
-      const response = await editActivity(options)
-        .then(async (response) => {
-          setIsLoading(false)
-          if (response.status !== 200) {
-            setFormSubmitOutcomeMessage(response.data.message)
-          } else {
-            dispatch(editUserActivity(response.data.params))
-            setFormSubmitOutcomeMessage('Activity status changed to completed.')
-          }
-        })
-
+      const response = await editActivity({userId: userDetails.userId, updatedActivity}) as unknown as IResponse;
+      const {data} = response;
+      const {message, details}: {message: string, details: IActivity} = data;
+      dispatch(editUserActivity({username: userDetails.username, updatedActivity: details}))
+      setFormSubmitOutcomeMessage(message)
+      window.location.reload()
     } catch (error) {
-      console.error(error)
       setIsLoading(false)
-      if (error.response) {
-        setFormSubmitOutcomeMessage(error.response.data.message)
+      console.log(error)
+
+      if (!error.response) {
+        setFormSubmitOutcomeMessage('Server is down. Try again later.')
+        return
+      }
+
+      const {status, data} = error.response;
+
+      if (status === 500) {
+        setFormSubmitOutcomeMessage('Failed to edit activity due to an internal error. Please try again later.')
+      } else {
+        setFormSubmitOutcomeMessage(data.message)
       }
     }
   }
   
   return (
     <>
-      <h3>{userActivity?.name}</h3>
-      <p>Directions: {userActivity?.description}</p>
-      <p>Points: {userActivity?.points} points</p>
-      <p>Status: {userActivity?.completionStatus}</p>
-      <p>Last Updated: {userActivity?.lastUpdatedOn?.split('T')[0] || 'Never'}</p>
+      <h3 className="text-3xl py-3 font-bold" data-testid="activity-name">{userActivity?.name}</h3>
+      <div data-testid="activity-details">
+        <p>Description: {userActivity?.description}</p>
+        <p>Points: {userActivity?.points} points</p>
+        <p>Status: {userActivity?.completionStatus}</p>
+        <p>Last Updated: {userActivity?.lastUpdatedOn?.split('T')[0] || 'Never'}</p>
+      </div>
+      
       <button
+        data-testid="activity-update-btn"
         disabled={userActivity?.completionStatus === CompletionStatus.COMPLETED}
         type="button"
         className={userActivity?.completionStatus !== CompletionStatus.COMPLETED ?
@@ -79,19 +76,13 @@ export default function ViewActivity<IViewActivity>({ userDetails, userActivity,
         }
 
         onClick={updateActivity}>
-        {activity?.completionStatus === CompletionStatus.COMPLETED ? 'Already completed' : 'Mark completed'}
+        {userActivity?.completionStatus === CompletionStatus.COMPLETED ? 'Already completed' : 'Mark completed'}
       </button>
-
-
-      <p>{formSubmitOutcomeMessage}</p>
-      {userActivity?.hasCards ?
-        <>
-          <hr className="my-5" />
-          <ListUi {...{ listType: 'cards', isMain, userDetails, activity: activity }} />
-        </>
-        : ''
-      }
-
+      <p data-testid="update-activity-outcome">{formSubmitOutcomeMessage}</p>
+      <div>
+        <hr className="my-5" />
+        <ListUi {...{ listType: 'cards', isMain, userDetails, activity: userActivity }} />
+      </div>
     </>
   )
 }

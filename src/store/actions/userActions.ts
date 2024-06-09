@@ -101,35 +101,33 @@ export function createUserActivity(activityData: {userActivity: IActivity, userI
   }
 }
 
-export function editUserActivity(updateData) {
-  const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
-  const isMain = updateData.email === currentUserData.email
+export function editUserActivity({username, updatedActivity}: {username: string, updatedActivity: IActivity}) {
+  const currentUserData: IUser = JSON.parse(sessionStorage.getItem('user_data'))
+  const isMain = username === currentUserData.username
   let activityToUpdate;
+  let editObject;
 
   if (isMain) {
-    activityToUpdate = currentUserData.activities.find(activity => activity.name === updateData.name)
+    activityToUpdate = currentUserData.activities.find(activity => activity.name === updatedActivity.name)
     let activityIndex = currentUserData.activities.indexOf(activityToUpdate)
-    activityToUpdate.completionStatus = updateData.completionStatus
-    activityToUpdate.lastUpdatedOn = updateData.lastUpdatedOn
-
+    activityToUpdate.completionStatus = updatedActivity.completionStatus
+    activityToUpdate.lastUpdatedOn = updatedActivity.lastUpdatedOn
     currentUserData.activities[activityIndex] = activityToUpdate;
+    editObject = { activities: currentUserData.activities }
   } else {
-    const student = currentUserData.students[updateData.username]
-    activityToUpdate = student.activities.find(activity => activity.name === updateData.name)
+    const student = currentUserData.students[username]
+    activityToUpdate = student.activities.find(activity => activity.name === updatedActivity.name)
     let activityIndex = student.activities.indexOf(activityToUpdate)
-    activityToUpdate.completionStatus = updateData.completionStatus
-    activityToUpdate.lastUpdatedOn = updateData.lastUpdatedOn
-    currentUserData.students[updateData.username].activities = activityToUpdate
+    activityToUpdate.completionStatus = updatedActivity.completionStatus
+    activityToUpdate.lastUpdatedOn = updatedActivity.lastUpdatedOn
+    currentUserData.students[username].activities[activityIndex] = activityToUpdate
+    editObject = { students: currentUserData.students }
   }
 
   sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
   return {
     type: 'EDIT',
-    editProps: [
-      {
-        activities: currentUserData.activities
-      }
-    ]
+    editProps: [editObject]
   }
 }
 
