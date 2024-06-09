@@ -1,4 +1,4 @@
-import {createActivity, editActivity, deleteUser, editUser, findUser, linkAccount, loginUser, registerUser, unlinkAccount} from '../../api/controller'
+import {createActivity, editActivity, deleteUser, editUser, findUser, linkAccount, loginUser, registerUser, unlinkAccount, deleteActivity} from '../../api/controller'
 import { deleteCommand, getCommand, patchCommand, postCommand } from '../../api/service'
 import { mockActivity, mockStudent, mockUser } from '../mocks';
 
@@ -85,6 +85,13 @@ describe('Controller', () => {
   
       expect(patchCommand).toHaveBeenCalledWith(process.env.NEXT_EDIT_ACTIVITY_URL, {userId: mockUser.userId, updatedActivity: mockActivity})
       expect(res).toEqual(mockActivity)
+    })
+
+    it('should make a deleteCommand call to delete activity', async () => {
+      (deleteCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve({}))
+    
+      const res = await deleteActivity({userId: mockUser.userId, activityName: mockActivity.name})
+      expect(res).toEqual({})
     })
   })
 })

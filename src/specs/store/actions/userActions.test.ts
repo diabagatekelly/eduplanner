@@ -1,5 +1,5 @@
 import { mockActivity, mockStudent, mockUser } from "../../mocks";
-import {addNewStudent, createUserActivity, editUserActivity, populateUser, removeStudent, resetUser, saveStudentDetails} from '../../../store/actions/userActions';
+import {addNewStudent, createUserActivity, editUserActivity, populateUser, removeStudent, removeUserActivity, resetUser, saveStudentDetails} from '../../../store/actions/userActions';
 import { ISODateString } from '../../../interfaces/isoDateType';
 import { formatISODate } from '../../../utils/formatDate';
 import { CompletionStatus } from "../../../interfaces/CompletionStatusEnum";
@@ -219,6 +219,44 @@ describe('User actions', () => {
           ]
         })
         expect(updatedUser.students[student.username].activities[0]).toMatchObject(updatedActivity)
+      })
+
+      it('should call EDIT with user_data updated with main user removed activity (remove activity for main user)', () => {
+        const currentUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        const currentUserActivities = currentUser.activities
+        expect(currentUserActivities[0]).toEqual(mockActivity)
+        expect(currentUserActivities[0]).not.toEqual(updatedActivity)
+
+        const reducer = removeUserActivity(teacher.username, updatedActivity.name)
+        const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        expect(reducer).toMatchObject({
+          type: 'EDIT',
+          editProps: [
+            {
+              activities: []
+            }
+          ]
+        })
+        expect(updatedUser.activities.length).toEqual(0)
+      })
+
+      it('should call EDIT with user_data updated with student removed activity (remove activity for student)', () => {
+        const currentUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        const currentUserStudentActivities = currentUser.students[student.username].activities
+        expect(currentUserStudentActivities[0]).toEqual(mockActivity)
+        expect(currentUserStudentActivities[0]).not.toEqual(updatedActivity)
+
+        const reducer = removeUserActivity(student.username, updatedActivity.name)
+        const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        expect(reducer).toMatchObject({
+          type: 'EDIT',
+          editProps: [
+            {
+              students: updatedUser.students
+            }
+          ]
+        })
+        expect(updatedUser.students[student.username].activities.length).toEqual(0)
       })
     })
   })

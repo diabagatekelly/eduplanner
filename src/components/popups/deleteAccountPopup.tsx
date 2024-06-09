@@ -43,7 +43,7 @@ const DeleteAccountPopup = ({onClose, showModal, ...childArgs}: {onClose: any, s
     }
   }
 
-  const onDeleteAccountSuccess = () => {
+  function onDeleteAccountSuccess() {
     dispatch(resetUser());
     dispatch(removeAuthToken());
     onClose();
