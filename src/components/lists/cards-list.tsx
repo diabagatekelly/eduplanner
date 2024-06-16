@@ -8,8 +8,17 @@ import { ICard } from "@/interfaces/ICard";
 import { IUser } from "@/interfaces/IUser";
 import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
 
+export const useMounted = () => {
+  const [mounted, setMounted] = useState<boolean>()
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  return mounted
+}
+
 export function CardsList({isMain, userDetails, getBorderColor, ...childArgs}) {
   let args;
+  const mounted = useMounted();
 
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
@@ -38,10 +47,13 @@ export function CardsList({isMain, userDetails, getBorderColor, ...childArgs}) {
     const inactiveCards = cards?.filter((card) => card.completionStatus === CompletionStatus.INACTIVE)
     getAllInactiveCards(inactiveCards)
 
-    const {hashReducer} = store.getState()
-    getHash(hashReducer)
+  
+    if (mounted) {
+      const hashReducer = window.location.hash
+      getHash(hashReducer)
+    }
 
-  }, [userDetails, childArgs?.activity])
+  }, [userDetails, childArgs?.activity, mounted])
 
 
   function deleteCard(card: ICard) {
@@ -88,6 +100,7 @@ export function CardsList({isMain, userDetails, getBorderColor, ...childArgs}) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
+  if (!mounted) return null;
   return (
     <>
       {hash === '' && 

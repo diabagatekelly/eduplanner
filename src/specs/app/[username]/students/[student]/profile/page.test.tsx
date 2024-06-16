@@ -40,7 +40,7 @@ describe('Non-main Profile', () => {
 
   describe('Non-main student profiles', () => {
     it('should display student from teacher account', async () => {
-      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher, hashReducer: ''}
+      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")
       useParams.mockReturnValue({student: 'mock-student', username: 'mock-user'})
@@ -65,7 +65,7 @@ describe('Non-main Profile', () => {
 
   describe('Modal behavior', () => {
     it('should show profile', async () => {
-      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher, hashReducer: ''}
+      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")
       useParams.mockReturnValue({student: 'mock-student', username: 'mock-user'})

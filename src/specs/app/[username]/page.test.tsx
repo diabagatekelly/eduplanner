@@ -25,7 +25,7 @@ describe('Main user page', () => {
 
   describe('Main - Student', () => {
     beforeEach(() => {
-      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: mockStudent, hashReducer: ''}
+      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: mockStudent}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       (NestedLayout as jest.Mock).mockImplementation(() => null);
     })
@@ -44,7 +44,7 @@ describe('Main user page', () => {
 
   describe('Main - Teacher', () => {
     beforeEach(() => {
-      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: mockUser, hashReducer: ''}
+      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: mockUser}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       (NestedLayout as jest.Mock).mockImplementation(() => null);
     })

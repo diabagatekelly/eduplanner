@@ -10,7 +10,6 @@ import { Suspense, useEffect, useState } from 'react';
 import { hasExpired, hasToken } from '@/store/actions/authActions';
 import { usePathname, useSearchParams } from 'next/navigation'
 import { populateUser } from '@/store/actions/userActions';
-import { getWindowLocationHash } from '@/store/actions/windowLocationHashActions';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -53,9 +52,7 @@ const Reloader = () => {
     const {authReducer, userReducer} = store.getState()
     const isAuthenticated = authReducer.isAuthenticated;
     setUserState({isAuthenticated, userReducer})
-    if (window) {
-      dispatch(getWindowLocationHash(window))
-    }
+
   }, [pathname, searchParams, dispatch])
 
   const username = userState.userReducer.username;
