@@ -9,6 +9,23 @@ export interface ICard {
   lastUpdatedOn: ISODateString,
   nextShowDate: ISODateString,
   stage: string,
-  cardContent: string,
   completionStatus: CompletionStatus,
 }
+
+export interface IQuranJuzCard {
+  cardId: string // btoa(juz-30)
+  type: 'Quran',
+  level: 'Juz',
+  juz: number,
+}
+
+export interface IQuranSurahCard {
+  cardId: string, // btoa(surah-114-juz-30)
+  type: 'Quran',
+  level: 'Surah',
+  name: string,
+  juz: number,
+  number: number,
+}
+
+export type IQuranCards = (IQuranJuzCard|IQuranSurahCard)[]

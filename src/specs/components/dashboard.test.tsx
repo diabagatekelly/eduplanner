@@ -43,7 +43,7 @@ describe('Dashboard', () => {
   })
 
   it('should show instructions for main student with teacher', async () => {
-    const userDetails = {...mockUser, linkedAccountsData: {teacher: 'my-teacher@email.com'}}
+    const userDetails = {...mockUser, linkedAccountsData: {teacher: btoa('my-teacher@email.com')}}
     render(<Dashboard {...{userDetails, isMain: true, isTeacher: false}}/>)
   
     const h3 = await screen.findByTestId("dashboard-header");

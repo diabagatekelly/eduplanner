@@ -62,7 +62,7 @@ export default function Register<IRegister>() {
       }
 
       for (const pair of rawFormData.entries()) {
-        jsonData[pair[0]] = `${pair[1]}`;
+        jsonData[pair[0].trim()] = `${(pair[1] as string).trim()}`;
       }
 
       const userId = btoa(jsonData.email)
@@ -73,7 +73,7 @@ export default function Register<IRegister>() {
         ...jsonData,
         userId,
         username,
-        lastLogin: formatISODate(new Date().toISOString() as ISODateString),
+        lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString,
         activities: [],
         linkedAccountsData 
       };

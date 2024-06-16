@@ -1,5 +1,6 @@
 import { deleteCommand, getCommand, patchCommand, postCommand } from "@/api/service";
 import { IActivity } from "@/interfaces/IActivity";
+import { ICard } from "@/interfaces/ICard";
 import { IUser, IUserLogin } from "@/interfaces/IUser";
 
 export const findUser = async (params: {userId: string}) => {
@@ -54,56 +55,63 @@ export const deleteActivity = async (activityDetails: {userId: string, activityN
   return await deleteCommand(url, params)
 }
 
-export const createCard = async (rawData) => {
+// export const getQuranCards = async () => {
+//   const url = process.env.NEXT_BANK_QURAN_GET
+//   return await getCommand(url, {})
+// }
+
+export const createCards = async (cardPayload: {userId: string, activity: string, cards: ICard[]}) => {
   const url = process.env.NEXT_CREATE_CARD_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  return await postCommand(url, cardPayload)
 }
 
-export const editCard = async (rawData) => {
-  const url = process.env.NEXT_EDIT_CARD_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+export const activateCard = async (cardPayload: {userId: string, activity: string, cardId: string}) => {
+  const url = process.env.NEXT_ACTIVATE_CARD_URL
+  return await postCommand(url, cardPayload)
 }
 
-export const editCardStage = async (rawData) => {
+// export const editCard = async (rawData) => {
+//   const url = process.env.NEXT_EDIT_CARD_URL
+
+//   return await postCommand(url, rawData)
+//     .then(async (response) => {
+//       return response;
+//     })
+// }
+
+export const editCardStage = async (data: { 
+  userId: string, 
+  activity: string, 
+  cardId: string,
+  editData: {
+    stage: string,
+    promote: boolean
+  }
+}) => {
   const url = process.env.NEXT_EDIT_CARD_STAGE_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  return await postCommand(url, data)
 }
 
-export const resetCardStage = async (rawData) => {
+export const resetCardStage = async (cardPayload: {userId: string, activity: string, cardId: string}) => {
   const url = process.env.NEXT_RESET_CARD_STAGE_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  return await postCommand(url, cardPayload)
 }
 
-export const requestCardReview = async (rawData) => {
+export const requestCardReview = async (data: {
+  id: string,
+  teacherId: string,
+  student: {
+    id: string,
+    fullName: string,
+    email: string
+  }
+}) => {
   const url = process.env.NEXT_REQUEST_REVIEW_CARD_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  return await postCommand(url, data)
 }
 
-export const deleteCard = async (rawData) => {
+export const deleteCard = async ({userId, activity, cardId}: {userId: string, activity: string, cardId: string}) => {
   const url = process.env.NEXT_DELETE_CARD_URL
-
-  return await postCommand(url, rawData)
-    .then(async (response) => {
-      return response;
-    })
+  const params = `${userId}/${activity}/${cardId}`
+  return await deleteCommand(url, params)
 }

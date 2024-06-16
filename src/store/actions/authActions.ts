@@ -4,7 +4,7 @@ import { formatISODate } from "@/utils/formatDate";
 
 export function setAuthToken({token, user}: {token: string, user: IUser}) {
   sessionStorage.setItem("user_token", token);
-  const today = formatISODate(new Date().toISOString() as ISODateString) 
+  const today = new Date(Date.now()).toLocaleDateString() as ISODateString 
   sessionStorage.setItem("created_on", today)
   sessionStorage.setItem("user_data", JSON.stringify(user))
   return {
@@ -16,6 +16,7 @@ export function removeAuthToken() {
   sessionStorage.removeItem("user_token");
   sessionStorage.removeItem("user_data");
   sessionStorage.removeItem("created_on");
+  window.location.assign('/login')
   return {
     type: 'UNAUTH'
   };
@@ -36,7 +37,7 @@ export function hasToken() {
 
 export function hasExpired() {
   const createdOn = sessionStorage.getItem('created_on');
-  const today = formatISODate(new Date().toISOString() as ISODateString) 
+  const today = new Date(Date.now()).toLocaleDateString() as ISODateString 
   const hasExpired = today !== createdOn
 
   if (hasExpired) {

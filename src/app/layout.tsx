@@ -52,6 +52,7 @@ const Reloader = () => {
     const {authReducer, userReducer} = store.getState()
     const isAuthenticated = authReducer.isAuthenticated;
     setUserState({isAuthenticated, userReducer})
+
   }, [pathname, searchParams, dispatch])
 
   const username = userState.userReducer.username;

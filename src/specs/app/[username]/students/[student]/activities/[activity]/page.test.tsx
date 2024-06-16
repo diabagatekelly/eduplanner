@@ -11,10 +11,10 @@ jest.mock('../../../../../../../app/nested-layout');
 describe('Main user page', () => {
   beforeEach(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2024-02-04'))
+    jest.setSystemTime(new Date('2/3/2024'))
     window.sessionStorage.setItem('user_data', JSON.stringify(mockUser))
     window.sessionStorage.setItem('user_token', 'xxxxxx')
-    window.sessionStorage.setItem('created_on', '2024-02-04')
+    window.sessionStorage.setItem('created_on', '2/3/2024')
   })
 
   afterEach(() => {

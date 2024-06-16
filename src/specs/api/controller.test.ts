@@ -1,6 +1,19 @@
-import {createActivity, editActivity, deleteUser, editUser, findUser, linkAccount, loginUser, registerUser, unlinkAccount, deleteActivity} from '../../api/controller'
+import {
+  createActivity,
+  editActivity,
+  deleteUser,
+  editUser, 
+  findUser,
+  linkAccount,
+  loginUser,
+  registerUser,
+  unlinkAccount,
+  deleteActivity,
+  createCards
+} from '../../api/controller'
 import { deleteCommand, getCommand, patchCommand, postCommand } from '../../api/service'
-import { mockActivity, mockStudent, mockUser } from '../mocks';
+import { IQuranCards } from '../../interfaces/ICard';
+import { mockActivity, mockBankJuzCard, mockBankSurahCard, mockStudent, mockUser, mockUserCard } from '../mocks';
 
 jest.mock('../../api/service');
 
@@ -92,6 +105,22 @@ describe('Controller', () => {
     
       const res = await deleteActivity({userId: mockUser.userId, activityName: mockActivity.name})
       expect(res).toEqual({})
+    })
+  })
+
+  describe('Cards', () => {
+    it('should make a postCommand call to create user cards', async () => {
+      const payload = {
+        userId: `${btoa('mock.user@email.com')}`,
+        activity: 'Quran',
+        cards: [mockUserCard]
+      };
+
+      (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve([mockUserCard]));
+      const res = await createCards(payload)
+  
+      expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_CREATE_CARD_URL, payload)
+      expect(res).toEqual([mockUserCard])
     })
   })
 })

@@ -84,7 +84,7 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
         points: Number(activityFormInfo.points),
         completionStatus: CompletionStatus.PENDING,
         hasCards: activityFormInfo.hasCards === 'true' ? true : false,
-        createdOn: formatISODate(new Date().toISOString() as ISODateString), 
+        createdOn: new Date(Date.now()).toLocaleDateString() as ISODateString, 
         lastUpdatedOn: null
       } 
 

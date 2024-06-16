@@ -6,11 +6,11 @@ import { CompletionStatus } from "../../../interfaces/CompletionStatusEnum";
 
 describe('User actions', () => {
   let mockSessionStorage;
-  const teacher = {...mockUser, lastLogin: formatISODate(new Date().toISOString() as ISODateString)}
+  const teacher = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString}
 
   beforeEach(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2024-02-04'))
+    jest.setSystemTime(new Date('2/3/2024'))
 
     sessionStorage.clear()
     mockSessionStorage = sessionStorage;
@@ -165,12 +165,12 @@ describe('User actions', () => {
 
     describe('With activity', () => {
       const student = {...mockStudent, activities: [mockActivity]}
-      const teacher = {...mockUser, students: {[student.username]: student}, linkedAccountsData: {students: [student.userId]}, lastLogin: formatISODate(new Date().toISOString() as ISODateString), activities: [mockActivity]}
-      const updatedActivity = {...mockActivity, lastUpdatedOn: formatISODate(new Date().toISOString() as ISODateString), completionStatus: CompletionStatus.COMPLETED}
+      const teacher = {...mockUser, students: {[student.username]: student}, linkedAccountsData: {students: [student.userId]}, lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString, activities: [mockActivity]}
+      const updatedActivity = {...mockActivity, lastUpdatedOn: new Date(Date.now()).toLocaleDateString() as ISODateString, completionStatus: CompletionStatus.COMPLETED}
       
       beforeEach(() => {
         jest.useFakeTimers()
-        jest.setSystemTime(new Date('2024-02-04'))
+        jest.setSystemTime(new Date('2/3/2024'))
     
         sessionStorage.clear()
         mockSessionStorage = sessionStorage;

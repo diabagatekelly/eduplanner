@@ -15,7 +15,7 @@ describe('Unlink Account Popup', () => {
 
   beforeAll(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2024-02-16'))
+    jest.setSystemTime(new Date('2/15/2024'))
     sessionStorage.setItem("user_data", JSON.stringify(teacher))
   })
 
