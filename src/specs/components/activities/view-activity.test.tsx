@@ -31,7 +31,7 @@ describe('View activity', () => {
       value: { reload: jest.fn() }
     });
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2024-02-04'))
+    jest.setSystemTime(new Date('2/3/2024'))
   })
 
   afterAll(() => {
@@ -100,7 +100,7 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
       
-      const userActivityDTO = {...mockActivity, lastUpdatedOn: formatISODate(new Date().toISOString() as ISODateString)}
+      const userActivityDTO = {...mockActivity, lastUpdatedOn: new Date(Date.now()).toLocaleDateString() as ISODateString}
       await expect(editActivity).toHaveBeenCalledWith({userId: userDetails.userId, updatedActivity: userActivityDTO})
     })
 
@@ -108,7 +108,7 @@ describe('View activity', () => {
       const updatedActivity = {
         ...mockActivity,
         completionStatus: CompletionStatus.COMPLETED,
-        lastUpdatedOn: formatISODate(new Date().toISOString() as ISODateString)
+        lastUpdatedOn: new Date(Date.now()).toLocaleDateString() as ISODateString
       };
       (editActivity as jest.Mock).mockImplementation(() => {
         return Promise.resolve({status: 200, data: {message: 'Success', details: updatedActivity}})

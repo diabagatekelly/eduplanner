@@ -26,7 +26,7 @@ export default function Dashboard({ userDetails, isMain, isTeacher }: { userDeta
             <div>
               <div className="pb-5">
                 {userDetails.linkedAccountsData?.teacher ?
-                  <h5 data-testid="student-instructions">Your teacher&#39;s email is {userDetails?.linkedAccountsData?.teacher}.</h5> :
+                  <h5 data-testid="student-instructions">Your teacher&#39;s email is {atob(userDetails?.linkedAccountsData?.teacher)}.</h5> :
                   <h5 data-testid="student-instructions">Ask your teacher or parent to add you and create some activities for you!</h5>
                 }
               </div>

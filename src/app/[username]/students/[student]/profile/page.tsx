@@ -19,7 +19,7 @@ export default function Profile() {
     const { userReducer } = store.getState()
     const user = userReducer.students[student]
     getUserData(user);
-  }, [])
+  }, [student])
 
   const isTeacher = user?.accountType === 'teacher';
   const isMain = false;

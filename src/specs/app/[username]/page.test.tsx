@@ -11,10 +11,10 @@ jest.mock('../../../app/nested-layout');
 describe('Main user page', () => {
   beforeEach(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2024-02-04'))
+    jest.setSystemTime(new Date('2/3/2024'))
     window.sessionStorage.setItem('user_data', JSON.stringify(mockUser))
     window.sessionStorage.setItem('user_token', 'xxxxxx')
-    window.sessionStorage.setItem('created_on', '2024-02-04')
+    window.sessionStorage.setItem('created_on', '2/3/2024')
   })
 
   afterEach(() => {
@@ -25,7 +25,7 @@ describe('Main user page', () => {
 
   describe('Main - Student', () => {
     beforeEach(() => {
-      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: mockStudent}
+      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: mockStudent, hashReducer: ''}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       (NestedLayout as jest.Mock).mockImplementation(() => null);
     })
@@ -44,7 +44,7 @@ describe('Main user page', () => {
 
   describe('Main - Teacher', () => {
     beforeEach(() => {
-      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: mockUser}
+      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: mockUser, hashReducer: ''}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       (NestedLayout as jest.Mock).mockImplementation(() => null);
     })

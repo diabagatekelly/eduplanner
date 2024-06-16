@@ -1,8 +1,10 @@
 import { IUser } from "../../src/interfaces/IUser";
+import { ICard } from "../../src/interfaces/ICard";
 import { IActivity } from "../../src/interfaces/IActivity";
 import { CompletionStatus } from "../../src/interfaces/CompletionStatusEnum";
 import { ISODateString } from "../../src/interfaces/isoDateType";
 import { formatISODate } from "../../src/utils/formatDate";
+import { IQuranSurahCard, IQuranJuzCard } from "@/interfaces/ICard";
 
 export const mockUser: IUser = {
   userId: btoa('mock.user@email.com'),
@@ -13,7 +15,7 @@ export const mockUser: IUser = {
   password: 'password',
   accountType: 'teacher',
   linkedAccountsData: {students: []},
-  lastLogin: formatISODate(new Date().toISOString() as ISODateString), 
+  lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString, 
   activities: []
 }
 
@@ -26,7 +28,7 @@ export const mockStudent: IUser = {
   password: 'password',
   accountType: 'student',
   linkedAccountsData: {teacher: null},
-  lastLogin: formatISODate(new Date().toISOString() as ISODateString),
+  lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString,
   activities: [] 
 }
 
@@ -37,6 +39,33 @@ export const mockActivity: IActivity = {
   description: 'Quran memorization',
   completionStatus: CompletionStatus.PENDING,
   hasCards: true,
-  createdOn: formatISODate(new Date().toISOString() as ISODateString), 
+  createdOn: new Date(Date.now()).toLocaleDateString() as ISODateString, 
   lastUpdatedOn: null
+}
+
+export const mockUserCard: ICard = {
+  cardId: `${btoa('surah-114-name-Naas-juz-30')}`,
+  activity: 'Quran',
+  activityType: 'Quran',
+  addedOn: new Date(Date.now()).toLocaleDateString() as ISODateString,
+  lastUpdatedOn: null,
+  nextShowDate: null,
+  stage: '0',
+  completionStatus: CompletionStatus.INACTIVE
+}
+
+export const mockBankSurahCard: IQuranSurahCard = {
+  cardId: `${btoa('surah-114-name-Naas-juz-30')}`,
+  type: 'Quran',
+  level: 'Surah',
+  name: 'Naas',
+  juz: 30,
+  number: 114
+}
+
+export const mockBankJuzCard: IQuranJuzCard = {
+  cardId: `${btoa('juz-30')}`,
+  type: 'Quran',
+  level: 'Juz',
+  juz: 30
 }

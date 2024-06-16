@@ -6,11 +6,11 @@ import { mockUser, mockStudent } from '../../../../../../specs/mocks';
 import store from '../../../../../../store/store';
 import Profile from '../../../../../../app/[username]/students/[student]/profile/page';
 
-const student = {...mockStudent, linkedAccountsData: {teacher: btoa('mock.user@email.com')}, lastLogin: '2024-02-16'}
+const student = {...mockStudent, linkedAccountsData: {teacher: btoa('mock.user@email.com')}, lastLogin: '2/15/2024'}
 const teacher = {
   ...mockUser,
   linkedAccountsData: {students: [btoa('mock.student@email.com')]}, 
-  lastLogin: '2024-02-16',
+  lastLogin: '2/15/2024',
   students: {'mock-student': student} 
 }
 
@@ -28,7 +28,7 @@ jest.mock('next/navigation', () => {
 describe('Non-main Profile', () => {
   beforeEach(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2024-02-16'))
+    jest.setSystemTime(new Date('2/15/2024'))
     window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
   })
 
@@ -40,7 +40,7 @@ describe('Non-main Profile', () => {
 
   describe('Non-main student profiles', () => {
     it('should display student from teacher account', async () => {
-      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}
+      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher, hashReducer: ''}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")
       useParams.mockReturnValue({student: 'mock-student', username: 'mock-user'})
@@ -58,14 +58,14 @@ describe('Non-main Profile', () => {
       expect(email).toHaveTextContent('mock.student@email.com')
       expect(accountType).toHaveTextContent('student')
       expect(linked).toHaveTextContent('mock.user@email.com (teacher)')
-      expect(loginDate).toHaveTextContent('2024-02-16')
+      expect(loginDate).toHaveTextContent('2/15/2024')
     })
   })
 
 
   describe('Modal behavior', () => {
     it('should show profile', async () => {
-      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}
+      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher, hashReducer: ''}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")
       useParams.mockReturnValue({student: 'mock-student', username: 'mock-user'})

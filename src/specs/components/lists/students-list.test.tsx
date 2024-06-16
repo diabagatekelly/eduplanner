@@ -77,10 +77,10 @@ describe('Students List', () => {
 
     beforeEach(() => {
       jest.useFakeTimers()
-      jest.setSystemTime(new Date('2024-02-04'))
+      jest.setSystemTime(new Date('2/3/2024'))
       window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
       window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2024-02-04')
+      window.sessionStorage.setItem('created_on', '2/3/2024')
 
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
@@ -127,10 +127,10 @@ describe('Students List', () => {
 
     beforeEach(() => {
       jest.useFakeTimers()
-      jest.setSystemTime(new Date('2024-02-04'))
+      jest.setSystemTime(new Date('2/3/2024'))
       window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
       window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2024-02-04')
+      window.sessionStorage.setItem('created_on', '2/3/2024')
 
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
@@ -171,10 +171,10 @@ describe('Students List', () => {
 
     beforeEach(() => {
       jest.useFakeTimers()
-      jest.setSystemTime(new Date('2024-02-04'))
+      jest.setSystemTime(new Date('2/3/2024'))
       window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
       window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2024-02-04')
+      window.sessionStorage.setItem('created_on', '2/3/2024')
 
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);

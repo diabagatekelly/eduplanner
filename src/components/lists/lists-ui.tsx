@@ -1,6 +1,6 @@
 import StudentsList from "./students-list";
 import ActivitiesList from "./activities-list";
-import CardsList from "./cards-list";
+import {CardsList} from "./cards-list";
 import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
 
 const ListsUi = ({ listType, isMain, userDetails, ...childArgs }) => {

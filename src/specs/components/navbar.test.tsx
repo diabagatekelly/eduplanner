@@ -138,10 +138,10 @@ describe('Navbar', () => {
     describe('Logging out', () => {
       beforeEach(() => {
         jest.useFakeTimers()
-        jest.setSystemTime(new Date('2024-02-04'))
+        jest.setSystemTime(new Date('2/3/2024'))
         window.sessionStorage.setItem('user_data', JSON.stringify(mockUser))
         window.sessionStorage.setItem('user_token', 'xxxxxx')
-        window.sessionStorage.setItem('created_on', '2024-02-04')
+        window.sessionStorage.setItem('created_on', '2/3/2024')
       })
     
       afterEach(() => {
@@ -176,7 +176,7 @@ describe('Navbar', () => {
         
         mockStore.mockRestore();
 
-        await expect(editUser).toHaveBeenCalledWith({userId: mockUser.userId, editData: {lastLogin: formatISODate(new Date().toISOString() as ISODateString)}})
+        await expect(editUser).toHaveBeenCalledWith({userId: mockUser.userId, editData: {lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString}})
         expect(window.sessionStorage.getItem('user_token')).toBe(null)
         expect(window.sessionStorage.getItem('user_data')).toBe(null)
         expect(window.sessionStorage.getItem('created_on')).toBe(null)
