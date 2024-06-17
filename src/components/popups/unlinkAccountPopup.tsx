@@ -53,7 +53,7 @@ export default function UnlinkAccountPopup({onClose, showModal, ...childArgs}: {
   
   return (
     <>
-      <dialog data-testid="unlink-account-popup" open={showModal} id="popup-modal" className="fixed top-0 left-0 right-0 z-50 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full border-4 border-gray-800 rounded-lg">
+      <div data-testid="unlink-account-popup" hidden={!showModal} id="popup-modal" className="fixed top-0 left-0 right-0 z-50 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full border-4 border-gray-800 rounded-lg">
         <div className="relative w-full max-w-md max-h-full">
           <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
             <button onClick={onClose} type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="popup-modal">
@@ -79,7 +79,7 @@ export default function UnlinkAccountPopup({onClose, showModal, ...childArgs}: {
             </div>
           </div>
         </div>
-      </dialog>
+      </div>
     </>
   )
 }
