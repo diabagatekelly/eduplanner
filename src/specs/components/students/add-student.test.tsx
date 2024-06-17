@@ -160,7 +160,7 @@ describe('Add student', () => {
 
     const expectedHTML = 'mock student - mock.student@email.com';
 
-    expect(linkAccountPopup).toHaveAttribute('open')
+    expect(linkAccountPopup).toBeVisible()
     expect(linkAccountPopup).toHaveTextContent(expectedHTML)
 
     await act(async () => {

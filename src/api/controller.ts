@@ -79,14 +79,11 @@ export const activateCard = async (cardPayload: {userId: string, activity: strin
 //     })
 // }
 
-export const editCardStage = async (data: { 
+export const editCard = async (data: { 
   userId: string, 
   activity: string, 
   cardId: string,
-  editData: {
-    stage: string,
-    promote: boolean
-  }
+  editData: Record<string, any>
 }) => {
   const url = process.env.NEXT_EDIT_CARD_STAGE_URL
   return await postCommand(url, data)

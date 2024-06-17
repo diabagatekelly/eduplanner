@@ -154,7 +154,7 @@ describe('Profile', () => {
       act(() => {
         deleteBtn.click()
       })
-      expect(popup).toHaveAttribute('open')
+      expect(popup).toBeVisible()
 
       const popupClosebtn = profile.container.querySelector('#popup-close-btn') as HTMLButtonElement;
 
@@ -162,7 +162,7 @@ describe('Profile', () => {
         popupClosebtn.click()
       })
 
-      expect(popup).not.toHaveAttribute('open')
+      expect(popup).not.toBeVisible()
     })
   })
 })

@@ -58,7 +58,7 @@ describe('Students List', () => {
       const expectedPopupText = 'Are you sure you want to remove this student?'
       const expectedStudentEmail = mockStudent.email
 
-      expect(unlinkAccountPopup).toHaveAttribute('open')
+      expect(unlinkAccountPopup).toBeVisible()
       expect(unlinkAccountPopup).toHaveTextContent(expectedPopupText)
       expect(unlinkAccountPopup).toHaveTextContent(expectedStudentEmail)
 
@@ -67,7 +67,7 @@ describe('Students List', () => {
         await fireEvent.click(closeUnlinkAccountPopupBtn)
       })
 
-      expect(unlinkAccountPopup).not.toHaveAttribute('open')
+      expect(unlinkAccountPopup).not.toBeVisible()
     
     })
   })

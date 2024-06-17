@@ -104,7 +104,7 @@ describe('Activities List', () => {
       const deleteActivityPopup = screen.getByTestId('delete-activity-popup')    
       const expectedPopupText = 'Are you sure you want to delete this activity?'
 
-      expect(deleteActivityPopup).toHaveAttribute('open')
+      expect(deleteActivityPopup).toBeVisible()
       expect(deleteActivityPopup).toHaveTextContent(expectedPopupText)
       expect(deleteActivityPopup).toHaveTextContent('Quran')
 
@@ -113,7 +113,7 @@ describe('Activities List', () => {
         await fireEvent.click(closeDeleteActivityPopupBtn)
       })
 
-      expect(deleteActivityPopup).not.toHaveAttribute('open')
+      expect(deleteActivityPopup).not.toBeVisible()
     })
   })
 })

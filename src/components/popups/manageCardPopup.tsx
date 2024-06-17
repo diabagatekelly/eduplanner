@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { editUserCard, removeUserCard } from "@/store/actions/userActions";
-import { activateCard, deleteCard, editCardStage, requestCardReview, resetCardStage } from "../../api/controller";
+import { activateCard, deleteCard, editCard, requestCardReview, resetCardStage } from "../../api/controller";
 import { IResponse } from "@/interfaces/IApiResponse";
 import { ICard } from "@/interfaces/ICard";
 import store from "@/store/store";
 import { IUser } from "@/interfaces/IUser";
+import { ISODateString } from "@/interfaces/isoDateType";
 
 const ManageCardPopup = ({onClose, showModal, isMain, ...childArgs}) => {
   const dispatch = useDispatch()
@@ -120,7 +121,7 @@ const ManageCardPopup = ({onClose, showModal, isMain, ...childArgs}) => {
         }
       }
 
-      const response = await editCardStage(editPayload)
+      const response = await editCard(editPayload)
       const {data} = response;
       const {details}: {message: string, details: ICard} = data;
       dispatch(editUserCard({
@@ -240,7 +241,7 @@ const ManageCardPopup = ({onClose, showModal, isMain, ...childArgs}) => {
   
   return (
     <>
-      <div aria-hidden="true" hidden={!showModal} id="popup-modal" className="fixed top-0 left-0 right-0 z-50 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full border-4 border-gray-800 rounded-lg">
+      <div aria-hidden="true" hidden={!showModal} id="popup-modal" className="fixed top-1/2 left-1/2 right-1/2 z-50 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full border-4 border-gray-800 rounded-lg">
         <div className="relative w-full max-w-md max-h-full">
           <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
             <button onClick={onClose} type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="popup-modal">
@@ -293,7 +294,18 @@ const ManageCardPopup = ({onClose, showModal, isMain, ...childArgs}) => {
                     </button>
                   </div>
                 }
-                {(isMain && userInfo?.accountType === 'teacher' || (!isMain && userInfo?.accountType === 'student')) && !['delete', 'activate', 'show'].includes(childArgs?.item.action) &&
+                {(isMain && userInfo?.accountType === 'teacher' || (!isMain && userInfo?.accountType === 'student')) && childArgs?.item.action === 'advance' &&
+                  <div className="activate-actions mt-5">
+                    <button 
+                      onClick={resetStage} 
+                      data-modal-hide="popup-modal" 
+                      type="button" 
+                      className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                        Advance card
+                    </button>
+                  </div>
+                }
+                {(isMain && userInfo?.accountType === 'teacher' || (!isMain && userInfo?.accountType === 'student')) && childArgs?.item.action === 'edit' &&
                   
                   <div className="teacher-actions">
                     <button 
