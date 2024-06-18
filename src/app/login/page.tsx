@@ -71,9 +71,9 @@ export default function Login<ILogin>() {
         password: ""
       });
       setFormSubmitOutcomeMessage('Logging in ...')
-      router.push('/' + details.user.username )
       dispatch(setAuthToken(details));
       dispatch(populateUser());
+      router.push('/' + details.user.username )
     } catch (error) {
       setIsLoading(false)
       console.log(error)

@@ -29,7 +29,7 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
   useEffect(() => {
     const { userReducer } = store.getState()
     getUserData(userReducer);
-  }, [])
+  }, [user])
 
   const navigation = [
     { name: 'Home', href: '/', current: pathname === '/', dataTestId: 'home-btn' },
