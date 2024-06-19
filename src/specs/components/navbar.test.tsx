@@ -176,7 +176,7 @@ describe('Navbar', () => {
         
         mockStore.mockRestore();
 
-        await expect(editUser).toHaveBeenCalledWith({userId: mockUser.userId, editData: {lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString}})
+        await expect(editUser).toHaveBeenCalledWith({userId: mockUser.userId, editData: {lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString}})
         expect(window.sessionStorage.getItem('user_token')).toBe(null)
         expect(window.sessionStorage.getItem('user_data')).toBe(null)
         expect(window.sessionStorage.getItem('created_on')).toBe(null)

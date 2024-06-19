@@ -32,7 +32,7 @@ describe('Profile', () => {
 
   describe('Student profiles', () => {
     it('should display student with no teacher', async () => {
-      const user = {...mockStudent, lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString}
+      const user = {...mockStudent, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")
@@ -53,7 +53,7 @@ describe('Profile', () => {
     })
 
     it('should display student with a teacher', async () => {
-      const user = {...mockStudent, lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString, linkedAccountsData: {teacher: btoa('some-teacher@email.com')}}
+      const user = {...mockStudent, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, linkedAccountsData: {teacher: btoa('some-teacher@email.com')}}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")
@@ -76,7 +76,7 @@ describe('Profile', () => {
 
   describe('Teacher profiles', () => {
     it('should display teacher with no student', async () => {
-      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString}
+      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")
@@ -97,7 +97,7 @@ describe('Profile', () => {
     })
 
     it('should display teacher with one student', async () => {
-      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString, linkedAccountsData: {students: [btoa('student1@email.com')]}}
+      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, linkedAccountsData: {students: [btoa('student1@email.com')]}}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")
@@ -118,7 +118,7 @@ describe('Profile', () => {
     })
 
     it('should display teacher with multiple students', async () => {
-      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString, linkedAccountsData: {students: [btoa('student1@email.com'), btoa('student2@email.com')]}}
+      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, linkedAccountsData: {students: [btoa('student1@email.com'), btoa('student2@email.com')]}}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")
@@ -141,7 +141,7 @@ describe('Profile', () => {
 
   describe('Modal behavior', () => {
     it('should show profile', async () => {
-      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString, linkedAccountsData: {students: [btoa('student1@email.com'), btoa('student2@email.com')]}}
+      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, linkedAccountsData: {students: [btoa('student1@email.com'), btoa('student2@email.com')]}}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")

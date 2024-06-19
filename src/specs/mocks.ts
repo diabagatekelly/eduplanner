@@ -15,7 +15,7 @@ export const mockUser: IUser = {
   password: 'password',
   accountType: 'teacher',
   linkedAccountsData: {students: []},
-  lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString, 
+  lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
   activities: []
 }
 
@@ -28,7 +28,7 @@ export const mockStudent: IUser = {
   password: 'password',
   accountType: 'student',
   linkedAccountsData: {teacher: null},
-  lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString,
+  lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
   activities: [] 
 }
 
@@ -39,7 +39,7 @@ export const mockActivity: IActivity = {
   description: 'Quran memorization',
   completionStatus: CompletionStatus.PENDING,
   hasCards: true,
-  createdOn: new Date(Date.now()).toLocaleDateString() as ISODateString, 
+  createdOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
   lastUpdatedOn: null
 }
 
@@ -47,7 +47,7 @@ export const mockUserCard: ICard = {
   cardId: `${btoa('surah-114-name-Naas-juz-30')}`,
   activity: 'Quran',
   activityType: 'Quran',
-  addedOn: new Date(Date.now()).toLocaleDateString() as ISODateString,
+  addedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',

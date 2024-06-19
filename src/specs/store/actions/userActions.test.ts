@@ -6,7 +6,7 @@ import { CompletionStatus } from "../../../interfaces/CompletionStatusEnum";
 
 describe('User actions', () => {
   let mockSessionStorage;
-  const teacher = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString}
+  const teacher = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString}
 
   beforeEach(() => {
     jest.useFakeTimers()
@@ -165,8 +165,8 @@ describe('User actions', () => {
 
     describe('With activity', () => {
       const student = {...mockStudent, activities: [mockActivity]}
-      const teacher = {...mockUser, students: {[student.username]: student}, linkedAccountsData: {students: [student.userId]}, lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString, activities: [mockActivity]}
-      const updatedActivity = {...mockActivity, lastUpdatedOn: new Date(Date.now()).toLocaleDateString() as ISODateString, completionStatus: CompletionStatus.COMPLETED}
+      const teacher = {...mockUser, students: {[student.username]: student}, linkedAccountsData: {students: [student.userId]}, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, activities: [mockActivity]}
+      const updatedActivity = {...mockActivity, lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, completionStatus: CompletionStatus.COMPLETED}
       
       beforeEach(() => {
         jest.useFakeTimers()

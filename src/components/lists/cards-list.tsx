@@ -30,7 +30,7 @@ export function CardsList({isMain, userDetails, getBorderColor, ...childArgs}) {
   const [hash, getHash] = useState('')
 
   useEffect(() => {
-    const cards = childArgs?.activity?.cards || []
+    const cards = [...childArgs?.activity?.cards] || []
 
     if (cards.length) {
       cards
@@ -45,13 +45,15 @@ export function CardsList({isMain, userDetails, getBorderColor, ...childArgs}) {
           }
         })
       cards.sort((a, b) => a.number - b.number)
+      cards.map((card) => delete card.number)
     }
+
     
     const todayCards = cards?.filter((card) => {
       return (
         card.completionStatus !== CompletionStatus.INACTIVE &&
-        (new Date().toLocaleDateString() === card.nextShowDate || 
-        new Date().toLocaleDateString() === card.addedOn)
+        (new Date().toLocaleDateString('en-US', {timeZone: 'EST'}) === card.nextShowDate || 
+        new Date().toLocaleDateString('en-US', {timeZone: 'EST'}) === card.addedOn)
       )
     })
     getCardsOfTheDay(todayCards)

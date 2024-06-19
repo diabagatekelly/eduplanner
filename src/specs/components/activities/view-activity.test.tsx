@@ -100,7 +100,7 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
       
-      const userActivityDTO = {...mockActivity, lastUpdatedOn: new Date(Date.now()).toLocaleDateString() as ISODateString}
+      const userActivityDTO = {...mockActivity, lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString}
       await expect(editActivity).toHaveBeenCalledWith({userId: userDetails.userId, updatedActivity: userActivityDTO})
     })
 
@@ -108,7 +108,7 @@ describe('View activity', () => {
       const updatedActivity = {
         ...mockActivity,
         completionStatus: CompletionStatus.COMPLETED,
-        lastUpdatedOn: new Date(Date.now()).toLocaleDateString() as ISODateString
+        lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString
       };
       (editActivity as jest.Mock).mockImplementation(() => {
         return Promise.resolve({status: 200, data: {message: 'Success', details: updatedActivity}})

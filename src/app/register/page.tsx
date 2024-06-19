@@ -73,7 +73,7 @@ export default function Register<IRegister>() {
         ...jsonData,
         userId,
         username,
-        lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString,
+        lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
         activities: [],
         linkedAccountsData 
       };

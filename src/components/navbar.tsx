@@ -37,7 +37,7 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
 
   async function logout() {
     try {
-      await editUser({ userId: user.userId, editData: {lastLogin: new Date(Date.now()).toLocaleDateString() as ISODateString}})
+      await editUser({ userId: user.userId, editData: {lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString}})
       dispatch(removeAuthToken())
       dispatch(resetUser())
       router.push('/login');

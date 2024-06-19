@@ -21,7 +21,7 @@ describe('Auth actions', () => {
 
   it('should set user_token, created_on, and user_data as expected', () => {
     const token = '123-token'
-    const date = (new Date('2/3/2024').toLocaleDateString() as ISODateString)
+    const date = (new Date('2/3/2024').toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString)
     setAuthToken({token, user: mockUser})
     expect(mockSessionStorage.getItem('user_token')).toEqual(token)
     expect(mockSessionStorage.getItem('created_on')).toEqual(date)
@@ -30,7 +30,7 @@ describe('Auth actions', () => {
 
   it('should remove user_token, created_on, and user_data as expected', () => {
     const token = '123-token'
-    const date = (new Date('2/3/2024').toLocaleDateString() as ISODateString)
+    const date = (new Date('2/3/2024').toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString)
     
     mockSessionStorage.setItem("user_token", token);
     mockSessionStorage.setItem("created_on", date)
@@ -57,7 +57,7 @@ describe('Auth actions', () => {
 
   it('should set reducer type to AUTH when token has not expired', () => {
     const token = '123-token'
-    const date = (new Date('2/3/2024').toLocaleDateString() as ISODateString)
+    const date = (new Date('2/3/2024').toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString)
     
     mockSessionStorage.setItem("user_token", token);
     mockSessionStorage.setItem("created_on", date)
@@ -69,7 +69,7 @@ describe('Auth actions', () => {
 
   it('should set reducer type to UNAUTH when token has expired', () => {
     const token = '123-token'
-    const date = (new Date('2/1/2024').toLocaleDateString() as ISODateString)
+    const date = (new Date('2/1/2024').toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString)
     
     mockSessionStorage.setItem("user_token", token);
     mockSessionStorage.setItem("created_on", date)
