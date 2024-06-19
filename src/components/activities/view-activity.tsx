@@ -113,7 +113,7 @@ export default function ViewActivity<IViewActivity>({ userDetails, userActivity,
     <>
       {userActivity ? 
       <>
-        <h3 className="text-3xl py-3 font-bold" data-testid="activity-name">{userActivity?.name}</h3>
+        <h3 className="text-3xl py-3 font-bold" data-testid="activity-name">{userActivity?.name} - {userDetails?.firstName} {userDetails?.lastName}</h3>
         <div data-testid="activity-details">
           <p>Description: {userActivity?.description}</p>
           <p>Points: {userActivity?.points} points</p>
@@ -144,9 +144,12 @@ export default function ViewActivity<IViewActivity>({ userDetails, userActivity,
         
         ''
       }
-      <div>
-        <ListUi {...{ listType: 'cards', isMain, userDetails, activity: userActivity }} />
-      </div>
+      {userActivity?.hasCards && 
+        <div>
+          <ListUi {...{ listType: 'cards', isMain, userDetails, activity: userActivity }} />
+        </div>
+    }
+      
     </>
   )
 }
