@@ -50,7 +50,7 @@ describe('Add Quran card form', () => {
   const user = {...mockUser, activities: [mockActivity]}
 
   it('should render the page with default checkboxes for each juz and surah', async () => {
-    render(<AddQuranCardForm  {...{user, activity: mockActivity}}/>)
+    render(<AddQuranCardForm  {...{isMain: true, user, activity: mockActivity}}/>)
     const checkboxes = await screen.findAllByTestId("quran-checkbox")
     const inputs = await screen.findAllByTestId("quran-checkbox-input")
     
@@ -63,7 +63,7 @@ describe('Add Quran card form', () => {
   })
 
   it('should check/uncheck checkboxes as expected', async () => {  
-    render(<AddQuranCardForm  {...{user, activity: mockActivity}}/>)
+    render(<AddQuranCardForm  {...{isMain: true, user, activity: mockActivity}}/>)
     const inputs = await screen.findAllByTestId("quran-checkbox-input")
     expect((inputs[inputs.length - 1] as HTMLInputElement).checked).toBe(false)
     await act(async () => {
@@ -89,7 +89,7 @@ describe('Add Quran card form', () => {
     const activityWithCard = {...mockActivity, cards: [mockBankSurahCard]}
     const userWithCards = {...mockUser, activities: [activityWithCard]}
 
-    render(<AddQuranCardForm  {...{user: userWithCards, activity: activityWithCard}}/>)
+    render(<AddQuranCardForm  {...{isMain: true, user: userWithCards, activity: activityWithCard}}/>)
     const inputs = await screen.findAllByTestId("quran-checkbox-input")
 
     expect((inputs[inputs.length - 1] as HTMLInputElement).value).toEqual(mockBankSurahCard.cardId)
@@ -107,7 +107,7 @@ describe('Add Quran card form', () => {
       (createCards as jest.Mock).mockImplementationOnce(() => {
         return Promise.resolve({status: 200, data: {message: 'Cards added', details: [mockUserCard]}})
       })
-      render(<AddQuranCardForm  {...{user, activity: mockActivity}}/>)
+      render(<AddQuranCardForm  {...{isMain: true, user, activity: mockActivity}}/>)
   
       const inputs = await screen.findAllByTestId("quran-checkbox-input")
       const submitButton = await screen.findByTestId("add-cards-submit-button")
@@ -131,7 +131,7 @@ describe('Add Quran card form', () => {
         return Promise.reject(error)
       });
   
-      render(<AddQuranCardForm  {...{user, activity: mockActivity}}/>)
+      render(<AddQuranCardForm  {...{isMain: true, user, activity: mockActivity}}/>)
   
       const inputs = await screen.findAllByTestId("quran-checkbox-input")
       const submitButton = await screen.findByTestId("add-cards-submit-button")
@@ -159,7 +159,7 @@ describe('Add Quran card form', () => {
       })
       jest.spyOn(console, 'log')
 
-      render(<AddQuranCardForm  {...{user, activity: mockActivity}}/>)
+      render(<AddQuranCardForm  {...{isMain: true, user, activity: mockActivity}}/>)
 
       const inputs = await screen.findAllByTestId("quran-checkbox-input")
       const submitButton = await screen.findByTestId("add-cards-submit-button")
@@ -188,7 +188,7 @@ describe('Add Quran card form', () => {
       });
       jest.spyOn(console, 'log')
 
-      render(<AddQuranCardForm  {...{user, activity: mockActivity}}/>)
+      render(<AddQuranCardForm  {...{isMain: true, user, activity: mockActivity}}/>)
 
       const inputs = await screen.findAllByTestId("quran-checkbox-input")
       const submitButton = await screen.findByTestId("add-cards-submit-button")
