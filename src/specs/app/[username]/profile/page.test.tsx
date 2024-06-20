@@ -97,7 +97,7 @@ describe('Profile', () => {
     })
 
     it('should display teacher with one student', async () => {
-      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, linkedAccountsData: {students: [btoa('student1@email.com')]}}
+      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, linkedAccountsData: {students: [[btoa('student1@email.com'), 'student1']]}}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")
@@ -111,14 +111,14 @@ describe('Profile', () => {
         '<p data-testid="profile-last" class="py-1"><span class="font-bold">Last Name:</span> user</p>'+
         '<p data-testid="profile-email" class="py-1"><span class="font-bold">Email:</span> mock.user@email.com</p>'+
         '<p data-testid="profile-accountType" class="py-1"><span class="font-bold">Account Type(s):</span> teacher</p>'+
-        '<p data-testid="profile-linkedAccounts" class="py-1"><span class="font-bold">Linked Accounts:</span> student1@email.com (students)</p>'+
+        '<p data-testid="profile-linkedAccounts" class="py-1"><span class="font-bold">Linked Accounts:</span> student1 (students)</p>'+
         `<p data-testid="profile-login" class="py-1"><span class="font-bold">Last logged in:</span> 2/15/2024</p>`
       
       expect(profile).toContainHTML(teacherWithOneLinkedAccounts)
     })
 
     it('should display teacher with multiple students', async () => {
-      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, linkedAccountsData: {students: [btoa('student1@email.com'), btoa('student2@email.com')]}}
+      const user = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, linkedAccountsData: {students: [[btoa('student1@email.com'), 'student1'], [btoa('student2@email.com'), 'student2']]}}
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: user}
       jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
       const useParams = jest.spyOn(require("next/navigation"), "useParams")
@@ -132,7 +132,7 @@ describe('Profile', () => {
         '<p data-testid="profile-last" class="py-1"><span class="font-bold">Last Name:</span> user</p>'+
         '<p data-testid="profile-email" class="py-1"><span class="font-bold">Email:</span> mock.user@email.com</p>'+
         '<p data-testid="profile-accountType" class="py-1"><span class="font-bold">Account Type(s):</span> teacher</p>'+
-        '<p data-testid="profile-linkedAccounts" class="py-1"><span class="font-bold">Linked Accounts:</span> student1@email.com, student2@email.com (students)</p>'+
+        '<p data-testid="profile-linkedAccounts" class="py-1"><span class="font-bold">Linked Accounts:</span> student1, student2 (students)</p>'+
         `<p data-testid="profile-login" class="py-1"><span class="font-bold">Last logged in:</span> 2/15/2024</p>`
       
       expect(profile).toContainHTML(teacherWithMultipleLinkedAccounts)

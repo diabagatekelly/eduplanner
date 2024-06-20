@@ -12,7 +12,7 @@ describe('User profile', () => {
       ...mockUser,
       lastLogin: '5/31/2024',
       linkedAccountsData: {
-        students: [btoa('mock.student@email.com'), btoa('mock.student2@email.com')]
+        students: [[btoa('mock.student@email.com'), 'student1'], [btoa('mock.student2@email.com'), 'student2']]
       }
     }
     render(<UserProfile {...{user}} />)
@@ -28,7 +28,7 @@ describe('User profile', () => {
     expect(lastName).toHaveTextContent('user')
     expect(email).toHaveTextContent('mock.user@email.com')
     expect(accountType).toHaveTextContent('teacher')
-    expect(linked).toHaveTextContent('mock.student@email.com, mock.student2@email.com (students)')
+    expect(linked).toHaveTextContent('student1, student2 (students)')
     expect(loginDate).toHaveTextContent('5/31/2024')
   })
 })

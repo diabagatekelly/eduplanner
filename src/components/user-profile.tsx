@@ -9,8 +9,8 @@ export default function UserProfile({user}: {user: IUser}) {
     if (user?.accountType === 'student' && userLinkedAccounts.teacher !== null) {
       linkedAccountsMessage = `${atob(userLinkedAccounts.teacher)} (teacher)`
     } else if (user?.accountType === 'teacher' && userLinkedAccounts.students?.length) {
-      const studentEmails = userLinkedAccounts.students.map(encodedEmail => atob(encodedEmail))
-      linkedAccountsMessage = `${studentEmails.join(', ')} (students)`
+      const students = userLinkedAccounts.students.map(encodedEmail => encodedEmail[1].split('-').join(' '))
+      linkedAccountsMessage = `${students.join(', ')} (students)`
     }
     return linkedAccountsMessage
   }
