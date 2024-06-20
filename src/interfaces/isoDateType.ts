@@ -29,5 +29,5 @@ type Time = any
 /**
  * YYYYMMDD
  */
-type ISODATE = `${YYYY}-${MM}-${DD}`
-export type ISODateString = `${YYYY}-${MM}-${DD}T${Time}`;
+export type ISODateString = `${YYYY}-${MM}-${DD}`
+// export type ISODateString = `${YYYY}-${MM}-${DD}T${Time}`;

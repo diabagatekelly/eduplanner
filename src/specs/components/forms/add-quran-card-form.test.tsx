@@ -29,7 +29,7 @@ describe('Add Quran card form', () => {
   
   beforeEach(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2/3/2024'))
+    jest.setSystemTime(new Date('2/4/2024'))
     window.sessionStorage.setItem('user_data', JSON.stringify(user))
     window.sessionStorage.setItem('user_token', 'xxxxxx')
     window.sessionStorage.setItem('created_on', '2/3/2024')
@@ -100,7 +100,7 @@ describe('Add Quran card form', () => {
     const expectedPaylod = {
       userId: `${btoa('mock.user@email.com')}`,
       activity: 'Quran',
-      cards: [{...mockUserCard, addedOn: "2/3/2024"}]
+      cards: [{...mockUserCard, addedOn: new Date('2/4/2024').toLocaleDateString('en-US', {timeZone: 'EST'})}]
     }
     
     it('should invoke createCards controller when form is submitted', async () => {
