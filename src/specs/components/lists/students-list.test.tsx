@@ -92,11 +92,11 @@ describe('Students List', () => {
       jest.useRealTimers()
     })
 
-    it('should display a list of student emails', () => {
+    it('should display a list of student names', () => {
       render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
       const studentList = screen.getByTestId('students-list')
     
-      expect(studentList).toHaveTextContent(`${mockStudent.email}`)
+      expect(studentList).toHaveTextContent(`${mockStudent.username.split('-').join(' ')}`)
     })
 
     it('should not make an API call, but rather use existing student details', async () => {
@@ -166,8 +166,8 @@ describe('Students List', () => {
   })
 
   describe('Has students but correct student not yet in object', () => {
-    const fakeStudent = {...mockStudent, email: 'some-fake@emai.com', userId: btoa('some-fake@emai.com')}
-    const teacher: IUser = {...mockUser, linkedAccountsData: {students: [mockStudent.userId, fakeStudent.userId]}, students: {'some-other-student': fakeStudent}}
+    const fakeStudent = {...mockStudent, username: 'some-other-student', email: 'some-fake@emai.com', userId: btoa('some-fake@emai.com')}
+    const teacher: IUser = {...mockUser, linkedAccountsData: {students: [fakeStudent.userId, mockStudent.userId ]}, students: {'some-other-student': fakeStudent}}
 
     beforeEach(() => {
       jest.useFakeTimers()
