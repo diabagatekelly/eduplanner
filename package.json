@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest",
+    "test": "cross-env TZ=EST jest",
     "test:ui": "cross-env CYPRESS_ENV=development cypress run --browser chrome",
     "test:ui:open": "cross-env CYPRESS_ENV=development cypress open"
   },
