@@ -84,7 +84,7 @@ describe('Add student', () => {
   })
 
   it('should not add pre-existing student', async () => {
-    const userWithStudents = {...mockUser, linkedAccountsData: {students: [`${mockStudent.email}`]}}
+    const userWithStudents = {...mockUser, linkedAccountsData: {students: [[mockStudent.userId, mockStudent.username]]}}
     render(<AddStudent {...{user: userWithStudents}} />)
 
     const email = screen.getByTestId('student-email')
@@ -106,7 +106,7 @@ describe('Add student', () => {
   })
 
   it('should clear pre-existing message when form in focus', async () => {
-    const userWithStudents = {...mockUser, linkedAccountsData: {students: [`${mockStudent.email}`]}}
+    const userWithStudents = {...mockUser, linkedAccountsData: {students: [[mockStudent.userId, mockStudent.username]]}}
     render(<AddStudent {...{user: userWithStudents}} />)
 
     const email = screen.getByTestId('student-email')

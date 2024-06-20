@@ -17,8 +17,11 @@ export function resetUser() {
 
 export function addNewStudent(newStudent: IUser) {
   let currentUserData: IUser = JSON.parse(sessionStorage.getItem('user_data'))
-  const hasStudents = currentUserData.linkedAccountsData?.students?.length
-  const updatedStudentIds = hasStudents ? [...currentUserData.linkedAccountsData?.students, newStudent.userId] : [newStudent.userId]
+  const hasStudents = currentUserData.linkedAccountsData.students?.length
+  const studentInfoTuple: [string, string] = [newStudent.userId, newStudent.username]
+  let updatedStudentIds: [string, string][] = 
+    hasStudents ? [...currentUserData.linkedAccountsData.students, studentInfoTuple] : [].concat([studentInfoTuple])
+
   currentUserData.linkedAccountsData.students = updatedStudentIds;
   sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
   return {
@@ -56,7 +59,7 @@ export function removeStudent(studentUserId: string) {
     studentToDelete = Object.values(currentUserData.students).find((student: any) => student.userId === studentUserId)
     delete currentUserData.students[studentToDelete.username]
   }
-  const updatedStudentIds = currentUserData.linkedAccountsData.students?.filter(id => id !== studentUserId)
+  const updatedStudentIds = currentUserData.linkedAccountsData.students?.filter(tuple => tuple[0] !== studentUserId)
   currentUserData.linkedAccountsData.students = updatedStudentIds;
 
   sessionStorage.setItem('user_data', JSON.stringify(currentUserData))

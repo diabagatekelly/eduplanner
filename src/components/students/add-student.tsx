@@ -67,7 +67,7 @@ export default function AddStudent<IAddStudent>({ user }: {user: IUser}) {
       }
 
       const currentStudents = user?.linkedAccountsData?.students
-      if (currentStudents?.includes(newStudent.email)) {
+      if (currentStudents?.some(tuple => tuple[0] === btoa(newStudent.email))) {
         setFormSubmitOutcomeMessage('This is already one of your students.')
         _resetForm()
         return

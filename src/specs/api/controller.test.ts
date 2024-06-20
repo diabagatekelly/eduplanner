@@ -68,7 +68,7 @@ describe('Controller', () => {
   describe('Linked accounts', () => {
     it('should make a postCommand call to link user accounts', async () => {
       (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve({}))
-      const params = {teacherId: mockUser.userId, studentId: mockStudent.userId}
+      const params: {teacherId: string, studentId: [string, string]}  = {teacherId: mockUser.userId, studentId: [mockStudent.userId, mockUser.username]}
       const res = await linkAccount(params)
   
       expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_ADD_LINKED_ACCOUNT_URL, params)

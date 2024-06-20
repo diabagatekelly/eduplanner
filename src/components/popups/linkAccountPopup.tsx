@@ -24,7 +24,7 @@ export default function LinkAccountPopup({onClose, showModal, ...childArgs}: {on
   async function addStudent() {
     try {
       setIsLoading(true)
-      const linkAccountsData = { teacherId: user.userId, studentId: studentInfo.userId }
+      const linkAccountsData: {teacherId: string, studentId: [string, string]} = { teacherId: user.userId, studentId: [studentInfo.userId, studentInfo.username] }
       await linkAccount(linkAccountsData)
       onLinkAccountSuccess()
       setIsLoading(false)

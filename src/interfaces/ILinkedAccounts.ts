@@ -1,4 +1,4 @@
 export interface ILinkedAccounts {
-  students?: string[]
+  students?: [string, string][]
   teacher?: string
 }

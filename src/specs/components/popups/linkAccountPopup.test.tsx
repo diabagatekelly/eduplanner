@@ -45,7 +45,7 @@ describe('Link Account Popup', () => {
     render(<LinkAccountPopup {...{onClose, showModal: true, ...childArgs}} />)
 
     const submitButton = screen.getByTestId('link-accounts-btn')
-    const linkAccountsDTO = { teacherId: teacher.userId, studentId: newStudent.userId }
+    const linkAccountsDTO = { teacherId: teacher.userId, studentId: [newStudent.userId, newStudent.username ]}
     
     await act(async () => {
       await fireEvent.click(submitButton)

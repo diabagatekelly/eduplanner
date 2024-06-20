@@ -1,12 +1,11 @@
 import { mockActivity, mockStudent, mockUser } from "../../mocks";
 import {addNewStudent, createUserActivity, editUserActivity, populateUser, removeStudent, removeUserActivity, resetUser, saveStudentDetails} from '../../../store/actions/userActions';
 import { ISODateString } from '../../../interfaces/isoDateType';
-import { formatISODate } from '../../../utils/formatDate';
 import { CompletionStatus } from "../../../interfaces/CompletionStatusEnum";
 
 describe('User actions', () => {
   let mockSessionStorage;
-  const teacher = {...mockUser, lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString}
+  const teacher = {...mockUser, lastLogin: new Date('2/3/2024').toISOString()}
 
   beforeEach(() => {
     jest.useFakeTimers()
@@ -43,18 +42,43 @@ describe('User actions', () => {
       expect(currentUserStudents).toBeFalsy()
   
       const reducer = addNewStudent(mockStudent)
-      const expectedUpdatedUser = {...teacher, linkedAccountsData: { students: [mockStudent.userId]}}
+      const expectedUpdatedUser = {...teacher, linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]]}}
       const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
       expect(reducer).toMatchObject({
         type: 'EDIT',
         editProps: [
           {
-            linkedAccountsData: { students: [mockStudent.userId]}
+            linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]]}
           }
         ]
       })
       expect(updatedUser).toMatchObject(expectedUpdatedUser)
-      expect(updatedUser.linkedAccountsData.students.includes(mockStudent.userId)).toBe(true)
+      expect(updatedUser.linkedAccountsData.students.some(tuple => (tuple[0] === mockStudent.userId))).toBe(true)
+    })
+
+    it('should call EDIT reducer with the user_data updated with new additional linked account student id (add 2nd new student)', () => {
+      addNewStudent(mockStudent)
+      const currentUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+
+      const currentUserStudents = currentUser.linkedAccountsData?.students?.length
+      expect(currentUser).toMatchObject({...teacher, linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]]}})
+      expect(currentUserStudents).toBeTruthy()
+
+      const secondStudent = {...mockStudent, userId: btoa('some-email.com'), email: 'some-email.com', username: 'student-2'}
+      const reducer = addNewStudent(secondStudent)
+
+      const expectedUpdatedUser = {...teacher, linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username], [secondStudent.userId, secondStudent.username]]}}
+      const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+      expect(reducer).toMatchObject({
+        type: 'EDIT',
+        editProps: [
+          {
+            linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username], [secondStudent.userId, secondStudent.username]]}
+          }
+        ]
+      })
+      expect(updatedUser).toMatchObject(expectedUpdatedUser)
+      expect(updatedUser.linkedAccountsData.students.some(tuple => (tuple[0] === secondStudent.userId))).toBe(true)
     })
 
     it('should call EDIT reducer with the user_data updated with old student account removed (remove student)', () => {
@@ -67,7 +91,7 @@ describe('User actions', () => {
       saveStudentDetails(mockStudent)
 
       const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
-      expect(updatedUser.linkedAccountsData.students.includes(mockStudent.userId)).toBe(true)
+      expect(updatedUser.linkedAccountsData.students.some(tuple => tuple[0] === mockStudent.userId)).toBe(true)
       expect(updatedUser.students[mockStudent.username]).toMatchObject(mockStudent)
 
       const reducer = removeStudent(mockStudent.userId)
@@ -111,6 +135,30 @@ describe('User actions', () => {
       expect(updatedUser).toMatchObject(expectedUpdatedUser)
       expect(updatedUser.students).toMatchObject({'mock-student': mockStudent})
     })
+
+    it('should call EDIT reducer with the user_data updated with new additional student details (save 2nd student details)', () => {
+      saveStudentDetails(mockStudent)
+      const currentUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+      const currentUserStudents = currentUser.students
+
+      expect(currentUser).toMatchObject({...teacher, students: {'mock-student': mockStudent}})
+      expect(currentUserStudents).toBeTruthy()
+  
+      const secondStudent = {...mockStudent, userId: btoa('some-email.com'), email: 'some-email.com', username: 'student-2'}
+      const reducer = saveStudentDetails(secondStudent)
+      const expectedUpdatedUser = {...teacher, students: {'mock-student': mockStudent, 'student-2': secondStudent}}
+      const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+      expect(reducer).toMatchObject({
+        type: 'EDIT',
+        editProps: [
+          {
+            students: {'mock-student': mockStudent, 'student-2': secondStudent}
+          }
+        ]
+      })
+      expect(updatedUser).toMatchObject(expectedUpdatedUser)
+      expect(updatedUser.students).toMatchObject({'mock-student': mockStudent, 'student-2': secondStudent})
+    })
   })
 
   describe('Activity', () => {
@@ -148,7 +196,7 @@ describe('User actions', () => {
       const studentUpdatedWithActivity = {...mockStudent, activities: [mockActivity]}
 
       const reducer = createUserActivity({userActivity: mockActivity, userId: mockStudent.userId, username: mockStudent.username})
-      const expectedUpdatedUser = {...teacher, linkedAccountsData: { students: [mockStudent.userId]}, students: {'mock-student': studentUpdatedWithActivity}}
+      const expectedUpdatedUser = {...teacher, linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]]}, students: {'mock-student': studentUpdatedWithActivity}}
       const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
       expect(reducer).toMatchObject({
         type: 'EDIT',

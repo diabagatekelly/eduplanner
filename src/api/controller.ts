@@ -28,7 +28,7 @@ export const registerUser = async (userJsonData: IUser) => {
   return await postCommand(url, userJsonData)
 }
 
-export const linkAccount = async (accountsData: {teacherId: string, studentId: string}) => {
+export const linkAccount = async (accountsData: {teacherId: string, studentId: [string, string]}) => {
   const url = process.env.NEXT_ADD_LINKED_ACCOUNT_URL
   return await postCommand(url, accountsData)
 }
