@@ -16,7 +16,6 @@ export function removeAuthToken() {
   sessionStorage.removeItem("user_token");
   sessionStorage.removeItem("user_data");
   sessionStorage.removeItem("created_on");
-  window.location.assign('/login')
   return {
     type: 'UNAUTH'
   };
