@@ -25,6 +25,9 @@ export default function Main({ params }: { params: { student: string } }) {
   return (
     <NestedLayout {...{ isTeacher }}>
       <Dashboard {...{ userDetails, isMain, isTeacher }} />
+      <button onClick={() => window.history.back()}>
+        Back
+      </button>
     </NestedLayout>
   )
 }

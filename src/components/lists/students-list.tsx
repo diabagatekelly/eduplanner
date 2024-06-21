@@ -85,7 +85,7 @@ export default function StudentsList({userDetails, getBorderColor}: {userDetails
       <div>
         <ul>
           {studentIdsList?.map(([userId, username]) => (
-            <li data-testid="students-list" style={{ borderColor: getBorderColor('students') }} className="flex justify-between border-4" key={userId}>
+            <li data-testid="students-list" style={{ borderColor: getBorderColor('students') }} className="flex justify-between border-4 mb-3" key={userId}>
               <p data-testid="students-email" className="hover:cursor-pointer" onClick={() => fetchStudent(userId)}>{username?.split('-').join(' ')}</p>
               <span data-testid="student-list-delete" onClick={() => deleteStudent(userId, username)}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">

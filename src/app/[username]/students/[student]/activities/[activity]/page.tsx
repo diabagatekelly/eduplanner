@@ -25,6 +25,9 @@ export default function Main({ params }: { params: { activity: string, student: 
   return (
     <NestedLayout {...{ isTeacher }}>
       <ViewActivity {...{ userDetails, userActivity, isMain }} />
+      <button onClick={() => window.history.back()}>
+        Back
+      </button>
     </NestedLayout>
   )
 }

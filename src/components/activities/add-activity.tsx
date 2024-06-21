@@ -123,6 +123,7 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
       <h3 className="text-3xl py-3 font-bold">Add a new activity:</h3>
       <AddActivityForm {...{ handleInput, formData, isLoading, submitForm }} />
       <div data-testid="add-activity-submit-message">{formSubmitOutcomeMessage}</div>
+      <hr className="my-5" />
     </div>
   )
 }

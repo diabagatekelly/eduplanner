@@ -5,8 +5,10 @@ import store from "@/store/store";
 import { useEffect, useState } from "react"
 import AddStudent from "@/components/students/add-student";
 import ListUi from "@/components/lists/lists-ui";
+import { useRouter } from "next/navigation";
 
 export default function Students() {
+  const router = useRouter();
   let args;
   const [user, getUserData] = useState({ ...args })
   
@@ -29,6 +31,9 @@ export default function Students() {
           <ListUi {...{ listType: 'students', isMain, userDetails }} />
         </div>
       </div>
+      <button onClick={() => router.push(`/${user.username}`)}>
+        Back
+      </button>
     </NestedLayout>
   )
 }
