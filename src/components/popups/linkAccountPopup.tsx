@@ -53,6 +53,7 @@ export default function LinkAccountPopup({onClose, showModal, ...childArgs}: {on
     dispatch(saveStudentDetails(studentInfo as IUser))
     setOutcomeMessage('Successfully added a new student')
     onClose();
+    window.location.reload()
   }
   
   return (

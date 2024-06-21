@@ -49,6 +49,7 @@ export default function UnlinkAccountPopup({onClose, showModal, ...childArgs}: {
     dispatch(removeStudent(studentInfo.userId));
     setOutcomeMessage('Successfully removed student.')
     onClose();
+    window.location.reload()
   }
   
   return (
@@ -68,7 +69,7 @@ export default function UnlinkAccountPopup({onClose, showModal, ...childArgs}: {
               </svg>
               <div className="modal-message">
                 <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to remove this student?</h3>
-                <h5 className="mb-5"><span>{`${atob(studentInfo?.userId)}`} </span></h5>
+                <h5 className="mb-5"><span>{`${studentInfo?.username.split('-').join(' ')} - ${atob(studentInfo?.userId)} `} </span></h5>
               </div>
 
               <button data-testid="unlink-accounts-btn" onClick={removeOldStudent} data-modal-hide="popup-modal" type="button" className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
