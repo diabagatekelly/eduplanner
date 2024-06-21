@@ -37,7 +37,7 @@ describe('Students List', () => {
   })
 
   describe('Delete popup', () => {
-    const teacher: IUser = {...mockUser, linkedAccountsData: {students: [mockStudent.userId]}, students: {[`${mockStudent.username}`]: mockStudent}}
+    const teacher: IUser = {...mockUser, linkedAccountsData: {students: [[mockStudent.userId, mockStudent.username]]}, students: {[mockStudent.username]: mockStudent}}
 
     beforeEach(() => {
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}
@@ -73,7 +73,7 @@ describe('Students List', () => {
   })
 
   describe('Students details already populated', () => {
-    const teacher: IUser = {...mockUser, linkedAccountsData: {students: [mockStudent.userId]}, students: {[`${mockStudent.username}`]: mockStudent}}
+    const teacher: IUser = {...mockUser, linkedAccountsData: {students: [[mockStudent.userId, mockStudent.username]]}, students: {[mockStudent.username]: mockStudent}}
 
     beforeEach(() => {
       jest.useFakeTimers()
@@ -123,7 +123,7 @@ describe('Students List', () => {
   })
 
   describe('Has students but students object not populated', () => {
-    const teacher: IUser = {...mockUser, linkedAccountsData: {students: [mockStudent.userId]}}
+    const teacher: IUser = {...mockUser, linkedAccountsData: {students: [[mockStudent.userId, mockStudent.username]]}}
 
     beforeEach(() => {
       jest.useFakeTimers()
@@ -167,7 +167,7 @@ describe('Students List', () => {
 
   describe('Has students but correct student not yet in object', () => {
     const fakeStudent = {...mockStudent, username: 'some-other-student', email: 'some-fake@emai.com', userId: btoa('some-fake@emai.com')}
-    const teacher: IUser = {...mockUser, linkedAccountsData: {students: [fakeStudent.userId, mockStudent.userId ]}, students: {'some-other-student': fakeStudent}}
+    const teacher: IUser = {...mockUser, linkedAccountsData: {students: [[mockStudent.userId, mockStudent.username], [fakeStudent.userId, fakeStudent.username]]}, students: {'some-other-student': fakeStudent}}
 
     beforeEach(() => {
       jest.useFakeTimers()
@@ -197,11 +197,11 @@ describe('Students List', () => {
 
       render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
       
-      const studentEmail = screen.getByText(`${mockStudent.email}`)
+      const studentUsername = screen.getAllByTestId('students-email')[0]
       const url = `/${teacher.username}/students/${mockStudent.username}`
       
       await act(async () => {
-        await fireEvent.click(studentEmail)
+        await fireEvent.click(studentUsername)
       })
 
       expect(findUser).toHaveBeenCalledWith({userId: mockStudent.userId})
@@ -221,10 +221,10 @@ describe('Students List', () => {
   
       render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
   
-      const studentEmail = screen.getByText(`${mockStudent.email}`)
+      const studentUsername = screen.getAllByTestId('students-email')[0]
 
       await act(async () => {
-        await fireEvent.click(studentEmail)
+        await fireEvent.click(studentUsername)
       })
   
       const errorMessage = screen.getByText(/Erroneous response/i)
@@ -246,10 +246,10 @@ describe('Students List', () => {
   
       render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
   
-      const studentEmail = screen.getByText(`${mockStudent.email}`)
+      const studentUsername = screen.getAllByTestId('students-email')[0]
 
       await act(async () => {
-        await fireEvent.click(studentEmail)
+        await fireEvent.click(studentUsername)
       })
   
       const errorMessage = await screen.getByText(/Failed to fetch student details due to an internal error. Please try again later./i)
@@ -272,10 +272,10 @@ describe('Students List', () => {
   
       render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
   
-      const studentEmail = screen.getByText(`${mockStudent.email}`)
+      const studentUsername = screen.getAllByTestId('students-email')[0]
 
       await act(async () => {
-        await fireEvent.click(studentEmail)
+        await fireEvent.click(studentUsername)
       })
   
       const errorMessage = await screen.getByText(/Server is down. Try again later./i)
