@@ -29,7 +29,8 @@ export default function ViewActivity<IViewActivity>({ userDetails, userActivity,
     try {
       const updatedActivity: IActivity = {
         ...userActivity,
-        lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString
+        lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
+        completionStatus: CompletionStatus.COMPLETED
       }
 
       const response = await editActivity({userId: userDetails.userId, updatedActivity}) as unknown as IResponse;
@@ -70,8 +71,18 @@ export default function ViewActivity<IViewActivity>({ userDetails, userActivity,
       }
 
       await requestCardReview(requestReview);
-
       dispatch(removeUserActivity(userDetails.username, userActivity.name))
+
+      const updatedActivity: IActivity = {
+        ...userActivity,
+        lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
+        completionStatus: CompletionStatus.REVIEW
+      }
+
+      const response = await editActivity({userId: userDetails.userId, updatedActivity}) as unknown as IResponse;
+      const {data} = response;
+      const {message, details}: {message: string, details: IActivity} = data;
+      dispatch(editUserActivity({username: userDetails.username, updatedActivity: details}))
 
       setIsLoading(false)
 

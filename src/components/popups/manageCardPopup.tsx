@@ -7,6 +7,7 @@ import { ICard } from "@/interfaces/ICard";
 import store from "@/store/store";
 import { IUser } from "@/interfaces/IUser";
 import { ISODateString } from "@/interfaces/isoDateType";
+import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
 
 const ManageCardPopup = ({onClose, showModal, isMain, ...childArgs}) => {
   const dispatch = useDispatch()
@@ -84,6 +85,24 @@ const ManageCardPopup = ({onClose, showModal, isMain, ...childArgs}) => {
         username: userInfo.username,
         activityName: activity.name, 
         cardId: card.cardId
+      }))
+
+      const editPayload = { 
+        userId: userInfo.userId, 
+        activity: activity.name, 
+        cardId: card.cardId,
+        editData: {
+          completionStatus: CompletionStatus.REVIEW
+        }
+      }
+
+      const response = await editCard(editPayload)
+      const {data} = response;
+      const {details}: {message: string, details: ICard} = data;
+      dispatch(editUserCard({
+        username: userInfo.username,
+        activityName: activity.name, 
+        updatedCard: details
       }))
 
       setIsLoading(false)
@@ -291,17 +310,6 @@ const ManageCardPopup = ({onClose, showModal, isMain, ...childArgs}) => {
                       type="button" 
                       className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                         Activate card
-                    </button>
-                  </div>
-                }
-                {(isMain && userInfo?.accountType === 'teacher' || (!isMain && userInfo?.accountType === 'student')) && childArgs?.item.action === 'advance' &&
-                  <div className="activate-actions mt-5">
-                    <button 
-                      onClick={resetStage} 
-                      data-modal-hide="popup-modal" 
-                      type="button" 
-                      className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
-                        Advance card
                     </button>
                   </div>
                 }

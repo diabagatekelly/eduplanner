@@ -145,7 +145,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({isMain, user, activ
           cardId: card,
           activity: activity.name,
           activityType: 'Quran',
-          addedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
+          addedOn: null,
           lastUpdatedOn: null,
           nextShowDate: null,
           stage: '0',
