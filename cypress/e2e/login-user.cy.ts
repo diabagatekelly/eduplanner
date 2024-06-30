@@ -60,4 +60,40 @@ describe('Login User', () => {
       })
     })
   })
+
+  describe('Redirect when unauthorized', () => {
+    const user: IUser = {...mockUser};
+    const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
+    
+    beforeEach(() => {
+      cy.intercept(loginUrl, {
+        statusCode: 200,
+        body: {
+          status: 'success',
+          message: 'User found',
+          details: {token: 'xxxxxx', user}
+        }
+      })
+      cy.login({email: user.email, password: user.password})
+      cy.wait(200)
+    })
+
+    it('should redirect to login page when session is cleared', () => {
+      cy.contains(`Welcome to your dashboard ${mockUser.firstName} ${mockUser.lastName}.`)
+      cy.url().should('include', `${mockUser.username}`) 
+      cy.window().its('store').invoke('getState').should('deep.equal', {
+        authReducer: {isAuthenticated: true},
+        userReducer: {...user}
+      })
+      cy.reload()
+      cy.url().should('include', `${mockUser.username}`) 
+      cy.window().its('sessionStorage').invoke('clear')
+      cy.reload()
+      cy.window().its('store').invoke('getState').should('deep.equal', {
+        authReducer: {isAuthenticated: false},
+        userReducer: {}
+      })
+      cy.url().should('include', 'login')
+    })
+  })
 })

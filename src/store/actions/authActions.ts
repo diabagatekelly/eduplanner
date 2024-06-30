@@ -1,6 +1,5 @@
 import { IUser } from "@/interfaces/IUser"
 import { ISODateString } from "@/interfaces/isoDateType"
-import { formatISODate } from "@/utils/formatDate";
 
 export function setAuthToken({token, user}: {token: string, user: IUser}) {
   sessionStorage.setItem("user_token", token);

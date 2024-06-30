@@ -8,8 +8,9 @@ import Navbar from '@/components/navbar';
 import {Footer} from '@/components/footer';
 import { Suspense, useEffect, useState } from 'react';
 import { hasExpired, hasToken } from '@/store/actions/authActions';
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { populateUser } from '@/store/actions/userActions';
+import { useMounted } from '@/components/lists/cards-list';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -33,11 +34,14 @@ export default function RootLayout({
   )
 }
 
+
 const Reloader = () => {
   let args;
   const dispatch = useDispatch()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const mounted = useMounted();
   
   const [userState, setUserState] = useState({isAuthenticated: false, userReducer: {...args}})
 
@@ -57,6 +61,12 @@ const Reloader = () => {
 
   const username = userState.userReducer.username;
   const isAuthenticated = userState.isAuthenticated;
+
+  if (mounted) {
+    if (!window?.sessionStorage.getItem('user_token') && pathname !== '/login' && pathname !== '/register') {
+      router.push('/login')
+    }
+  }
 
   return ( 
     <Suspense fallback={null}>
