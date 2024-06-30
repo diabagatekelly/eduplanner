@@ -39,7 +39,7 @@ describe('Main user page', () => {
     it('should pass the correct userDetails, userActivity, isMain values for student to ViewActivity', () => {
       render(<Main {...{params: {activity: 'Quran'}}}/>)
       const expectedViewActivityArgs = {isMain: true, userDetails: mockStudentWithActivity, userActivity: mockActivity}
-      expect((NestedLayout as jest.Mock).mock.calls[1][0].children.props).toMatchObject(expectedViewActivityArgs)
+      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[0].props).toMatchObject(expectedViewActivityArgs)
     })
   })
 
@@ -59,7 +59,7 @@ describe('Main user page', () => {
     it('should pass the correct userDetails, isMain, isTeacher values for teacher on own page to ViewActivity', () => {
       render(<Main {...{params: {activity: 'Quran'}}}/>)
       const expectedViewActivityArgs = {isMain: true, userDetails: mockUserWithActivity, userActivity: mockActivity}
-      expect((NestedLayout as jest.Mock).mock.calls[1][0].children.props).toMatchObject(expectedViewActivityArgs)
+      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[0].props).toMatchObject(expectedViewActivityArgs)
     })
   })  
 })

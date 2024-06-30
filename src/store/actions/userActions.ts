@@ -167,7 +167,7 @@ export function createUserCard({username, activityName, newCards}: {username: st
     let currentActivity = currentActivities.find(activity => activity.name === activityName)
     const currentActivityCards = currentActivity.cards || []
     const updatedActivityCards = [...currentActivityCards, ...newCards]
-    currentActivity.cards = updatedActivityCards
+    currentActivity.cards = Array.from(new Set(updatedActivityCards))
     currentUserData.activities = currentActivities
   } else {
     const student = currentUserData.students[username]
@@ -175,7 +175,7 @@ export function createUserCard({username, activityName, newCards}: {username: st
     let studentCurrentActivity = studentActivities.find(activity => activity.name === activityName)
     const studentActivityCards = studentCurrentActivity.cards || []
     const updatedStudentActivityCards = [...studentActivityCards, ...newCards]
-    studentCurrentActivity.cards = updatedStudentActivityCards
+    studentCurrentActivity.cards = Array.from(new Set(updatedStudentActivityCards))
     currentUserData.students[username].activities = studentActivities
   }
   

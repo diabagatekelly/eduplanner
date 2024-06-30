@@ -7,6 +7,14 @@ import NestedLayout from '../../../../app/nested-layout';
 import store from '../../../../store/store';
 
 jest.mock('../../../../app/nested-layout');
+jest.mock('next/navigation', () => {
+  return {
+    useRouter: jest.fn(() => ({
+      push: jest.fn(),
+      replace: jest.fn(),
+    }))
+  }
+});
 
 describe('Students list', () => {
   const teacher = {...mockUser, accountType: 'teacher', linkedAccountsData: {students: ['y@email.com']}}
@@ -36,14 +44,14 @@ describe('Students list', () => {
   it('should pass the correct user to AddStudent', () => {
     render(<Students />)
     const expectedAddStudentArgs = {user: teacher}
-    const addStudentChild = (NestedLayout as jest.Mock).mock.calls[1][0].children.props.children[0].props
+    const addStudentChild = (NestedLayout as jest.Mock).mock.calls[1][0].children[0].props.children[0].props
     expect(addStudentChild).toMatchObject(expectedAddStudentArgs)
   })
 
   it('should pass the correct listType, isMain, and userDetails to ListUi', () => {
     render(<Students />)
     const expectedListUiArgs = {listType: 'students', isMain: true, userDetails: teacher}
-    const listUiChild = (NestedLayout as jest.Mock).mock.calls[1][0].children.props.children[2].props.children[1].props
+    const listUiChild = (NestedLayout as jest.Mock).mock.calls[1][0].children[0].props.children[2].props.children[1].props
     expect(listUiChild).toMatchObject(expectedListUiArgs)
   })
 

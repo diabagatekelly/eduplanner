@@ -44,7 +44,7 @@ describe('Main user page', () => {
     it('should pass the correct userDetails, isMain, isTeacher values for teacher on student page to Dashboard', () => {
       render(<Main {...{params: {student: `${mockStudent.username}`}}}/>)
       const expecteDashboarddArgs = {isMain: false, isTeacher: true, userDetails: mockStudent}
-      expect((NestedLayout as jest.Mock).mock.calls[1][0].children.props).toMatchObject(expecteDashboarddArgs)
+      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[0].props).toMatchObject(expecteDashboarddArgs)
     })
   })
   

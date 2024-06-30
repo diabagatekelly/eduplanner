@@ -107,8 +107,7 @@ export const requestCardReview = async (data: {
   return await postCommand(url, data)
 }
 
-export const deleteCard = async ({userId, activity, cardId}: {userId: string, activity: string, cardId: string}) => {
+export const deleteCard = async (cards: {userId: string, activity: string, cardId: string}[]) => {
   const url = process.env.NEXT_DELETE_CARD_URL
-  const params = `${userId}/${activity}/${cardId}`
-  return await deleteCommand(url, params)
+  return await postCommand(url, cards)
 }

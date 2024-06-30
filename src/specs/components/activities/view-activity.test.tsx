@@ -100,7 +100,7 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
       
-      const userActivityDTO = {...mockActivity, lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString}
+      const userActivityDTO = {...mockActivity, completionStatus: CompletionStatus.COMPLETED, lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString}
       await expect(editActivity).toHaveBeenCalledWith({userId: userDetails.userId, updatedActivity: userActivityDTO})
     })
 

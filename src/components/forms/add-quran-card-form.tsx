@@ -136,9 +136,11 @@ export default function AddQuranCardForm<IAddQuranCardForm>({isMain, user, activ
 
       const cardsToRemove = [...quranCards]
         .filter(card => card.level === 'Surah' && selectedJuz.includes(card.juz) && activity?.cards?.some((currentCard: ICard) => currentCard.cardId === card.cardId))
-        .map(card => card.cardId)
+        .map(card => {
+          return {userId: user.userId, activity: activity.name, cardId: card.cardId}
+        })
 
-      const finalizedListToCreate = selectedCards.filter(card => cardsToRemove.length ? cardsToRemove.some(cardToRemove => cardToRemove !== card) : true)
+      const finalizedListToCreate = selectedCards.filter(card => cardsToRemove.length ? cardsToRemove.some(cardToRemove => cardToRemove.cardId !== card) : true)
 
       const cards: ICard[] = finalizedListToCreate.map((card) => {
         return {
@@ -171,9 +173,12 @@ export default function AddQuranCardForm<IAddQuranCardForm>({isMain, user, activ
       const {message, details}: {message: string, details: ICard[]} = data;
       dispatch(createUserCard({username: user.username, activityName: activity.name, newCards: details}))
 
-      for (let cardId of cardsToRemove) {
-        await deleteCard({userId: user.userId, activity: activity.name, cardId})
-        dispatch(removeUserCard({username: user.username, activityName: activity.name, cardId}))
+      if (cardsToRemove.length) {
+        await deleteCard(cardsToRemove)
+        for (let card of cardsToRemove) {
+          delete card.userId;
+          dispatch(removeUserCard({cardId: card.cardId, activityName: card.activity, username: user.username}))
+        }
       }
 
       setFormSubmitOutcomeMessage(message)

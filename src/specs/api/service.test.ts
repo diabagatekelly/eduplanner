@@ -51,7 +51,7 @@ describe('Service', () => {
     expect(res).toEqual(mockPatchResponse);
   })
 
-  it('should call axios deletCommand with jsonData', async () => {
+  it('should call axios deleteCommand with jsonData', async () => {
     const finalUrl = `${mockUrl}/${mockUser.userId}`
 
     const res = await deleteCommand(mockUrl, mockUser.userId)

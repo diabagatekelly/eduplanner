@@ -12,14 +12,19 @@ jest.mock('../../../api/controller');
 describe('Unlink Account Popup', () => {
   const teacher = {...mockUser, linkedAccountsData: {students: [mockStudent.userId]}}
   const childArgs = {user: mockStudent}
+  const reload = window.location.reload;
 
   beforeAll(() => {
+    Object.defineProperty(window, 'location', {
+      value: { reload: jest.fn() }
+    });
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/15/2024'))
     sessionStorage.setItem("user_data", JSON.stringify(teacher))
   })
 
   afterAll(() => {
+    window.location.reload = reload;
     jest.useRealTimers()
     jest.resetAllMocks()
     sessionStorage.clear()

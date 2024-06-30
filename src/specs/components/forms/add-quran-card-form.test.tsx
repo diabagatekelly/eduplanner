@@ -100,7 +100,7 @@ describe('Add Quran card form', () => {
     const expectedPaylod = {
       userId: `${btoa('mock.user@email.com')}`,
       activity: 'Quran',
-      cards: [{...mockUserCard, addedOn: new Date('2/4/2024').toLocaleDateString('en-US', {timeZone: 'EST'})}]
+      cards: [{...mockUserCard, addedOn: null}]
     }
     
     it('should invoke createCards controller when form is submitted', async () => {

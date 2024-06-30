@@ -172,11 +172,11 @@ const ManageCardPopup = ({onClose, showModal, isMain, ...childArgs}) => {
 
   async function removeCard() {
     try {
-      const deletePayload = { 
+      const deletePayload = [{ 
         userId: userInfo.userId, 
         activity: activity.name, 
         cardId: card.cardId
-      }
+      }]
       await deleteCard(deletePayload) as unknown as IResponse;
       dispatch(removeUserCard({
         username: userInfo.username,

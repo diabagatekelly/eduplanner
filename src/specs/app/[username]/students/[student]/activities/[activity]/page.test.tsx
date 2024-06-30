@@ -40,7 +40,7 @@ describe('Main user page', () => {
     it('should pass the correct  userDetails, userActivity, isMain values for non-main (teacher student) to ViewActivity', () => {
       render(<Main {...{params: {activity: 'Quran', student: updatedMockStudentWithActivity.username}}}/>)
       const expectedViewActivityArgs = {isMain: false, userDetails: updatedMockStudentWithActivity, userActivity: mockActivity}
-      expect((NestedLayout as jest.Mock).mock.calls[1][0].children.props).toMatchObject(expectedViewActivityArgs)
+      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[0].props).toMatchObject(expectedViewActivityArgs)
     })
   })
 })
