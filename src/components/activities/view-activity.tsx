@@ -10,9 +10,9 @@ import { IActivity } from "@/interfaces/IActivity"
 import { IUser } from "@/interfaces/IUser"
 import { ISODateString } from "@/interfaces/isoDateType"
 import store from "@/store/store"
-import { formatISODate } from "@/utils/formatDate"
 import { IResponse } from "@/interfaces/IApiResponse"
 import { ICard } from "@/interfaces/ICard"
+import { fromDbFormat } from "@/utils/formatActivityName"
 
 interface IViewActivity {
   updateActivity: () => Promise<void>
@@ -124,7 +124,7 @@ export default function ViewActivity<IViewActivity>({ userDetails, userActivity,
     <>
       {userActivity ? 
       <>
-        <h3 className="text-3xl py-3 font-bold" data-testid="activity-name">{userActivity?.name} - {userDetails?.firstName} {userDetails?.lastName}</h3>
+        <h3 className="text-3xl py-3 font-bold" data-testid="activity-name">{fromDbFormat(userActivity?.name)} - {userDetails?.firstName} {userDetails?.lastName}</h3>
         <div data-testid="activity-details">
           <p>Description: {userActivity?.description}</p>
           <p>Points: {userActivity?.points} points</p>

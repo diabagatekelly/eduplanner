@@ -3,7 +3,6 @@ import { ICard } from "../../src/interfaces/ICard";
 import { IActivity } from "../../src/interfaces/IActivity";
 import { CompletionStatus } from "../../src/interfaces/CompletionStatusEnum";
 import { ISODateString } from "../../src/interfaces/isoDateType";
-import { formatISODate } from "../../src/utils/formatDate";
 import { IQuranSurahCard, IQuranJuzCard } from "@/interfaces/ICard";
 
 export const mockUser: IUser = {

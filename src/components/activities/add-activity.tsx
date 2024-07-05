@@ -10,7 +10,6 @@ import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
 import { ISODateString } from "@/interfaces/isoDateType";
 import { IUser } from "@/interfaces/IUser";
 import { toDbFormat } from "@/utils/formatActivityName";
-import { formatISODate } from "@/utils/formatDate";
 import { IResponse } from "@/interfaces/IApiResponse";
 
 interface IAddActivity {

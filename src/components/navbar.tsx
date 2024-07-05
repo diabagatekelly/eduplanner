@@ -11,7 +11,6 @@ import { usePathname, useRouter } from 'next/navigation'
 import { editUser } from "../api/controller";
 import store from "../store/store";
 import { IUser } from "@/interfaces/IUser";
-import { formatISODate } from "@/utils/formatDate";
 import { ISODateString } from "@/interfaces/isoDateType";
 
 function classNames(...classes) {

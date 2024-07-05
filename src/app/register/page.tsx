@@ -9,7 +9,6 @@ import { IResponse } from "@/interfaces/IApiResponse";
 import { setAuthToken } from "@/store/actions/authActions";
 import { registerUser } from "@/api/controller";
 import { ISODateString } from "@/interfaces/isoDateType";
-import { formatISODate } from "@/utils/formatDate";
 
 interface IRegister {
   handleInput: (e: React.FormEvent<HTMLInputElement>) => void,

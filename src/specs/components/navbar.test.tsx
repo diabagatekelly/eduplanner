@@ -6,7 +6,6 @@ import * as React from 'react';
 import { mockUser } from '../mocks';
 import { editUser } from '../../api/controller';
 import { ISODateString } from '../../interfaces/isoDateType';
-import { formatISODate } from '../../utils/formatDate';
 import store from '../../store/store';
 
 jest.mock('next/navigation', () => {

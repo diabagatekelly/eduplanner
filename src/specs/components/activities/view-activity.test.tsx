@@ -8,7 +8,6 @@ import { mockUser, mockActivity } from '../../mocks';
 import { CompletionStatus } from '../../../interfaces/CompletionStatusEnum';
 import ListUi from "../../../components/lists/lists-ui";
 import { ISODateString } from '../../../interfaces/isoDateType';
-import { formatISODate } from '../../../utils/formatDate';
 
 jest.mock('../../../components/lists/lists-ui');
 jest.mock('../../../api/controller');

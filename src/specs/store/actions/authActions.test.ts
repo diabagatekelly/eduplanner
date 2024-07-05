@@ -1,6 +1,5 @@
 import { ISODateString } from '../../../interfaces/isoDateType';
 import {hasExpired, hasToken, removeAuthToken, setAuthToken} from '../../../store/actions/authActions';
-import { formatISODate } from '../../../utils/formatDate';
 import { mockUser } from '../../mocks';
 
 describe('Auth actions', () => {
