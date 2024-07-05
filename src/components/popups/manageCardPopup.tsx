@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { editUserCard, removeUserCard } from "@/store/actions/userActions";
-import { activateCard, deleteCard, editCard, requestCardReview, resetCardStage } from "../../api/controller";
+import { activateCard, deleteCard, editCardStage, editAnyCardAttr, requestCardReview, resetCardStage } from "../../api/controller";
 import { IResponse } from "@/interfaces/IApiResponse";
 import { ICard } from "@/interfaces/ICard";
 import store from "@/store/store";
@@ -96,7 +96,7 @@ const ManageCardPopup = ({onClose, showModal, isMain, ...childArgs}) => {
         }
       }
 
-      const response = await editCard(editPayload)
+      const response = await editCardStage(editPayload)
       const {data} = response;
       const {details}: {message: string, details: ICard} = data;
       dispatch(editUserCard({
@@ -140,7 +140,7 @@ const ManageCardPopup = ({onClose, showModal, isMain, ...childArgs}) => {
         }
       }
 
-      const response = await editCard(editPayload)
+      const response = await editCardStage(editPayload)
       const {data} = response;
       const {details}: {message: string, details: ICard} = data;
       dispatch(editUserCard({
