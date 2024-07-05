@@ -9,11 +9,16 @@ import {
   registerUser,
   unlinkAccount,
   deleteActivity,
-  createCards
-} from '../../api/controller'
-import { deleteCommand, getCommand, patchCommand, postCommand } from '../../api/service'
-import { IQuranCards } from '../../interfaces/ICard';
-import { mockActivity, mockBankJuzCard, mockBankSurahCard, mockStudent, mockUser, mockUserCard } from '../mocks';
+  createCards,
+  activateCard,
+  editAnyCardAttr,
+  editCardStage,
+  resetCardStage,
+  requestCardReview,
+  deleteCard
+} from '../../api/controller';
+import { deleteCommand, getCommand, patchCommand, postCommand } from '../../api/service';
+import { mockActivity, mockStudent, mockUser, mockUserCard } from '../mocks';
 
 jest.mock('../../api/service');
 
@@ -121,6 +126,103 @@ describe('Controller', () => {
   
       expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_CREATE_CARD_URL, payload)
       expect(res).toEqual([mockUserCard])
+    })
+
+    it('should make post command call to activate card', async () => {
+      const payload = {
+        userId: `${btoa('mock.user@email.com')}`,
+        activity: 'Quran',
+        cardId: mockUserCard.cardId
+      };
+
+      (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(mockUserCard));
+      const res = await activateCard(payload)
+  
+      expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_ACTIVATE_CARD_URL, payload)
+      expect(res).toEqual(mockUserCard)
+    })
+
+    it('should make post command call to edit any other card attribute', async () => {
+      const payload = {
+        userId: `${btoa('mock.user@email.com')}`,
+        activity: 'Quran',
+        cardId: mockUserCard.cardId,
+        editData: {stage: '4'}
+      };
+
+      (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(mockUserCard));
+      const res = await editAnyCardAttr(payload)
+  
+      expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_EDIT_CARD_URL, payload)
+      expect(res).toEqual(mockUserCard)
+    })
+
+    it('should make post command call to edit card to promote or demote card', async () => {
+      const payload = {
+        userId: `${btoa('mock.user@email.com')}`,
+        activity: 'Quran',
+        cardId: mockUserCard.cardId,
+        editData: {promote: true}
+      };
+
+      (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(mockUserCard));
+      const res = await editCardStage(payload)
+  
+      expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_EDIT_CARD_STAGE_URL, payload)
+      expect(res).toEqual(mockUserCard)
+    })
+
+    it('should make post command call to reset card stage', async () => {
+      const payload = {
+        userId: `${btoa('mock.user@email.com')}`,
+        activity: 'Quran',
+        cardId: mockUserCard.cardId
+      };
+
+      (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(mockUserCard));
+      const res = await resetCardStage(payload)
+  
+      expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_RESET_CARD_STAGE_URL, payload)
+      expect(res).toEqual(mockUserCard)
+    })
+
+    it('should make post command call to request card review', async () => {
+      const payload = {
+        id: mockUserCard.cardId,
+        teacherId: mockUser.userId,
+        student: {
+          id: mockStudent.userId,
+          fullName: 'Mock student',
+          email: mockStudent.email
+        }
+      };
+
+      (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(mockUserCard));
+      const res = await requestCardReview(payload)
+  
+      expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_REQUEST_REVIEW_CARD_URL, payload)
+      expect(res).toEqual(mockUserCard)
+    })
+
+    it('should make post command call to delete card', async () => {
+      const payload = [
+        {
+          userId: mockUser.userId,
+          activity: mockActivity.name,
+          cardId: mockUserCard.cardId
+        },
+        {
+          userId: mockStudent.userId,
+          activity: mockActivity.name,
+          cardId: mockUserCard.cardId
+        }
+      ];
+
+      (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(mockUserCard));
+      const res = await deleteCard(payload)
+  
+      expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_DELETE_CARD_URL, payload)
+      expect(res).toEqual(mockUserCard)
     })
   })
 })
