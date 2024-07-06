@@ -55,4 +55,17 @@ describe('Students list', () => {
     expect(listUiChild).toMatchObject(expectedListUiArgs)
   })
 
+  it('should display back button', async () => {
+    render(<Students/>)
+    expect((NestedLayout as jest.Mock).mock.calls[1][0].children[1].props).toMatchObject({'children': 'Back'});
+
+    const useRouter = jest.spyOn(require("next/navigation"), "useRouter");
+    useRouter.mockImplementation(() => ({
+      push: jest.fn()
+    }));
+  
+    (NestedLayout as jest.Mock).mock.calls[1][0].children[1].props.onClick()
+    expect(useRouter.mock.results[1].value.push).toHaveBeenCalledWith(`/${mockUser.username}`)
+  })
+
 })

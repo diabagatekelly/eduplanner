@@ -9,6 +9,19 @@ import store from '../../../../../../../store/store';
 jest.mock('../../../../../../../app/nested-layout');
 
 describe('Main user page', () => {
+  const back = window.history.back;
+
+  beforeAll(() => {
+    Object.defineProperty(window, 'history', {
+      value: { back: jest.fn() }
+    });
+  })
+
+  afterAll(() => {
+    sessionStorage.clear()
+    window.history.back = back;
+  })
+  
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/3/2024'))
@@ -41,6 +54,14 @@ describe('Main user page', () => {
       render(<Main {...{params: {activity: 'Quran', student: updatedMockStudentWithActivity.username}}}/>)
       const expectedViewActivityArgs = {isMain: false, userDetails: updatedMockStudentWithActivity, userActivity: mockActivity}
       expect((NestedLayout as jest.Mock).mock.calls[1][0].children[0].props).toMatchObject(expectedViewActivityArgs)
+    })
+
+    it('should display back button', async () => {
+      render(<Main {...{params: {activity: 'Quran', student: updatedMockStudentWithActivity.username}}}/>)
+      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[1].props).toMatchObject({'children': 'Back'});
+    
+      (NestedLayout as jest.Mock).mock.calls[1][0].children[1].props.onClick()
+      expect(window.history.back).toHaveBeenCalled()
     })
   })
 })

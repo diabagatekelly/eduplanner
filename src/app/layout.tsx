@@ -46,6 +46,7 @@ const Reloader = () => {
   const [userState, setUserState] = useState({isAuthenticated: false, userReducer: {...args}})
 
   useEffect(() => {
+    /* istanbul ignore next */
     if (window.Cypress) {
       //@ts-ignore
       window.store = store

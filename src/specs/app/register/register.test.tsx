@@ -4,7 +4,7 @@ import { screen, fireEvent, act } from '@testing-library/react'
 import { render } from '../../util';
 import * as React from 'react';
 import { registerUser } from '../../../api/controller';
-import { mockStudent } from '../../../specs/mocks';
+import { mockStudent, mockUser } from '../../../specs/mocks';
 
 jest.mock('next/navigation', () => {
   return {
@@ -16,7 +16,7 @@ jest.mock('next/navigation', () => {
 });
 jest.mock('../../../api/controller');
 
-async function fillRegisterForm() {
+async function fillStudentRegisterForm() {
   const firstName = screen.getByLabelText(/First Name:/i)
   const lastName = screen.getByLabelText(/Last Name:/i)
   const password = screen.getByLabelText(/Password:/i)
@@ -43,6 +43,33 @@ async function fillRegisterForm() {
   })
 }
 
+async function fillTeacherRegisterForm() {
+  const firstName = screen.getByLabelText(/First Name:/i)
+  const lastName = screen.getByLabelText(/Last Name:/i)
+  const password = screen.getByLabelText(/Password:/i)
+  const email = screen.getByLabelText(/Email:/i)
+  const teacherRadio = screen.getByDisplayValue(/Student/i)
+
+  await act(() => {
+    // fill out the form
+    fireEvent.change(firstName, {
+      target: {value: 'mock'},
+    })
+    fireEvent.change(lastName, {
+      target: {value: 'user'},
+    })
+    fireEvent.change(password, {
+      target: {value: 'password'},
+    })
+    fireEvent.change(email, {
+      target: {value: 'mock.user@email.com'},
+    })
+    fireEvent.change(teacherRadio, {
+      target: {value: 'teacher'},
+    })
+  })
+}
+
 describe('Register page', () => {
   it('should render the page with its form', async () => {
     render(<Register />)
@@ -54,7 +81,7 @@ describe('Register page', () => {
     expect(registerForm).toBeInTheDocument()
   })
 
-  it('should invoke registerUser controller when form is submitted', async () => {
+  it('should invoke registerUser controller when form is submitted for student', async () => {
     (registerUser as jest.Mock).mockImplementationOnce(() => {
       return Promise.resolve({status: 200, data: {message: null, details: {user: mockStudent}}})
     })
@@ -62,13 +89,30 @@ describe('Register page', () => {
 
     const submitButton = screen.getByText(/Create Account/i)
 
-    await fillRegisterForm()
+    await fillStudentRegisterForm()
 
     await act(async () => {
       await fireEvent.click(submitButton)
     })
     
     await expect(registerUser).toHaveBeenCalledWith(mockStudent)
+  })
+
+  it('should invoke registerUser controller when form is submitted for teacher', async () => {
+    (registerUser as jest.Mock).mockImplementationOnce(() => {
+      return Promise.resolve({status: 200, data: {message: null, details: {user: mockUser}}})
+    })
+    render(<Register />)
+
+    const submitButton = screen.getByText(/Create Account/i)
+
+    await fillTeacherRegisterForm()
+
+    await act(async () => {
+      await fireEvent.click(submitButton)
+    })
+    
+    await expect(registerUser).toHaveBeenCalledWith(mockUser)
   })
 
   it('should reset form when response is successful and display success message, then reset message when form in focus', async () => {
@@ -83,7 +127,7 @@ describe('Register page', () => {
     const email = screen.getByLabelText(/Email:/i)
     const submitButton = screen.getByText(/Create Account/i)
 
-    await fillRegisterForm()
+    await fillStudentRegisterForm()
 
     expect(firstName).toHaveValue('mock')
     expect(lastName).toHaveValue('student')
@@ -126,7 +170,7 @@ describe('Register page', () => {
     const email = screen.getByLabelText(/Email:/i)
     const submitButton = screen.getByText(/Create Account/i)
 
-    await fillRegisterForm()
+    await fillStudentRegisterForm()
 
     expect(firstName).toHaveValue('mock')
     expect(lastName).toHaveValue('student')
@@ -160,7 +204,7 @@ describe('Register page', () => {
     const email = screen.getByLabelText(/Email:/i)
     const submitButton = screen.getByText(/Create Account/i)
 
-    await fillRegisterForm()
+    await fillStudentRegisterForm()
 
     expect(firstName).toHaveValue('mock')
     expect(lastName).toHaveValue('student')
@@ -195,7 +239,7 @@ describe('Register page', () => {
     const email = screen.getByLabelText(/Email:/i)
     const submitButton = screen.getByText(/Create Account/i)
 
-    await fillRegisterForm()
+    await fillStudentRegisterForm()
 
     expect(firstName).toHaveValue('mock')
     expect(lastName).toHaveValue('student')
