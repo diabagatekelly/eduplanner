@@ -15,10 +15,15 @@ jest.mock('next/navigation', () => {
     useSearchParams: jest.fn()
   }
 });
+
 describe('Root layout', () => {
-  it('should render as expected', async () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should render as expected', () => {
+    jest.spyOn(console, 'error').mockImplementation(() => null)
     render(<RootLayout {...{children: <Home />}}/>)
-    const homeContent = await screen.getByTestId('home')
-    expect(homeContent).toBeInTheDocument()
+    expect(screen.getByTestId('home')).toBeInTheDocument()
   })
 })

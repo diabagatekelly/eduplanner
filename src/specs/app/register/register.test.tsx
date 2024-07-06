@@ -157,6 +157,8 @@ describe('Register page', () => {
   })
 
   it('should not reset form when response is not 200 or 500 and display error message', async () => {
+    jest.spyOn(console, 'log').mockImplementation(() => null);
+
     const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
     (registerUser as jest.Mock).mockImplementationOnce(() => {
       return Promise.reject(error)
@@ -195,7 +197,6 @@ describe('Register page', () => {
     (registerUser as jest.Mock).mockImplementationOnce(() => {
       return Promise.reject(error)
     })
-    jest.spyOn(console, 'log')
     render(<Register />)
 
     const firstName = screen.getByLabelText(/First Name:/i)
@@ -229,7 +230,6 @@ describe('Register page', () => {
     (registerUser as jest.Mock).mockImplementationOnce(() => {
       return Promise.reject({status: 500, message: 'Error thrown and caught.'});
     });
-    jest.spyOn(console, 'log')
     render(<Register />)
 
 

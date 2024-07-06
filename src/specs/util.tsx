@@ -4,7 +4,7 @@ import store from '@/store/store'
 import { Provider } from 'react-redux'
 
 
-export default function RootLayout({
+function RootLayout({
   children,
 }: {
   children: React.ReactNode

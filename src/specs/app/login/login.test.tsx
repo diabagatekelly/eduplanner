@@ -101,6 +101,7 @@ describe('Login page', () => {
   })
 
   it('should not reset form when response is not 200 or 500 and display error message', async () => {
+    jest.spyOn(console, 'log').mockImplementation(() => null);
     const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
     (loginUser as jest.Mock).mockImplementationOnce(() => {
       return Promise.reject(error)
