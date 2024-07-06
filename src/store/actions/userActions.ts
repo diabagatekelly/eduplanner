@@ -77,22 +77,22 @@ export function removeStudent(studentUserId: string) {
 
 }
 
-export function createUserActivity(activityData: {userActivity: IActivity, userId: string, username: string}) {
+export function createUserActivity({userActivity, username}: {userActivity: IActivity, username: string}) {
   let editObject;
-  const currentUserData = JSON.parse(sessionStorage.getItem('user_data'))
-  const isMain = activityData?.userId === currentUserData.userId
+  const currentUserData: IUser = JSON.parse(sessionStorage.getItem('user_data'))
+  const isMain = username === currentUserData.username
   if (isMain) {
     const currentActivities = currentUserData.activities
-    currentActivities.push(activityData.userActivity)
+    currentActivities.push(userActivity)
     currentUserData.activities = currentActivities
     editObject = {
       activities: currentUserData.activities
     }
   } else {
-    const student = currentUserData.students?.[activityData.username]
+    const student = currentUserData.students?.[username]
     const studentActivities = student?.activities
-    studentActivities.push(activityData.userActivity)
-    currentUserData.students[activityData.username].activities = studentActivities
+    studentActivities.push(userActivity)
+    currentUserData.students[username].activities = studentActivities
     editObject = {
       students: currentUserData.students
     }

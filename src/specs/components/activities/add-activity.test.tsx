@@ -157,6 +157,8 @@ describe('Add activity', () => {
   })
 
   it('should not reset form when response is not 200 or 500 and display error message', async () => {
+    jest.spyOn(console, 'log').mockImplementation(() => null);
+
     const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
     (createActivity as jest.Mock).mockImplementation(() => {
       return Promise.reject(error)
@@ -208,7 +210,6 @@ describe('Add activity', () => {
     (createActivity as jest.Mock).mockImplementation(() => {
       return Promise.reject(error)
     })
-    jest.spyOn(console, 'log')
     render(<AddActivity {...{userDetails}} />)
 
     const name = screen.getByLabelText(/Name:/i)
@@ -256,7 +257,6 @@ describe('Add activity', () => {
     (createActivity as jest.Mock).mockImplementation(() => {
       return Promise.reject({status: 500, message: 'Error thrown and caught.'});
     });
-    jest.spyOn(console, 'log')
     render(<AddActivity {...{userDetails}} />)
 
     const name = screen.getByLabelText(/Name:/i)
