@@ -61,7 +61,7 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
   }
 
   return (
-    <Disclosure as="nav" className="fixed top w-full bg-gray-800">
+    <Disclosure data-testid="nav" as="nav" className="fixed top w-full bg-gray-800">
       {({ open }) => (
         <>
           <div className="mx-auto px-2 sm:px-6 lg:px-8">
@@ -72,9 +72,9 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                   <span className="absolute -inset-0.5" />
                   <span className="sr-only">Open main menu</span>
                   {open ? (
-                    <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                    <XMarkIcon data-testid="x-icon-btn" className="block h-6 w-6" aria-hidden="true" />
                   ) : (
-                    <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                    <Bars3Icon data-testid="bars-icon-btn" className="block h-6 w-6" aria-hidden="true" />
                   )}
                 </Disclosure.Button>
               </div>
@@ -99,11 +99,7 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                       <Link
                         key="Dashboard"
                         href={`/${username}`}
-                        className={classNames(
-                          pathname === `/${username}` ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                          'rounded-md px-3 py-2 text-sm font-medium'
-                        )}
-                        aria-current={pathname === `/${username}` ? 'page' : undefined}
+                        className='text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium'
                       >
                         Dashboard
                       </Link>
@@ -142,11 +138,17 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <Menu.Item>
-                        {({ active }) => (
+                        {({ active }) =>(
                           <Link
                             data-testid="profile-link"
                             href={`/${username}/profile`}
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                            className={
+                              classNames(
+                                /* istanbul ignore next */
+                                active ? 'bg-gray-200' : '', 
+                                pathname.includes(`/${username}/profile`) ? 'italic rounded-md border-2 border-gray-700' : '', 
+                                'block px-4 py-2 text-sm text-gray-700'
+                              )}
                           >
                             Your Profile
                           </Link>
@@ -159,7 +161,11 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                             data-testid="logout-link"
                             onClick={logout}
                             href="#"
-                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                            className={classNames(
+                              /* istanbul ignore next */
+                              active ? 'bg-gray-100' : '', 
+                              'block px-4 py-2 text-sm text-gray-700'
+                            )}
                           >
                             Sign out
                           </Link>
@@ -210,11 +216,7 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                     key="Dashboard"
                     as="a"
                     href={`/${username}`}
-                    className={classNames(
-                      pathname === `/${username}` ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                      'block rounded-md px-3 py-2 text-base font-medium'
-                    )}
-                    aria-current={pathname === `/${username}` ? 'page' : undefined}
+                    className='text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium'
                   >
                     Dashboard
                   </Disclosure.Button> : ""

@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google'
 import { Provider, useDispatch } from "react-redux";
 import store from "@/store/store";
 import Navbar from '@/components/navbar';
-import {Footer} from '@/components/footer';
+import Footer from '@/components/footer';
 import { Suspense, useEffect, useState } from 'react';
 import { hasExpired, hasToken } from '@/store/actions/authActions';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'

@@ -3,7 +3,7 @@ import '@testing-library/jest-dom'
 import { act, fireEvent, screen } from '@testing-library/react'
 import { render } from '../util';
 import * as React from 'react';
-import { mockUser } from '../mocks';
+import { mockActivity, mockUser } from '../mocks';
 import { editUser } from '../../api/controller';
 import { ISODateString } from '../../interfaces/isoDateType';
 import store from '../../store/store';
@@ -70,11 +70,33 @@ describe('Navbar', () => {
       
     })
 
-    
+    describe('Highligting active items', () => {
+      it('should highlight Login button when on login page', async () => {
+        jest.spyOn(require('next/navigation'), 'usePathname').mockImplementation(() => '/login');
+        render(<Navbar {...{isAuthenticated: false, username: mockUser.username}}/>);
+
+        const loginBtn = await screen.findByText('Login');
+        const highlightedClass = 'bg-gray-900 text-white';
+
+        expect(loginBtn).toHaveClass(highlightedClass)
+      })
+
+      it('should highlight Home button when on login page', async () => {
+        jest.spyOn(require('next/navigation'), 'usePathname').mockImplementation(() => '/');
+        render(<Navbar {...{isAuthenticated: false, username: mockUser.username}}/>);
+
+        const homeBtn = screen.getByTestId("home-btn");
+        const highlightedClass = 'bg-gray-900 text-white';
+
+        expect(homeBtn).toHaveClass(highlightedClass)
+      })
+    })    
   })
 
   describe('Authorized user', () => {
     it('should display "Home" button and "User" icon', async () => {
+      jest.spyOn(console, 'log').mockImplementation(() => null);
+
       render(<Navbar {...{isAuthenticated: true, username: mockUser.username}}/>)
     
       const homeBtn = await screen.findByTestId("home-btn");
@@ -106,8 +128,6 @@ describe('Navbar', () => {
       await act(async () => {
         await fireEvent.click(profileMenuItem)
       })
-    
-
     })
 
     it('should navigate to # logout is clickd', async () => {
@@ -284,5 +304,57 @@ describe('Navbar', () => {
       })
     })
 
+    describe('Highligting active items', () => {
+      it('should highlight Profile button when on profile page', async () => {
+        const userDetails = {...mockUser, activities: [mockActivity]};
+        const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: userDetails}
+        jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
+        
+        jest.spyOn(require('next/navigation'), 'usePathname').mockImplementation(() => '/mock-user/profile');
+        render(<Navbar {...{isAuthenticated: true, username: mockUser.username}}/>);
+
+        const userIcon = await screen.findByTestId("user-icon");
+        await act(async () => {
+          await fireEvent.click(userIcon)
+        })
+
+        const profileMenuItem = await screen.findByTestId("profile-link")
+        const highlightedClass = 'italic rounded-md border-2 border-gray-700';
+
+        expect(profileMenuItem).toHaveClass(highlightedClass)
+      })
+    })
+  })
+
+  describe('Toggle drawer', () => {
+    beforeEach(() => {
+      global.window.innerWidth = 500;
+    })
+
+    afterEach(() => {
+      global.window.innerWidth = 1200;
+    })
+
+    it('should toggle drawer as expected', async () => {
+      render(<Navbar {...{isAuthenticated: true, username: mockUser.username}}/>)
+      const barsIconWhenClosed = await screen.findByTestId('bars-icon-btn')
+    
+      expect(barsIconWhenClosed).toBeInTheDocument()
+      
+      await act(async () => {
+        await fireEvent.click(barsIconWhenClosed)
+      })
+      
+      const xIconWhenOpened = await screen.findByTestId('x-icon-btn')
+      expect(xIconWhenOpened).toBeInTheDocument()
+      
+  
+      await act(async () => {
+        await fireEvent.click(xIconWhenOpened)
+      })
+
+      const barsIconWhenClosed2 = await screen.findByTestId('bars-icon-btn')
+      expect(barsIconWhenClosed2).toBeInTheDocument()
+    })
   })
 })
