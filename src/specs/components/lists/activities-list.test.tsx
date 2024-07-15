@@ -40,7 +40,7 @@ describe('Activities List', () => {
     const mockActivity1 = mockActivity;
     const mockActivity2 = {...mockActivity, name: "Reading"}
     const student = {...mockStudent, activities: [{...mockActivity1, completionStatus: CompletionStatus.COMPLETED}]}
-    const teacher: IUser = {...mockUser, activities: [mockActivity1, mockActivity2]}
+    const teacher: IUser = {...mockUser, activities: [mockActivity1, {...mockActivity2, completionStatus: CompletionStatus.DELINQUENT}]}
     
     beforeEach(() => {
       const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}

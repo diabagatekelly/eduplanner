@@ -129,7 +129,7 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
             {!cardsOfTheDay.length ? <p data-testid="no-cards-msg">You have no cards to review today.</p> :
             cardsOfTheDay?.length &&            
             cardsOfTheDay?.map((card) => (
-              <li data-testid="list-today-cards" style={{ borderColor: getBorderColor(card) }} className="flex justify-between border-4 mb-3" key={card.cardId}>
+              <li data-testid="list-today-cards" style={{ borderColor: getBorderColor(card) }} className="flex justify-between border-4 mb-3 px-3 py-1" key={card.cardId}>
                 <p data-testid="today-card-name">{formatCardName(card.cardId)}</p>
                 <div className="flex">
                   <span data-testid="today-card-show-btn" className="hover:cursor-pointer mx-2" onClick={() => showCard(card)}>
@@ -162,7 +162,7 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
             {!allActiveCards.length ?  <p data-testid="no-cards-msg">You have no active cards.</p> :
             allActiveCards?.length &&            
             allActiveCards?.map((card) => (
-              <li data-testid="list-active-cards" style={{ borderColor: getBorderColor(card) }} className="flex justify-between border-4 mb-3" key={card.cardId}>
+              <li data-testid="list-active-cards" style={{ borderColor: getBorderColor(card) }} className="flex justify-between border-4 mb-3 px-3 py-1" key={card.cardId}>
                 <p data-testid="active-card-name">{formatCardName(card.cardId)}</p>
                 <div className="flex">
                   <span data-testid="active-card-show-btn" className="hover:cursor-pointer mx-2" onClick={() => showCard(card)}>
@@ -195,7 +195,7 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
             {!allInactiveCards.length ?  <p data-testid="no-cards-msg">You have no inactive cards.</p> :
             allInactiveCards?.length &&            
             allInactiveCards?.map((card) => (
-              <li data-testid="list-inactive-cards" className="flex justify-between border-4 mb-3" key={card.cardId}>
+              <li style={{ borderColor: getBorderColor(card) }} data-testid="list-inactive-cards" className="flex justify-between border-4 mb-3" key={card.cardId}>
                 <p data-testid="inactive-card-name">{formatCardName(card.cardId)}</p>
                 <div className="flex">
                   <span data-testid="inactive-card-show-btn" className="hover:cursor-pointer mx-2" onClick={() => showCard(card)}>
