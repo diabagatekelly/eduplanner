@@ -7,6 +7,7 @@ import { IUser } from '../../../interfaces/IUser';
 import { mockActivity, mockStudent, mockUser } from '../../mocks';
 import store from '../../../store/store';
 import { deleteActivity } from '../../../api/controller';
+import { CompletionStatus } from '../../../interfaces/CompletionStatusEnum';
 
 jest.mock('../../../api/controller');
 jest.mock('next/navigation', () => {
@@ -20,8 +21,6 @@ jest.mock('next/navigation', () => {
 });
 
 describe('Activities List', () => {
-  const getBorderColor = () => 'red';
-
   describe('No activities', () => {
     const teacher: IUser = {...mockUser, activities: []}
     
@@ -31,7 +30,7 @@ describe('Activities List', () => {
     })
 
     it('should display "no activities" message when uer has no activities', () => {
-      render(<ActivitiesList {...{isMain: true, userDetails: teacher, getBorderColor}}/>)
+      render(<ActivitiesList {...{isMain: true, userDetails: teacher}}/>)
       const noActivities = screen.getByTestId('no-activities-message')
       expect(noActivities).toHaveTextContent('You have no activities yet.')
     })
@@ -40,7 +39,7 @@ describe('Activities List', () => {
   describe('With activities', () => {
     const mockActivity1 = mockActivity;
     const mockActivity2 = {...mockActivity, name: "Reading"}
-    const student = {...mockStudent, activities: [mockActivity1]}
+    const student = {...mockStudent, activities: [{...mockActivity1, completionStatus: CompletionStatus.COMPLETED}]}
     const teacher: IUser = {...mockUser, activities: [mockActivity1, mockActivity2]}
     
     beforeEach(() => {
@@ -49,7 +48,7 @@ describe('Activities List', () => {
     })
 
     it('should display list of activities', async () => {
-      render(<ActivitiesList {...{isMain: true, userDetails: teacher, getBorderColor}}/>)
+      render(<ActivitiesList {...{isMain: true, userDetails: teacher}}/>)
       const activitiesList = screen.getAllByTestId('activity-in-list')
       expect(activitiesList).toHaveLength(2)
       expect(activitiesList[0]).toHaveTextContent('Quran')
@@ -57,7 +56,7 @@ describe('Activities List', () => {
     })
 
     it('should fetch activity for main user', async () => {
-      render(<ActivitiesList {...{isMain: true, userDetails: teacher, getBorderColor}}/>)
+      render(<ActivitiesList {...{isMain: true, userDetails: teacher}}/>)
       const activitiesList = screen.getAllByTestId('activity-in-list')
 
       const useRouter = jest.spyOn(require("next/navigation"), "useRouter");
@@ -73,11 +72,10 @@ describe('Activities List', () => {
     })
 
     it('should fetch activity for non-main user', async () => {
-      render(<ActivitiesList {...{isMain: false, userDetails: student, getBorderColor}}/>)
+      render(<ActivitiesList {...{isMain: false, userDetails: student}}/>)
       const activitiesList = screen.getAllByTestId('activity-in-list')
 
       const useRouter = jest.spyOn(require("next/navigation"), "useRouter");
-      const usePathname = jest.spyOn(require("next/navigation"), "usePathname");
 
       useRouter.mockImplementation(() => ({
         push: jest.fn()
@@ -91,7 +89,7 @@ describe('Activities List', () => {
     })
 
     it('should delete activity for main user', async () => {
-      render(<ActivitiesList {...{isMain: true, userDetails: teacher, getBorderColor}}/>);
+      render(<ActivitiesList {...{isMain: true, userDetails: teacher}}/>);
       const deleteActivitiesList = screen.getAllByTestId('delete-activities-in-list');
       (deleteActivity as jest.Mock).mockImplementation(() => {
         return Promise.resolve({status: 200, data: {message: 'Activity deleted.', details: {activity: mockActivity}}})

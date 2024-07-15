@@ -100,7 +100,6 @@ export default function AddQuranCardForm<IAddQuranCardForm>({isMain, user, activ
       
       return card
     })
-    
 
     setSelectedJuz([...ajzah])
     setFormData([...cards])
@@ -160,7 +159,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({isMain, user, activ
           cardId: `${btoa(`custom-${jsonData.content}`)}`,
           activity: activity.name,
           activityType: 'Quran',
-          addedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
+          addedOn: null,
           lastUpdatedOn: null,
           nextShowDate: null,
           stage: '0',
@@ -176,7 +175,6 @@ export default function AddQuranCardForm<IAddQuranCardForm>({isMain, user, activ
       if (cardsToRemove.length) {
         await deleteCard(cardsToRemove)
         for (let card of cardsToRemove) {
-          delete card.userId;
           dispatch(removeUserCard({cardId: card.cardId, activityName: card.activity, username: user.username}))
         }
       }
@@ -204,7 +202,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({isMain, user, activ
 
   return (
     <>
-      <form id="addQuranCardForm" onSubmit={submitForm} method="POST" className="space-y-6">
+      <form data-testid="addQuranCardForm" id="addQuranCardForm" onSubmit={submitForm} method="POST" className="space-y-6">
         <fieldset>
           <legend className="sr-only">Checkbox variants</legend>
           {formData.map((val, i) => (
@@ -215,7 +213,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({isMain, user, activ
         <fieldset>
           <div className="mb-5">
             <label htmlFor="content" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Custom (Surah name range start to range end):</label>
-            <input onChange={handleCustomInput} value={custom.content} id="content" name="content" type="text" 
+            <input onChange={handleCustomInput} value={custom.content} data-testid="custom-quran" id="content" name="content" type="text" 
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Naas 1 to 2" />
           </div>
         </fieldset>

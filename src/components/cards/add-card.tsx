@@ -1,85 +1,83 @@
 "use client"
 
-import { useState, FormEvent, useEffect } from "react";
-import { createUserCard, editUserCard } from "../../store/actions/userActions";
-import AddCardForm from "../forms/add-card-form";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
+// import AddCardForm from "../forms/add-card-form.skip";
 import { usePathname } from 'next/navigation';
-import { ICard } from "../../interfaces/ICard";
-import { createCards } from "../../api/controller";
 import AddQuranCardForm from "../forms/add-quran-card-form";
+import { IUser } from "@/interfaces/IUser";
+import { IActivity } from "@/interfaces/IActivity";
 
-const AddCard = ({ isMain, userDetails, activity, ...args }) => {
-  const dispatch = useDispatch()
+export default function AddCard({ isMain, userDetails, activity } : {isMain: boolean, userDetails: IUser, activity: IActivity}) {
+  // const dispatch = useDispatch()
 
-  const [formData, setFormData] = useState([
-    {
-      front: "",
-      back: ""
-    }
-  ]);
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formSuccess, setFormSuccess] = useState(false)
+  // const [formData, setFormData] = useState([
+  //   {
+  //     front: "",
+  //     back: ""
+  //   }
+  // ]);
+  // const [isLoading, setIsLoading] = useState<boolean>(false)
+  // const [formSuccess, setFormSuccess] = useState(false)
   const [formSuccessMessage, setFormSuccessMessage] = useState("")
 
-  useEffect(() => {
-  }, [formData, userDetails, activity])
+  // useEffect(() => {
+  // }, [formData, userDetails, activity])
 
 
-  const handleInput = (e: any, index) => {
-    const fieldName: string = e.target.name;
-    const fieldValue: any = e.target.value;
-  }
+  // const handleInput = (e: any, index) => {
+  //   const fieldName: string = e.target.name;
+  //   const fieldValue: any = e.target.value;
+  // }
 
-  function addCardFieldset() {
-    if (args.mode === 'edit') {
-      args.resetMode()
-    } else {
-      const values = [...formData];
-      const newSet = {
-        front: "",
-        back: ""
-      }
-      values.push(newSet)    
-      setFormData(values)
-    }
-  }
+  // function addCardFieldset() {
+  //   if (args.mode === 'edit') {
+  //     args.resetMode()
+  //   } else {
+  //     const values = [...formData];
+  //     const newSet = {
+  //       front: "",
+  //       back: ""
+  //     }
+  //     values.push(newSet)    
+  //     setFormData(values)
+  //   }
+  // }
 
-  function reset() {
-    setFormData([
-      {
-        front: "",
-        back: ""
-      }
-    ]);
-    setFormSuccessMessage("");
-    window.location.reload()
-  }
+  // function reset() {
+  //   setFormData([
+  //     {
+  //       front: "",
+  //       back: ""
+  //     }
+  //   ]);
+  //   setFormSuccessMessage("");
+  //   window.location.reload()
+  // }
 
 
-  async function submitForm(e: FormEvent<HTMLFormElement>): Promise<any> {
-    const data = e.currentTarget || e.target as HTMLFormElement
-    // We don't want the page to refresh
-    e.preventDefault()
-    setIsLoading(true) // Set loading to true when the request starts
-    let indivCardFormData = []
-    let response;
-    try {
-      // if (args.mode === 'edit') {
-      //   response = await submitEditCard(data, indivCardFormData)
-      // } else {
-      //   response = await submitCreateCard(data, indivCardFormData)
-      // }
+  // async function submitForm(e: FormEvent<HTMLFormElement>): Promise<any> {
+  //   const data = e.currentTarget || e.target as HTMLFormElement
+  //   // We don't want the page to refresh
+  //   e.preventDefault()
+  //   setIsLoading(true) // Set loading to true when the request starts
+  //   let indivCardFormData = []
+  //   let response;
+  //   try {
+  //     // if (args.mode === 'edit') {
+  //     //   response = await submitEditCard(data, indivCardFormData)
+  //     // } else {
+  //     //   response = await submitCreateCard(data, indivCardFormData)
+  //     // }
 
-    } catch (error) {
-      console.error(error)
-      setIsLoading(false)
-      setFormSuccess(false)
-      if (error.response) {
-        setFormSuccessMessage(error.response.data.message)
-      }
-    }
-  }
+  //   } catch (error) {
+  //     console.error(error)
+  //     setIsLoading(false)
+  //     setFormSuccess(false)
+  //     if (error.response) {
+  //       setFormSuccessMessage(error.response.data.message)
+  //     }
+  //   }
+  // }
 
   // async function submitCreateCard(formData, indivCardFormData) {
   //   const rawFormData = new FormData(formData)
@@ -187,12 +185,11 @@ const AddCard = ({ isMain, userDetails, activity, ...args }) => {
            : 
             <>
               <h3 className="text-3xl py-3 font-bold">Add new arabic cards:</h3>
-              <AddCardForm {...{ handleInput, formData, isLoading, submitForm, addCardFieldset, mode: args.mode }} />
+              <p>Coming soon!</p>
+              {/* <AddCardForm {...{ handleInput, formData, isLoading, submitForm, addCardFieldset, mode: args.mode }} /> */}
             </>
         }
       <div>{formSuccessMessage}</div>
     </div>
   )
 }
-
-export default AddCard;

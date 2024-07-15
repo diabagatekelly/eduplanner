@@ -79,6 +79,7 @@ describe('Link Account Popup', () => {
   })
 
   it('should not close popup when response is not 200 or 500 and display error message', async () => {
+    jest.spyOn(console, 'log').mockImplementation(() => null);
     const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
     (linkAccount as jest.Mock).mockImplementation(() => {
       return Promise.reject(error)
@@ -103,7 +104,7 @@ describe('Link Account Popup', () => {
     (linkAccount as jest.Mock).mockImplementation(() => {
       return Promise.reject(error)
     })
-    jest.spyOn(console, 'log')
+
     let showModal = true;
   
     render(<LinkAccountPopup {...{onClose: () => showModal = false, showModal, ...childArgs}} />)
@@ -123,7 +124,7 @@ describe('Link Account Popup', () => {
     (linkAccount as jest.Mock).mockImplementation(() => {
       return Promise.reject({status: 500, message: 'Error thrown and caught.'});
     });
-    jest.spyOn(console, 'log')
+
     let showModal = true;
   
     render(<LinkAccountPopup {...{onClose: () => showModal = false, showModal, ...childArgs}} />)

@@ -10,7 +10,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { hasExpired, hasToken } from '@/store/actions/authActions';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { populateUser } from '@/store/actions/userActions';
-import { useMounted } from '@/components/lists/cards-list';
+import { useMounted } from '@/utils/useMounted';
 
 const inter = Inter({ subsets: ['latin'] })
 

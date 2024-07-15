@@ -1,5 +1,5 @@
-import { mockActivity, mockStudent, mockUser } from "../../mocks";
-import {addNewStudent, createUserActivity, editUserActivity, populateUser, removeStudent, removeUserActivity, resetUser, saveStudentDetails} from '../../../store/actions/userActions';
+import { mockActivity, mockStudent, mockUser, mockUserCard } from "../../mocks";
+import {addNewStudent, createUserActivity, createUserCard, editUserActivity, editUserCard, populateUser, removeStudent, removeUserActivity, removeUserCard, resetUser, saveStudentDetails} from '../../../store/actions/userActions';
 import { ISODateString } from '../../../interfaces/isoDateType';
 import { CompletionStatus } from "../../../interfaces/CompletionStatusEnum";
 
@@ -167,7 +167,7 @@ describe('User actions', () => {
       const currentUserActivities = currentUser.activities
       expect(currentUserActivities).toEqual([])
   
-      const reducer = createUserActivity({userActivity: mockActivity, userId: teacher.userId, username: teacher.username})
+      const reducer = createUserActivity({userActivity: mockActivity, username: teacher.username})
       const expectedUpdatedUser = {...teacher, activities: [mockActivity]}
       const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
       expect(reducer).toMatchObject({
@@ -195,7 +195,7 @@ describe('User actions', () => {
 
       const studentUpdatedWithActivity = {...mockStudent, activities: [mockActivity]}
 
-      const reducer = createUserActivity({userActivity: mockActivity, userId: mockStudent.userId, username: mockStudent.username})
+      const reducer = createUserActivity({userActivity: mockActivity, username: mockStudent.username})
       const expectedUpdatedUser = {...teacher, linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]]}, students: {'mock-student': studentUpdatedWithActivity}}
       const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
       expect(reducer).toMatchObject({
@@ -307,5 +307,175 @@ describe('User actions', () => {
         expect(updatedUser.students[student.username].activities.length).toEqual(0)
       })
     })
+  })
+
+  describe('Cards', () => {
+    describe('Create cards', () => {
+      it('should call EDIT reducer with user_data updated with main user new cards (create new cards for main user)', () => {
+        createUserActivity({userActivity: mockActivity, username: teacher.username})
+        const currentUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        const currentUserCards = currentUser.activities?.cards
+        expect(currentUserCards).toBeFalsy()
+  
+        const activityWithCards = {...mockActivity, cards: [mockUserCard]}
+    
+        const reducer = createUserCard({username: teacher.username, activityName: 'Quran', newCards: [mockUserCard]})
+        const expectedUpdatedUser = {...teacher, activities: [activityWithCards]}
+        const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        expect(reducer).toMatchObject({
+          type: 'EDIT',
+          editProps: [
+            {
+              activities: [activityWithCards]
+            }
+          ]
+        })
+        expect(updatedUser).toMatchObject(expectedUpdatedUser)
+        expect(updatedUser.activities[0].cards).toBeTruthy()
+        expect(updatedUser.activities[0].cards).not.toMatchObject([])
+        expect(JSON.stringify(updatedUser.activities[0].cards[0])).toEqual(JSON.stringify(mockUserCard))
+      })
+  
+      it('should call EDIT reducer with user_data updated with student user new cards (create new cards for student user)', () => {
+        addNewStudent(mockStudent)
+        saveStudentDetails(mockStudent)
+        createUserActivity({userActivity: mockActivity, username: mockStudent.username})
+  
+        const currentUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        const currentUserStudents = currentUser.linkedAccountsData?.students?.length
+        const currentUserStudentsDetails = currentUser.students
+        const currentUserStudentsActivities = currentUserStudentsDetails[mockStudent.username].activities
+        expect(currentUserStudents).toEqual(1)
+        expect(currentUserStudentsDetails).toBeTruthy()
+        expect(currentUserStudentsActivities.length).toEqual(1)
+  
+        const studentWithCards = {...mockStudent, activities: [{...mockActivity, cards: [mockUserCard]}]}
+    
+        const reducer = createUserCard({username: mockStudent.username, activityName: 'Quran', newCards: [mockUserCard]})
+        const expectedUpdatedUser = {...teacher, linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]]}, students: {'mock-student': studentWithCards}}
+        const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        expect(reducer).toMatchObject({
+          type: 'EDIT',
+          editProps: [
+            {
+              students: {'mock-student': studentWithCards}
+            }
+          ]
+        })
+        expect(updatedUser).toMatchObject(expectedUpdatedUser)
+        expect(updatedUser.students[mockStudent.username].activities[0].cards).toBeTruthy()
+        expect(updatedUser.students[mockStudent.username].activities[0].cards).not.toMatchObject([])
+        expect(JSON.stringify(updatedUser.students[mockStudent.username].activities[0].cards[0])).toEqual(JSON.stringify(mockUserCard))
+      })
+    })
+
+    describe('Edit cards', () => {
+      it('should call EDIT reducer with user_data updated with main user edited cards (edit cards for main user)', () => {
+        createUserActivity({userActivity: mockActivity, username: teacher.username})
+        createUserCard({username: teacher.username, activityName: 'Quran', newCards: [mockUserCard]})
+        const userWithCards = JSON.parse(mockSessionStorage.getItem('user_data'))
+        expect(JSON.stringify(userWithCards.activities[0].cards[0])).toEqual(JSON.stringify(mockUserCard))
+
+        const reducer = editUserCard({username: teacher.username, activityName: 'Quran', updatedCard: {...mockUserCard, completionStatus: CompletionStatus.COMPLETED}})
+
+        const expectedUpdatedUser = {...teacher, activities: [{...mockActivity, cards: [{...mockUserCard, completionStatus: CompletionStatus.COMPLETED}]}]}
+        const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        
+        expect(reducer).toMatchObject({
+          type: 'EDIT',
+          editProps: [
+            {
+              activities: [{...mockActivity, cards: [{...mockUserCard, completionStatus: CompletionStatus.COMPLETED}]}]
+            }
+          ]
+        })
+        expect(updatedUser).toMatchObject(expectedUpdatedUser)
+        expect(JSON.stringify(updatedUser.activities[0].cards[0])).toEqual(JSON.stringify({...mockUserCard, completionStatus: CompletionStatus.COMPLETED}))
+      })
+  
+      it('should call EDIT reducer with user_data updated with student user edited cards (edit cards for student user)', () => {
+        addNewStudent(mockStudent)
+        saveStudentDetails(mockStudent)
+        createUserActivity({userActivity: mockActivity, username: mockStudent.username})
+        createUserCard({username: mockStudent.username, activityName: 'Quran', newCards: [mockUserCard]})
+  
+        const currentUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        const currentUserStudentsActivities = currentUser.students[mockStudent.username].activities
+  
+        expect(currentUserStudentsActivities[0].cards[0]).toMatchObject(mockUserCard)
+
+        const updatedCard = {...mockUserCard, completionStatus: CompletionStatus.COMPLETED}
+  
+        const studentWithUpdatedCards = {...mockStudent, activities: [{...mockActivity, cards: [updatedCard]}]}
+    
+        const reducer = editUserCard({username: mockStudent.username, activityName: 'Quran', updatedCard: updatedCard})
+        const expectedUpdatedUser = {...teacher, linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]]}, students: {'mock-student': studentWithUpdatedCards}}
+        const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        expect(reducer).toMatchObject({
+          type: 'EDIT',
+          editProps: [
+            {
+              students: {'mock-student': studentWithUpdatedCards}
+            }
+          ]
+        })
+        expect(updatedUser).toMatchObject(expectedUpdatedUser)
+        expect(JSON.stringify(updatedUser.students[mockStudent.username].activities[0].cards[0])).toEqual(JSON.stringify(updatedCard))
+      })
+    })
+
+    describe('Remove cards', () => {
+      it('should call EDIT reducer with user_data updated with main user deleted cards (delete cards for main user)', () => {
+        createUserActivity({userActivity: mockActivity, username: teacher.username})
+        createUserCard({username: teacher.username, activityName: 'Quran', newCards: [mockUserCard]})
+        const userWithCards = JSON.parse(mockSessionStorage.getItem('user_data'))
+        expect(JSON.stringify(userWithCards.activities[0].cards[0])).toEqual(JSON.stringify(mockUserCard))
+
+        const reducer = removeUserCard({username: teacher.username, activityName: 'Quran', cardId: mockUserCard.cardId})
+
+        const expectedUpdatedUser = {...teacher, activities: [{...mockActivity, cards: []}]}
+        const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        
+        expect(reducer).toMatchObject({
+          type: 'EDIT',
+          editProps: [
+            {
+              activities: [{...mockActivity, cards: []}]
+            }
+          ]
+        })
+        expect(updatedUser).toMatchObject(expectedUpdatedUser)
+        expect(updatedUser.activities[0].cards.length).toEqual(0)
+      })
+  
+      it('should call EDIT reducer with user_data updated with student user deleted cards (deleted cards for student user)', () => {
+        addNewStudent(mockStudent)
+        saveStudentDetails(mockStudent)
+        createUserActivity({userActivity: mockActivity, username: mockStudent.username})
+        createUserCard({username: mockStudent.username, activityName: 'Quran', newCards: [mockUserCard]})
+  
+        const currentUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        const currentUserStudentsActivities = currentUser.students[mockStudent.username].activities
+  
+        expect(currentUserStudentsActivities[0].cards[0]).toMatchObject(mockUserCard)
+  
+        const studentWithUpdatedCards = {...mockStudent, activities: [{...mockActivity, cards: []}]}
+    
+        const reducer = removeUserCard({username: mockStudent.username, activityName: 'Quran', cardId: mockUserCard.cardId})
+        const expectedUpdatedUser = {...teacher, linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]]}, students: {'mock-student': studentWithUpdatedCards}}
+        const updatedUser = JSON.parse(mockSessionStorage.getItem('user_data'))
+        expect(reducer).toMatchObject({
+          type: 'EDIT',
+          editProps: [
+            {
+              students: {'mock-student': studentWithUpdatedCards}
+            }
+          ]
+        })
+        expect(updatedUser).toMatchObject(expectedUpdatedUser)
+        expect(updatedUser.students[mockStudent.username].activities[0].cards.length).toEqual(0)
+      })
+    })
+    
   })
 })

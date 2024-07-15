@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react";
 import Popup from "../popups/popup";
 import { useRouter } from "next/navigation";
@@ -5,8 +7,9 @@ import { usePathname } from 'next/navigation'
 import { IUser } from "@/interfaces/IUser";
 import { IActivity } from "@/interfaces/IActivity";
 import { fromDbFormat } from "@/utils/formatActivityName";
+import { getBorderColor } from "@/utils/getBorderColor";
 
-export default function ActivitiesList({isMain, userDetails, getBorderColor}: {isMain: boolean, userDetails: IUser, getBorderColor: any}) {
+export default function ActivitiesList({isMain, userDetails}: {isMain: boolean, userDetails: IUser}) {
   let args;
   const router = useRouter();
   const pathName = usePathname();
