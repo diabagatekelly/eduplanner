@@ -216,8 +216,6 @@ describe('Navbar', () => {
           push: jest.fn()
         }));
 
-        jest.spyOn(console, 'log')
-
         render(<Navbar {...{isAuthenticated: true, username: mockUser.username}}/>)
     
         const userIcon = await screen.findByTestId("user-icon");
@@ -250,8 +248,6 @@ describe('Navbar', () => {
           push: jest.fn()
         }));
 
-        jest.spyOn(console, 'log')
-
         render(<Navbar {...{isAuthenticated: true, username: mockUser.username}}/>)
     
         const userIcon = await screen.findByTestId("user-icon");
@@ -282,8 +278,6 @@ describe('Navbar', () => {
         useRouter.mockImplementation(() => ({
           push: jest.fn()
         }));
-
-        jest.spyOn(console, 'log')
 
         render(<Navbar {...{isAuthenticated: true, username: mockUser.username}}/>)
     

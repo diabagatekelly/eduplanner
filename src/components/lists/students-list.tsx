@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react";
 import Popup from "../popups/popup";
 import { findUser } from "@/api/controller";
@@ -5,8 +7,9 @@ import { useDispatch } from "react-redux";
 import { saveStudentDetails } from "@/store/actions/userActions";
 import { useRouter } from "next/navigation";
 import { IUser } from "@/interfaces/IUser";
+import { getBorderColor } from "@/utils/getBorderColor";
 
-export default function StudentsList({userDetails, getBorderColor}: {userDetails: IUser, getBorderColor: any}) {
+export default function StudentsList({userDetails}: {userDetails: IUser}) {
   let args;
   const dispatch = useDispatch();
   const router = useRouter()

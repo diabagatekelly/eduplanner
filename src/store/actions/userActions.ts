@@ -169,24 +169,33 @@ export function createUserCard({username, activityName, newCards}: {username: st
     const updatedActivityCards = [...currentActivityCards, ...newCards]
     currentActivity.cards = Array.from(new Set(updatedActivityCards))
     currentUserData.activities = currentActivities
+    sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
+
+    return {
+      type: 'EDIT',
+      editProps: [
+        {
+          activities: currentUserData.activities
+        }
+      ]
+    }
   } else {
     const student = currentUserData.students[username]
-    const studentActivities = student.activities || []
+    const studentActivities = student.activities
     let studentCurrentActivity = studentActivities.find(activity => activity.name === activityName)
     const studentActivityCards = studentCurrentActivity.cards || []
     const updatedStudentActivityCards = [...studentActivityCards, ...newCards]
     studentCurrentActivity.cards = Array.from(new Set(updatedStudentActivityCards))
     currentUserData.students[username].activities = studentActivities
-  }
-  
-  sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
-  return {
-    type: 'EDIT',
-    editProps: [
-      {
-        activities: currentUserData.activities
-      }
-    ]
+    sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
+    return {
+      type: 'EDIT',
+      editProps: [
+        {
+          students: currentUserData.students
+        }
+      ]
+    }
   }
 }
 
@@ -200,13 +209,16 @@ export function editUserCard({username, activityName, updatedCard}: {username: s
     let cardToUpdate = currentActivityCards.find(card => card.cardId === updatedCard.cardId)
     let cardToUpdateIdx = currentActivityCards.indexOf(cardToUpdate)
     currentActivityCards.splice(cardToUpdateIdx, 1, updatedCard)
-    // for (let item in cardData.updated) {
-    //   currentActivityCards[cardToUpdateIdx][item] = cardData.updated[item]
-    //   currentActivityCards[cardToUpdateIdx][item] = cardData.updated[item]
-    // }
-    // const updatedActivityCards = [...currentActivityCards]
-    // currentActivity.cards = updatedActivityCards
     currentUserData.activities = currentActivities
+    sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
+    return {
+      type: 'EDIT',
+      editProps: [
+        {
+          activities: currentUserData.activities
+        }
+      ]
+    }
   } else {
     const student = currentUserData.students[username]
     const studentActivities = student.activities
@@ -215,13 +227,6 @@ export function editUserCard({username, activityName, updatedCard}: {username: s
     let cardToUpdate = studentActivityCards.find(card => card.cardId === updatedCard.cardId)
     let cardToUpdateIdx = studentActivityCards.indexOf(cardToUpdate)
     studentActivityCards.splice(cardToUpdateIdx, 1, updatedCard)
-
-    // for (let item in cardData.updated) {
-    //   studentActivityCards[cardToUpdateIdx][item] = cardData.updated[item]
-    //   studentActivityCards[cardToUpdateIdx][item] = cardData.updated[item]
-    // }
-    // const updatedStudentActivityCards = [...studentActivityCards]
-    // studentCurrentActivity.cards = updatedStudentActivityCards
     currentUserData.students[username].activities = studentActivities
   }
   
@@ -230,7 +235,7 @@ export function editUserCard({username, activityName, updatedCard}: {username: s
     type: 'EDIT',
     editProps: [
       {
-        activities: currentUserData.activities
+        students: currentUserData.students
       }
     ]
   }
@@ -249,9 +254,18 @@ export function removeUserCard({username, activityName, cardId}: {username: stri
     const updatedActivityCards = [...currentActivityCards]
     currentActivity.cards = updatedActivityCards
     currentUserData.activities = currentActivities
+    sessionStorage.setItem('user_data', JSON.stringify(currentUserData))
+    return {
+      type: 'EDIT',
+      editProps: [
+        {
+          activities: currentUserData.activities
+        }
+      ]
+    }
   } else {
     const student = currentUserData.students[username]
-    const studentActivities = student.activities || []
+    const studentActivities = student.activities
     let studentCurrentActivity = studentActivities.find(activity => activity.name === activityName)
     const studentActivityCards = studentCurrentActivity.cards
     let cardToUpdate = studentActivityCards.find(card => card.cardId === cardId)
@@ -267,7 +281,7 @@ export function removeUserCard({username, activityName, cardId}: {username: stri
     type: 'EDIT',
     editProps: [
       {
-        activities: currentUserData.activities
+        students: currentUserData.students
       }
     ]
   }

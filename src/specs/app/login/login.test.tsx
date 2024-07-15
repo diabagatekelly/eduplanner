@@ -142,7 +142,6 @@ describe('Login page', () => {
     (loginUser as jest.Mock).mockImplementationOnce(() => {
       return Promise.reject(error)
     })
-    jest.spyOn(console, 'log')
     render(<Login />)
 
     const email = screen.getByLabelText(/Email:/i)
@@ -178,7 +177,6 @@ describe('Login page', () => {
     (loginUser as jest.Mock).mockImplementationOnce(() => {
       return Promise.reject({status: 500, message: 'Error thrown and caught.'});
     });
-    jest.spyOn(console, 'log')
     render(<Login />)
 
     const email = screen.getByLabelText(/Email:/i)

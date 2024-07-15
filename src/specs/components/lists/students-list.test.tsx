@@ -17,8 +17,6 @@ jest.mock('next/navigation', () => {
 });
 
 describe('Students List', () => {
-  const getBorderColor = () => 'red';
-
   describe('No students', () => {
     const teacher: IUser = {...mockUser, linkedAccountsData: {students: []}}
     
@@ -28,10 +26,8 @@ describe('Students List', () => {
     })
 
     it('should display "no students" message when teacher has no students', () => {
-      render(<StudentsList {...{userDetails: undefined, getBorderColor}}/>)
-
+      render(<StudentsList {...{userDetails: undefined}}/>)
       const noStudentsMessage = screen.getByTestId('no-students-message')
-
       expect(noStudentsMessage).toHaveTextContent('You have no students yet.')
     })
   })
@@ -45,10 +41,9 @@ describe('Students List', () => {
     })
 
     it('should open delete popup when trying to remove user as a student', async () => {
-      render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
-      
+      render(<StudentsList {...{userDetails: teacher}}/>)
       const deleteBtn = screen.getByTestId('student-list-delete')
-      
+  
       await act(async () => {
         await fireEvent.click(deleteBtn)
       })
@@ -93,7 +88,7 @@ describe('Students List', () => {
     })
 
     it('should display a list of student names', () => {
-      render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
+      render(<StudentsList {...{userDetails: teacher}}/>)
       const studentList = screen.getByTestId('students-list')
     
       expect(studentList).toHaveTextContent(`${mockStudent.username.split('-').join(' ')}`)
@@ -108,7 +103,7 @@ describe('Students List', () => {
       };
       (useRouter as jest.Mock).mockReturnValue(mockRouter);
 
-      render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
+      render(<StudentsList {...{userDetails: teacher}}/>)
       
       const studentEmail = screen.getByTestId('students-email')
       const url = `/${teacher.username}/students/${mockStudent.username}`
@@ -151,7 +146,7 @@ describe('Students List', () => {
       };
       (useRouter as jest.Mock).mockReturnValue(mockRouter);
 
-      render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
+      render(<StudentsList {...{userDetails: teacher}}/>)
       
       const studentEmail = screen.getByTestId('students-email')
       const url = `/${teacher.username}/students/${mockStudent.username}`
@@ -195,7 +190,7 @@ describe('Students List', () => {
       };
       (useRouter as jest.Mock).mockReturnValue(mockRouter);
 
-      render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
+      render(<StudentsList {...{userDetails: teacher}}/>)
       
       const studentUsername = screen.getAllByTestId('students-email')[0]
       const url = `/${teacher.username}/students/${mockStudent.username}`
@@ -210,6 +205,7 @@ describe('Students List', () => {
     })
 
     it('should not reset form when response is not 200 or 500 and display error message', async () => {
+      jest.spyOn(console, 'log').mockImplementation(() => null);
       const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
       (findUser as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
@@ -219,7 +215,7 @@ describe('Students List', () => {
       };
       (useRouter as jest.Mock).mockReturnValue(mockRouter);
   
-      render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
+      render(<StudentsList {...{userDetails: teacher}}/>)
   
       const studentUsername = screen.getAllByTestId('students-email')[0]
 
@@ -238,13 +234,13 @@ describe('Students List', () => {
       (findUser as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
-      jest.spyOn(console, 'log')
+
       const mockRouter = {
         push: jest.fn()
       };
       (useRouter as jest.Mock).mockReturnValue(mockRouter);
   
-      render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
+      render(<StudentsList {...{userDetails: teacher}}/>)
   
       const studentUsername = screen.getAllByTestId('students-email')[0]
 
@@ -264,13 +260,13 @@ describe('Students List', () => {
       (findUser as jest.Mock).mockImplementation(() => {
         return Promise.reject({status: 500, message: 'Error thrown and caught.'});
       });
-      jest.spyOn(console, 'log')
+
       const mockRouter = {
         push: jest.fn()
       };
       (useRouter as jest.Mock).mockReturnValue(mockRouter);
   
-      render(<StudentsList {...{userDetails: teacher, getBorderColor}}/>)
+      render(<StudentsList {...{userDetails: teacher}}/>)
   
       const studentUsername = screen.getAllByTestId('students-email')[0]
 

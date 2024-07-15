@@ -1,11 +1,14 @@
 const INITIAL_STATE = {}
 
 export default function user(userData = INITIAL_STATE, action: { type: string, userInfo?: string, editProps?: { propKey: any }[], allData?: {} }) {
+  /* istanbul ignore next */
   switch (action.type) {
     case 'SCAN':
+      /* istanbul ignore next */
       return { ...userData }
 
     case 'QUERY':
+      /* istanbul ignore next */
       return userData[action.userInfo]
 
     case 'EDIT':

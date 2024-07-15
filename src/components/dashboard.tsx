@@ -1,10 +1,10 @@
 "use client"
 
-import ListUi from "@/components/lists/lists-ui";
 import AddActivity from "./activities/add-activity";
 import { IUser } from "@/interfaces/IUser";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ListUi from "@/components/lists/lists-ui";
 
 export default function Dashboard({ userDetails, isMain, isTeacher }: { userDetails: IUser, isMain: boolean, isTeacher: boolean }) {
   const fullName = `${userDetails?.firstName} ${userDetails?.lastName}`

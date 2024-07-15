@@ -11,7 +11,9 @@ import store from '../../../store/store';
 jest.mock('../../../api/controller');
 jest.mock('next/navigation', () => {
   return {
-    useRouter: jest.fn(),
+    useRouter: jest.fn(() => ({
+      push: jest.fn()
+    })),
     usePathname: jest.fn()
   }
 });
@@ -66,6 +68,7 @@ describe('Delete Account Popup', () => {
   })
 
   it('should not close popup when response is not 200 or 500 and display error message', async () => {
+    jest.spyOn(console, 'log').mockImplementation(() => null)
     const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
     (deleteUser as jest.Mock).mockImplementation(() => {
       return Promise.reject(error)
@@ -90,7 +93,7 @@ describe('Delete Account Popup', () => {
     (deleteUser as jest.Mock).mockImplementation(() => {
       return Promise.reject(error)
     })
-    jest.spyOn(console, 'log')
+
     let showModal = true;
   
     render(<DeleteAccountPopup {...{onClose: () => showModal = false, showModal, ...childArgs}} />)
@@ -110,7 +113,7 @@ describe('Delete Account Popup', () => {
     (deleteUser as jest.Mock).mockImplementation(() => {
       return Promise.reject({status: 500, message: 'Error thrown and caught.'});
     });
-    jest.spyOn(console, 'log')
+
     let showModal = true;
   
     render(<DeleteAccountPopup {...{onClose: () => showModal = false, showModal, ...childArgs}} />)
