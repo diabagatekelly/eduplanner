@@ -6,8 +6,9 @@ import UnlinkAccountPopup from "./unlinkAccountPopup";
 import DeleteActivityPopup from "./deleteActivityPopup";
 import ManageCardPopup from "./manageCardPopup";
 import { IUser } from "@/interfaces/IUser";
+import { IActivity } from "@/interfaces/IActivity";
 
-const Popup = ({ onClose, showModal, modalType, isMain, ...childArgs }: {onClose: any, showModal: boolean, modalType: string, isMain?: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>}) => {
+const Popup = ({ onClose, showModal, modalType, isMain, ...childArgs }: {onClose: any, showModal: boolean, modalType: string, isMain?: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>, item?: any, activity?: IActivity}) => {
   if (modalType === 'deleteAccount') {
     return (
       <DeleteAccountPopup {...{onClose, showModal, ...childArgs}}/>

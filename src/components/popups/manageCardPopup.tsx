@@ -8,10 +8,10 @@ import { IUser } from "@/interfaces/IUser";
 import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
 import { IActivity } from "@/interfaces/IActivity";
 
-export default function ManageCardPopup({onClose, showModal, isMain, ...childArgs}: {onClose: any, showModal: boolean, isMain: boolean, user?: IUser, activity?: IActivity, item?: {card: ICard, action: string}}) {
+export default function ManageCardPopup({onClose, showModal, isMain, ...childArgs}: {onClose: any, showModal: boolean, isMain: boolean, user?: IUser | Partial<IUser>, activity?: IActivity, item?: {card: ICard, action: string}}) {
   const dispatch = useDispatch()
 
-  const [userInfo, getUserInfo] = useState<IUser>({ ...childArgs.user });
+  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user });
   const [card, getCardDetails] = useState<ICard>({...childArgs.item.card});
   const [activity, getActivityDetails] = useState<IActivity>({ ...childArgs.activity });
   const [statusMessage, setStatusMessage] = useState('');
