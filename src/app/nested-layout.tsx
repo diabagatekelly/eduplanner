@@ -25,7 +25,7 @@ export default function NestedLayout({ children, isTeacher }: {children: any, is
 
     const cardSubMenu = userReducer?.activities?.find(activity => activity.name === activityPath)?.hasCards
     showCardSubMenu(cardSubMenu)
-  }, [])
+  }, [activityPath])
 
   function toggleDrawer(open) {
     open === true ? setOpenDrawer(true) : setOpenDrawer(false)

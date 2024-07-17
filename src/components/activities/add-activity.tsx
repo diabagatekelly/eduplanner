@@ -124,7 +124,7 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
         <h6 className="text-1xl py-3 font-bold">Instructions on naming activity:</h6>
         <p><span className="font-bold">For Quran: </span>Quran</p>
         <p><span className="font-bold">For language: </span>(Target language) Language, ie. Arabic Language</p>
-        <p><span className="font-bold">Any other subject: </span>A name that isn't 'Quran' and doesn't contain 'Language'</p>
+        <p><span className="font-bold">Any other subject: </span>A name that isn&#39;t &#39;Quran&#39; and doesn&#39;t contain &#39;Language&#39;</p>
       </div>
       <AddActivityForm {...{ handleInput, formData, isLoading, submitForm }} />
       <div data-testid="add-activity-submit-message">{formSubmitOutcomeMessage}</div>
