@@ -119,7 +119,13 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
 
   return (
     <div className="justify-items-start">
-      <h3 className="text-3xl py-3 font-bold">Add a new activity:</h3>
+      <h3 className="text-3xl py-3 font-bold">Add a new activity</h3>
+      <div>
+        <h6 className="text-1xl py-3 font-bold">Instructions on naming activity:</h6>
+        <p><span className="font-bold">For Quran: </span>Quran</p>
+        <p><span className="font-bold">For language: </span>(Target language) Language, ie. Arabic Language</p>
+        <p><span className="font-bold">Any other subject: </span>A name that isn't 'Quran' and doesn't contain 'Language'</p>
+      </div>
       <AddActivityForm {...{ handleInput, formData, isLoading, submitForm }} />
       <div data-testid="add-activity-submit-message">{formSubmitOutcomeMessage}</div>
       <hr className="my-5" />

@@ -15,7 +15,7 @@ export default function ListUi({ listType, isMain, userDetails, ...childArgs }: 
     
       <div className="status-color-legend my-20">
         <p><span className="bg-green-500 border border-green-500 mr-2 w-20 h-3 inline-block"></span>COMPLETED</p>
-        <p><span className="bg-orange-500 border border-orange-500 mr-2 w-20 h-3 inline-block"></span>PENDING</p>
+        <p><span className="bg-orange-300 border border-orange-300 mr-2 w-20 h-3 inline-block"></span>PENDING</p>
         <p><span className="bg-gray-500 border border-gray-500 mr-2 w-20 h-3 inline-block"></span>INACTIVE / REVIEW</p>
         <p><span className="bg-red-500 border border-red-500 mr-2 w-20 h-3 inline-block"></span>DELINQUENT</p>
       </div>

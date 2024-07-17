@@ -1,6 +1,6 @@
 import { FormEvent } from "react";
 
-const LoginForm = ({
+export default function LoginForm({
   handleInput,
   formData,
   isLoading,
@@ -10,7 +10,7 @@ const LoginForm = ({
     formData: {email: string, password: string},
     isLoading: boolean,
     submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
-  }) => {
+  }) {
 
   return (
     <>
@@ -41,5 +41,3 @@ const LoginForm = ({
     </>
   )
 }
-
-export default LoginForm;

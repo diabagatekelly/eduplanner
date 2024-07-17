@@ -1,7 +1,7 @@
 import { FormEvent } from "react";
-import { IActivity, IActivityFormData } from "../../interfaces/IActivity";
+import { IActivityFormData } from "../../interfaces/IActivity";
 
-const AddActivityForm = ({
+export default function AddActivityForm({
   handleInput,
   formData,
   isLoading,
@@ -11,7 +11,7 @@ const AddActivityForm = ({
     formData: IActivityFormData,
     isLoading: boolean,
     submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
-  }) => {
+  }) {
 
   return (
     <>
@@ -51,5 +51,3 @@ const AddActivityForm = ({
     </>
   )
 }
-
-export default AddActivityForm;

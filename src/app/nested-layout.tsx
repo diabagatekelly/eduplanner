@@ -16,11 +16,15 @@ export default function NestedLayout({ children, isTeacher }: {children: any, is
   let args;
 
   const [user, getUserData] = useState<IUser>({ ...args })
+  const [cardSubMenu, showCardSubMenu] = useState(false)
   const [openDrawer, setOpenDrawer] = useState(true)
   
   useEffect(() => {
     const { userReducer } = store.getState()
     getUserData(userReducer);
+
+    const cardSubMenu = userReducer?.activities?.find(activity => activity.name === activityPath)?.hasCards
+    showCardSubMenu(cardSubMenu)
   }, [])
 
   function toggleDrawer(open) {
@@ -58,7 +62,7 @@ export default function NestedLayout({ children, isTeacher }: {children: any, is
                 <span className="flex-1 ml-3 whitespace-nowrap">Manage Students</span>
               </a>
             </li> : ""}
-            {activityPath === 'Quran' ? 
+            {cardSubMenu ? 
               <>
                 <li className='menu-item'>
                   <a href={pathname} className={"flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group" + classNames(pathname === `/${user.username}/students` ? " bg-gray-800 text-white hover:bg-gray-700" : "")}>

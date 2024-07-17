@@ -1,9 +1,9 @@
 import { CompletionStatus } from "@/interfaces/CompletionStatusEnum"
 
 export function getBorderColor(listItem) {
-  let borderColor = 'rgb(249 115 22)' //orange
+  let borderColor = 'rgb(253 186 116)' //orange
   if (listItem?.completionStatus === CompletionStatus.PENDING) {
-    borderColor = 'rgb(249 115 22)' //orange
+    borderColor = 'rgb(253 186 116)' //orange
   } else if (listItem?.completionStatus === CompletionStatus.COMPLETED) {
     borderColor = 'rgb(34 197 94)' //green
   } else if ([CompletionStatus.REVIEW, CompletionStatus.INACTIVE].includes(listItem?.completionStatus)) {

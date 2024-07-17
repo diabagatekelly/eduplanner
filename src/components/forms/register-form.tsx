@@ -1,7 +1,7 @@
 import { FormEvent } from "react";
 import { IUserFormData } from "../../interfaces/IUser";
 
-const RegisterForm = ({
+export default function RegisterForm({
   handleInput,
   formData,
   isLoading,
@@ -11,7 +11,7 @@ const RegisterForm = ({
     formData: IUserFormData,
     isLoading: boolean,
     submitForm: (e: FormEvent<HTMLFormElement>) => void
-  }) => {
+  }) {
 
   return (
     <>
@@ -60,5 +60,3 @@ const RegisterForm = ({
     </>
   )
 }
-
-export default RegisterForm;

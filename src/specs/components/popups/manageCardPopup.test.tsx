@@ -322,6 +322,18 @@ describe('Manage Card Popup', () => {
       expect(errorMessage).toBeInTheDocument()  
       expect(console.log).toHaveBeenCalledWith({status: 500, message: 'Error thrown and caught.'})
     })
+
+    it('should display disabled button when card already reviewed', async () => {
+      const myUser2 = {...mockStudent, linkedAccountsData: {teacher: mockUser.userId}, activities: [{...mockActivity, cards: [{...mockUserCard, completionStatus: CompletionStatus.REVIEW}]}]}
+
+      let showModal = true;
+      let onClose = () => {showModal = false};
+    
+      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.REVIEW}, action: 'edit'}}} />)
+      const requestReviewBtn = await screen.findByTestId('submit-review-btn')
+
+      expect(requestReviewBtn).toBeDisabled()
+    })
   })
 
   describe('Override stage', () => {

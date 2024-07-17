@@ -1,6 +1,6 @@
 import { FormEvent } from "react";
 
-const SearchUserForm = ({
+export default function SearchUserForm({
   handleInput,
   formData,
   isLoading,
@@ -10,7 +10,7 @@ const SearchUserForm = ({
     formData: {email: string},
     isLoading: boolean,
     submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
-  }) => {
+  }) {
 
   return (
     <>
@@ -23,5 +23,3 @@ const SearchUserForm = ({
     </>
   )
 }
-
-export default SearchUserForm;
