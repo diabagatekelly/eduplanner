@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { IUser } from "@/interfaces/IUser";
 import { IResponse } from "@/interfaces/IApiResponse";
 
-const DeleteAccountPopup = ({onClose, showModal, ...childArgs}: {onClose: any, showModal: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>}) => {
+export default function DeleteAccountPopup({onClose, showModal, ...childArgs}: {onClose: any, showModal: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>}) {
   const dispatch = useDispatch()
   const router = useRouter()
 
@@ -82,5 +82,3 @@ const DeleteAccountPopup = ({onClose, showModal, ...childArgs}: {onClose: any, s
     </>
   )
 }
-
-export default DeleteAccountPopup;

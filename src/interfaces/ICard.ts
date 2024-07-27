@@ -29,3 +29,19 @@ export interface IQuranSurahCard {
 }
 
 export type IQuranCards = (IQuranJuzCard|IQuranSurahCard)[]
+
+export interface ILanguageVocabOralCard {
+  cardId: string, // btoa(arabic-vocab-house-oral)
+  word: string,
+  instructions: 'Recall to / from; use in 3 spoken sentences',
+  type: 'oral'
+}
+
+export interface ILanguageVocabSpellingCard {
+  cardId: string, // btoa(arabic-vocab-house-spelling)
+  word: string,
+  instructions: 'Write in target language; use in 3 written sentences',
+  type: 'spelling'
+}
+
+export type ILanguageVocabCards = (ILanguageVocabOralCard|ILanguageVocabSpellingCard)[]

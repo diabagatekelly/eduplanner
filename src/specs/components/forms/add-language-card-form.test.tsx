@@ -1,0 +1,659 @@
+import '@testing-library/jest-dom'
+import { screen, fireEvent, act } from '@testing-library/react'
+import { render } from '../../util';
+import * as React from 'react';
+import AddLanguageCardForm from '../../../components/forms/add-language-card-form';
+import SubmitLanguageVocabCard from '../../../components/cards/submit-language-vocab-card';
+import SubmitMiscCard from '../../../components/cards/submit-misc-card';
+import {mockUser, mockActivity, mockLanguageActivity} from '../../mocks';
+
+jest.mock('../../../components/cards/submit-language-vocab-card');
+jest.mock('../../../components/cards/submit-misc-card');
+
+describe('Add language card form', () => {
+  const reload = window.location.reload;
+
+  beforeAll(() => {
+    Object.defineProperty(window, 'location', {
+      value: { reload: jest.fn() }
+    });
+  })
+
+  afterAll(() => {
+    window.location.reload = reload;
+  })
+
+  const user = {...mockUser, activities: [{...mockLanguageActivity}]}
+  
+  beforeEach(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2/4/2024'))
+    window.sessionStorage.setItem('user_data', JSON.stringify(user))
+    window.sessionStorage.setItem('user_token', 'xxxxxx')
+    window.sessionStorage.setItem('created_on', '2/3/2024')
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks();
+    jest.clearAllMocks()
+    window.sessionStorage.clear()
+    jest.useRealTimers()
+  })
+
+  describe('Display forms', () => {
+    it('should display "Select language card type form on load"', async () => {
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
+
+      const selectCardTypeForm = await screen.findByTestId("select-language-card-type")
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      
+      const selectInputType = await screen.findByTestId("select-input-type")
+      const selectInputTypeSelect = document.querySelector("#listInputMethod") as Element;
+
+      const uploadFileForm = await screen.findByTestId("upload-file-form")
+      const typeListForm = await screen.findByTestId("type-list-form")
+
+      expect(selectCardTypeForm).not.toHaveClass('hidden')
+      expect(selectInputType).toHaveClass('hidden')
+      expect(uploadFileForm).toHaveClass('hidden')
+      expect(typeListForm).toHaveClass('hidden')
+
+      // From 1st dropdown, select Vocab card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      expect(selectInputType).not.toHaveClass('hidden')
+
+      // From 2nd dropdown, select Type list
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Type list' } })
+      })
+
+      expect(typeListForm).not.toHaveClass('hidden')
+      expect(uploadFileForm).toHaveClass('hidden')
+
+      // Switch 2nd dropdown to Upload file
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Upload file' } })
+      })
+
+      expect(typeListForm).toHaveClass('hidden')
+      expect(uploadFileForm).not.toHaveClass('hidden')
+
+      // Switch 1st dropdown to Grammar card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Grammar card' } })
+      })
+
+      expect(selectInputType).toHaveClass('hidden')
+      expect(uploadFileForm).toHaveClass('hidden')
+      expect(typeListForm).not.toHaveClass('hidden')
+
+      // Switch 1st dropdown back to Vocab card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      expect(selectInputType).not.toHaveClass('hidden')
+      expect(uploadFileForm).toHaveClass('hidden')
+      expect(typeListForm).toHaveClass('hidden')
+
+      // Switch 2nd dropdown to Upload file then Choose ...
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Upload file' } })
+      })
+
+      expect(uploadFileForm).not.toHaveClass('hidden')
+
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Choose ...' } })
+      })
+
+      expect(uploadFileForm).toHaveClass('hidden')
+
+      // Switch 1st dropdown back to Choose ...
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Choose ...' } })
+      })
+
+      expect(selectInputType).toHaveClass('hidden')
+    })
+  })
+
+  describe('Create grammar cards list', () => {
+    it('should not validate empty grammar cards list', async () => {
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
+    
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const typeListForm = await screen.findByTestId("type-list-form")
+      const validateTypeBoxBtn = await screen.findByTestId("add-type-cards-validate-button")
+      const outcomeMsg = await screen.findByTestId('outcome-message')
+
+      // Switch 1st dropdown to Grammar card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Grammar card' } })
+      })
+
+      expect(typeListForm).not.toHaveClass('hidden')
+
+      await act(async () => {
+        fireEvent.click(validateTypeBoxBtn)
+      })
+
+      expect(outcomeMsg).toHaveTextContent('Oops, you are trying to validate an empty list')
+    })
+
+    it('should warn when typing more than 20 grammar cards', async () => {
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
+    
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const textArea = await screen.findByTestId("textarea-for-typed-list") as HTMLTextAreaElement;
+      const outcomeMsg = await screen.findByTestId('outcome-message')
+      
+      // Switch 1st dropdown to Grammar card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Grammar card' } })
+      })
+
+      expect(textArea).not.toHaveClass('hidden')
+
+      await act(async () => {
+        await fireEvent.change(textArea, { target: { value: '1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 2' } })
+      })
+
+      expect(outcomeMsg).toHaveTextContent('Oops, this is as long as your list can get!')
+    })
+
+    it('should open popup with expected grammar list', async () => {
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
+    
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const textArea = await screen.findByTestId("textarea-for-typed-list") as HTMLTextAreaElement;
+      const validateTypeBoxBtn = await screen.findByTestId("add-type-cards-validate-button");
+      const outcomeMsg = await screen.findByTestId('outcome-message')
+      
+      await expect(screen.queryByTestId('validate-popup')).toBeNull()
+      // Switch 1st dropdown to Grammar card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Grammar card' } })
+      })
+
+      expect(textArea).not.toHaveClass('hidden')
+
+      await act(async () => {
+        await fireEvent.change(textArea, { target: { value: '1, 2, 3, 4, 5, , 7, 8, 9, 10 , 11, 12, 13, 14' } })
+        await fireEvent.click(validateTypeBoxBtn)
+      })
+
+      await expect(screen.queryByTestId('validate-popup')).not.toBeNull()
+      await expect(screen.queryByTestId('validate-popup')).toHaveTextContent('1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14')
+
+      const closeBtn = await screen.findByTestId('validate-popup-close-btn')
+
+      await act(async () => {
+        await fireEvent.click(closeBtn)
+      })
+
+      await expect(screen.queryByTestId('validate-popup')).toHaveAttribute('hidden')
+      expect(outcomeMsg).toHaveTextContent('Validation canceled.')
+    })
+
+    it('should submit with expected list', async () => {
+      (SubmitMiscCard as jest.Mock).mockImplementation(() => Promise.resolve({status: 200, data: {message: 'Cards added', details: []}}));
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockLanguageActivity}} />)
+    
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const textArea = await screen.findByTestId("textarea-for-typed-list") as HTMLTextAreaElement;
+      const validateTypeBoxBtn = await screen.findByTestId("add-type-cards-validate-button");
+      const createCardBtn = await screen.findByTestId('add-type-cards-submit-button')
+      
+      // Switch 1st dropdown to Grammar card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Grammar card' } })
+      })
+
+      await act(async () => {
+        await fireEvent.change(textArea, { target: { value: 'conjugate, Madinah 1 pg. 6 ex. 1' } })
+        await fireEvent.click(validateTypeBoxBtn)
+      })
+
+      const popupYesBtn = await screen.findByTestId('validate-btn')
+
+      await act(async () => {
+        await fireEvent.click(popupYesBtn)
+      })
+
+      await act(async () => {
+        await fireEvent.click(createCardBtn)
+      })
+
+      expect(SubmitMiscCard).toHaveBeenCalledWith({userId: mockUser.userId, activity: mockLanguageActivity.name, miscList: ['conjugate', 'Madinah 1 pg. 6 ex. 1'], type: 'Grammar'})
+    })
+  })
+
+  describe('Create typed vocab cards list', () => {
+    it('should warn when typing more than 8 vocab cards', async () => {
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
+    
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const textArea = await screen.findByTestId("textarea-for-typed-list") as HTMLTextAreaElement;
+      const outcomeMsg = await screen.findByTestId('outcome-message')
+      
+      // Switch 1st dropdown to Grammar card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      const selectInputTypeSelect = document.querySelector("#listInputMethod") as Element;
+
+      // From 2nd dropdown, select Type list
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Type list' } })
+      })
+
+      expect(textArea).not.toHaveClass('hidden')
+
+      await act(async () => {
+        await fireEvent.change(textArea, { target: { value: '1, 2, 3, 4, 5, 6, 7, 8, 2' } })
+      })
+
+      expect(outcomeMsg).toHaveTextContent('Oops, this is as long as your list can get!')
+    })
+  })
+
+  describe('Create vocab cards list from upload', () => {
+    it('should not validate empty upload', async () => {
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
+    
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const uploadFileForm = await screen.findByTestId("upload-file-form")
+      const validateTypeBoxBtn = await screen.findByTestId("add-type-cards-validate-button")
+      const outcomeMsg = await screen.findByTestId('outcome-message')
+
+      // Switch 1st dropdown to Grammar card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      const selectInputTypeSelect = document.querySelector("#listInputMethod") as Element;
+
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Upload file' } })
+      })
+
+      expect(uploadFileForm).not.toHaveClass('hidden')
+
+      await act(async () => {
+        fireEvent.click(validateTypeBoxBtn)
+      })
+
+      expect(outcomeMsg).toHaveTextContent('Oops, you are trying to validate an empty list')
+    })
+
+    it('should warn when uploading vocab list with more than 8 words', async () => {
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
+    
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
+      const outcomeMsg = await screen.findByTestId('outcome-message')
+      
+      // Switch 1st dropdown to Vocab card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      // Select Upload File from dropdown
+      const selectInputTypeSelect = document.querySelector("#listInputMethod") as Element;
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Upload file' } })
+      })
+      expect(uploadFileForm).not.toHaveClass('hidden')
+
+      
+      // Upload text file
+      const file = new File(['cat, man, dog, house, mother, father, brother, sister, fruits'], 'foo.txt', {type: 'text/plain'})
+      file.text = jest.fn(() => Promise.resolve('cat, man, dog, house, mother, father, brother, sister, fruits'))
+      await act(async () => {
+        await fireEvent.input(uploadFileForm, { target: {files: [file]} })
+      })
+      expect(await uploadFileForm.files?.[0].text()).toEqual('cat, man, dog, house, mother, father, brother, sister, fruits')
+
+      expect(outcomeMsg).toHaveTextContent('Oops, your uploaded list has more than 8 words! Please remove 1 word.')
+
+    
+    })
+
+    it('should open popup with uploaded vocab list', async () => {
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
+    
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
+      const validateUploadBtn = await screen.findByTestId("add-upload-cards-val-button");
+      const outcomeMsg = await screen.findByTestId('outcome-message')
+
+      await expect(screen.queryByTestId('validate-popup')).toBeNull()
+      
+      // Switch 1st dropdown to Vocab card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      // Select Upload File from dropdown
+      const selectInputTypeSelect = document.querySelector("#listInputMethod") as Element;
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Upload file' } })
+      })
+      expect(uploadFileForm).not.toHaveClass('hidden')
+
+      
+      // Upload text file
+      const file = new File(['cat, man, dog, , cat,'], 'foo.txt', {type: 'text/plain'})
+      file.text = jest.fn(() => Promise.resolve('cat, man, dog, , cat,'))
+      await act(async () => {
+        await fireEvent.input(uploadFileForm, { target: {files: [file]} })
+      })
+      expect(await uploadFileForm.files?.[0].text()).toEqual('cat, man, dog, , cat,')
+
+      // Validate list
+      await act(async () => {
+        fireEvent.click(validateUploadBtn)
+      })
+
+      await expect(screen.queryByTestId('validate-popup')).not.toBeNull()
+      await expect(screen.queryByTestId('validate-popup')).toHaveTextContent('cat, man, dog')
+
+      const popupYesButton = await screen.findByTestId('validate-btn')
+
+      await act(async () => {
+        await fireEvent.click(popupYesButton)
+      })
+
+      await expect(screen.queryByTestId('validate-popup')).toHaveAttribute('hidden')
+      expect(outcomeMsg).toHaveTextContent('Successful validation, now you can create your cards.')
+
+    })
+
+    it('should submit with expected list', async () => {
+      (SubmitLanguageVocabCard as jest.Mock).mockImplementation(() => Promise.resolve({status: 200, data: {message: 'Cards added', details: []}}));
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockLanguageActivity}} />)
+    
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
+      const validateUploadBtn = await screen.findByTestId("add-upload-cards-val-button");
+      const createCardBtn = await screen.findByTestId('add-type-cards-submit-button')
+
+      // Switch 1st dropdown to Vocab card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      // Select Upload File from dropdown
+      const selectInputTypeSelect = document.querySelector("#listInputMethod") as Element;
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Upload file' } })
+      })
+      
+      // Upload text file
+      const file = new File(['cat, man, dog, , cat,'], 'foo.txt', {type: 'text/plain'})
+      file.text = jest.fn(() => Promise.resolve('cat, man, dog, , cat,'))
+      await act(async () => {
+        await fireEvent.input(uploadFileForm, { target: {files: [file]} })
+      })
+
+      // Validate list
+      await act(async () => {
+        fireEvent.click(validateUploadBtn)
+      })
+
+      const popupYesBtn = await screen.findByTestId('validate-btn')
+
+      await act(async () => {
+        await fireEvent.click(popupYesBtn)
+      })
+
+      await act(async () => {
+        await fireEvent.click(createCardBtn)
+      })
+
+      expect(SubmitLanguageVocabCard).toHaveBeenCalledWith({userId: mockUser.userId, activity: mockLanguageActivity.name, vocabList: ['cat', 'man', 'dog']})
+    })
+
+    it('should remove uploaded file as expected', async () => {
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
+    
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
+      const validateUploadBtn = await screen.findByTestId("add-upload-cards-val-button");
+      const outcomeMsg = await screen.findByTestId('outcome-message')
+      const removeUploadBtn = await screen.findByTestId("remove-upload-btn")
+
+      await expect(screen.queryByTestId('validate-popup')).toBeNull()
+      
+      // Switch 1st dropdown to Vocab card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      // Select Upload File from dropdown
+      const selectInputTypeSelect = document.querySelector("#listInputMethod") as Element;
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Upload file' } })
+      })
+      expect(uploadFileForm).not.toHaveClass('hidden')
+
+      
+      // Upload text file
+      const file = new File(['cat, man, dog, , cat,'], 'foo.txt', {type: 'text/plain'})
+      file.text = jest.fn(() => Promise.resolve('cat, man, dog, , cat,'))
+      
+      await act(async () => {
+        await fireEvent.input(uploadFileForm, { target: {files: [file]} })
+      })
+      expect(await uploadFileForm.files?.[0].text()).toEqual('cat, man, dog, , cat,')
+      expect(uploadFileForm.files?.[0].name).toEqual('foo.txt')
+
+      await act(async () => {
+        fireEvent.click(removeUploadBtn)
+      })
+
+      // Validate list
+      await act(async () => {
+        fireEvent.click(validateUploadBtn)
+      })
+
+      await expect(screen.queryByTestId('validate-popup')).toBeNull()
+      expect(outcomeMsg).toHaveTextContent('Oops, you are trying to validate an empty list')
+    })
+
+    it('should allow uploaded of non-text file', async () => {
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
+    
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
+      const outcomeMsg = await screen.findByTestId('outcome-message')
+
+      await expect(screen.queryByTestId('validate-popup')).toBeNull()
+      
+      // Switch 1st dropdown to Vocab card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      // Select Upload File from dropdown
+      const selectInputTypeSelect = document.querySelector("#listInputMethod") as Element;
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Upload file' } })
+      })
+      expect(uploadFileForm).not.toHaveClass('hidden')
+
+      
+      // Upload image file
+      const file = new File(['cat, man, dog, , cat,'], 'foo.png', {type: 'image/png'})
+      file.text = jest.fn(() => Promise.resolve('cat, man, dog, , cat,'))
+      
+      await act(async () => {
+        await fireEvent.input(uploadFileForm, { target: {files: [file]} })
+      })
+
+      expect(outcomeMsg).toHaveTextContent('The file uploaded is not a text (.txt) file.')
+    })
+  })
+
+
+  describe('Submitting errors', () => {
+    it('should not reset form when response is not 200 or 500 and display error message', async () => {
+      jest.spyOn(console, 'log').mockImplementation(() => null)
+      const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
+      (SubmitLanguageVocabCard as jest.Mock).mockImplementationOnce(() => {
+        return Promise.reject(error)
+      });
+  
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockLanguageActivity}} />)
+  
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
+      const validateUploadBtn = await screen.findByTestId("add-upload-cards-val-button");
+      const createCardBtn = await screen.findByTestId('add-type-cards-submit-button')
+
+      // Switch 1st dropdown to Vocab card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      // Select Upload File from dropdown
+      const selectInputTypeSelect = document.querySelector("#listInputMethod") as Element;
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Upload file' } })
+      })
+      
+      // Upload text file
+      const file = new File(['cat, man, dog, , cat,'], 'foo.txt', {type: 'text/plain'})
+      file.text = jest.fn(() => Promise.resolve('cat, man, dog, , cat,'))
+      await act(async () => {
+        await fireEvent.input(uploadFileForm, { target: {files: [file]} })
+      })
+
+      // Validate list
+      await act(async () => {
+        fireEvent.click(validateUploadBtn)
+      })
+
+      const popupYesBtn = await screen.findByTestId('validate-btn')
+
+      await act(async () => {
+        await fireEvent.click(popupYesBtn)
+      })
+
+      await act(async () => {
+        await fireEvent.click(createCardBtn)
+      })
+      
+      const errorMessage = await screen.findByText(/Erroneous response/i)
+      expect(errorMessage).toBeInTheDocument()
+    })
+  
+    it('should not reset form when response is 500 and display error message', async () => {
+      const error = {response: {status: 500, data: {status: 'internalServerError', message: 'Server error'}}};
+      (SubmitLanguageVocabCard as jest.Mock).mockImplementationOnce(() => {
+        return Promise.reject(error)
+      })
+
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockLanguageActivity}} />)
+  
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
+      const validateUploadBtn = await screen.findByTestId("add-upload-cards-val-button");
+      const createCardBtn = await screen.findByTestId('add-type-cards-submit-button')
+
+      // Switch 1st dropdown to Vocab card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      // Select Upload File from dropdown
+      const selectInputTypeSelect = document.querySelector("#listInputMethod") as Element;
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Upload file' } })
+      })
+      
+      // Upload text file
+      const file = new File(['cat, man, dog, , cat,'], 'foo.txt', {type: 'text/plain'})
+      file.text = jest.fn(() => Promise.resolve('cat, man, dog, , cat,'))
+      await act(async () => {
+        await fireEvent.input(uploadFileForm, { target: {files: [file]} })
+      })
+
+      // Validate list
+      await act(async () => {
+        fireEvent.click(validateUploadBtn)
+      })
+
+      const popupYesBtn = await screen.findByTestId('validate-btn')
+
+      await act(async () => {
+        await fireEvent.click(popupYesBtn)
+      })
+
+      await act(async () => {
+        await fireEvent.click(createCardBtn)
+      })
+
+      const errorMessage = await screen.getByText(/Failed to add cards due to an internal error. Please try again later./i)
+
+      expect(errorMessage).toBeInTheDocument()
+      expect(console.log).toHaveBeenCalledWith(error)
+    })
+  
+    it('should not reset form when error is thrown with no response', async () => {
+      (SubmitLanguageVocabCard as jest.Mock).mockImplementationOnce(() => {
+        return Promise.reject({status: 500, message: 'Error thrown and caught.'});
+      });
+
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockLanguageActivity}} />)
+  
+      const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
+      const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
+      const validateUploadBtn = await screen.findByTestId("add-upload-cards-val-button");
+      const createCardBtn = await screen.findByTestId('add-type-cards-submit-button')
+
+      // Switch 1st dropdown to Vocab card
+      await act(async () => {
+        fireEvent.change(selectCardTypeFormSelect, { target: { value: 'Vocab card' } })
+      })
+
+      // Select Upload File from dropdown
+      const selectInputTypeSelect = document.querySelector("#listInputMethod") as Element;
+      await act(async () => {
+        fireEvent.change(selectInputTypeSelect, { target: { value: 'Upload file' } })
+      })
+      
+      // Upload text file
+      const file = new File(['cat, man, dog, , cat,'], 'foo.txt', {type: 'text/plain'})
+      file.text = jest.fn(() => Promise.resolve('cat, man, dog, , cat,'))
+      await act(async () => {
+        await fireEvent.input(uploadFileForm, { target: {files: [file]} })
+      })
+
+      // Validate list
+      await act(async () => {
+        fireEvent.click(validateUploadBtn)
+      })
+
+      const popupYesBtn = await screen.findByTestId('validate-btn')
+
+      await act(async () => {
+        await fireEvent.click(popupYesBtn)
+      })
+
+      await act(async () => {
+        await fireEvent.click(createCardBtn)
+      })
+  
+      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
+      expect(errorMessage).toBeInTheDocument()  
+      expect(console.log).toHaveBeenCalledWith({status: 500, message: 'Error thrown and caught.'})
+    })
+
+  })
+})
