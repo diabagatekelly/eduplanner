@@ -15,10 +15,11 @@ import {
   editCardStage,
   resetCardStage,
   requestCardReview,
-  deleteCard
+  deleteCard,
+  createLanguageVocabCards
 } from '../../api/controller';
 import { deleteCommand, getCommand, patchCommand, postCommand } from '../../api/service';
-import { mockActivity, mockStudent, mockUser, mockUserCard } from '../mocks';
+import { mockActivity, mockBankLanguageVocabCardOral, mockBankLanguageVocabCardSpelling, mockLanguageActivity, mockStudent, mockUser, mockUserCard, mockUserLanguageVocabCardOral, mockUserLanguageVocabCardSpelling } from '../mocks';
 
 jest.mock('../../api/service');
 
@@ -223,6 +224,37 @@ describe('Controller', () => {
   
       expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_DELETE_CARD_URL, payload)
       expect(res).toEqual(mockUserCard)
+    })
+
+    // it('should make post command call to upload vocab file', async () => {
+    //   const file = {} as FormData;
+
+    //   (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve(mockUserCard));
+    //   const res = await uploadVocabList(file)
+  
+    //   expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_UPLOAD_VOCAB_CARDS_URL, file, {headers: {
+    //     'Content-Type': 'multipart/form-data'
+    //   }})
+    //   expect(res).toEqual(mockUserCard)
+
+    // })
+
+    it('should make post command create language vocab list', async () => {
+      const payload = {
+        userId: mockUser.userId,
+        activity: mockLanguageActivity.name,
+        cards: {
+          userCards: [mockUserLanguageVocabCardOral, mockUserLanguageVocabCardSpelling],
+          bankCards: [mockBankLanguageVocabCardOral, mockBankLanguageVocabCardSpelling]
+        }
+      };
+
+      (postCommand as jest.Mock).mockImplementationOnce(async () => Promise.resolve([mockUserLanguageVocabCardOral, mockUserLanguageVocabCardSpelling]));
+      const res = await createLanguageVocabCards(payload)
+  
+      expect(postCommand).toHaveBeenCalledWith(process.env.NEXT_CREATE_LANGUAGE_VOCAB_CARDS_URL, payload)
+      expect(res).toEqual([mockUserLanguageVocabCardOral, mockUserLanguageVocabCardSpelling])
+
     })
   })
 })

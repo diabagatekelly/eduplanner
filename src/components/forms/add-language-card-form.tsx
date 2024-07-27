@@ -1,0 +1,315 @@
+"use client"
+
+import { FormEvent, useEffect, useState } from "react";
+import React from "react";
+import { IActivity } from "@/interfaces/IActivity";
+import { IUser } from "@/interfaces/IUser";
+import { IResponse } from "@/interfaces/IApiResponse";
+import Popup from "../popups/popup";
+import SubmitLanguageVocabCard from "../cards/submit-language-vocab-card";
+import SubmitMiscCard from "../cards/submit-misc-card";
+import { ICard } from "@/interfaces/ICard";
+import { createUserCard } from "@/store/actions/userActions";
+import { useDispatch } from "react-redux";
+
+interface IAddLanguageCardForm {
+  handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
+  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
+}
+
+export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user, activity}:{isMain: boolean, user: IUser, activity: IActivity}) {
+  let args;
+  const dispatch = useDispatch();
+
+  const [file, uploadFile] = useState({
+    content: ''
+  })
+
+  const [typedList, getTypedList] = useState({
+    words: ''
+  })
+
+  const [shouldUpload, getuploadForm] = useState(false)
+  const [shouldType, getTypeBox] = useState(false)
+  const [grammarCard, createGrammarCard] = useState(false)
+  const [vocabCard, createVocabCard] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('');
+  const [popupItem, getPopupItem] = useState<{list: string}>({ ...args })
+  const [shouldProceed, determineShouldProceed] = useState<'yes'|'no'>('no')
+  const [finalCardList, setFinalCardList] = useState('')
+
+  useEffect(() => {
+  }, [user, activity, shouldProceed, file, finalCardList])
+
+  async function onFileInput(e: React.FormEvent<HTMLInputElement>) {
+    if ((e.target as HTMLInputElement).files[0].type !== 'text/plain') {
+      setFormSubmitOutcomeMessage('The file uploaded is not a text (.txt) file.')
+      return
+    }
+
+    const content = await (e.target as HTMLInputElement).files[0]?.text()
+    const cleanedContent = cleanUpList(content)
+    if (!isContentValid(cleanedContent)[0]) {
+      const extra = isContentValid(content)[1] - 8
+      setFormSubmitOutcomeMessage(`Oops, your uploaded list has more than 8 words! Please remove ${extra} word.`);
+      return
+    }
+    setFormSubmitOutcomeMessage('');
+    uploadFile({
+      content: cleanedContent,
+    });
+  }
+
+  function removeUpload(_e: React.MouseEvent<SVGSVGElement, MouseEvent>) {
+    const uploadInput = document.querySelector('#upload') as HTMLInputElement;
+    uploadFile({content: ''});
+    uploadInput.value = '';
+  }
+
+  function onTextareaChange(e: React.FormEvent<HTMLTextAreaElement>) {
+    const target = e.target as HTMLTextAreaElement;
+    if (isContentValid(target.value) || !isContentValid(target.value) && (e.nativeEvent as InputEvent).inputType === 'deleteContentBackward') {
+      setFormSubmitOutcomeMessage('');
+      getTypedList({
+        words: target.value
+      })
+    } else {
+      setFormSubmitOutcomeMessage('Oops, this is as long as your list can get!');
+      getTypedList({
+        words: typedList.words
+      });
+      (document.querySelector('#typed') as HTMLTextAreaElement).value = typedList.words.substring(0, typedList.words.length - 1);
+    }
+  }
+
+  function cleanUpList(list: string) {
+    const wordsAsArray = list.split(',')
+    const listOfItemsToValidate = Array.from(new Set(
+      wordsAsArray.filter(item => (item !== ' ' && item !== ''))
+      .map((item) => {
+        return item.trim();
+      })
+    )).join(', ')
+
+    return listOfItemsToValidate
+  }
+
+  function isContentValid(content: string) {
+    if (grammarCard === true && vocabCard === false && !shouldType) {
+      // Validating typed list for grammar (20)
+      return content.split(',').length <= 20
+    } else if (shouldType) {
+      // Validating typed list for vocab (8)
+      return content.split(',').length <= 8
+    } else if (shouldUpload) {
+      // Validating uploaded list for vocab (8)
+      return [content.split(',').length <= 8, content.split(',').length]
+    }
+  }
+
+  function selectWayToInputList(e: FormEvent<HTMLFormElement>) {
+    setFormSubmitOutcomeMessage('');
+    determineShouldProceed('no');
+    const chosenInputMethod = (e.target as HTMLSelectElement).value
+
+    if (chosenInputMethod === 'Type list') {
+      getTypeBox(true)
+      getuploadForm(false)
+    } else if (chosenInputMethod === 'Upload file') {
+      getTypeBox(false)
+      getuploadForm(true)
+    } else {
+      getTypeBox(false)
+      getuploadForm(false)
+    } 
+  }
+
+  function setLanguageCardType(e: FormEvent<HTMLFormElement>) {
+    setFormSubmitOutcomeMessage('');
+    determineShouldProceed('no');
+    const languageCardType = (e.target as HTMLSelectElement).value;
+
+    (document.querySelector('#typed') as HTMLTextAreaElement).value = '';
+    if (languageCardType === 'Vocab card') {
+      createVocabCard(true);
+      createGrammarCard(false);
+      getTypeBox(false);
+      getuploadForm(false);
+
+      (document.querySelector('#listInputMethod') as HTMLFormElement).value = 'Choose ...';
+    } else if (languageCardType === 'Grammar card') {
+      createGrammarCard(true)
+      createVocabCard(false)
+      getTypeBox(false)
+      getuploadForm(false)
+    } else {
+      createGrammarCard(false)
+      createVocabCard(false)
+      getTypeBox(false)
+      getuploadForm(false)
+    } 
+  }
+
+  function validateInput(e: React.FormEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    setFormSubmitOutcomeMessage('');
+    determineShouldProceed('no');
+
+    if (((shouldType || grammarCard) && typedList.words === '') || (shouldUpload && file.content === '')) {
+      setFormSubmitOutcomeMessage('Oops, you are trying to validate an empty list');
+      return
+    }
+
+    let listOfItemsToValidate: string;
+    if (shouldType || grammarCard) {
+      listOfItemsToValidate = cleanUpList(typedList.words);
+      (document.querySelector('#typed') as HTMLTextAreaElement).value = listOfItemsToValidate;
+    } else if (shouldUpload) {
+      listOfItemsToValidate = file.content
+    }
+
+    getPopupItem({list: listOfItemsToValidate})
+    setModalType('validate')
+    setShowModal(true)
+  }
+
+  
+
+  async function submitForm(e: React.FormEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    setFormSubmitOutcomeMessage('');
+
+    try {
+      const finalCardListAsArr = finalCardList.split(', ');
+      let createdCards: IResponse;
+      
+      if (grammarCard) {
+        createdCards = await SubmitMiscCard({userId: user.userId, activity: activity.name, miscList: finalCardListAsArr, type: 'Grammar'});
+      } else {
+        createdCards = await SubmitLanguageVocabCard({userId: user.userId, activity: activity.name, vocabList: finalCardListAsArr});
+      }
+      
+      const {data} = createdCards;
+      const {message, details}: {message: string, details: ICard[]} = data;
+      dispatch(createUserCard({username: user.username, activityName: activity.name, newCards: details}))
+
+      setFormSubmitOutcomeMessage(message)
+      window.location.reload()
+      
+    } catch (error) {
+      setIsLoading(false)
+      console.log(error)
+
+      if (!error.response) {
+        setFormSubmitOutcomeMessage('Server is down. Try again later.')
+        return
+      }
+
+      const {status, data} = error.response;
+
+      if (status === 500) {
+        setFormSubmitOutcomeMessage('Failed to add cards due to an internal error. Please try again later.')
+      } else {
+        setFormSubmitOutcomeMessage(data.message)
+      }
+    }
+  }
+
+  return (
+    <>
+      <div data-testid="add-language-card-form" id="addLanguageCardForm" className="space-y-6">
+
+        <form className='max-w-md' data-testid="select-language-card-type" onChange={setLanguageCardType}>
+          <label htmlFor="cardTypeSelect" className="block mb-2 text-md font-small text-gray-900 dark:text-white"><b>Are you creating a vocab or grammar card?</b></label>
+          <select id="cardTypeSelect" name="cardTypeSelect" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            <option>Choose ...</option>
+            <option>Vocab card</option>
+            <option>Grammar card</option>
+          </select>
+        </form>
+        
+        <form data-testid="select-input-type" className={vocabCard === true && grammarCard === false ? 'max-w-md' : 'max-w-md hidden'}  onChange={selectWayToInputList}>
+          <label htmlFor="listInputMethod" className="block mb-2 text-md font-small text-gray-900 dark:text-white"><b>How would you like to enter your vocab list?</b></label>
+          <select id="listInputMethod" name="listInputMethod" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            <option>Choose ...</option>
+            <option>Type list</option>
+            <option>Upload file</option>
+          </select>
+        </form>
+
+        <div data-testid="upload-file-form" className={vocabCard === true && grammarCard === false && shouldUpload ? '' : 'hidden'}>
+          <div>
+            <p>Files supported: .txt</p>
+          </div>
+          
+          <label htmlFor="upload" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Upload list of vocab words (in English):</label>
+          <input data-testid="upload-form" className="space-y-2" onInput={onFileInput} type="file" id="upload" name="upload" accept=".txt"/>
+          <svg data-testid="remove-upload-btn" onClick={removeUpload} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={`w-6 h-6 inline-block ${file.content === '' ? 'hidden' : ''}`}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+
+          <div className="block mt-5">
+            <button data-testid="add-upload-cards-val-button" onClick={validateInput} disabled={isLoading || (isMain && user.accountType === 'student')} 
+              className={"inline-block mr-5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}>
+              Validate Uploaded List
+            </button>
+            <button data-testid="add-upload-cards-submit-button" type="submit" onClick={submitForm} disabled={isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no'} 
+              className={`inline-block rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no' ? "bg-gray-600 focus-visible:outline-gray-600" : "bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"}`}>
+              Create Cards
+            </button>
+          </div>
+        </div>
+
+        <div data-testid="type-list-form" className={grammarCard === true && vocabCard === false || shouldType === true ? '' : 'hidden'}>
+          <div>
+            {shouldType && 
+              <p>Type comma-separated list of vocab words.</p>
+            }
+            {grammarCard === true && vocabCard === false && !shouldType &&
+              <div>
+                <p>Type comma-separated list of grammar points.</p>
+                <p>
+                  <span>A grammar point can be a custom instruction (ie. conjugate 3 verbs in present tense, conjugate 3 verbs in past tense) </span>
+                  <span>or it can reference an exercise in a book (ie. Madinah 1 ex. 5 pg. 5, Al-kitaab 1 ex. 3 pg. 50).</span>
+                </p>          
+              </div>
+            }
+          </div>
+          
+          <label htmlFor="typed" className="block mt-2 text-sm font-medium text-gray-900 dark:text-white">
+            {shouldType && 
+              <div>
+                <p>List of vocab words separated by commas, in English, max: 8 words</p>
+                <p><i>ie. dog, cat, man</i></p>
+              </div>
+            }
+            {grammarCard === true && vocabCard === false && 
+              <div>
+                <p>List of grammar points separated by commas, in English, max: 20 points</p>
+                <p><i>ie. conjugate 3 verbs in present tense, Madinah 1 ex. 5 pg. 5</i></p>
+              </div>
+            }
+          </label>
+          <textarea data-testid="textarea-for-typed-list" className="border border-gray-500 p-3" onChange={onTextareaChange} id="typed" name="typed" rows={4} cols={50}></textarea>
+          <div className="mt-5">
+            <button data-testid="add-type-cards-validate-button" onClick={validateInput} disabled={isLoading || (isMain && user.accountType === 'student')} 
+              className={"inline-block mr-5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}>
+              Validate Typed List
+            </button>
+            <button data-testid="add-type-cards-submit-button" type="submit" onClick={submitForm} disabled={isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no'} 
+              className={`inline-block rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no' ? "bg-gray-600 focus-visible:outline-gray-600" : "bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"}`}>
+              Create Cards
+            </button>
+          </div>
+          
+        </div>
+        
+      </div>
+      <p data-testid="outcome-message">{formSubmitOutcomeMessage}</p>
+      <Popup {...{ showModal, modalType, item: popupItem, determineShouldProceed, setFormSubmitOutcomeMessage, setFinalCardList}} onClose={() => setShowModal(false)} />
+    </>
+  )
+}

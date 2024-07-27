@@ -4,7 +4,7 @@ import { removeUserActivity } from "@/store/actions/userActions";
 import { deleteActivity } from "../../api/controller";
 import { IUser } from "@/interfaces/IUser";
 
-const DeleteActivityPopup = ({onClose, showModal, ...childArgs}: {onClose: any, showModal: boolean, item?: {activityName: string}, user?: IUser | Partial<IUser>}) => {
+export default function DeleteActivityPopup({onClose, showModal, ...childArgs}: {onClose: any, showModal: boolean, item?: {activityName: string}, user?: IUser | Partial<IUser>}) {
   const dispatch = useDispatch()
 
   const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user });
@@ -81,5 +81,3 @@ const DeleteActivityPopup = ({onClose, showModal, ...childArgs}: {onClose: any, 
     </>
   )
 }
-
-export default DeleteActivityPopup;
