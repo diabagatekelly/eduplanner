@@ -137,11 +137,11 @@ describe('Add Quran card form', () => {
         const expectedPaylod = {
           userId: `${btoa('mock.user@email.com')}`,
           activity: 'Quran',
-          cards: [{...mockUserCard, addedOn: null}, {...mockUserCard, cardId: `${btoa(`custom-Furqan 1 to 2`)}`, addedOn: null}]
+          cards: [{...mockUserCard}, {...mockUserCard, cardId: `${btoa(`custom-Furqan 1 to 2`)}`}]
         };
   
         (createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.resolve({status: 200, data: {message: 'Cards added', details: [{...mockUserCard, addedOn: null}, {...mockUserCard, cardId: `${btoa(`custom-Furqan 1 to 2`)}`, addedOn: null}]}})
+          return Promise.resolve({status: 200, data: {message: 'Cards added', details: [{...mockUserCard}, {...mockUserCard, cardId: `${btoa(`custom-Furqan 1 to 2`)}`}]}})
         })
         render(<AddQuranCardForm  {...{isMain: true, user, activity: mockActivity}}/>)
     
@@ -279,7 +279,7 @@ describe('Add Quran card form', () => {
         const expectedPaylod = {
           userId: mockUser.userId,
           activity: 'Quran',
-          cards: [{...userCardWithJuz, addedOn: null}]
+          cards: [{...userCardWithJuz}]
         };
   
         (createCards as jest.Mock).mockImplementationOnce(() => {

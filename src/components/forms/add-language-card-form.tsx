@@ -6,11 +6,11 @@ import { IActivity } from "@/interfaces/IActivity";
 import { IUser } from "@/interfaces/IUser";
 import { IResponse } from "@/interfaces/IApiResponse";
 import Popup from "../popups/popup";
-import SubmitLanguageVocabCard from "../cards/submit-language-vocab-card";
-import SubmitMiscCard from "../cards/submit-misc-card";
 import { ICard } from "@/interfaces/ICard";
 import { createUserCard } from "@/store/actions/userActions";
 import { useDispatch } from "react-redux";
+import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
+import { createCards } from "@/api/controller";
 
 interface IAddLanguageCardForm {
   handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
@@ -53,8 +53,8 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
     const content = await (e.target as HTMLInputElement).files[0]?.text()
     const cleanedContent = cleanUpList(content)
     if (!isContentValid(cleanedContent)[0]) {
-      const extra = isContentValid(content)[1] - 8
-      setFormSubmitOutcomeMessage(`Oops, your uploaded list has more than 8 words! Please remove ${extra} word.`);
+      const extra = isContentValid(content)[1] - 10
+      setFormSubmitOutcomeMessage(`Oops, your uploaded list has more than 10 words! Please remove ${extra} word.`);
       return
     }
     setFormSubmitOutcomeMessage('');
@@ -102,11 +102,11 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
       // Validating typed list for grammar (20)
       return content.split(',').length <= 20
     } else if (shouldType) {
-      // Validating typed list for vocab (8)
-      return content.split(',').length <= 8
+      // Validating typed list for vocab (10)
+      return content.split(',').length <= 10
     } else if (shouldUpload) {
-      // Validating uploaded list for vocab (8)
-      return [content.split(',').length <= 8, content.split(',').length]
+      // Validating uploaded list for vocab (10)
+      return [content.split(',').length <= 10, content.split(',').length]
     }
   }
 
@@ -176,22 +176,56 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
     setShowModal(true)
   }
 
-  
-
   async function submitForm(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     setFormSubmitOutcomeMessage('');
 
     try {
       const finalCardListAsArr = finalCardList.split(', ');
-      let createdCards: IResponse;
-      
-      if (grammarCard) {
-        createdCards = await SubmitMiscCard({userId: user.userId, activity: activity.name, miscList: finalCardListAsArr, type: 'Grammar'});
-      } else {
-        createdCards = await SubmitLanguageVocabCard({userId: user.userId, activity: activity.name, vocabList: finalCardListAsArr});
+      const language = activity?.name?.split('-')[0].toLowerCase();
+      let cards: ICard[] = [];
+
+      const userCardBase = {
+        activity: activity?.name,
+        addedOn: null,
+        lastUpdatedOn: null,
+        nextShowDate: null,
+        stage: '0',
+        completionStatus: CompletionStatus.INACTIVE
       }
       
+      if (grammarCard) {
+        finalCardListAsArr.forEach((word) => {
+          cards.push({
+            cardId: `${btoa(`${language}-grammar-${word}`)}`,
+            activityType: 'Grammar',
+            ...userCardBase
+          })
+        })
+        
+      } else {
+        finalCardListAsArr.forEach((word) => {
+          const oralCard: ICard = {
+            cardId: `${btoa(`${language}-vocab-${word}-oral`)}`,
+            activityType: 'Vocab',
+            ...userCardBase
+          };
+          const spellingCards: ICard = {
+            cardId: `${btoa(`${language}-vocab-${word}-spelling`)}`,
+            activityType: 'Vocab',
+            ...userCardBase
+          }
+          cards.push(oralCard, spellingCards)
+        })
+      }
+
+      const payload = {
+        userId: user.userId,
+        activity: activity?.name,
+        cards
+      }
+      
+      const createdCards = await createCards(payload) as IResponse;
       const {data} = createdCards;
       const {message, details}: {message: string, details: ICard[]} = data;
       dispatch(createUserCard({username: user.username, activityName: activity.name, newCards: details}))
@@ -282,7 +316,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
           <label htmlFor="typed" className="block mt-2 text-sm font-medium text-gray-900 dark:text-white">
             {shouldType && 
               <div>
-                <p>List of vocab words separated by commas, in English, max: 8 words</p>
+                <p>List of vocab words separated by commas, in English, max: 10 words</p>
                 <p><i>ie. dog, cat, man</i></p>
               </div>
             }
