@@ -9,6 +9,7 @@ import AddCard from "../cards/add-card";
 import { IActivity } from "@/interfaces/IActivity";
 import { useMounted } from "@/utils/useMounted";
 import { getBorderColor } from "@/utils/getBorderColor";
+import formatCardName from "@/utils/formatCardName";
 
 export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: boolean, userDetails: IUser, activity?: IActivity}) {
   let args;
@@ -103,22 +104,6 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
     setShowModal(true);
   }
 
-  function formatCardName(cardId) {
-    const cardName = atob(cardId)
-    const cardNameNoHyphens = cardName.split('-')
-    if (cardNameNoHyphens[0] === 'juz') {
-      return `${_capitalizeFirstLetter(cardNameNoHyphens[0])} ${cardNameNoHyphens[1]}`
-    } else if (cardNameNoHyphens[0] === 'custom') {
-      return `${_capitalizeFirstLetter(cardNameNoHyphens[0])}: ${cardNameNoHyphens[1]}`
-    } else {
-      return `${_capitalizeFirstLetter(cardNameNoHyphens[0])} ${cardNameNoHyphens[1]}: ${cardNameNoHyphens[3]}`
-    }
-  }
-
-  function _capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  }
-
   if (!mounted) return null;
   return (
     <>
@@ -130,7 +115,7 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
             cardsOfTheDay?.length &&            
             cardsOfTheDay?.map((card) => (
               <li data-testid="list-today-cards" style={{ borderColor: getBorderColor(card) }} className="flex justify-between border-4 mb-3 px-3 py-1" key={card.cardId}>
-                <p data-testid="today-card-name">{formatCardName(card.cardId)}</p>
+                <p data-testid="today-card-name">{formatCardName(card.cardId, childArgs?.activity?.name)}</p>
                 <div className="flex">
                   <span data-testid="today-card-show-btn" className="hover:cursor-pointer mx-2" onClick={() => showCard(card)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -163,7 +148,7 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
             allActiveCards?.length &&            
             allActiveCards?.map((card) => (
               <li data-testid="list-active-cards" style={{ borderColor: getBorderColor(card) }} className="flex justify-between border-4 mb-3 px-3 py-1" key={card.cardId}>
-                <p data-testid="active-card-name">{formatCardName(card.cardId)}</p>
+                <p data-testid="active-card-name">{formatCardName(card.cardId, childArgs?.activity?.name)}</p>
                 <div className="flex">
                   <span data-testid="active-card-show-btn" className="hover:cursor-pointer mx-2" onClick={() => showCard(card)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -196,7 +181,7 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
             allInactiveCards?.length &&            
             allInactiveCards?.map((card) => (
               <li style={{ borderColor: getBorderColor(card) }} data-testid="list-inactive-cards" className="flex justify-between border-4 mb-3" key={card.cardId}>
-                <p data-testid="inactive-card-name">{formatCardName(card.cardId)}</p>
+                <p data-testid="inactive-card-name">{formatCardName(card.cardId, childArgs?.activity?.name)}</p>
                 <div className="flex">
                   <span data-testid="inactive-card-show-btn" className="hover:cursor-pointer mx-2" onClick={() => showCard(card)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">

@@ -7,6 +7,7 @@ import { ICard } from "@/interfaces/ICard";
 import { IUser } from "@/interfaces/IUser";
 import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
 import { IActivity } from "@/interfaces/IActivity";
+import formatCardName from "@/utils/formatCardName";
 
 export default function ManageCardPopup({onClose, showModal, isMain, ...childArgs}: {onClose: any, showModal: boolean, isMain: boolean, user?: IUser | Partial<IUser>, activity?: IActivity, item?: {card: ICard, action: string}}) {
   const dispatch = useDispatch()
@@ -284,20 +285,14 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
     }
   }
 
-  function formatCardName(cardId) {
-    const cardName = atob(cardId)
-    const cardNameNoHyphens = cardName.split('-')
-    if (cardNameNoHyphens[0] === 'juz') {
-      return `${_capitalizeFirstLetter(cardNameNoHyphens[0])} ${cardNameNoHyphens[1]}`
-    } else if (cardNameNoHyphens[0] === 'custom') {
-      return `${_capitalizeFirstLetter(cardNameNoHyphens[0])}: ${cardNameNoHyphens[1]}`
+  function formatCardInstructions(cardName) {
+    if (cardName.includes('(oral)')) {
+      return '1. Recall to / from; 2. use in 3 spoken sentences'
+    } else if (cardName.includes('(spelling)')) {
+      return '1. Write in target language; 2. use in 3 written sentences'
     } else {
-      return `${_capitalizeFirstLetter(cardNameNoHyphens[0])} ${cardNameNoHyphens[1]}: ${cardNameNoHyphens[3]}`
+      return cardName.split(':')[1]
     }
-  }
-
-  function _capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
   function handleOverrideFormChange(e) {
@@ -323,7 +318,10 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
               <div className="modal-message">
                 <h3 data-testid="card-title" className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Manage Card</h3>
                 <div className="text-left">
-                  <h6 data-testid="card-name">{formatCardName(card.cardId)}</h6>
+                  <h6 data-testid="card-name">{formatCardName(card.cardId, activity?.name)}</h6>
+                  {activity?.name !== 'Quran' && 
+                    <h6 data-testid="card-instructions">Instructions: {formatCardInstructions(formatCardName(card.cardId, activity?.name))}</h6>
+                  }
                   <hr />
                   <div data-testid="card-owner-info" className="my-5">
                     <h6>Owner: {userInfo.firstName} {userInfo.lastName}</h6>

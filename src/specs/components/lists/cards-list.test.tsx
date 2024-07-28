@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { screen, fireEvent, act } from '@testing-library/react'
 import { render } from '../../util';
 import * as React from 'react';
-import { mockActivity, mockStudent, mockUser, mockUserCard } from '../../mocks';
+import { mockActivity, mockCookingActivity, mockLanguageActivity, mockStudent, mockUser, mockUserCard, mockUserLanguageGrammarCard, mockUserLanguageVocabCardOral, mockUserMiscCard } from '../../mocks';
 import { CompletionStatus } from '../../../interfaces/CompletionStatusEnum';
 
 jest.mock('../../../utils/useMounted', () => {
@@ -128,14 +128,15 @@ describe('Cards List', () => {
   
           it('should display pending cards added today', async () => {
             window.location.hash = '';
-            sessionStorage.setItem("user_data", JSON.stringify({...mockUser, activities: activityWithPendingAddedToday}))
-            render(<CardsList {...{isMain: true, userDetails: mockUser, activity: activityWithPendingAddedToday}} />)
+            const updatedActivity = {...mockLanguageActivity, cards: [{...mockUserLanguageGrammarCard, completionStatus: CompletionStatus.PENDING, addedOn: '2/3/2024', cardId: `${btoa('arabic-grammar-conjugate')}`}]}
+            sessionStorage.setItem("user_data", JSON.stringify({...mockUser, activities: updatedActivity}))
+            render(<CardsList {...{isMain: true, userDetails: mockUser, activity: updatedActivity}} />)
             
             const reviewCards = await screen.findByTestId("list-today-cards");
             const reviewCardName = await screen.findByTestId("today-card-name");
             const editBtn = await screen.findByTestId("today-card-edit-btn");
             expect(reviewCards).toBeInTheDocument()
-            expect(reviewCardName).toHaveTextContent('Juz 30')
+            expect(reviewCardName).toHaveTextContent('Arabic grammar: conjugate')
             expect(editBtn).not.toHaveClass('hidden');
 
             await act(async () => {
@@ -240,7 +241,7 @@ describe('Cards List', () => {
           })
   
           it('should display active cards', async () => {
-            const activityWithReviewCards2 = {...mockActivity, cards: [{...mockUserCard, completionStatus: CompletionStatus.REVIEW, cardId: `${btoa('surah-1-name-Faatiha-juz-1')}`}]}
+            const activityWithReviewCards2 = {...mockLanguageActivity, cards: [{...mockUserLanguageVocabCardOral, completionStatus: CompletionStatus.REVIEW, cardId: `${btoa('arabic-vocab-house-oral')}`}]}
             window.location.hash = '#active';
             sessionStorage.setItem("user_data", JSON.stringify({...mockUser, activities: activityWithReviewCards2}))
             render(<CardsList {...{isMain: true, userDetails: mockUser, activity: activityWithReviewCards2}} />)
@@ -250,7 +251,7 @@ describe('Cards List', () => {
             const showBtn = await screen.findByTestId("active-card-show-btn");
 
             expect(reviewCards).toBeInTheDocument();
-            expect(reviewCardName).toHaveTextContent('Surah 1: Faatiha');
+            expect(reviewCardName).toHaveTextContent('Arabic vocab: house (oral)');
             expect(showBtn).not.toHaveClass('hidden');
 
             await act(async () => {
@@ -270,14 +271,15 @@ describe('Cards List', () => {
   
           it('should display pending cards added today', async () => {
             window.location.hash = '#active';
-            sessionStorage.setItem("user_data", JSON.stringify({...mockUser, activities: activityWithPendingAddedToday}))
-            render(<CardsList {...{isMain: true, userDetails: mockUser, activity: activityWithPendingAddedToday}} />)
+            const updatedActivity = {...mockCookingActivity, cards: [{...mockUserMiscCard, completionStatus: CompletionStatus.PENDING, addedOn: '2/3/2024', cardId: `${btoa('misc-card-cook an egg')}`}]}
+            sessionStorage.setItem("user_data", JSON.stringify({...mockUser, activities: updatedActivity}))
+            render(<CardsList {...{isMain: true, userDetails: mockUser, activity: updatedActivity}} />)
             
             const reviewCards = await screen.findByTestId("list-active-cards");
             const reviewCardName = await screen.findByTestId("active-card-name");
             const overrideBtn = await screen.findByTestId("active-card-override-btn");
             expect(reviewCards).toBeInTheDocument()
-            expect(reviewCardName).toHaveTextContent('Juz 30')
+            expect(reviewCardName).toHaveTextContent('Miscellaneous Card: cook an egg')
             expect(overrideBtn).not.toHaveClass('hidden');
 
             await act(async () => {
