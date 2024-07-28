@@ -49,7 +49,7 @@ describe('Manage Card Popup', () => {
       let showModal;
       let onClose = () => {showModal = false};
   
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, addedOn: '1/24/2024'}, action: 'edit'}}} />)
    
       const heading = await screen.findByTestId('card-title')
       const cardName = await screen.findByTestId("card-name") 
@@ -59,7 +59,7 @@ describe('Manage Card Popup', () => {
       expect(cardName).toHaveTextContent('Surah 114: Naas')
       expect(cardOwnerInfo).toHaveTextContent('Owner: mock user')
       expect(cardOwnerInfo).toHaveTextContent('Activity: Quran')
-      expect(cardOwnerInfo).toHaveTextContent(`Created On: ${mockUserCard.addedOn}`)
+      expect(cardOwnerInfo).toHaveTextContent(`Created On: 1/24/2024`)
       expect(cardOwnerInfo).toHaveTextContent(`Last updated: Never`)
       expect(cardOwnerInfo).toHaveTextContent(`Next show date: Never`)
     })

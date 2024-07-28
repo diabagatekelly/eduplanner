@@ -1,6 +1,6 @@
 import { deleteCommand, getCommand, patchCommand, postCommand } from "@/api/service";
 import { IActivity } from "@/interfaces/IActivity";
-import { ICard, ILanguageVocabCards } from "@/interfaces/ICard";
+import { ICard } from "@/interfaces/ICard";
 import { IUser, IUserLogin } from "@/interfaces/IUser";
 
 export const findUser = async (params: {userId: string}) => {
@@ -53,31 +53,6 @@ export const deleteActivity = async (activityDetails: {userId: string, activityN
   const url = process.env.NEXT_DELETE_ACTIVITY_URL
   const params = `${activityDetails.userId}/${activityDetails.activityName}`
   return await deleteCommand(url, params)
-}
-
-// export const getQuranCards = async () => {
-//   const url = process.env.NEXT_BANK_QURAN_GET
-//   return await getCommand(url, {})
-// }
-
-// export const uploadVocabList = async (file: FormData) => {
-//   const url = process.env.NEXT_UPLOAD_VOCAB_CARDS_URL 
-//   return await postCommand(url, file, {
-//     headers: {
-//       'Content-Type': 'multipart/form-data'
-//     }
-//   })
-// }
-
-export const createLanguageVocabCards = async (payload: {
-  userId: string,
-  activity: string,
-  cards: {
-    userCards: ICard[],
-    bankCards: ILanguageVocabCards
-  }}) => {
-  const url = process.env.NEXT_CREATE_LANGUAGE_VOCAB_CARDS_URL
-  return await postCommand(url, payload)
 }
 
 export const createCards = async (cardPayload: {userId: string, activity: string, cards: ICard[]}) => {

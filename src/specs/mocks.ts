@@ -1,5 +1,5 @@
 import { IUser } from "../../src/interfaces/IUser";
-import { ICard, ILanguageVocabOralCard, ILanguageVocabSpellingCard } from "../../src/interfaces/ICard";
+import { ICard } from "../../src/interfaces/ICard";
 import { IActivity } from "../../src/interfaces/IActivity";
 import { CompletionStatus } from "../../src/interfaces/CompletionStatusEnum";
 import { ISODateString } from "../../src/interfaces/isoDateType";
@@ -43,10 +43,21 @@ export const mockActivity: IActivity = {
 }
 
 export const mockLanguageActivity: IActivity = {
-  activityId: btoa('mock.user@email.com-Arabic Language'), // btoa(userEmail-activityName)
+  activityId: btoa('mock.user@email.com-Arabic-Language'), // btoa(userEmail-activityName)
   name: 'Arabic-Language',
   points: 10,
   description: 'Arabic language',
+  completionStatus: CompletionStatus.PENDING,
+  hasCards: true,
+  createdOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
+  lastUpdatedOn: null
+}
+
+export const mockCookingActivity: IActivity = {
+  activityId: btoa('mock.user@email.com-Cooking'), // btoa(userEmail-activityName)
+  name: 'Cooking',
+  points: 3,
+  description: 'practice cooking',
   completionStatus: CompletionStatus.PENDING,
   hasCards: true,
   createdOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
@@ -57,7 +68,7 @@ export const mockUserCard: ICard = {
   cardId: `${btoa('surah-114-name-Naas-juz-30')}`,
   activity: 'Quran',
   activityType: 'Quran',
-  addedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
+  addedOn: null,
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
@@ -68,7 +79,7 @@ export const mockUserLanguageVocabCardOral: ICard = {
   cardId: `${btoa('arabic-vocab-house-oral')}`,
   activity: 'Arabic-Language',
   activityType: 'Vocab',
-  addedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
+  addedOn: null,
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
@@ -79,25 +90,33 @@ export const mockUserLanguageVocabCardSpelling: ICard = {
   cardId: `${btoa('arabic-vocab-house-spelling')}`,
   activity: 'Arabic-Language',
   activityType: 'Vocab',
-  addedOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
+  addedOn: null,
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
   completionStatus: CompletionStatus.INACTIVE
 }
 
-export const mockBankLanguageVocabCardOral: ILanguageVocabOralCard = {
-  cardId: `${btoa('arabic-vocab-house-oral')}`,
-  word: 'house',
-  instructions: 'Recall to / from; use in 3 spoken sentences',
-  type: 'oral'
+export const mockUserLanguageGrammarCard: ICard = {
+  cardId: `${btoa('arabic-grammar-house')}`,
+  activity: 'Arabic-Language',
+  activityType: 'Grammar',
+  addedOn: null,
+  lastUpdatedOn: null,
+  nextShowDate: null,
+  stage: '0',
+  completionStatus: CompletionStatus.INACTIVE
 }
 
-export const mockBankLanguageVocabCardSpelling: ILanguageVocabSpellingCard = {
-  cardId: `${btoa('arabic-vocab-house-spelling')}`,
-  word: 'house',
-  instructions: 'Write in target language; use in 3 written sentences',
-  type: 'spelling'
+export const mockUserMiscCard: ICard = {
+  cardId: `${btoa('misc-card-cook an egg')}`,
+  activity: 'Cooking',
+  activityType: 'Miscellaneous',
+  addedOn: null,
+  lastUpdatedOn: null,
+  nextShowDate: null,
+  stage: '0',
+  completionStatus: CompletionStatus.INACTIVE
 }
 
 export const mockBankSurahCard: IQuranSurahCard = {

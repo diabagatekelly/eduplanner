@@ -44,4 +44,3 @@ export interface ILanguageVocabSpellingCard {
   type: 'spelling'
 }
 
-export type ILanguageVocabCards = (ILanguageVocabOralCard|ILanguageVocabSpellingCard)[]
