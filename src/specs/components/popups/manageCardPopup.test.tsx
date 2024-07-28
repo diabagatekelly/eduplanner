@@ -11,7 +11,7 @@ import {
   requestCardReview,
   resetCardStage
 } from '../../../api/controller';
-import { mockUser, mockStudent, mockActivity, mockUserCard } from '../../../specs/mocks';
+import { mockUser, mockStudent, mockActivity, mockUserCard, mockLanguageActivity, mockUserLanguageVocabCardSpelling } from '../../../specs/mocks';
 import { CompletionStatus } from '../../../interfaces/CompletionStatusEnum';
 
 jest.mock('../../../api/controller');
@@ -54,6 +54,7 @@ describe('Manage Card Popup', () => {
       const heading = await screen.findByTestId('card-title')
       const cardName = await screen.findByTestId("card-name") 
       const cardOwnerInfo = await screen.findByTestId('card-owner-info')
+      const cardInstructions = await screen.queryByTestId('card-instructions')
       
       expect(heading).toHaveTextContent('Manage Card')
       expect(cardName).toHaveTextContent('Surah 114: Naas')
@@ -62,6 +63,7 @@ describe('Manage Card Popup', () => {
       expect(cardOwnerInfo).toHaveTextContent(`Created On: 1/24/2024`)
       expect(cardOwnerInfo).toHaveTextContent(`Last updated: Never`)
       expect(cardOwnerInfo).toHaveTextContent(`Next show date: Never`)
+      expect(cardInstructions).not.toBeInTheDocument()
     })
 
     it('should invoke resetCardStage controller when form is submitted', async () => {
@@ -201,11 +203,13 @@ describe('Manage Card Popup', () => {
       let showModal;
       let onClose = () => {showModal = false};
   
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockLanguageActivity, item: {card: mockUserLanguageVocabCardSpelling, action: 'edit'}}} />)
    
       const cardOwnerInfo = await screen.findByTestId('card-owner-info')
+      const cardInstructions = await screen.findByTestId('card-instructions')
       
       expect(cardOwnerInfo).toHaveTextContent('Owner: mock student')
+      expect(cardInstructions).toHaveTextContent('Instructions: 1. Write in target language; 2. use in 3 written sentences')
     })
 
     it('should invoke requestCardReview controller when form is submitted', async () => {
