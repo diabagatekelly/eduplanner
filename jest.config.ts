@@ -34,6 +34,14 @@ const config: Config = {
     '!**/vendor/**',
     '!**/specs/**',
   ],
+  coverageThreshold: {
+    global: {
+      branches: 100,
+      functions: 100,
+      lines: 100,
+      statements: 100,
+    },
+  },
 
   // The directory where Jest should output its coverage files
   coverageDirectory: "../coverage",
