@@ -24,6 +24,7 @@ export default function DeleteActivityPopup({onClose, showModal, ...childArgs}: 
       const activityData = { userId: userInfo.userId, activityName }
       await deleteActivity(activityData)
       onDeleteActivitySuccess()
+      window.location.reload()
 
     } catch (error) {
       console.log(error)
