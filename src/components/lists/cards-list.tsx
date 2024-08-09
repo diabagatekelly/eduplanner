@@ -29,7 +29,12 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
     const cards: any[] | ICard = extractedActivity.cards || []
 
     if (cards.length) {
+      //if (cards[0].activity === 'Quran') {
+        //sortQuranCards(cards)
+      //}
       cards.map(card => {
+        // console.log(atob(card.cardId).split('-'))
+        // const cardType = atob(card.cardId).split('-')[0]
         let num = `${atob(card.cardId).split('-')[1]}`
         if (num.length === 1) {
           card.number = `00${num}`
@@ -41,6 +46,7 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
       });
       cards.sort((a, b) => a.number - b.number);
       cards.map((card) => delete card.number);
+      
     }
 
     const todayCards = cards?.filter((card) => {
@@ -67,6 +73,23 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
     }
 
   }, [userDetails, childArgs?.activity, mounted])
+
+  // function sortQuranCards(cards) {
+  //   cards.map(card => {
+  //     console.log(atob(card.cardId).split('-'))
+  //     const cardType = atob(card.cardId).split('-')[0]
+  //     let num = `${atob(card.cardId).split('-')[1]}`
+  //     if (num.length === 1) {
+  //       card.number = `00${num}`
+  //     } else if (num.length === 2) {
+  //       card.number = `0${num}`
+  //     } else {
+  //       card.number = `${num}`
+  //     }
+  //   });
+  //   cards.sort((a, b) => a.number - b.number);
+  //   cards.map((card) => delete card.number);
+  // }
 
 
   function deleteCard(card: ICard) {
@@ -109,12 +132,12 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
     <>
       {hash === '' && 
         <>
-          <h3 className="today-page-title mb-2 text-2xl font-bold">Cards of the Day</h3>
-          <ul>
+          <h3 className="today-page-title component-heading">Cards of the Day</h3>
+          <ul className="py-3">
             {!cardsOfTheDay.length ? <p data-testid="no-cards-msg">You have no cards to review today.</p> :
             cardsOfTheDay?.length &&            
             cardsOfTheDay?.map((card) => (
-              <li data-testid="list-today-cards" style={{ borderColor: getBorderColor(card) }} className="flex justify-between border-4 mb-3 px-3 py-1" key={card.cardId}>
+              <li data-testid="list-today-cards" style={{ borderColor: getBorderColor(card) }} className="list-item-card" key={card.cardId}>
                 <p data-testid="today-card-name">{formatCardName(card.cardId, childArgs?.activity?.name)}</p>
                 <div className="flex">
                   <span data-testid="today-card-show-btn" className="hover:cursor-pointer mx-2" onClick={() => showCard(card)}>
@@ -142,12 +165,12 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
 
       {hash === '#active' &&
         <>
-          <h3 className="mb-2 text-2xl font-bold">Active Cards</h3>
-          <ul id="active">
+          <h3 className="component-heading">Active Cards</h3>
+          <ul className="py-3" id="active">
             {!allActiveCards.length ?  <p data-testid="no-cards-msg">You have no active cards.</p> :
             allActiveCards?.length &&            
             allActiveCards?.map((card) => (
-              <li data-testid="list-active-cards" style={{ borderColor: getBorderColor(card) }} className="flex justify-between border-4 mb-3 px-3 py-1" key={card.cardId}>
+              <li data-testid="list-active-cards" style={{ borderColor: getBorderColor(card) }} className="list-item-card" key={card.cardId}>
                 <p data-testid="active-card-name">{formatCardName(card.cardId, childArgs?.activity?.name)}</p>
                 <div className="flex">
                   <span data-testid="active-card-show-btn" className="hover:cursor-pointer mx-2" onClick={() => showCard(card)}>
@@ -175,12 +198,12 @@ export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: 
 
       {hash === '#inactive' &&
         <>
-          <h3 className="mb-2 text-2xl font-bold">Inactive Cards</h3>
-          <ul>
+          <h3 className="component-heading">Inactive Cards</h3>
+          <ul className="py-3">
             {!allInactiveCards.length ?  <p data-testid="no-cards-msg">You have no inactive cards.</p> :
             allInactiveCards?.length &&            
             allInactiveCards?.map((card) => (
-              <li style={{ borderColor: getBorderColor(card) }} data-testid="list-inactive-cards" className="flex justify-between border-4 mb-3" key={card.cardId}>
+              <li style={{ borderColor: getBorderColor(card) }} data-testid="list-inactive-cards" className="list-item-card" key={card.cardId}>
                 <p data-testid="inactive-card-name">{formatCardName(card.cardId, childArgs?.activity?.name)}</p>
                 <div className="flex">
                   <span data-testid="inactive-card-show-btn" className="hover:cursor-pointer mx-2" onClick={() => showCard(card)}>

@@ -49,11 +49,12 @@ export default function ActivitiesList({isMain, userDetails}: {isMain: boolean, 
 
   return (
     <>
-    <div data-testid="activities-list">
       {activitiesList?.length ?
-        <ul>
+      <>
+        <h3 className="component-sub-title">Current activities:</h3>
+        <ul data-testid="activities-list" className="py-3">
           {activitiesList?.map((activity) => (
-            <li style={{ borderColor: getBorderColor(activity) }} className="flex justify-between border-4 mb-3 px-3 py-1" key={activity?.name}>
+            <li style={{ borderColor: getBorderColor(activity) }} className="list-item-card" key={activity?.name}>
               <p data-testid="activity-in-list" className="hover:cursor-pointer" onClick={() => fetchActivity(activity?.name)}>{fromDbFormat(activity?.name)}</p>
               <span data-testid="delete-activities-in-list" onClick={() => deleteActivity(activity?.name)}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -62,10 +63,12 @@ export default function ActivitiesList({isMain, userDetails}: {isMain: boolean, 
               </span>
             </li>
           ))}
-        </ul> :
+        </ul> 
+      </>
+        :
         <p data-testid="no-activities-message">You have no activities yet.</p>
       }
-    </div>
+
       <Popup {...{ showModal, modalType, isMain, user: popupUserDetails, item: popupItem }} onClose={() => setShowModal(false)} />
     </>
   )

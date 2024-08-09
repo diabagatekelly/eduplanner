@@ -38,7 +38,7 @@ describe('Add activity', () => {
     const heading = await screen.findByRole('heading', { level: 3 })
     const addActivityForm = await screen.findByTestId('add-activity-form')
  
-    expect(heading).toHaveTextContent('Add a new activity')
+    expect(heading).toHaveTextContent('Add a new activity:')
     expect(addActivityForm).toBeInTheDocument()
   })
 

@@ -104,7 +104,7 @@ export default function AddStudent<IAddStudent>({ user }: {user: IUser}) {
 
   return (
     <div className="justify-items-start">
-      <h3 className="text-3xl py-3 font-bold">Add a new student:</h3>
+      <h3 className="component-sub-title">Add a new student:</h3>
       <p>Enter your student&#39;s email:</p>
       <SearchUserForm {...{ handleInput, formData, isLoading, submitForm }} />
       <Popup {...{ showModal, modalType, user, newStudent}} onClose={() => setShowModal(false)} />

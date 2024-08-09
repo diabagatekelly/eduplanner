@@ -20,7 +20,7 @@ describe('Register user', () => {
       cy.contains('Create an account').should('exist')
       cy.register(user)
       cy.wait(100)
-      cy.contains(`Welcome to your dashboard ${mockUser.firstName} ${mockUser.lastName}.`)
+      cy.contains(`Welcome ${mockUser.firstName} ${mockUser.lastName}!`)
       cy.url().should('include', `${mockUser.username}`) 
     })
   

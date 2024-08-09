@@ -119,7 +119,7 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
 
   return (
     <div className="justify-items-start">
-      <h3 className="text-3xl py-3 font-bold">Add a new activity</h3>
+      <h3 className="component-sub-title">Add a new activity:</h3>
       <div>
         <h6 className="text-1xl py-3 font-bold">Instructions on naming activity:</h6>
         <p><span className="font-bold">For Quran: </span>Quran</p>

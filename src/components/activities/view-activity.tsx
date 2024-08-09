@@ -121,7 +121,10 @@ export default function ViewActivity<IViewActivity>({ userDetails, userActivity,
   
   return (
     <>
-      <h3 className="text-3xl py-3 font-bold" data-testid="activity-name">{fromDbFormat(userActivity?.name)} - {userDetails?.firstName} {userDetails?.lastName}</h3>
+      <div data-testid="activity-name">
+        <h3 className="component-title">{fromDbFormat(userActivity?.name)}</h3>
+        <h3 className="component-heading">{userDetails?.firstName} {userDetails?.lastName}</h3>
+      </div>
       <div data-testid="activity-details">
         <p>Description: {userActivity?.description}</p>
         <p>Points: {userActivity?.points} points</p>

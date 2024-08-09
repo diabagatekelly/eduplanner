@@ -35,11 +35,9 @@ describe('Dashboard', () => {
     
     const h3 = await screen.findByTestId("dashboard-header");
     const addActivityForm = await screen.findByTestId("add-activity-form")
-    const activitiesList = await screen.findByTestId("activities-list")
     
     expect(h3).toHaveTextContent('Manage student mock user.')
     expect(addActivityForm).toBeInTheDocument();
-    expect(activitiesList).toBeInTheDocument()
   })
 
   it('should show main teacher info', async () => {
@@ -48,11 +46,9 @@ describe('Dashboard', () => {
   
     const h3 = await screen.findByTestId("dashboard-header");
     const addActivityForm = await screen.findByTestId("add-activity-form")
-    const activitiesList = await screen.findByTestId("activities-list")
     
-    expect(h3).toHaveTextContent('Welcome to your dashboard mock user.')
+    expect(h3).toHaveTextContent('Welcome mock user!')
     expect(addActivityForm).toBeInTheDocument();
-    expect(activitiesList).toBeInTheDocument()
   })
 
   it('should show instructions for main student with teacher', async () => {
@@ -62,11 +58,11 @@ describe('Dashboard', () => {
     const h3 = await screen.findByTestId("dashboard-header");
     const studentInstructions = await screen.findByTestId("student-instructions");
     const addActivityForm = await screen.queryAllByTestId("add-activity-form")
-    const activitiesList = await screen.findByTestId("activities-list")
+    const activitiesList = await screen.queryByTestId("activities-list")
     
-    expect(h3).toHaveTextContent('Welcome to your dashboard mock user.')
-    expect(studentInstructions).toHaveTextContent("Your teacher's email is my-teacher@email.com.")
-    expect(activitiesList).toBeInTheDocument()
+    expect(h3).toHaveTextContent('Welcome mock user!')
+    expect(studentInstructions).toHaveTextContent("Your teacher's email is my-teacher@email.com")
+    expect(activitiesList).not.toBeInTheDocument()
     expect(addActivityForm.length).toBe(0)
   })
 
@@ -77,11 +73,11 @@ describe('Dashboard', () => {
     const h3 = await screen.findByTestId("dashboard-header");
     const studentInstructions = await screen.findByTestId("student-instructions");
     const addActivityForm = await screen.queryAllByTestId("add-activity-form")
-    const activitiesList = await screen.findByTestId("activities-list")
+    const activitiesList = await screen.queryByTestId("activities-list")
     
-    expect(h3).toHaveTextContent('Welcome to your dashboard mock user.')
+    expect(h3).toHaveTextContent('Welcome mock user!')
     expect(studentInstructions).toHaveTextContent("Ask your teacher or parent to add you and create some activities for you!")
-    expect(activitiesList).toBeInTheDocument()
+    expect(activitiesList).not.toBeInTheDocument()
     expect(addActivityForm.length).toBe(0)
   })
 

@@ -20,7 +20,7 @@ describe('Login User', () => {
     it('should login user', () => {
       cy.login({email: user.email, password: user.password})
       cy.wait(100)
-      cy.contains(`Welcome to your dashboard ${mockUser.firstName} ${mockUser.lastName}.`)
+      cy.contains(`Welcome ${mockUser.firstName} ${mockUser.lastName}!`)
       cy.url().should('include', `${mockUser.username}`) 
     })
 
@@ -79,7 +79,7 @@ describe('Login User', () => {
     })
 
     it('should redirect to login page when session is cleared', () => {
-      cy.contains(`Welcome to your dashboard ${mockUser.firstName} ${mockUser.lastName}.`)
+      cy.contains(`Welcome ${mockUser.firstName} ${mockUser.lastName}!`)
       cy.url().should('include', `${mockUser.username}`) 
       cy.window().its('store').invoke('getState').should('deep.equal', {
         authReducer: {isAuthenticated: true},

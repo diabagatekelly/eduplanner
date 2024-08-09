@@ -16,21 +16,21 @@ export default function AddCard({ isMain, userDetails, activity } : {isMain: boo
         {
           pathname.includes('/activities/Quran') && 
           <>
-            <h3 className="text-3xl py-3 font-bold">Add New Quran Cards:</h3>
+            <h3 className="component-heading">Add New Quran Cards:</h3>
             <AddQuranCardForm {...{isMain, user: userDetails, activity}}/>
           </>
         }
         {
           pathname.includes('Language') &&
           <>
-            <h3 className="text-3xl py-3 font-bold">Add New Language Cards:</h3>
+            <h3 className="component-heading">Add New Language Cards:</h3>
             <AddLanguageCardForm {...{isMain, user: userDetails, activity}} />
           </>
         }
         {
           !pathname.includes('/activities/Quran') && !pathname.includes('Language') &&
           <>
-            <h3 className="text-3xl py-3 font-bold">Add New Cards:</h3>
+            <h3 className="component-heading">Add New Cards:</h3>
             <AddMiscCardForm {...{isMain, user: userDetails, activity}} />
           </>
         }

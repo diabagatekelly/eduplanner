@@ -85,10 +85,10 @@ export default function StudentsList({userDetails}: {userDetails: IUser}) {
   return (
     <>
       {studentIdsList?.length ?
-      <div>
-        <ul>
+      <>
+        <ul className="py-3">
           {studentIdsList?.map(([userId, username]) => (
-            <li data-testid="students-list" style={{ borderColor: getBorderColor({completionStatus: null}) }} className="flex justify-between border-2 mb-3 px-3 py-1" key={userId}>
+            <li data-testid="students-list" style={{ borderColor: getBorderColor({completionStatus: null}) }} className="list-item-card" key={userId}>
               <p data-testid="students-email" className="hover:cursor-pointer" onClick={() => fetchStudent(userId)}>{username?.split('-').join(' ')}</p>
               <span data-testid="student-list-delete" onClick={() => deleteStudent(userId, username)}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -99,9 +99,9 @@ export default function StudentsList({userDetails}: {userDetails: IUser}) {
           ))}
         </ul> 
         <p>{errorMessage}</p>
-      </div>
+      </>
         :
-        <p data-testid="no-students-message">You have no students yet.</p>
+      <p data-testid="no-students-message">You have no students yet.</p>
       }
       <Popup {...{ showModal, modalType, user: popupUserDetails }} onClose={() => setShowModal(false)} />
       

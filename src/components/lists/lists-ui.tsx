@@ -9,10 +9,11 @@ export default function ListUi({ listType, isMain, userDetails, ...childArgs }: 
 
   return (
     <>
-      {listType === 'students' && <StudentsList {...{userDetails}}/>}
-      {listType === 'activities' && <ActivitiesList {...{isMain, userDetails}} />}
-      {listType === 'cards' && <CardsList {...{isMain, userDetails, ...childArgs}} />}
-    
+      <div className={`${listType}-list`}>
+        {listType === 'students' && <StudentsList {...{userDetails}}/>}
+        {listType === 'activities' && <ActivitiesList {...{isMain, userDetails}} />}
+        {listType === 'cards' && <CardsList {...{isMain, userDetails, ...childArgs}} />}
+      </div>
       <div className="status-color-legend my-20">
         <p><span className="bg-green-500 border border-green-500 mr-2 w-20 h-3 inline-block"></span>COMPLETED</p>
         <p><span className="bg-orange-300 border border-orange-300 mr-2 w-20 h-3 inline-block"></span>PENDING</p>

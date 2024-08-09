@@ -332,7 +332,7 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                   </div>
                   <hr />
                   <div data-testid="card-stage-management" className="my-5">
-                    <h6 className="mb-2">Current Status: {card.completionStatus}</h6>
+                    <h6 className="mb-2">Current status: {card.completionStatus}</h6>
                     {childArgs?.item.action === 'override' ? 
                       <form className="max-w-md mx-auto" onChange={handleOverrideFormChange}>
                         <label htmlFor="countries" className="block mb-2 text-md font-small text-gray-900 dark:text-white">Override current stage: <b>{card.stage}</b></label>
