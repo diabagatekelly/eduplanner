@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-white`}>
+      <body className={`${inter.className}`}>
         <Provider store={store}>
           <Reloader />
           <div className="py-20 px-5">
