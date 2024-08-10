@@ -58,7 +58,7 @@ export default function LinkAccountPopup({onClose, showModal, ...childArgs}: {on
   
   return (
     <>
-      <div data-testid="link-account-popup" hidden={!showModal} id="popup-modal" className="fixed top-1/2 left-1/2 right-1/2 z-50 overflow-x-hidden overflow-y-auto md:inset-0 max-h-full border-4 border-gray-800 rounded-lg">
+      <div data-testid="link-account-popup" hidden={!showModal} id="popup-modal" className="popup-styling">
         <div className="relative w-full max-w-md max-h-full">
           <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
             <button data-testid="close-link-account-popup" onClick={onClose} type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="popup-modal">
