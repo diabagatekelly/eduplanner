@@ -74,7 +74,7 @@ describe('View activity', () => {
         const button = await screen.findByTestId('activity-update-btn');
   
         expect(button).not.toBeDisabled()
-        expect(button).toHaveClass(' bg-green-600')
+        expect(button).toHaveClass('green-btn')
         expect(button).toHaveTextContent('Mark completed')
       })
   
@@ -85,7 +85,7 @@ describe('View activity', () => {
         const button = await screen.findByTestId('activity-update-btn');
   
         expect(button).toBeDisabled()
-        expect(button).toHaveClass(' bg-gray-600')
+        expect(button).toHaveClass('disabled-btn')
         expect(button).toHaveTextContent('Already completed')
       })
     })
@@ -223,7 +223,7 @@ describe('View activity', () => {
         const button = await screen.findByTestId('activity-update-btn');
   
         expect(button).not.toBeDisabled()
-        expect(button).toHaveClass(' bg-green-600')
+        expect(button).toHaveClass('green-btn')
         expect(button).toHaveTextContent('Request review')
       })
   
@@ -234,7 +234,7 @@ describe('View activity', () => {
         const button = await screen.findByTestId('activity-update-btn');
   
         expect(button).toBeDisabled()
-        expect(button).toHaveClass(' bg-gray-600')
+        expect(button).toHaveClass('disabled-btn')
         expect(button).toHaveTextContent('Already completed')
       })
     })
