@@ -39,7 +39,7 @@ body {
   }
 
   .popup-styling {
-    @apply fixed top-0 [@media(max-height:500px)]:top-[0] md:top-[5%] max-[650px]:left-[15%] max-md:left-1/3 lg:left-1/3 max-[667px]:w-3/4 md:w-full max-w-md max-h-full [@media(max-height:550px)]:max-h-[80%] border-4 border-gray-800 rounded-lg overflow-y-auto
+    @apply fixed top-0 [@media(max-height:500px)]:top-[0] md:top-[5%] max-[450px]:left-[15%] min-[451px]:left-[25%] min-[667px]:left-[38%] md:left-[25%] lg:left-1/3 max-[479px]:w-[75%] md:w-full max-w-md max-h-full [@media(max-height:550px)]:max-h-[80%] border-4 border-gray-800 rounded-lg overflow-y-auto
   }
 }
 
