@@ -31,7 +31,7 @@ export default function Dashboard({ userDetails, isMain, isTeacher }: { userDeta
               </div>
               <hr />
               <ListUi {...{ listType: 'activities', isMain, userDetails }} />
-              <button onClick={() => window.history.back()}>
+              <button className="default-btn" onClick={() => window.history.back()}>
                 Back
               </button>
             </div>

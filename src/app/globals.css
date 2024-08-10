@@ -35,11 +35,31 @@ body {
   }
 
   .list-item-card {
-    @apply flex justify-between mb-3 p-4 md:p-6 bg-white border-4 rounded-lg shadow dark:bg-gray-800
+    @apply flex justify-between mb-3 p-2 md:p-4 bg-white border-4 rounded-lg shadow dark:bg-gray-800
   }
 
   .popup-styling {
     @apply fixed top-0 [@media(max-height:500px)]:top-[0] md:top-[5%] max-[450px]:left-[15%] min-[451px]:left-[25%] min-[667px]:left-[38%] md:left-[25%] lg:left-1/3 max-[479px]:w-[75%] md:w-full max-w-md max-h-full [@media(max-height:550px)]:max-h-[80%] border-4 border-gray-800 rounded-lg overflow-y-auto
+  }
+
+  .default-btn {
+    @apply my-3 md:my-5 rounded-md bg-indigo-600 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
+  }
+
+  .red-btn {
+    @apply my-3 md:my-5 rounded-md bg-red-600 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600
+  }
+
+  .green-btn {
+    @apply my-3 md:my-5 rounded-md bg-green-600 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600
+  }
+
+  .disabled-btn {
+    @apply my-3 md:my-5 rounded-md bg-gray-500 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600
+  }
+
+  .neutral-btn {
+    @apply my-3 md:my-5 rounded-md bg-white px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-gray-800 shadow-sm border border-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800 hover:outline hover:outline-2 hover:outline-gray-800
   }
 }
 

@@ -287,11 +287,11 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
 
           <div className="block mt-5">
             <button data-testid="add-upload-cards-val-button" onClick={validateInput} disabled={isLoading || (isMain && user.accountType === 'student')} 
-              className={"inline-block mr-5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}>
-              Validate Uploaded List
+              className="inline-block mr-5 default-btn">
+                Validate Uploaded List
             </button>
             <button data-testid="add-upload-cards-submit-button" type="submit" onClick={submitForm} disabled={isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no'} 
-              className={`inline-block rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no' ? "bg-gray-600 focus-visible:outline-gray-600" : "bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"}`}>
+              className={`inline-block ${isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no' ? "disabled-btn" : "default-btn"}`}>
               Create Cards
             </button>
           </div>
@@ -330,11 +330,11 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
           <textarea data-testid="textarea-for-typed-list" className="border border-gray-500 p-3" onChange={onTextareaChange} id="typed" name="typed" rows={4} cols={50}></textarea>
           <div className="mt-5">
             <button data-testid="add-type-cards-validate-button" onClick={validateInput} disabled={isLoading || (isMain && user.accountType === 'student')} 
-              className={"inline-block mr-5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}>
+              className={"inline-block mr-5 default-btn"}>
               Validate Typed List
             </button>
             <button data-testid="add-type-cards-submit-button" type="submit" onClick={submitForm} disabled={isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no'} 
-              className={`inline-block rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no' ? "bg-gray-600 focus-visible:outline-gray-600" : "bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"}`}>
+              className={`inline-block ${isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no' ? "disabled-btn" : "default-btn"}`}>
               Create Cards
             </button>
           </div>

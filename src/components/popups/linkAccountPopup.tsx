@@ -76,10 +76,10 @@ export default function LinkAccountPopup({onClose, showModal, ...childArgs}: {on
                 <h5 className="mb-5"><span>{studentInfo?.firstName} {studentInfo?.lastName} - {studentInfo?.email} </span></h5>
               </div>
 
-              <button data-testid="link-accounts-btn" onClick={addStudent} data-modal-hide="popup-modal" type="button" className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+              <button data-testid="link-accounts-btn" onClick={addStudent} data-modal-hide="popup-modal" type="button" className="green-btn mr-2">
                 Yes, I&#39;m sure
               </button>
-              <button onClick={onClose} data-modal-hide="popup-modal" type="button" className="text-white-500 bg-red hover:bg-red-100 focus:ring-4 focus:outline-none focus:ring-red-200 rounded-lg border border-red-200 text-sm font-medium px-5 py-2.5 hover:text-red-900 focus:z-10 dark:bg-red-700 dark:text-white-300 dark:border-red-500 dark:hover:text-black dark:hover:bg-gray-600 dark:focus:ring-red-600">No, cancel</button>
+              <button onClick={onClose} data-modal-hide="popup-modal" type="button" className="neutral-btn">No, cancel</button>
               <p data-testid="add-student-outcome-message">{outcomeMessage}</p>
             </div>
           </div>

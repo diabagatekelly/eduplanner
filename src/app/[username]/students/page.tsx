@@ -31,7 +31,7 @@ export default function Students() {
           <ListUi {...{ listType: 'students', isMain, userDetails }} />
         </div>
       </div>
-      <button onClick={() => router.push(`/${user.username}`)}>
+      <button className="default-btn" onClick={() => router.push(`/${user.username}`)}>
         Back
       </button>
     </NestedLayout>

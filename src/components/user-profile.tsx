@@ -16,7 +16,7 @@ export default function UserProfile({user}: {user: IUser}) {
   }
   
   return (
-    <div className="flex flex-col px-3">
+    <div className="flex flex-col">
       <div className="justify-items-start">
         <h2 className="component-title">Personal Info</h2>
         <div data-testid="profile-info" className="personal-info mt-5 mb-3">

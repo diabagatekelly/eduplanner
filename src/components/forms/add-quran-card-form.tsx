@@ -219,7 +219,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({isMain, user, activ
         </fieldset>
         <div>
           <button data-testid="add-cards-submit-button" type="submit" disabled={isLoading || (isMain && user.accountType === 'student')} 
-            className={"mt-5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"}>
+            className={"default-btn"}>
             Submit Cards
           </button>
         </div>

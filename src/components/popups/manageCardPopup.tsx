@@ -361,7 +361,7 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                       onClick={overrideStage} 
                       data-modal-hide="popup-modal" 
                       type="submit" 
-                      className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                      className="green-btn mr-2">
                         Override Stage
                     </button>
                   </div>
@@ -373,7 +373,7 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                       onClick={removeCard} 
                       data-modal-hide="popup-modal" 
                       type="button" 
-                      className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                      className="green-btn mr-2">
                         Delete card
                     </button>
                   </div>
@@ -385,7 +385,7 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                       onClick={activate} 
                       data-modal-hide="popup-modal" 
                       type="button" 
-                      className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                      className="green-btn mr-2">
                         Activate card
                     </button>
                   </div>
@@ -398,7 +398,7 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                       onClick={resetStage} 
                       data-modal-hide="popup-modal" 
                       type="button" 
-                      className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                      className="green-btn mr-2">
                         Reset Stage
                     </button>
                     <button 
@@ -407,7 +407,7 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                       onClick={async () => await submitEditStage(true)} 
                       data-modal-hide="popup-modal" 
                       type="button" 
-                      className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                      className="green-btn mr-2">
                         Promote
                     </button>
 
@@ -417,7 +417,7 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                       onClick={async () => await submitEditStage(false)} 
                       data-modal-hide="popup-modal" 
                       type="button" 
-                      className="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                      className="green-btn mr-2">
                         Demote
                     </button>
                   </div>
@@ -431,16 +431,16 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                       data-testid="submit-review-btn"
                       data-modal-hide="popup-modal" 
                       type="button" 
-                      className={[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(card.completionStatus) ? 'text-white focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2 bg-gray-400' : 
-                      'text-white focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2 bg-green-600 hover:bg-green-800'}>
-                        Submit for Review
+                      className={[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(card.completionStatus) ? 'disabled-btn mr-2' : 
+                      'green-btn'}>
+                        {[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(card.completionStatus) ? 'Already submitted for review' : 'Submit for review'}
                     </button>
                   </div>
                 }
                 
               </div>
               <div className="mt-5">
-                <button onClick={onClose} data-modal-hide="popup-modal" type="button" className="text-white-500 bg-red hover:bg-red-100 focus:ring-4 focus:outline-none focus:ring-red-200 rounded-lg border border-red-200 text-sm font-medium px-5 py-2.5 hover:text-red-900 focus:z-10 dark:bg-red-700 dark:text-white-300 dark:border-red-500 dark:hover:text-black dark:hover:bg-gray-600 dark:focus:ring-red-600">Cancel</button>
+                <button onClick={onClose} data-modal-hide="popup-modal" type="button" className="neutral-btn">Cancel</button>
               </div>
               <p data-testid="status-message">{statusMessage}</p>
             </div>

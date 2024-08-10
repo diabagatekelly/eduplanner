@@ -31,8 +31,8 @@ export default function Profile() {
       <button
         onClick={() => setShowModal(true)}
         id="delete-button"
-        className="flex w-auto justify-center rounded-md bg-red-600 px-3 mx-1 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-        Delete Account
+        className="red-btn">
+          Delete Account
       </button>
       <Popup {...{ showModal, modalType, isMain, user }} onClose={() => setShowModal(false)} />
     </NestedLayout>

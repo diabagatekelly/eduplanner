@@ -54,7 +54,7 @@ export default function RegisterForm({
         </fieldset>
 
         <div>
-          <button type="submit" disabled={isLoading} className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{isLoading ? 'Loading...' : 'Create Account'}</button>
+          <button type="submit" disabled={isLoading} className="flex w-full justify-center default-btn">{isLoading ? 'Loading...' : 'Create Account'}</button>
         </div>
       </form>
     </>
