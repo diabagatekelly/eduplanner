@@ -21,11 +21,10 @@ describe('Validate Popup', () => {
   it('should validate and close when button in clicked as expected', async () => {
     let showModal;
     const onClose = jest.fn().mockImplementation(() => showModal = false);
-    const determineShouldProceed = jest.fn().mockImplementation((args) => args);
-    const setFormSubmitOutcomeMessage = jest.fn().mockImplementation(() => 'Successful validation, now you can create your cards.')
-    const setFinalCardList = jest.fn().mockImplementation(() => 'man, cat, dog')
+    const setFormSubmitOutcomeMessage = jest.fn().mockImplementation(() => '')
+    const submitList = jest.fn().mockImplementation(() => null)
     
-    const childArgs = {item: {list: 'man, cat, dog'}, determineShouldProceed, setFormSubmitOutcomeMessage, setFinalCardList}
+    const childArgs = {item: {list: 'man, cat, dog'}, setFormSubmitOutcomeMessage, submitList}
     render(<ValidatePopup {...{onClose, showModal: true, ...childArgs}} />)
   
     const submitYesButton = screen.getByTestId('validate-btn')
@@ -34,9 +33,8 @@ describe('Validate Popup', () => {
       await fireEvent.click(submitYesButton)
     })
 
-    expect(determineShouldProceed).toHaveBeenCalledWith('yes')
-    expect(setFormSubmitOutcomeMessage).toHaveBeenCalledWith('Successful validation, now you can create your cards.')
-    expect(setFinalCardList).toHaveBeenCalledWith('man, cat, dog')
+    expect(submitList).toHaveBeenCalledWith('man, cat, dog')
+    expect(setFormSubmitOutcomeMessage).not.toHaveBeenCalled()
     expect(onClose).toHaveBeenCalled()
   })
 })

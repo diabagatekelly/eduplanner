@@ -205,7 +205,6 @@ describe('Add language card form', () => {
         const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
         const textArea = await screen.findByTestId("textarea-for-typed-list") as HTMLTextAreaElement;
         const validateTypeBoxBtn = await screen.findByTestId("add-type-cards-validate-button");
-        const createCardBtn = await screen.findByTestId('add-type-cards-submit-button');
         
         // Switch 1st dropdown to Grammar card
         await act(async () => {
@@ -221,10 +220,6 @@ describe('Add language card form', () => {
   
         await act(async () => {
           await fireEvent.click(popupYesBtn)
-        })
-  
-        await act(async () => {
-          await fireEvent.click(createCardBtn)
         })
 
         const expectedCardsPayload = [
@@ -328,12 +323,15 @@ describe('Add language card form', () => {
     })
 
     it('should open popup with uploaded vocab list', async () => {
-      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
+      render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockLanguageActivity}} />);
+
+      (createCards as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({status: 200, data: {message: 'Cards added', details: [{...mockUserLanguageVocabCard}]}})
+      });
     
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
       const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
       const validateUploadBtn = await screen.findByTestId("add-upload-cards-val-button");
-      const outcomeMsg = await screen.findByTestId('outcome-message')
 
       await expect(screen.queryByTestId('validate-popup')).toBeNull()
       
@@ -373,8 +371,6 @@ describe('Add language card form', () => {
       })
 
       await expect(screen.queryByTestId('validate-popup')).toHaveAttribute('hidden')
-      expect(outcomeMsg).toHaveTextContent('Successful validation, now you can create your cards.')
-
     })
 
     it('should remove uploaded file as expected', async () => {
@@ -424,7 +420,7 @@ describe('Add language card form', () => {
       expect(outcomeMsg).toHaveTextContent('Oops, you are trying to validate an empty list')
     })
 
-    it('should allow uploaded of non-text file', async () => {
+    it('should not allow upload of non-text file', async () => {
       render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
     
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
@@ -479,7 +475,6 @@ describe('Add language card form', () => {
         const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
         const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
         const validateUploadBtn = await screen.findByTestId("add-upload-cards-val-button");
-        const createCardBtn = await screen.findByTestId('add-type-cards-submit-button')
   
         // Switch 1st dropdown to Vocab card
         await act(async () => {
@@ -510,10 +505,6 @@ describe('Add language card form', () => {
           await fireEvent.click(popupYesBtn)
         })
   
-        await act(async () => {
-          await fireEvent.click(createCardBtn)
-        })
-  
         expect(createCards).toHaveBeenCalledWith(expectedControllerPayload)
       })
     })
@@ -533,7 +524,6 @@ describe('Add language card form', () => {
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
       const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
       const validateUploadBtn = await screen.findByTestId("add-upload-cards-val-button");
-      const createCardBtn = await screen.findByTestId('add-type-cards-submit-button')
 
       // Switch 1st dropdown to Vocab card
       await act(async () => {
@@ -562,10 +552,6 @@ describe('Add language card form', () => {
 
       await act(async () => {
         await fireEvent.click(popupYesBtn)
-      })
-
-      await act(async () => {
-        await fireEvent.click(createCardBtn)
       })
       
       const errorMessage = await screen.findByText(/Erroneous response/i)
@@ -583,7 +569,6 @@ describe('Add language card form', () => {
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
       const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
       const validateUploadBtn = await screen.findByTestId("add-upload-cards-val-button");
-      const createCardBtn = await screen.findByTestId('add-type-cards-submit-button')
 
       // Switch 1st dropdown to Vocab card
       await act(async () => {
@@ -612,10 +597,6 @@ describe('Add language card form', () => {
 
       await act(async () => {
         await fireEvent.click(popupYesBtn)
-      })
-
-      await act(async () => {
-        await fireEvent.click(createCardBtn)
       })
 
       const errorMessage = await screen.getByText(/Failed to add cards due to an internal error. Please try again later./i)
@@ -634,7 +615,6 @@ describe('Add language card form', () => {
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
       const uploadFileForm = await screen.findByTestId('upload-form') as HTMLInputElement
       const validateUploadBtn = await screen.findByTestId("add-upload-cards-val-button");
-      const createCardBtn = await screen.findByTestId('add-type-cards-submit-button')
 
       // Switch 1st dropdown to Vocab card
       await act(async () => {
@@ -664,15 +644,10 @@ describe('Add language card form', () => {
       await act(async () => {
         await fireEvent.click(popupYesBtn)
       })
-
-      await act(async () => {
-        await fireEvent.click(createCardBtn)
-      })
   
       const errorMessage = await screen.getByText(/Server is down. Try again later./i)
       expect(errorMessage).toBeInTheDocument()  
       expect(console.log).toHaveBeenCalledWith({status: 500, message: 'Error thrown and caught.'})
     })
-
   })
 })

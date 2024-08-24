@@ -14,7 +14,7 @@ import { createCards } from "@/api/controller";
 
 interface IAddLanguageCardForm {
   handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
-  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
+  submitList: (list: string) => Promise<void>
 }
 
 export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user, activity}:{isMain: boolean, user: IUser, activity: IActivity}) {
@@ -38,11 +38,9 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [popupItem, getPopupItem] = useState<{list: string}>({ ...args })
-  const [shouldProceed, determineShouldProceed] = useState<'yes'|'no'>('no')
-  const [finalCardList, setFinalCardList] = useState('')
 
   useEffect(() => {
-  }, [user, activity, shouldProceed, file, finalCardList])
+  }, [user, activity, file])
 
   async function onFileInput(e: React.FormEvent<HTMLInputElement>) {
     if ((e.target as HTMLInputElement).files[0].type !== 'text/plain') {
@@ -86,7 +84,6 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
 
   function selectWayToInputList(e: FormEvent<HTMLFormElement>) {
     setFormSubmitOutcomeMessage('');
-    determineShouldProceed('no');
     const chosenInputMethod = (e.target as HTMLSelectElement).value
 
     if (chosenInputMethod === 'Type list') {
@@ -103,7 +100,6 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
 
   function setLanguageCardType(e: FormEvent<HTMLFormElement>) {
     setFormSubmitOutcomeMessage('');
-    determineShouldProceed('no');
     const languageCardType = (e.target as HTMLSelectElement).value;
 
     (document.querySelector('#typed') as HTMLTextAreaElement).value = '';
@@ -130,7 +126,6 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
   function validateInput(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     setFormSubmitOutcomeMessage('');
-    determineShouldProceed('no');
 
     if (((shouldType || grammarCard) && typedList.words === '') || (shouldUpload && file.content === '')) {
       setFormSubmitOutcomeMessage('Oops, you are trying to validate an empty list');
@@ -150,8 +145,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
     setShowModal(true)
   }
 
-  async function submitForm(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault();
+  async function submitList(finalCardList: string) {
     setFormSubmitOutcomeMessage('');
 
     try {
@@ -247,10 +241,6 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
               className="inline-block mr-5 default-btn">
                 Validate Uploaded List
             </button>
-            <button data-testid="add-upload-cards-submit-button" type="submit" onClick={submitForm} disabled={isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no'} 
-              className={`inline-block ${isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no' ? "disabled-btn" : "default-btn"}`}>
-              Create Cards
-            </button>
           </div>
         </div>
 
@@ -290,17 +280,13 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
               className={"inline-block mr-5 default-btn"}>
               Validate Typed List
             </button>
-            <button data-testid="add-type-cards-submit-button" type="submit" onClick={submitForm} disabled={isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no'} 
-              className={`inline-block ${isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no' ? "disabled-btn" : "default-btn"}`}>
-              Create Cards
-            </button>
           </div>
           
         </div>
         
       </div>
       <p data-testid="outcome-message">{formSubmitOutcomeMessage}</p>
-      <Popup {...{ showModal, modalType, item: popupItem, determineShouldProceed, setFormSubmitOutcomeMessage, setFinalCardList}} onClose={() => setShowModal(false)} />
+      <Popup {...{ showModal, modalType, item: popupItem, submitList, setFormSubmitOutcomeMessage}} onClose={() => setShowModal(false)} />
     </>
   )
 }

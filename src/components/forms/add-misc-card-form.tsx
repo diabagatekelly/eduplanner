@@ -22,33 +22,21 @@ export default function AddMiscCardForm({isMain, user, activity}:{isMain: boolea
   })
   
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
-  const [shouldProceed, determineShouldProceed] = useState<'yes'|'no'>('no')
   const [modalType, setModalType] = useState('');
   const [popupItem, getPopupItem] = useState<{list: string}>({ ...args })
   const [showModal, setShowModal] = useState(false);
-  const [finalCardList, setFinalCardList] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   function onTextareaChange(e: React.FormEvent<HTMLTextAreaElement>) {
     const target = e.target as HTMLTextAreaElement;
-    const isContentValid = target.value.split(',').length <= 10;
 
-    if (isContentValid || !isContentValid && (e.nativeEvent as InputEvent).inputType === 'deleteContentBackward') {
-      setFormSubmitOutcomeMessage('');
-      getTypedList({
-        words: target.value
-      })
-    } else {
-      setFormSubmitOutcomeMessage('Oops, this is as long as your list can get!');
-      getTypedList({
-        words: typedList.words
-      });
-      (document.querySelector('#typed') as HTMLTextAreaElement).value = typedList.words.substring(0, typedList.words.length - 1);
-    }
+    setFormSubmitOutcomeMessage('');
+    getTypedList({
+      words: target.value
+    })
   }
 
-  async function submitForm(e: React.FormEvent<HTMLButtonElement>) {
-    e.preventDefault();
+  async function submitList(finalCardList: string) {
     setFormSubmitOutcomeMessage('');
 
     try {
@@ -108,7 +96,6 @@ export default function AddMiscCardForm({isMain, user, activity}:{isMain: boolea
   function validateInput(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     setFormSubmitOutcomeMessage('');
-    determineShouldProceed('no');
 
     if (typedList.words === '') {
       setFormSubmitOutcomeMessage('Oops, you are trying to validate an empty list');
@@ -146,7 +133,7 @@ export default function AddMiscCardForm({isMain, user, activity}:{isMain: boolea
           
           <label htmlFor="typed" className="block mt-2 text-sm font-medium text-gray-900 dark:text-white">
             <div>
-              <p>List of cards separated by commas, in English, max: 20 cards</p>
+              <p>List of cards separated by commas, in English</p>
               <p><i>ie. cook an egg, practice making your bed</i></p>
             </div>
           </label>
@@ -156,16 +143,12 @@ export default function AddMiscCardForm({isMain, user, activity}:{isMain: boolea
               className={"inline-block mr-5 default-btn"}>
               Validate Typed List
             </button>
-            <button data-testid="add-type-cards-submit-button" type="submit" onClick={submitForm} disabled={isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no'} 
-              className={`inline-block ${isLoading || (isMain && user.accountType === 'student') || shouldProceed === 'no' ? "disabled-btn" : "default-btn"}`}>
-              Create Cards
-            </button>
           </div>
         </div>
         
       </div>
       <p data-testid="outcome-message">{formSubmitOutcomeMessage}</p>
-      <Popup {...{ showModal, modalType, item: popupItem, determineShouldProceed, setFormSubmitOutcomeMessage, setFinalCardList}} onClose={() => setShowModal(false)} />
+      <Popup {...{ showModal, modalType, item: popupItem, submitList, setFormSubmitOutcomeMessage}} onClose={() => setShowModal(false)} />
     </>
   )
 }

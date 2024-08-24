@@ -60,7 +60,7 @@ describe('Add misc card form', () => {
       expect(outcomeMsg).toHaveTextContent('Oops, you are trying to validate an empty list')
     })
 
-    it('should warn when typing more than 10 cards', async () => {
+    it('should allow unlimited number of cards to be created', async () => {
       render(<AddMiscCardForm {...{isMain: true, user: mockUser, activity: mockCookingActivity}} />)
     
       const textArea = await screen.findByTestId("textarea-for-typed-list") as HTMLTextAreaElement;
@@ -70,7 +70,7 @@ describe('Add misc card form', () => {
         await fireEvent.change(textArea, { target: { value: '1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 2' } })
       })
 
-      expect(outcomeMsg).toHaveTextContent('Oops, this is as long as your list can get!')
+      expect(outcomeMsg).not.toHaveTextContent('Oops, this is as long as your list can get!')
     })
 
     it('should open popup with expected list', async () => {
@@ -105,7 +105,6 @@ describe('Add misc card form', () => {
       
         const textArea = await screen.findByTestId("textarea-for-typed-list") as HTMLTextAreaElement;
         const validateTypeBoxBtn = await screen.findByTestId("add-type-cards-validate-button");
-        const createCardBtn = await screen.findByTestId('add-type-cards-submit-button');
         
         await act(async () => {
           await fireEvent.change(textArea, { target: { value: 'cook an egg, make your bed' } })
@@ -116,10 +115,6 @@ describe('Add misc card form', () => {
   
         await act(async () => {
           await fireEvent.click(popupYesBtn)
-        })
-  
-        await act(async () => {
-          await fireEvent.click(createCardBtn)
         })
 
         const expectedCardsPayload = [
@@ -141,7 +136,6 @@ describe('Add misc card form', () => {
     
         const textArea = await screen.findByTestId("textarea-for-typed-list") as HTMLTextAreaElement;
         const validateTypeBoxBtn = await screen.findByTestId("add-type-cards-validate-button");
-        const createCardBtn = await screen.findByTestId('add-type-cards-submit-button');
         
         await act(async () => {
           await fireEvent.change(textArea, { target: { value: 'cook an egg, make your bed' } })
@@ -152,10 +146,6 @@ describe('Add misc card form', () => {
   
         await act(async () => {
           await fireEvent.click(popupYesBtn)
-        })
-  
-        await act(async () => {
-          await fireEvent.click(createCardBtn)
         })
         
         const errorMessage = await screen.findByText(/Erroneous response/i)
@@ -172,7 +162,6 @@ describe('Add misc card form', () => {
     
         const textArea = await screen.findByTestId("textarea-for-typed-list") as HTMLTextAreaElement;
         const validateTypeBoxBtn = await screen.findByTestId("add-type-cards-validate-button");
-        const createCardBtn = await screen.findByTestId('add-type-cards-submit-button');
         
         await act(async () => {
           await fireEvent.change(textArea, { target: { value: 'cook an egg, make your bed' } })
@@ -183,10 +172,6 @@ describe('Add misc card form', () => {
   
         await act(async () => {
           await fireEvent.click(popupYesBtn)
-        })
-  
-        await act(async () => {
-          await fireEvent.click(createCardBtn)
         })
 
         const errorMessage = await screen.getByText(/Failed to add cards due to an internal error. Please try again later./i)
@@ -204,7 +189,6 @@ describe('Add misc card form', () => {
     
         const textArea = await screen.findByTestId("textarea-for-typed-list") as HTMLTextAreaElement;
         const validateTypeBoxBtn = await screen.findByTestId("add-type-cards-validate-button");
-        const createCardBtn = await screen.findByTestId('add-type-cards-submit-button');
         
         await act(async () => {
           await fireEvent.change(textArea, { target: { value: 'cook an egg, make your bed' } })
@@ -215,10 +199,6 @@ describe('Add misc card form', () => {
   
         await act(async () => {
           await fireEvent.click(popupYesBtn)
-        })
-  
-        await act(async () => {
-          await fireEvent.click(createCardBtn)
         })
     
         const errorMessage = await screen.getByText(/Server is down. Try again later./i)

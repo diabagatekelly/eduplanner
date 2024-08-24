@@ -5,9 +5,8 @@ export default function ValidatePopup({onClose, showModal, ...childArgs}:
     onClose: any,
     showModal: boolean,
     item?: any,
-    determineShouldProceed?: any,
+    submitList?: any,
     setFormSubmitOutcomeMessage?: any,
-    setFinalCardList?: any
   }) {
 
   const [itemsToValidate, getItemsToValidate] = useState('')
@@ -18,9 +17,7 @@ export default function ValidatePopup({onClose, showModal, ...childArgs}:
   }, [showModal, childArgs])
 
   function validate() {
-    childArgs?.determineShouldProceed('yes')
-    childArgs?.setFormSubmitOutcomeMessage('Successful validation, now you can create your cards.')
-    childArgs?.setFinalCardList(itemsToValidate)
+    childArgs?.submitList(itemsToValidate)
     onClose()
   }
 
@@ -50,7 +47,7 @@ export default function ValidatePopup({onClose, showModal, ...childArgs}:
               </div>
 
               <button data-testid="validate-btn" onClick={validate} data-modal-hide="popup-modal" type="button" className="green-btn mr-2">
-                Yes, I&#39;m sure
+                Yes, I&#39;m sure. Create Cards.
               </button>
               <button data-testid="validate-popup-close-btn" onClick={cancel} data-modal-hide="popup-modal" type="button" className="neutral-btn">No, cancel</button>
             </div>
