@@ -11,7 +11,7 @@ import {
   requestCardReview,
   resetCardStage
 } from '../../../api/controller';
-import { mockUser, mockStudent, mockActivity, mockUserCard, mockLanguageActivity, mockUserLanguageVocabCardSpelling } from '../../../specs/mocks';
+import { mockUser, mockStudent, mockActivity, mockUserCard, mockLanguageActivity, mockUserLanguageVocabCard } from '../../../specs/mocks';
 import { CompletionStatus } from '../../../interfaces/CompletionStatusEnum';
 
 jest.mock('../../../api/controller');
@@ -203,13 +203,13 @@ describe('Manage Card Popup', () => {
       let showModal;
       let onClose = () => {showModal = false};
   
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockLanguageActivity, item: {card: mockUserLanguageVocabCardSpelling, action: 'edit'}}} />)
+      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockLanguageActivity, item: {card: mockUserLanguageVocabCard, action: 'edit'}}} />)
    
       const cardOwnerInfo = await screen.findByTestId('card-owner-info')
       const cardInstructions = await screen.findByTestId('card-instructions')
       
       expect(cardOwnerInfo).toHaveTextContent('Owner: mock student')
-      expect(cardInstructions).toHaveTextContent('Instructions: 1. Write in target language; 2. use in 3 written sentences')
+      expect(cardInstructions).toHaveTextContent('Instructions: 1. Recall to / from2. Use in spoken sentencesOPTIONAL: Practice spellingOPTIONAL: Use in written sentences')
     })
 
     it('should invoke requestCardReview controller when form is submitted', async () => {

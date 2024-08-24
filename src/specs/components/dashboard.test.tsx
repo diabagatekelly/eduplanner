@@ -36,7 +36,7 @@ describe('Dashboard', () => {
     const h3 = await screen.findByTestId("dashboard-header");
     const addActivityForm = await screen.findByTestId("add-activity-form")
     
-    expect(h3).toHaveTextContent('Manage student mock user.')
+    expect(h3).toHaveTextContent('Manage mock user.')
     expect(addActivityForm).toBeInTheDocument();
   })
 

@@ -75,19 +75,8 @@ export const mockUserCard: ICard = {
   completionStatus: CompletionStatus.INACTIVE
 }
 
-export const mockUserLanguageVocabCardOral: ICard = {
-  cardId: `${btoa('arabic-vocab-house-oral')}`,
-  activity: 'Arabic-Language',
-  activityType: 'Vocab',
-  addedOn: null,
-  lastUpdatedOn: null,
-  nextShowDate: null,
-  stage: '0',
-  completionStatus: CompletionStatus.INACTIVE
-}
-
-export const mockUserLanguageVocabCardSpelling: ICard = {
-  cardId: `${btoa('arabic-vocab-house-spelling')}`,
+export const mockUserLanguageVocabCard: ICard = {
+  cardId: `${btoa('arabic-vocab-house')}`,
   activity: 'Arabic-Language',
   activityType: 'Vocab',
   addedOn: null,

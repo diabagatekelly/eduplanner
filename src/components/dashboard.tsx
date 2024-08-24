@@ -41,7 +41,7 @@ export default function Dashboard({ userDetails, isMain, isTeacher }: { userDeta
         :
 
         <div>
-          <h2 data-testid="dashboard-header" className="component-title">{`Manage student ${fullName}.`}</h2>
+          <h2 data-testid="dashboard-header" className="component-title">{`Manage ${fullName}.`}</h2>
           <p className="text-lg md:text-xl">
             <Link className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500" href={`${currentPath}/profile`}>View student profile</Link>
           </p>

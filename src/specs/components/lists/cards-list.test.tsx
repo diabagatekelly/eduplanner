@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { screen, fireEvent, act } from '@testing-library/react'
 import { render } from '../../util';
 import * as React from 'react';
-import { mockActivity, mockCookingActivity, mockLanguageActivity, mockStudent, mockUser, mockUserCard, mockUserLanguageGrammarCard, mockUserLanguageVocabCardOral, mockUserMiscCard } from '../../mocks';
+import { mockActivity, mockCookingActivity, mockLanguageActivity, mockStudent, mockUser, mockUserCard, mockUserLanguageGrammarCard, mockUserLanguageVocabCard, mockUserMiscCard } from '../../mocks';
 import { CompletionStatus } from '../../../interfaces/CompletionStatusEnum';
 
 jest.mock('../../../utils/useMounted', () => {
@@ -136,7 +136,7 @@ describe('Cards List', () => {
             const reviewCardName = await screen.findByTestId("today-card-name");
             const editBtn = await screen.findByTestId("today-card-edit-btn");
             expect(reviewCards).toBeInTheDocument()
-            expect(reviewCardName).toHaveTextContent('Arabic grammar: conjugate')
+            expect(reviewCardName).toHaveTextContent('Arabic Grammar: conjugate')
             expect(editBtn).not.toHaveClass('hidden');
 
             await act(async () => {
@@ -241,7 +241,7 @@ describe('Cards List', () => {
           })
   
           it('should display active cards', async () => {
-            const activityWithReviewCards2 = {...mockLanguageActivity, cards: [{...mockUserLanguageVocabCardOral, completionStatus: CompletionStatus.REVIEW, cardId: `${btoa('arabic-vocab-house-oral')}`}]}
+            const activityWithReviewCards2 = {...mockLanguageActivity, cards: [{...mockUserLanguageVocabCard, completionStatus: CompletionStatus.REVIEW, cardId: `${btoa('arabic-vocab-house')}`}]}
             window.location.hash = '#active';
             sessionStorage.setItem("user_data", JSON.stringify({...mockUser, activities: activityWithReviewCards2}))
             render(<CardsList {...{isMain: true, userDetails: mockUser, activity: activityWithReviewCards2}} />)
@@ -251,7 +251,7 @@ describe('Cards List', () => {
             const showBtn = await screen.findByTestId("active-card-show-btn");
 
             expect(reviewCards).toBeInTheDocument();
-            expect(reviewCardName).toHaveTextContent('Arabic vocab: house (oral)');
+            expect(reviewCardName).toHaveTextContent('Arabic Vocab: house');
             expect(showBtn).not.toHaveClass('hidden');
 
             await act(async () => {

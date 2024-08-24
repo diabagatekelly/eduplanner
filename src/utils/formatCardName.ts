@@ -24,13 +24,7 @@ function _formatQuranCardName(cardId) {
 function _formatLanguageCardName(cardId) {
   const cardName = atob(cardId);
   const cardNameNoHyphens = cardName.split('-');
-  const typeOrInstructions = cardNameNoHyphens[cardNameNoHyphens.length - 1]
-
-  if (['oral', 'spelling'].includes(typeOrInstructions)) {
-    return `${_capitalizeFirstLetter(cardNameNoHyphens[0])} ${cardNameNoHyphens[1]}: ${cardNameNoHyphens[2]} (${cardNameNoHyphens[3]})`
-  } else {
-    return `${_capitalizeFirstLetter(cardNameNoHyphens[0])} ${cardNameNoHyphens[1]}: ${cardNameNoHyphens[2]}`
-  }
+  return `${_capitalizeFirstLetter(cardNameNoHyphens[0])} ${_capitalizeFirstLetter(cardNameNoHyphens[1])}: ${cardNameNoHyphens[2]}`
 }
 
 function _formatMiscCardName(cardId) {

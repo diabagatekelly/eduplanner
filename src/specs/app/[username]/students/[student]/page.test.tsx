@@ -45,7 +45,7 @@ describe('Main user page', () => {
 
     it('should correctly display the student\'s name', () => {
       render(<Main {...{params: {student: `${mockStudent.username}`}}}/>)
-      expect('Manage student mock student.')
+      expect('Manage mock student.')
     })
 
     it('should pass the correct isTeacher values for teacher on student page to NestedLayout', () => {

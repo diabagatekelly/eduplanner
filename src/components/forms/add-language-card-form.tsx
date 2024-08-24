@@ -51,12 +51,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
     }
 
     const content = await (e.target as HTMLInputElement).files[0]?.text()
-    const cleanedContent = cleanUpList(content)
-    if (!isContentValid(cleanedContent)[0]) {
-      const extra = isContentValid(content)[1] - 10
-      setFormSubmitOutcomeMessage(`Oops, your uploaded list has more than 10 words! Please remove ${extra} word.`);
-      return
-    }
+    const cleanedContent = cleanUpList(content);
     setFormSubmitOutcomeMessage('');
     uploadFile({
       content: cleanedContent,
@@ -71,18 +66,10 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
 
   function onTextareaChange(e: React.FormEvent<HTMLTextAreaElement>) {
     const target = e.target as HTMLTextAreaElement;
-    if (isContentValid(target.value) || !isContentValid(target.value) && (e.nativeEvent as InputEvent).inputType === 'deleteContentBackward') {
-      setFormSubmitOutcomeMessage('');
-      getTypedList({
-        words: target.value
-      })
-    } else {
-      setFormSubmitOutcomeMessage('Oops, this is as long as your list can get!');
-      getTypedList({
-        words: typedList.words
-      });
-      (document.querySelector('#typed') as HTMLTextAreaElement).value = typedList.words.substring(0, typedList.words.length - 1);
-    }
+    setFormSubmitOutcomeMessage('');
+    getTypedList({
+      words: target.value
+    })
   }
 
   function cleanUpList(list: string) {
@@ -95,19 +82,6 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
     )).join(', ')
 
     return listOfItemsToValidate
-  }
-
-  function isContentValid(content: string) {
-    if (grammarCard === true && vocabCard === false && !shouldType) {
-      // Validating typed list for grammar (20)
-      return content.split(',').length <= 20
-    } else if (shouldType) {
-      // Validating typed list for vocab (10)
-      return content.split(',').length <= 10
-    } else if (shouldUpload) {
-      // Validating uploaded list for vocab (10)
-      return [content.split(',').length <= 10, content.split(',').length]
-    }
   }
 
   function selectWayToInputList(e: FormEvent<HTMLFormElement>) {
@@ -193,31 +167,14 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
         stage: '0',
         completionStatus: CompletionStatus.INACTIVE
       }
-      
-      if (grammarCard) {
-        finalCardListAsArr.forEach((word) => {
-          cards.push({
-            cardId: `${btoa(`${language}-grammar-${word}`)}`,
-            activityType: 'Grammar',
-            ...userCardBase
-          })
+
+      finalCardListAsArr.forEach((word) => {
+        cards.push({
+          cardId: grammarCard ? `${btoa(`${language}-grammar-${word}`)}` : `${btoa(`${language}-vocab-${word}`)}`,
+          activityType: grammarCard ? 'Grammar' : 'Vocab',
+          ...userCardBase
         })
-        
-      } else {
-        finalCardListAsArr.forEach((word) => {
-          const oralCard: ICard = {
-            cardId: `${btoa(`${language}-vocab-${word}-oral`)}`,
-            activityType: 'Vocab',
-            ...userCardBase
-          };
-          const spellingCards: ICard = {
-            cardId: `${btoa(`${language}-vocab-${word}-spelling`)}`,
-            activityType: 'Vocab',
-            ...userCardBase
-          }
-          cards.push(oralCard, spellingCards)
-        })
-      }
+      })
 
       const payload = {
         userId: user.userId,
@@ -316,13 +273,13 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
           <label htmlFor="typed" className="block mt-2 text-sm font-medium text-gray-900 dark:text-white">
             {shouldType && 
               <div>
-                <p>List of vocab words separated by commas, in English, max: 10 words</p>
+                <p>List of vocab words separated by commas, in English</p>
                 <p><i>ie. dog, cat, man</i></p>
               </div>
             }
             {grammarCard === true && vocabCard === false && 
               <div>
-                <p>List of grammar points separated by commas, in English, max: 20 points</p>
+                <p>List of grammar points separated by commas, in English</p>
                 <p><i>ie. conjugate 3 verbs in present tense, Madinah 1 ex. 5 pg. 5</i></p>
               </div>
             }

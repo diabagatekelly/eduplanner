@@ -286,13 +286,19 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
   }
 
   function formatCardInstructions(cardName) {
-    if (cardName.includes('(oral)')) {
-      return '1. Recall to / from; 2. use in 3 spoken sentences'
-    } else if (cardName.includes('(spelling)')) {
-      return '1. Write in target language; 2. use in 3 written sentences'
+    if (cardName.includes('Vocab')) {
+      return (
+      <>
+        <ul>
+          <li>1. Recall to / from</li>
+          <li>2. Use in spoken sentences</li>
+          <li>OPTIONAL: Practice spelling</li>
+          <li>OPTIONAL: Use in written sentences</li>
+        </ul>
+      </>)
     } else {
-      return cardName.split(':')[1]
-    }
+      return 'None'
+    } 
   }
 
   function handleOverrideFormChange(e) {
@@ -319,7 +325,7 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                 <h3 data-testid="card-title" className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Manage Card</h3>
                 <div className="text-left">
                   <h6 data-testid="card-name">{formatCardName(card.cardId, activity?.name)}</h6>
-                  {activity?.name !== 'Quran' && 
+                  {activity?.name !== 'Quran' &&
                     <h6 data-testid="card-instructions">Instructions: {formatCardInstructions(formatCardName(card.cardId, activity?.name))}</h6>
                   }
                   <hr />

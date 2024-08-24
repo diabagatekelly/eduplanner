@@ -3,7 +3,7 @@ import { screen, fireEvent, act } from '@testing-library/react'
 import { render } from '../../util';
 import * as React from 'react';
 import AddLanguageCardForm from '../../../components/forms/add-language-card-form';
-import {mockUser, mockActivity, mockLanguageActivity, mockUserLanguageGrammarCard, mockUserLanguageVocabCardOral, mockUserLanguageVocabCardSpelling} from '../../mocks';
+import {mockUser, mockActivity, mockLanguageActivity, mockUserLanguageGrammarCard, mockUserLanguageVocabCard} from '../../mocks';
 import { createCards } from '../../../api/controller';
 
 jest.mock('../../../api/controller');
@@ -142,7 +142,7 @@ describe('Add language card form', () => {
       expect(outcomeMsg).toHaveTextContent('Oops, you are trying to validate an empty list')
     })
 
-    it('should warn when typing more than 20 grammar cards', async () => {
+    it('should allow to create an unlimited number of grammar cards', async () => {
       render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
     
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
@@ -160,7 +160,7 @@ describe('Add language card form', () => {
         await fireEvent.change(textArea, { target: { value: '1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 2' } })
       })
 
-      expect(outcomeMsg).toHaveTextContent('Oops, this is as long as your list can get!')
+      expect(outcomeMsg).not.toHaveTextContent('Oops, this is as long as your list can get!')
     })
 
     it('should open popup with expected grammar list', async () => {
@@ -238,7 +238,7 @@ describe('Add language card form', () => {
   })
 
   describe('Create typed vocab cards list', () => {
-    it('should warn when typing more than 10 vocab cards', async () => {
+    it('should allow to create an unlimited number of vocab cards', async () => {
       render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
     
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
@@ -263,7 +263,7 @@ describe('Add language card form', () => {
         await fireEvent.change(textArea, { target: { value: '1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 2' } })
       })
 
-      expect(outcomeMsg).toHaveTextContent('Oops, this is as long as your list can get!')
+      expect(outcomeMsg).not.toHaveTextContent('Oops, this is as long as your list can get!')
     })
   })
 
@@ -296,7 +296,7 @@ describe('Add language card form', () => {
       expect(outcomeMsg).toHaveTextContent('Oops, you are trying to validate an empty list')
     })
 
-    it('should warn when uploading vocab list with more than 10 words', async () => {
+    it('should allow to upload an unlimited number of words', async () => {
       render(<AddLanguageCardForm {...{isMain: true, user: mockUser, activity: mockActivity}} />)
     
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element;
@@ -324,9 +324,7 @@ describe('Add language card form', () => {
       })
       expect(await uploadFileForm.files?.[0].text()).toEqual('cat, man, dog, house, mother, father, brother, sister, fruits, vegetables, chicken')
 
-      expect(outcomeMsg).toHaveTextContent('Oops, your uploaded list has more than 10 words! Please remove 1 word.')
-
-    
+      expect(outcomeMsg).not.toHaveTextContent('Oops, your uploaded list has more than 10 words! Please remove 1 word.')
     })
 
     it('should open popup with uploaded vocab list', async () => {
@@ -461,8 +459,8 @@ describe('Add language card form', () => {
 
     describe('Submitting', () => {
       it('should submit with expected list', async () => {
-        const houseUserCards = [{...mockUserLanguageVocabCardOral}, {...mockUserLanguageVocabCardSpelling}]
-        const catUserCards = [{...mockUserLanguageVocabCardOral, cardId: `${btoa('arabic-vocab-cat-oral')}`}, {...mockUserLanguageVocabCardSpelling, cardId: `${btoa('arabic-vocab-cat-spelling')}`}]
+        const houseUserCards = [{...mockUserLanguageVocabCard}]
+        const catUserCards = [{...mockUserLanguageVocabCard, cardId: `${btoa('arabic-vocab-cat')}`}]
        
         const expectedReturnedCards = [...houseUserCards, ...catUserCards]
         const expectedControllerPayload = {
