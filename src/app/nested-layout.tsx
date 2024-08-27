@@ -13,6 +13,7 @@ function classNames(...classes) {
 export default function NestedLayout({ children, isTeacher }: {children: any, isTeacher: boolean}) {
   const pathname = usePathname();
   const activityPath = useParams().activity;
+  const student = useParams().student as string;
   let args;
 
   const [user, getUserData] = useState<IUser>({ ...args })
@@ -20,10 +21,18 @@ export default function NestedLayout({ children, isTeacher }: {children: any, is
   const [openDrawer, setOpenDrawer] = useState(true)
   
   useEffect(() => {
-    const { userReducer } = store.getState()
+    const { userReducer }: {userReducer: IUser} = store.getState()
     getUserData(userReducer);
 
-    const cardSubMenu = userReducer?.activities?.find(activity => activity.name === activityPath)?.hasCards
+    const isMain = !student;
+    let cardSubMenu;
+
+    if (isMain) {
+      cardSubMenu = userReducer?.activities?.find(activity => activity.name === activityPath)?.hasCards
+    } else {
+      cardSubMenu = userReducer?.students?.[student]?.activities?.find(activity => activity.name === activityPath)?.hasCards      
+    }
+
     showCardSubMenu(cardSubMenu)
   }, [activityPath])
 
@@ -72,17 +81,17 @@ export default function NestedLayout({ children, isTeacher }: {children: any, is
                     <span className="flex-1 ml-3 whitespace-nowrap">Activity: {fromDbFormat(activityPath)}</span>
                   </a>
                 </li>
-                <li>
+                <li className='menu-item-cards'>
                   <a href={`${pathname}/#active`} className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                     <span className="flex-1 ml-7 whitespace-nowrap italic">View All Active Cards</span>
                   </a>
                 </li>
-                <li>
+                <li className='menu-item-cards'>
                   <a href={`${pathname}/#inactive`} className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                     <span className="flex-1 ml-7 whitespace-nowrap italic">View All Inactive Cards</span>
                   </a>
                 </li>
-                <li>
+                <li className='menu-item-cards'>
                   <a href={`${pathname}/#add`} className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                     <span className="flex-1 ml-7 whitespace-nowrap italic">Add new card</span>
                   </a>
