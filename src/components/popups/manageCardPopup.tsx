@@ -349,10 +349,6 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                           <option>7</option>
                           <option>15</option>
                           <option>30</option>
-                          <option>45</option>
-                          <option>60</option>
-                          <option>75</option>
-                          <option>90</option>
                         </select>
                       </form>
                       : 

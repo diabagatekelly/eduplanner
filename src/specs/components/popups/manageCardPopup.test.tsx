@@ -389,12 +389,12 @@ describe('Manage Card Popup', () => {
         activity: 'Quran',
         cardId: mockUserCard.cardId,
         editData: {
-          stage: '45'
+          stage: '30'
         }
       }
 
       await act(async () => {
-        fireEvent.change(overrideStageForm, { target: { value: '45' } })
+        fireEvent.change(overrideStageForm, { target: { value: '30' } })
         await fireEvent.click(overrideStageBtn)
       })
       
@@ -416,7 +416,7 @@ describe('Manage Card Popup', () => {
       const submitMessage = await screen.findByTestId('status-message');
 
       await act(async () => {
-        fireEvent.change(overrideStageForm, { target: { value: '45' } })
+        fireEvent.change(overrideStageForm, { target: { value: '30' } })
         await fireEvent.click(overrideStageBtn)
       })
 
@@ -964,12 +964,12 @@ describe('Manage Card Popup', () => {
           activity: 'Quran',
           cardId: mockUserCard.cardId,
           editData: {
-            stage: '45'
+            stage: '30'
           }
         }
   
         await act(async () => {
-          fireEvent.change(overrideStageForm, { target: { value: '45' } })
+          fireEvent.change(overrideStageForm, { target: { value: '30' } })
           await fireEvent.click(overrideStageBtn)
         })
         
@@ -977,16 +977,4 @@ describe('Manage Card Popup', () => {
       })
     })
   })
-  
-  
-
-  
-
-  
-
-  
-
-  
-
-  
 })
