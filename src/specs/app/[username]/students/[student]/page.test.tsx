@@ -56,14 +56,14 @@ describe('Main user page', () => {
     it('should pass the correct userDetails, isMain, isTeacher values for teacher on student page to Dashboard', () => {
       render(<Main {...{params: {student: `${mockStudent.username}`}}}/>)
       const expecteDashboarddArgs = {isMain: false, isTeacher: true, userDetails: mockStudent}
-      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[0].props).toMatchObject(expecteDashboarddArgs)
+      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[1].props).toMatchObject(expecteDashboarddArgs)
     })
 
     it('should display back button', async () => {
       render(<Main {...{params: {student: `${mockStudent.username}`}}}/>)
-      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[1].props).toMatchObject({'children': 'Back'});
+      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[2].props).toMatchObject({'children': 'Back'});
     
-      (NestedLayout as jest.Mock).mock.calls[1][0].children[1].props.onClick()
+      (NestedLayout as jest.Mock).mock.calls[1][0].children[2].props.onClick()
       expect(window.history.back).toHaveBeenCalled()
     })
   })

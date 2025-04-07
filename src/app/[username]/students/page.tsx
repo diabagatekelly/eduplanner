@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import AddStudent from "@/components/students/add-student";
 import ListUi from "@/components/lists/lists-ui";
 import { useRouter } from "next/navigation";
+import Breadcrumbs from "@/components/breadcrumbs";
 
 export default function Students() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function Students() {
   return (
     <NestedLayout {...{ isTeacher }}>
       <div className="flex flex-col px-3">
+        <Breadcrumbs />
         <AddStudent {...{user}} />
         <hr className="mt-4"></hr>
         <div className="justify-items-start">

@@ -49,7 +49,7 @@ describe('Add activity', () => {
     render(<AddActivity {...{userDetails}} />)
 
     const name = screen.getByLabelText(/Name:/i)
-    const description = screen.getByLabelText(/Description:/i)
+    const description = screen.getByLabelText('Description (optional):')
     const points = screen.getByLabelText('Points (optional):')
     const hasCards = screen.getByLabelText(/Yes/i)
     const submitButton = screen.getByTestId('add-activity-btn')
@@ -81,7 +81,7 @@ describe('Add activity', () => {
     render(<AddActivity {...{userDetails}} />)
 
     const name = screen.getByLabelText(/Name:/i)
-    const description = screen.getByLabelText(/Description:/i)
+    const description = screen.getByLabelText('Description (optional):')
     const points = screen.getByLabelText('Points (optional):')
     const hasCards = screen.getByLabelText(/Yes/i)
     const submitButton = screen.getByTestId('add-activity-btn')
@@ -119,7 +119,7 @@ describe('Add activity', () => {
     render(<AddActivity {...{userDetails}} />)
 
     const name = screen.getByLabelText(/Name:/i)
-    const description = screen.getByLabelText(/Description:/i)
+    const description = screen.getByLabelText('Description (optional):')
     const points = screen.getByLabelText('Points (optional):')
     const hasCards = screen.getByLabelText(/Yes/i)
     const submitButton = screen.getByTestId('add-activity-btn')
@@ -167,7 +167,7 @@ describe('Add activity', () => {
     render(<AddActivity {...{userDetails}} />)
 
     const name = screen.getByLabelText(/Name:/i)
-    const description = screen.getByLabelText(/Description:/i)
+    const description = screen.getByLabelText('Description (optional):')
     const points = screen.getByLabelText('Points (optional):')
     const hasCards = screen.getByLabelText(/Yes/i)
     const submitButton = screen.getByTestId('add-activity-btn')
@@ -213,7 +213,7 @@ describe('Add activity', () => {
     render(<AddActivity {...{userDetails}} />)
 
     const name = screen.getByLabelText(/Name:/i)
-    const description = screen.getByLabelText(/Description:/i)
+    const description = screen.getByLabelText('Description (optional):')
     const points = screen.getByLabelText('Points (optional):')
     const hasCards = screen.getByLabelText(/Yes/i)
     const submitButton = screen.getByTestId('add-activity-btn')
@@ -260,7 +260,7 @@ describe('Add activity', () => {
     render(<AddActivity {...{userDetails}} />)
 
     const name = screen.getByLabelText(/Name:/i)
-    const description = screen.getByLabelText(/Description:/i)
+    const description = screen.getByLabelText('Description (optional):')
     const points = screen.getByLabelText('Points (optional):')
     const hasCards = screen.getByLabelText(/No/i)
     const submitButton = screen.getByTestId('add-activity-btn')

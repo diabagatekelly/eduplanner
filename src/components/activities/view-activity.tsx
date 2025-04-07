@@ -123,11 +123,10 @@ export default function ViewActivity<IViewActivity>({ userDetails, userActivity,
     <>
       <div data-testid="activity-name">
         <h3 className="component-title">{fromDbFormat(userActivity?.name)}</h3>
-        <h3 className="component-heading">{userDetails?.firstName} {userDetails?.lastName}</h3>
       </div>
       <div data-testid="activity-details">
-        <p>Description: {userActivity?.description}</p>
-        <p>Points: {userActivity?.points} points</p>
+        {userActivity?.description !== '' && <p>Description: {userActivity?.description}</p>}
+        {userActivity?.points !== 0 && <p>Points: {userActivity?.points} points</p>}
         <p>Status: {userActivity?.completionStatus}</p>
         <p>Last Updated: {userActivity?.lastUpdatedOn?.split('T')[0] || 'Never'}</p>
       </div>
