@@ -34,7 +34,7 @@ export default function NestedLayout({ children, isTeacher }: {children: any, is
     }
 
     showCardSubMenu(cardSubMenu)
-  }, [activityPath])
+  }, [activityPath, student])
 
   function toggleDrawer(open) {
     open === true ? setOpenDrawer(true) : setOpenDrawer(false)

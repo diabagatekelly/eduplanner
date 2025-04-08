@@ -5,6 +5,7 @@ import ViewActivity from "@/components/activities/view-activity";
 import { IUser } from "@/interfaces/IUser";
 import store from "@/store/store";
 import { useEffect, useState } from "react"
+import Breadcrumbs from "@/components/breadcrumbs";
 
 export default function Main({ params }: { params: { activity: string } }) {
   const isMain = true;
@@ -22,6 +23,7 @@ export default function Main({ params }: { params: { activity: string } }) {
 
   return (
     <NestedLayout {...{ isTeacher }}>
+      <Breadcrumbs />
       <ViewActivity {...{ userDetails: user, userActivity, isMain }} />
       <button className="default-btn" onClick={() => window.history.back()}>
         Back

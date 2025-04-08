@@ -5,6 +5,7 @@ import store from "@/store/store";
 import { useEffect, useState } from "react"
 import ViewActivity from "@/components/activities/view-activity";
 import { IUser } from "@/interfaces/IUser";
+import Breadcrumbs from "@/components/breadcrumbs";
 
 export default function Main({ params }: { params: { activity: string, student: string } }) {
   let args;
@@ -16,7 +17,7 @@ export default function Main({ params }: { params: { activity: string, student: 
   }, [])
 
   const allStudents = user.students
-  const userDetails = allStudents?.[params.student]
+  const userDetails: IUser = allStudents?.[params.student]
   const isMain = false;
 
   const isTeacher = user.accountType === 'teacher';
@@ -24,6 +25,7 @@ export default function Main({ params }: { params: { activity: string, student: 
 
   return (
     <NestedLayout {...{ isTeacher }}>
+      <Breadcrumbs />
       <ViewActivity {...{ userDetails, userActivity, isMain }} />
       <button className="default-btn" onClick={() => window.history.back()}>
         Back

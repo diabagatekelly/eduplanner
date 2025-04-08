@@ -5,6 +5,7 @@ import store from "@/store/store";
 import { useEffect, useState } from "react";
 import Dashboard from "@/components/dashboard";
 import { IUser } from "@/interfaces/IUser";
+import Breadcrumbs from "@/components/breadcrumbs";
 
 export default function Main({ params }: { params: { username: string } }) {
   let args;
@@ -21,6 +22,7 @@ export default function Main({ params }: { params: { username: string } }) {
 
   return (
     <NestedLayout {...{ isTeacher }}>
+      <Breadcrumbs />
       <Dashboard {...{ userDetails, isMain, isTeacher }} />
     </NestedLayout>
   )
