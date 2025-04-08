@@ -1,47 +1,46 @@
 "use client"
 
 import { useParams, usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export default function Breadcrumbs() {
   const pathUsername = useParams().username
   const pathCurrentActivity = useParams().activity
   const pathStudent = useParams().student
   const pathName = usePathname()
-  const pathSegments = pathName.split('/')
+  const pathSegments = useMemo(() => pathName.split('/'), [pathName])
 
   const [breadcrumbs, updateBreadcrumbs] = useState<any[]>([])
 
   useEffect(() => {
-    let updatedBreadcrumbs = Object.entries(constructBreadcrumbsDict());
-    updateBreadcrumbs(updatedBreadcrumbs);
-  }, [constructBreadcrumbsDict])
-
-  function constructBreadcrumbsDict() {
+    const breadcrumbsDict = {};
     pathSegments.forEach((_seg, idx) => {
       switch(idx) {
         case 1:
-          breadcrumbs['Home'] = '/'
+          breadcrumbsDict['Home'] = '/'
           break;
         case 2:
-          breadcrumbs['Dashboard'] = `/${pathUsername}`
+          breadcrumbsDict['Dashboard'] = `/${pathUsername}`
           break;
         case 3:
           if (pathSegments[2] === 'activities') {
-            breadcrumbs[`${pathCurrentActivity}`] = null
+            breadcrumbsDict[`${pathCurrentActivity}`] = null
           } else if (pathSegments[2] === 'students') {
             if (pathSegments.length === 4) {
-              breadcrumbs[`${pathStudent}`] = null
+              breadcrumbsDict[`${pathStudent}`] = null
             } else if (pathSegments.length > 4) {
-              breadcrumbs[`All ${pathStudent} activities`] = `/${pathUsername}/students/${pathStudent}`
-              breadcrumbs[`${pathCurrentActivity}`] = null
+              breadcrumbsDict[`All ${pathStudent} activities`] = `/${pathUsername}/students/${pathStudent}`
+              breadcrumbsDict[`${pathCurrentActivity}`] = null
             }
           }
           break;
+        default:
+          break;
       }
     });
-    return breadcrumbs;
-  }
+
+    updateBreadcrumbs(Object.entries(breadcrumbsDict));
+  }, [pathSegments, pathUsername, pathCurrentActivity, pathStudent])
 
 
   return (

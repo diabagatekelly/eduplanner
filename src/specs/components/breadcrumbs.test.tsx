@@ -4,58 +4,6 @@ import { act, fireEvent, screen } from '@testing-library/react'
 import { render } from '../util';
 import * as React from 'react';
 import { mockActivity, mockUser } from '../mocks';
-import { editUser } from '../../api/controller';
-import { ISODateString } from '../../interfaces/isoDateType';
-import store from '../../store/store';
-
-// it('should display "Home" and navigate as expected', async () => {
-//   render(<Breadcrumbs {...{isMain: true}}/>)
-
-//   const breadcrumbsHome = await screen.findByTestId("breadcrumbs-home")
-//   expect(breadcrumbsHome).toBeInTheDocument();
-//   expect(breadcrumbsHome).toHaveTextContent('Home');
-
-//   breadcrumbsHome.addEventListener("click", (e) => { 
-//     e.preventDefault(); 
-//     e.stopPropagation(); 
-//     const target = e.target as HTMLAnchorElement;
-//     const destination = target.getAttribute('href')
-//     expect(destination).toEqual('/')
-//   })
-
-//   await act(async () => {
-//     await fireEvent.click(breadcrumbsHome)
-//   })
-
-// })
-
-// it('should display "All activities" and navigate as expected', async () => {
-//   render(<Breadcrumbs {...{isMain: true}}/>)
-
-//   const breadcrumbsAllActivities = await screen.findByTestId("breadcrumbs-all-activities")
-//   expect(breadcrumbsAllActivities).toBeInTheDocument();
-//   expect(breadcrumbsAllActivities).toHaveTextContent('All activities');
-
-//   breadcrumbsAllActivities.addEventListener("click", (e) => { 
-//     e.preventDefault(); 
-//     e.stopPropagation(); 
-//     const target = e.target as HTMLAnchorElement;
-//     const destination = target.getAttribute('href')
-//     expect(destination).toEqual(`/${mockUser.username}`)
-//   })
-
-//   await act(async () => {
-//     await fireEvent.click(breadcrumbsAllActivities)
-//   })
-// })
-
-// it('should display current activity as expected', async () => {
-//   render(<Breadcrumbs {...{isMain: true}}/>)
-
-//   const breadcrumbsCurrentActivity = await screen.findByTestId("breadcrumbs-current-activity")
-//   expect(breadcrumbsCurrentActivity).toBeInTheDocument();
-//   expect(breadcrumbsCurrentActivity).toHaveTextContent('Quran');
-// })
 
 jest.mock('next/navigation', () => {
   return {
@@ -73,7 +21,6 @@ jest.mock('next/navigation', () => {
     usePathname: jest.fn(() => `root/${mockUser.username}`)
   }
 });
-// jest.mock('../../api/controller');
 
 describe('Breadcrumbs', () => {
   describe('Home', () => {
