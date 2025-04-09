@@ -11,6 +11,7 @@ import { createUserCard } from "@/store/actions/userActions";
 import { useDispatch } from "react-redux";
 import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
 import { createCards } from "@/api/controller";
+import { DocumentMinusIcon } from "@heroicons/react/24/solid";
 
 interface IAddLanguageCardForm {
   handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
@@ -231,10 +232,21 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({isMain, user,
           </div>
           
           <label htmlFor="upload" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Upload list of vocab words (in English):</label>
-          <input data-testid="upload-form" className="space-y-2" onInput={onFileInput} type="file" id="upload" name="upload" accept=".txt"/>
-          <svg data-testid="remove-upload-btn" onClick={removeUpload} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={`w-6 h-6 inline-block ${file.content === '' ? 'hidden' : ''}`}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
+          <div className="flex justify-between space-x-2">
+            <input data-testid="upload-form" className="space-y-2" onInput={onFileInput} type="file" id="upload" name="upload" accept=".txt"/>
+            <DocumentMinusIcon 
+              title="Remove uploaded file"
+              style={{cursor: 'pointer'}}
+              data-testid="remove-upload-btn" 
+              onClick={removeUpload} 
+              fill="none" 
+              strokeWidth="1.5" 
+              stroke="currentColor" 
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className={`w-6 h-6 inline-block ${file.content === '' ? 'hidden' : ''}`} 
+            />
+          </div>
 
           <div className="block mt-5">
             <button data-testid="add-upload-cards-val-button" onClick={validateInput} disabled={isLoading || (isMain && user.accountType === 'student')} 

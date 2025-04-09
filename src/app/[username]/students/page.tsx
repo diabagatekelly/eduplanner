@@ -28,7 +28,7 @@ export default function Students() {
         <Breadcrumbs />
         <AddStudent {...{user}} />
         <hr className="mt-4"></hr>
-        <div className="justify-items-start">
+        <div className="my-5">
           <h3 className="component-sub-title">Current students:</h3>
           <ListUi {...{ listType: 'students', isMain, userDetails }} />
         </div>
