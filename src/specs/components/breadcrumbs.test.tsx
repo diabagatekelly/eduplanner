@@ -45,6 +45,7 @@ describe('Breadcrumbs', () => {
       })
     })
   })
+
   describe('Dashboard', () => {
     it('should display "Home" and "Dashboard" breadcrumbs and navigate as expected', async () => {
       jest.spyOn(require('next/navigation'), 'usePathname').mockImplementation(() => `root/${mockUser.username}/students`)
@@ -63,7 +64,7 @@ describe('Breadcrumbs', () => {
         e.stopPropagation(); 
         const target = e.target as HTMLAnchorElement;
         const destination = target.getAttribute('href')
-        expect(destination).toEqual(`/${mockUser.username}`)
+        expect(destination).toEqual(`/mock`)
       })
 
       await act(async () => {
@@ -132,7 +133,7 @@ describe('Breadcrumbs', () => {
           e.stopPropagation(); 
           const target = e.target as HTMLAnchorElement;
           const destination = target.getAttribute('href')
-          expect(destination).toEqual(`/${mockUser.username}/students/Yusuf`)
+          expect(destination).toEqual(`/mock/students/Yusuf`)
         })
   
         await act(async () => {

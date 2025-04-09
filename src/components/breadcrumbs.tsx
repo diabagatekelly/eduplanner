@@ -5,11 +5,11 @@ import { useParams, usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 export default function Breadcrumbs() {
-  const pathUsername = useParams().username
-  const pathCurrentActivity = useParams().activity
-  const pathStudent = useParams().student
+  const pathUsername = (useParams().username as string)?.split('-')[0]
+  const pathCurrentActivity = (useParams().activity as string)?.split('-')[0]
+  const pathStudent = (useParams().student as string)?.split('-')[0]
   const pathName = usePathname()
-  const pathSegments = useMemo(() => pathName.split('/'), [pathName])
+  const pathSegments = useMemo(() => pathName?.split('/'), [pathName])
 
   const [breadcrumbs, updateBreadcrumbs] = useState<any[]>([])
 
