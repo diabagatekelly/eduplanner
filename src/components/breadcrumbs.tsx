@@ -5,9 +5,9 @@ import { useParams, usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 export default function Breadcrumbs() {
-  const pathUsername = (useParams().username as string)?.split('-')[0]
-  const pathCurrentActivity = (useParams().activity as string)?.split('-')[0]
-  const pathStudent = (useParams().student as string)?.split('-')[0]
+  const pathUsername = (useParams().username as string)
+  const pathCurrentActivity = (useParams().activity as string)
+  const pathStudent = (useParams().student as string)
   const pathName = usePathname()
   const pathSegments = useMemo(() => pathName?.split('/'), [pathName])
 
@@ -30,7 +30,7 @@ export default function Breadcrumbs() {
             if (pathSegments.length === 4) {
               breadcrumbsDict[`${pathStudent}`] = null
             } else if (pathSegments.length > 4) {
-              breadcrumbsDict[`All ${pathStudent} activities`] = `/${pathUsername}/students/${pathStudent}`
+              breadcrumbsDict[`All ${pathStudent}'s Activities`] = `/${pathUsername}/students/${pathStudent}`
               breadcrumbsDict[`${pathCurrentActivity}`] = null
             }
           }
@@ -43,6 +43,9 @@ export default function Breadcrumbs() {
     updateBreadcrumbs(Object.entries(breadcrumbsDict));
   }, [pathSegments, pathUsername, pathCurrentActivity, pathStudent])
 
+  function formatBreadcrumbText(text: string) {
+    return text.split('-').join(' ')
+  }  
 
   return (
     <>
@@ -57,7 +60,7 @@ export default function Breadcrumbs() {
                     aria-hidden="true"
                     fill="currentColor"
                   />
-                  {crumb[0]}
+                  {formatBreadcrumbText(crumb[0])}
                 </a>
               }
               {crumb[0] !== 'Home' && 
@@ -72,10 +75,20 @@ export default function Breadcrumbs() {
                     strokeLinejoin='round'
                   />
                   {crumb[1] === null && 
-                    <span data-testid={`breadcrumbs-${crumb[0]}`} className="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">{crumb[0]}</span>}
+                    <span 
+                      data-testid={`breadcrumbs-${crumb[0]}`} 
+                      className="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">
+                        {formatBreadcrumbText(crumb[0])}
+                    </span>
+                  }
                 
                   {crumb[1] !== null && 
-                    <a data-testid={`breadcrumbs-${crumb[0]}`} href={`${crumb[1]}`} className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">{crumb[0]}</a>}
+                    <a 
+                      data-testid={`breadcrumbs-${crumb[0]}`} href={`${crumb[1]}`} 
+                      className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">
+                        {formatBreadcrumbText(crumb[0])}
+                    </a>
+                  }
                 </>
               }
             </li>
