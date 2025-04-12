@@ -1,10 +1,10 @@
 version: 2.1
 orbs:
+  node: circleci/node@7.1.0
   cypress: cypress-io/cypress@3.4.3
 jobs:
   run-unit-tests:
-    docker:
-      - image: cimg/node:18.18.0
+    executor: node/default
     steps:
       - checkout
       - run:
