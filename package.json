@@ -9,7 +9,8 @@
     "lint": "next lint",
     "test": "cross-env TZ=EST jest",
     "test:ui": "cross-env CYPRESS_ENV=development cypress run --browser chrome",
-    "test:ui:open": "cross-env CYPRESS_ENV=development cypress open"
+    "test:ui:open": "cross-env CYPRESS_ENV=development cypress open",
+    "prepare": "husky"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
@@ -37,6 +38,7 @@
     "@testing-library/react": "^14.1.2",
     "@types/jest": "^29.5.11",
     "cypress": "^13.6.3",
+    "husky": "^9.1.7",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "nyc-config-tsx": "^0.1.0",
