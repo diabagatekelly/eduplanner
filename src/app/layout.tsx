@@ -8,7 +8,7 @@ import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import { Suspense, useEffect, useState } from 'react';
 import { hasExpired, hasToken } from '@/store/actions/authActions';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { populateUser } from '@/store/actions/userActions';
 import { useMounted } from '@/utils/useMounted';
 
@@ -39,7 +39,7 @@ const Reloader = () => {
   let args;
   const dispatch = useDispatch()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
+  // const searchParams = useSearchParams()
   const router = useRouter()
   const mounted = useMounted();
   
@@ -58,7 +58,7 @@ const Reloader = () => {
     const isAuthenticated = authReducer.isAuthenticated;
     setUserState({isAuthenticated, userReducer})
 
-  }, [pathname, searchParams, dispatch])
+  }, [pathname, dispatch])
 
   const username = userState.userReducer.username;
   const isAuthenticated = userState.isAuthenticated;

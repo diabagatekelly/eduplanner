@@ -2,6 +2,7 @@ import Main from '../../../../../../../app/[username]/students/[student]/activit
 import '@testing-library/jest-dom'
 import { render } from '../../../../../../util';
 import * as React from 'react';
+import { act } from 'react';
 import { mockStudent, mockUser, mockActivity } from '../../../../../../../specs/mocks';
 import NestedLayout from '../../../../../../../app/nested-layout';
 import store from '../../../../../../../store/store';
@@ -45,19 +46,25 @@ describe('Main user page', () => {
       (NestedLayout as jest.Mock).mockImplementation(() => null);
     })
 
-    it('should pass the correct isTeacher values for non-main (teacher student) to NestedLayout', () => {
-      render(<Main {...{params: {activity: 'Quran', student: updatedMockStudentWithActivity.username}}}/>)
+    it('should pass the correct isTeacher values for non-main (teacher student) to NestedLayout', async () => {
+      await act(async () => {
+        render(<Main {...{params: Promise.resolve({activity: 'Quran', student: updatedMockStudentWithActivity.username})}}/>)
+      })
       expect((NestedLayout as jest.Mock).mock.calls[1][0]).toEqual(expect.objectContaining({isTeacher: true}))
     })
 
-    it('should pass the correct  userDetails, userActivity, isMain values for non-main (teacher student) to ViewActivity', () => {
-      render(<Main {...{params: {activity: 'Quran', student: updatedMockStudentWithActivity.username}}}/>)
+    it('should pass the correct  userDetails, userActivity, isMain values for non-main (teacher student) to ViewActivity', async () => {
+      await act(async () => {
+        render(<Main {...{params: Promise.resolve({activity: 'Quran', student: updatedMockStudentWithActivity.username})}}/>)
+      })
       const expectedViewActivityArgs = {isMain: false, userDetails: updatedMockStudentWithActivity, userActivity: mockActivity}
       expect((NestedLayout as jest.Mock).mock.calls[1][0].children[1].props).toMatchObject(expectedViewActivityArgs)
     })
 
     it('should display back button', async () => {
-      render(<Main {...{params: {activity: 'Quran', student: updatedMockStudentWithActivity.username}}}/>)
+      await act(async () => {
+        render(<Main {...{params: Promise.resolve({activity: 'Quran', student: updatedMockStudentWithActivity.username})}}/>)
+      })
       expect((NestedLayout as jest.Mock).mock.calls[1][0].children[2].props).toMatchObject({'children': 'Back'});
     
       (NestedLayout as jest.Mock).mock.calls[1][0].children[2].props.onClick()

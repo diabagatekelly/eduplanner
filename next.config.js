@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+export const nextConfig = {
     env: {
         NEXT_SITE_URL: process.env.NEXT_SITE_URL,
         NEXT_GET_USER_URL: process.env.NEXT_GET_USER_URL,
@@ -19,8 +19,8 @@ const nextConfig = {
         NEXT_RESET_CARD_STAGE_URL: process.env.NEXT_RESET_CARD_STAGE_URL,
         NEXT_REQUEST_REVIEW_CARD_URL: process.env.NEXT_REQUEST_REVIEW_CARD_URL,
         NEXT_ACTIVATE_CARD_URL: process.env.NEXT_ACTIVATE_CARD_URL,
-        CI: false
+        CI: 'false'
     },
 }
 
-module.exports = nextConfig
+export default nextConfig;

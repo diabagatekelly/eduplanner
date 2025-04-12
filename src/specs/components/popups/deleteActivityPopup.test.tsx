@@ -23,6 +23,14 @@ describe('Delete Activity Popup', () => {
     window.sessionStorage.setItem('user_data', JSON.stringify(mockUser))
     window.sessionStorage.setItem('user_token', 'xxxxxx')
     window.sessionStorage.setItem('created_on', '2/3/2024')
+
+    // Mock window.location.reload
+    Object.defineProperty(window, 'location', {
+      value: {
+        reload: jest.fn(),
+      },
+      writable: true,
+    });
   })
 
   afterEach(() => {
