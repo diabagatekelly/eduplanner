@@ -4,10 +4,14 @@ import NestedLayout from "@/app/nested-layout";
 import ViewActivity from "@/components/activities/view-activity";
 import { IUser } from "@/interfaces/IUser";
 import store from "@/store/store";
-import { useEffect, useState } from "react"
+import { useEffect, useState, use } from "react";
 import Breadcrumbs from "@/components/breadcrumbs";
+import { ActivityParams } from "@/interfaces/IParams";
 
-export default function Main({ params }: { params: { activity: string } }) {
+export default function Main(props: {params: ActivityParams}) {
+  const params = use(props.params);
+  const activityFromParams = params.activity
+
   const isMain = true;
 
   let args;
@@ -19,7 +23,7 @@ export default function Main({ params }: { params: { activity: string } }) {
   }, [])
 
   const isTeacher: boolean = user.accountType === 'teacher';
-  const userActivity = user.activities?.find((activity) => activity?.name === params.activity)
+  const userActivity = user.activities?.find((activity) => activity?.name === activityFromParams)
 
   return (
     <NestedLayout {...{ isTeacher }}>

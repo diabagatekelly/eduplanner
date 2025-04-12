@@ -2,6 +2,7 @@ import Main from '../../../../../app/[username]/activities/[activity]/page'
 import '@testing-library/jest-dom'
 import { render } from '../../../../util';
 import * as React from 'react';
+import {act} from 'react';
 import { mockUser, mockStudent, mockActivity } from '../../../../../specs/mocks';
 import NestedLayout from '../../../../../app/nested-layout';
 import store from '../../../../../store/store';
@@ -44,19 +45,25 @@ describe('Main user page', () => {
       (NestedLayout as jest.Mock).mockImplementation(() => null);
     })
 
-    it('should pass the correct isTeacher values for student to NestedLayout', () => {
-      render(<Main {...{params: {activity: 'Quran'}}}/>)
+    it('should pass the correct isTeacher values for student to NestedLayout', async () => {
+      await act(async () => {
+        render(<Main {...{params: Promise.resolve({activity: 'Quran'})}}/>)
+      })
       expect((NestedLayout as jest.Mock).mock.calls[1][0]).toEqual(expect.objectContaining({isTeacher: false}))
     })
 
-    it('should pass the correct userDetails, userActivity, isMain values for student to ViewActivity', () => {
-      render(<Main {...{params: {activity: 'Quran'}}}/>)
+    it('should pass the correct userDetails, userActivity, isMain values for student to ViewActivity', async () => {
+      await act(async () => {
+        render(<Main {...{params: Promise.resolve({activity: 'Quran'})}}/>)
+      })
       const expectedViewActivityArgs = {isMain: true, userDetails: mockStudentWithActivity, userActivity: mockActivity}
       expect((NestedLayout as jest.Mock).mock.calls[1][0].children[1].props).toMatchObject(expectedViewActivityArgs)
     })
 
     it('should display back button', async () => {
-      render(<Main {...{params: {activity: 'Quran'}}}/>)
+      await act(async () => {
+        render(<Main {...{params: Promise.resolve({activity: 'Quran'})}}/>)
+      })
       expect((NestedLayout as jest.Mock).mock.calls[1][0].children[2].props).toMatchObject({'children': 'Back'});
     
       (NestedLayout as jest.Mock).mock.calls[1][0].children[2].props.onClick()
@@ -72,13 +79,17 @@ describe('Main user page', () => {
       (NestedLayout as jest.Mock).mockImplementation(() => null);
     })
 
-    it('should pass the correct isTeacher values for teacher on own page to NestedLayout', () => {
-      render(<Main {...{params: {activity: 'Quran'}}}/>)
+    it('should pass the correct isTeacher values for teacher on own page to NestedLayout', async () => {
+      await act(async () => {
+        render(<Main {...{params: Promise.resolve({activity: 'Quran'})}}/>)
+      })
       expect((NestedLayout as jest.Mock).mock.calls[1][0]).toEqual(expect.objectContaining({isTeacher: true}))
     })
 
-    it('should pass the correct userDetails, isMain, isTeacher values for teacher on own page to ViewActivity', () => {
-      render(<Main {...{params: {activity: 'Quran'}}}/>)
+    it('should pass the correct userDetails, isMain, isTeacher values for teacher on own page to ViewActivity', async () => {
+      await act(async () => {
+        render(<Main {...{params: Promise.resolve({activity: 'Quran'})}}/>)
+      })
       const expectedViewActivityArgs = {isMain: true, userDetails: mockUserWithActivity, userActivity: mockActivity}
       expect((NestedLayout as jest.Mock).mock.calls[1][0].children[1].props).toMatchObject(expectedViewActivityArgs)
     })
