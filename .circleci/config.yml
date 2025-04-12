@@ -14,7 +14,9 @@ jobs:
           name: Run frontend tests
           command: npm run test
   install-and-persist:
-    executor: cypress/default
+    executor: 
+      name: cypress/default
+      node-version: '18.18.0'
     steps:
       - cypress/install
       - persist_to_workspace:
@@ -23,7 +25,9 @@ jobs:
             - project
           root: ~/
   run-integration-tests:
-    executor: cypress/default
+    executor: 
+      name: cypress/default
+      node-version: '18.18.0'
     steps:
       - attach_workspace:
           at: ~/
