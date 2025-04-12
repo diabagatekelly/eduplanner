@@ -4,7 +4,7 @@ orbs:
 jobs:
   run-unit-tests:
     docker:
-      - image: cimg/node:19.8.0
+      - image: cimg/node:18.18.0
     steps:
       - checkout
       - run:
