@@ -51,7 +51,7 @@ describe('Navbar', () => {
       
     })
 
-    it('shoud navigate to "/" when home button clicked', async () => {
+    it('shoud navigate to "/home" when home button clicked', async () => {
       render(<Navbar {...{isAuthenticated: false, username: mockUser.username}}/>)
     
       const homeBtn = screen.getByTestId("home-btn");
@@ -61,7 +61,7 @@ describe('Navbar', () => {
         e.stopPropagation(); 
         const target = e.target as HTMLAnchorElement;
         const destination = target.getAttribute('href')
-        expect(destination).toEqual('/')
+        expect(destination).toEqual('/home')
       })
 
       await act(async () => {
@@ -82,7 +82,7 @@ describe('Navbar', () => {
       })
 
       it('should highlight Home button when on login page', async () => {
-        jest.spyOn(require('next/navigation'), 'usePathname').mockImplementation(() => '/');
+        jest.spyOn(require('next/navigation'), 'usePathname').mockImplementation(() => '/home');
         render(<Navbar {...{isAuthenticated: false, username: mockUser.username}}/>);
 
         const homeBtn = screen.getByTestId("home-btn");

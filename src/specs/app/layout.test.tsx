@@ -1,5 +1,5 @@
 import RootLayout from '../../app/layout';
-import Home from '../../app/page';
+import Home from '../../app/home/page';
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import * as React from 'react';

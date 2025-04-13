@@ -28,7 +28,7 @@ import { IUser } from '@/interfaces/IUser'
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
 Cypress.Commands.add('navigateToRegisterPage', () => {
-  cy.visit('/')
+  cy.visit('/home')
   cy.get('[data-testid="login-btn"]').click()
   cy.get('[data-testid="register-link"]').click()
 })
@@ -45,7 +45,7 @@ Cypress.Commands.add('register', (mockUser: IUser) => {
 })
 
 Cypress.Commands.add('login', (credentials: {email: string, password: string}) => { 
-  cy.visit('/')
+  cy.visit('/home')
   cy.get('[data-testid="login-btn"]').click()
   cy.get('[data-testid="login-form"]').within(() => {
     cy.get('input[name="email"]').type(credentials.email)

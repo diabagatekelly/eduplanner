@@ -31,7 +31,7 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
   }, [user])
 
   const navigation = [
-    { name: 'Home', href: '/', current: pathname === '/', dataTestId: 'home-btn' },
+    { name: 'Home', href: '/home', current: pathname === '/home', dataTestId: 'home-btn' },
   ]
 
   async function logout() {
