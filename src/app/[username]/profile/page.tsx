@@ -4,7 +4,7 @@ import NestedLayout from "@/app/nested-layout";
 import store from "@/store/store";
 import Popup from "@/components/popups/popup";
 import { useEffect, useState } from "react"
-import UserProfile from "@/components/user-profile";
+import UserProfile from "@/app/[username]/profile/components/user-profile";
 import { IUser } from "@/interfaces/IUser";
 
 export default function Profile() {

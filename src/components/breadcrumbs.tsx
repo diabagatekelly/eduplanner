@@ -18,7 +18,7 @@ export default function Breadcrumbs() {
     pathSegments.forEach((_seg, idx) => {
       switch(idx) {
         case 1:
-          breadcrumbsDict['Home'] = '/'
+          breadcrumbsDict['Home'] = '/home'
           break;
         case 2:
           breadcrumbsDict['Dashboard'] = `/${pathUsername}`

@@ -1,9 +1,8 @@
-import UserProfile from '../../components/user-profile';
-import { mockUser } from '../mocks';
+import UserProfile from '../../../../../app/[username]/profile/components/user-profile';
+import { mockUser } from '../../../../mocks';
 import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react'
-
-import { render } from '../util';
+import { render } from '../../../../util';
 import * as React from 'react';
 
 describe('User profile', () => {

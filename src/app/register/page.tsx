@@ -3,7 +3,7 @@
 import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation';
 import { useDispatch } from "react-redux";
-import RegisterForm from "@/components/forms/register-form";
+import RegisterForm from "@/app/register/components/register-form";
 import { IUser, IUserFormData } from "@/interfaces/IUser";
 import { IResponse } from "@/interfaces/IApiResponse";
 import { setAuthToken } from "@/store/actions/authActions";

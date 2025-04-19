@@ -37,7 +37,7 @@ describe('Breadcrumbs', () => {
         e.stopPropagation(); 
         const target = e.target as HTMLAnchorElement;
         const destination = target.getAttribute('href')
-        expect(destination).toEqual('/')
+        expect(destination).toEqual('/home')
       })
 
       await act(async () => {
