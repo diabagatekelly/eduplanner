@@ -5,12 +5,12 @@ import { createActivity } from "../../api/controller";
 import AddActivityForm from "../forms/add-activity-form";
 import { useDispatch } from "react-redux";
 import { createUserActivity } from "../../store/actions/userActions";
-import { IActivity, IActivityFormData } from "../../interfaces/IActivity";
-import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
-import { ISODateString } from "@/interfaces/isoDateType";
-import { IUser } from "@/interfaces/IUser";
-import { toDbFormat } from "@/utils/formatActivityName";
-import { IResponse } from "@/interfaces/IApiResponse";
+import { IActivity, IActivityFormData } from "../../types/IActivity";
+import { CompletionStatus } from "@/types/CompletionStatusEnum";
+import { ISODateString } from "@/types/isoDateType";
+import { IUser } from "@/types/IUser";
+import { toDbFormat } from "@/lib/helpers/formatActivityName";
+import { IResponse } from "@/types/IApiResponse";
 
 interface IAddActivity {
   handleInput: (e: React.FormEvent<HTMLInputElement>) => void,

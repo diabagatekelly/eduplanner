@@ -4,9 +4,9 @@ import NestedLayout from "@/app/nested-layout";
 import store from "@/store/store";
 import { useEffect, useState, use } from "react";
 import Dashboard from "@/components/dashboard";
-import {IUser} from "@/interfaces/IUser";
+import {IUser} from "@/types/IUser";
 import Breadcrumbs from "@/components/breadcrumbs";
-import { StudentParams } from "@/interfaces/IParams";
+import { StudentParams } from "@/types/IParams";
 
 export default function Main(props: { params: StudentParams }) {
   const params = use(props.params);

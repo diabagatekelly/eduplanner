@@ -3,7 +3,7 @@ import '@testing-library/jest-dom'
 import { screen, fireEvent, act } from '@testing-library/react'
 import { render } from '../../util';
 import * as React from 'react';
-import { IUser } from '../../../interfaces/IUser';
+import { IUser } from '../../../types/IUser';
 import { mockStudent, mockUser } from '../../mocks';
 import store from '../../../store/store';
 import { findUser } from '../../../api/controller';

@@ -1,6 +1,6 @@
 "use-client"
 
-import { IUser } from "@/interfaces/IUser";
+import { IUser } from "@/types/IUser";
 
 export default function UserProfile({user}: {user: IUser}) {
   const getStudentListOrTeacher = () => {

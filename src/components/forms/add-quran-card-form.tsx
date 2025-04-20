@@ -1,17 +1,17 @@
 "use client"
 
 import { FormEvent, useEffect, useState } from "react";
-import { ICard, IQuranCards } from "../../interfaces/ICard";
+import { ICard, IQuranCards } from "../../types/ICard";
 import React from "react";
-import { IActivity } from "@/interfaces/IActivity";
-import { IUser } from "@/interfaces/IUser";
+import { IActivity } from "@/types/IActivity";
+import { IUser } from "@/types/IUser";
 import { useDispatch } from "react-redux";
 import { createCards, deleteCard } from "@/api/controller";
-import { quranCards } from "@/entities/quran-bank";
-import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
-import { ISODateString } from "@/interfaces/isoDateType";
+import { quranCards } from "@/lib/constants/quran-bank";
+import { CompletionStatus } from "@/types/CompletionStatusEnum";
+import { ISODateString } from "@/types/isoDateType";
 import { createUserCard, removeUserCard } from "@/store/actions/userActions";
-import { IResponse } from "@/interfaces/IApiResponse";
+import { IResponse } from "@/types/IApiResponse";
 
 interface IAddQuranCardForm {
   handleInput: (e: React.FormEvent<HTMLInputElement>) => void,

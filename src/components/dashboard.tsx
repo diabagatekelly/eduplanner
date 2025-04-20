@@ -1,7 +1,7 @@
 "use client"
 
 import AddActivity from "./activities/add-activity";
-import { IUser } from "@/interfaces/IUser";
+import { IUser } from "@/types/IUser";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ListUi from "@/components/lists/lists-ui";

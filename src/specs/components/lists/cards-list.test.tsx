@@ -4,9 +4,9 @@ import { screen, fireEvent, act } from '@testing-library/react'
 import { render } from '../../util';
 import * as React from 'react';
 import { mockActivity, mockCookingActivity, mockLanguageActivity, mockStudent, mockUser, mockUserCard, mockUserLanguageGrammarCard, mockUserLanguageVocabCard, mockUserMiscCard } from '../../mocks';
-import { CompletionStatus } from '../../../interfaces/CompletionStatusEnum';
+import { CompletionStatus } from '../../../types/CompletionStatusEnum';
 
-jest.mock('../../../utils/useMounted', () => {
+jest.mock('../../../lib/helpers/useMounted', () => {
   return {
     useMounted: jest.fn()
       .mockImplementationOnce(() => false)

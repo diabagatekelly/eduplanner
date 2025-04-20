@@ -6,8 +6,8 @@ import { findUser } from "@/api/controller";
 import { useDispatch } from "react-redux";
 import { saveStudentDetails } from "@/store/actions/userActions";
 import { useRouter } from "next/navigation";
-import { IUser } from "@/interfaces/IUser";
-import { getBorderColor } from "@/utils/getBorderColor";
+import { IUser } from "@/types/IUser";
+import { getBorderColor } from "@/lib/helpers/getBorderColor";
 import { TrashIcon } from "@heroicons/react/24/solid";
 
 export default function StudentsList({userDetails}: {userDetails: IUser}) {

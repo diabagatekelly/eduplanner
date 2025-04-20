@@ -1,16 +1,16 @@
 "use client"
 
 import { useState } from "react";
-import { ICard } from "../../interfaces/ICard";
+import { ICard } from "../../types/ICard";
 import React from "react";
-import { IUser } from "@/interfaces/IUser";
-import { IActivity } from "@/interfaces/IActivity";
+import { IUser } from "@/types/IUser";
+import { IActivity } from "@/types/IActivity";
 import Popup from "../popups/popup";
 import { createCards } from "@/api/controller";
-import { IResponse } from "@/interfaces/IApiResponse";
+import { IResponse } from "@/types/IApiResponse";
 import { createUserCard } from "@/store/actions/userActions";
 import { useDispatch } from "react-redux";
-import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
+import { CompletionStatus } from "@/types/CompletionStatusEnum";
 
 
 export default function AddMiscCardForm({isMain, user, activity}:{isMain: boolean, user: IUser, activity: IActivity}) {

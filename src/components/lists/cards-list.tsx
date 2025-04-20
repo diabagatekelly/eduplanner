@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Popup from "../popups/popup";
-import { ICard } from "@/interfaces/ICard";
-import { IUser } from "@/interfaces/IUser";
-import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
+import { ICard } from "@/types/ICard";
+import { IUser } from "@/types/IUser";
+import { CompletionStatus } from "@/types/CompletionStatusEnum";
 import AddCard from "../cards/add-card";
-import { IActivity } from "@/interfaces/IActivity";
-import { useMounted } from "@/utils/useMounted";
-import { getBorderColor } from "@/utils/getBorderColor";
-import formatCardName from "@/utils/formatCardName";
+import { IActivity } from "@/types/IActivity";
+import { useMounted } from "@/lib/helpers/useMounted";
+import { getBorderColor } from "@/lib/helpers/getBorderColor";
+import formatCardName from "@/lib/helpers/formatCardName";
 import { DocumentMinusIcon, DocumentPlusIcon, EyeIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 
 export default function CardsList({isMain, userDetails, ...childArgs}: {isMain: boolean, userDetails: IUser, activity?: IActivity}) {

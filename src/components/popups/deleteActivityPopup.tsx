@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { removeUserActivity } from "@/store/actions/userActions";
 import { deleteActivity } from "../../api/controller";
-import { IUser } from "@/interfaces/IUser";
+import { IUser } from "@/types/IUser";
 import { BoltSlashIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
 export default function DeleteActivityPopup({onClose, showModal, ...childArgs}: {onClose: any, showModal: boolean, item?: {activityName: string}, user?: IUser | Partial<IUser>}) {

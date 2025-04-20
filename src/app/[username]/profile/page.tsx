@@ -5,7 +5,7 @@ import store from "@/store/store";
 import Popup from "@/components/popups/popup";
 import { useEffect, useState } from "react"
 import UserProfile from "@/app/[username]/profile/components/user-profile";
-import { IUser } from "@/interfaces/IUser";
+import { IUser } from "@/types/IUser";
 
 export default function Profile() {
   let args;

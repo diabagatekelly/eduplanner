@@ -1,4 +1,4 @@
-import { ISODateString } from '../../../interfaces/isoDateType';
+import { ISODateString } from '../../../types/isoDateType';
 import {hasExpired, hasToken, removeAuthToken, setAuthToken} from '../../../store/actions/authActions';
 import { mockUser } from '../../mocks';
 

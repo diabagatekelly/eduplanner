@@ -3,8 +3,8 @@
 import LoginForm from "@/app/login/components/login-form";
 import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation'
-import { IUserLogin } from "@/interfaces/IUser";
-import { IResponse } from "@/interfaces/IApiResponse";
+import { IUserLogin } from "@/types/IUser";
+import { IResponse } from "@/types/IApiResponse";
 import Link from "next/link";
 import { setAuthToken } from "@/store/actions/authActions";
 import { useDispatch } from "react-redux";

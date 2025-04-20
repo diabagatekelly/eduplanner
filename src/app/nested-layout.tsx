@@ -3,8 +3,8 @@
 import { useParams, usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react';
 import store from '@/store/store';
-import { IUser } from '@/interfaces/IUser';
-import { fromDbFormat } from '@/utils/formatActivityName';
+import { IUser } from '@/types/IUser';
+import { fromDbFormat } from '@/lib/helpers/formatActivityName';
 import { Bars3BottomLeftIcon, ChartPieIcon, LightBulbIcon, UserGroupIcon } from '@heroicons/react/24/solid';
 
 function classNames(...classes) {

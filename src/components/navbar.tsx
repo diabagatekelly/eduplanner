@@ -10,8 +10,8 @@ import { resetUser } from "../store/actions/userActions";
 import { usePathname, useRouter } from 'next/navigation'
 import { editUser } from "../api/controller";
 import store from "../store/store";
-import { IUser } from "@/interfaces/IUser";
-import { ISODateString } from "@/interfaces/isoDateType";
+import { IUser } from "@/types/IUser";
+import { ISODateString } from "@/types/isoDateType";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')

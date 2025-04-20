@@ -1,5 +1,5 @@
 import { mockUser } from '../../src/specs/mocks';
-import { IUser } from '../../src/interfaces/IUser';
+import { IUser } from '../../src/types/IUser';
 
 
 describe('Login User', () => {

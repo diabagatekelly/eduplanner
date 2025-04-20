@@ -1,4 +1,4 @@
-import { IUser } from '@/interfaces/IUser'
+import { IUser } from '@/types/IUser'
 
 /// <reference types="cypress" />
 // ***********************************************

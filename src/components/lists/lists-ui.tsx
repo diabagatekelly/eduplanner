@@ -3,7 +3,7 @@
 import StudentsList from "./students-list";
 import ActivitiesList from "./activities-list";
 import CardsList from "./cards-list";
-import { IUser } from "@/interfaces/IUser";
+import { IUser } from "@/types/IUser";
 
 export default function ListUi({ listType, isMain, userDetails, ...childArgs }: {listType: string, isMain: boolean, userDetails: IUser, childArgs?: any}) {
 

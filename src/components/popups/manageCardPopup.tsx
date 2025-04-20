@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { editUserCard, removeUserCard } from "@/store/actions/userActions";
 import { activateCard, deleteCard, editCardStage, editAnyCardAttr, requestCardReview, resetCardStage } from "../../api/controller";
-import { IResponse } from "@/interfaces/IApiResponse";
-import { ICard } from "@/interfaces/ICard";
-import { IUser } from "@/interfaces/IUser";
-import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
-import { IActivity } from "@/interfaces/IActivity";
-import formatCardName from "@/utils/formatCardName";
+import { IResponse } from "@/types/IApiResponse";
+import { ICard } from "@/types/ICard";
+import { IUser } from "@/types/IUser";
+import { CompletionStatus } from "@/types/CompletionStatusEnum";
+import { IActivity } from "@/types/IActivity";
+import formatCardName from "@/lib/helpers/formatCardName";
 import { ClipboardDocumentCheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
 export default function ManageCardPopup({onClose, showModal, isMain, ...childArgs}: {onClose: any, showModal: boolean, isMain: boolean, user?: IUser | Partial<IUser>, activity?: IActivity, item?: {card: ICard, action: string}}) {

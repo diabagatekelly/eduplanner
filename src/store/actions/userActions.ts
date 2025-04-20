@@ -1,6 +1,6 @@
-import { IActivity } from "@/interfaces/IActivity";
-import { ICard } from "@/interfaces/ICard";
-import { IUser } from "@/interfaces/IUser";
+import { IActivity } from "@/types/IActivity";
+import { ICard } from "@/types/ICard";
+import { IUser } from "@/types/IUser";
 
 export function populateUser() {
   return {

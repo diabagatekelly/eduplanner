@@ -4,7 +4,7 @@ import { screen, fireEvent, act } from '@testing-library/react'
 import { render } from '../../util';
 import AddQuranCardForm from '../../../components/forms/add-quran-card-form';
 import { mockActivity, mockUser, mockUserCard } from "../../mocks";
-import { quranCards } from "../../../entities/quran-bank";
+import { quranCards } from "../../../lib/constants/quran-bank";
 import { createCards, deleteCard } from '../../../api/controller';
 
 jest.mock('../../../api/controller');

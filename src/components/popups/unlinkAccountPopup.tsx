@@ -3,7 +3,7 @@ import store from "../../store/store";
 import { useDispatch } from "react-redux";
 import { removeStudent } from "@/store/actions/userActions";
 import { unlinkAccount } from "../../api/controller";
-import { IUser } from "@/interfaces/IUser";
+import { IUser } from "@/types/IUser";
 import { XMarkIcon, MinusIcon } from "@heroicons/react/24/solid";
 
 export default function UnlinkAccountPopup({onClose, showModal, ...childArgs}: {onClose: any, showModal: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>}) {

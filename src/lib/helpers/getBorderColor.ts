@@ -1,4 +1,4 @@
-import { CompletionStatus } from "@/interfaces/CompletionStatusEnum"
+import { CompletionStatus } from "@/types/CompletionStatusEnum"
 
 export function getBorderColor(listItem) {
   let borderColor = 'rgb(253 186 116)' //orange

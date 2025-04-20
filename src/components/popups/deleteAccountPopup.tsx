@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { deleteUser } from "../../api/controller";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { IUser } from "@/interfaces/IUser";
-import { IResponse } from "@/interfaces/IApiResponse";
+import { IUser } from "@/types/IUser";
+import { IResponse } from "@/types/IApiResponse";
 import { UserMinusIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
 export default function DeleteAccountPopup({onClose, showModal, ...childArgs}: {onClose: any, showModal: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>}) {

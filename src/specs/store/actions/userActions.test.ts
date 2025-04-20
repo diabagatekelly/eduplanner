@@ -1,7 +1,7 @@
 import { mockActivity, mockStudent, mockUser, mockUserCard } from "../../mocks";
 import {addNewStudent, createUserActivity, createUserCard, editUserActivity, editUserCard, populateUser, removeStudent, removeUserActivity, removeUserCard, resetUser, saveStudentDetails} from '../../../store/actions/userActions';
-import { ISODateString } from '../../../interfaces/isoDateType';
-import { CompletionStatus } from "../../../interfaces/CompletionStatusEnum";
+import { ISODateString } from '../../../types/isoDateType';
+import { CompletionStatus } from "../../../types/CompletionStatusEnum";
 
 describe('User actions', () => {
   let mockSessionStorage;

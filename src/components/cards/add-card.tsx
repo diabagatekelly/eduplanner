@@ -4,8 +4,8 @@ import { useState } from "react";
 import AddMiscCardForm from "../forms/add-misc-card-form";
 import { usePathname } from 'next/navigation';
 import AddQuranCardForm from "../forms/add-quran-card-form";
-import { IUser } from "@/interfaces/IUser";
-import { IActivity } from "@/interfaces/IActivity";
+import { IUser } from "@/types/IUser";
+import { IActivity } from "@/types/IActivity";
 import AddLanguageCardForm from "../forms/add-language-card-form";
 
 export default function AddCard({ isMain, userDetails, activity } : {isMain: boolean, userDetails: IUser, activity: IActivity}) {

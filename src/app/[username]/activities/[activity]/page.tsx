@@ -2,11 +2,11 @@
 
 import NestedLayout from "@/app/nested-layout";
 import ViewActivity from "@/components/activities/view-activity";
-import { IUser } from "@/interfaces/IUser";
+import { IUser } from "@/types/IUser";
 import store from "@/store/store";
 import { useEffect, useState, use } from "react";
 import Breadcrumbs from "@/components/breadcrumbs";
-import { ActivityParams } from "@/interfaces/IParams";
+import { ActivityParams } from "@/types/IParams";
 
 export default function Main(props: {params: ActivityParams}) {
   const params = use(props.params);

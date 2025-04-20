@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import Popup from "../popups/popup";
 import { useRouter } from "next/navigation";
 import { usePathname } from 'next/navigation'
-import { IUser } from "@/interfaces/IUser";
-import { IActivity } from "@/interfaces/IActivity";
-import { fromDbFormat } from "@/utils/formatActivityName";
-import { getBorderColor } from "@/utils/getBorderColor";
+import { IUser } from "@/types/IUser";
+import { IActivity } from "@/types/IActivity";
+import { fromDbFormat } from "@/lib/helpers/formatActivityName";
+import { getBorderColor } from "@/lib/helpers/getBorderColor";
 import { TrashIcon } from "@heroicons/react/24/solid";
 
 export default function ActivitiesList({isMain, userDetails}: {isMain: boolean, userDetails: IUser}) {

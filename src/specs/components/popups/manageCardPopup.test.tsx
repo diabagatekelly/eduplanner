@@ -12,7 +12,7 @@ import {
   resetCardStage
 } from '../../../api/controller';
 import { mockUser, mockStudent, mockActivity, mockUserCard, mockLanguageActivity, mockUserLanguageVocabCard } from '../../../specs/mocks';
-import { CompletionStatus } from '../../../interfaces/CompletionStatusEnum';
+import { CompletionStatus } from '../../../types/CompletionStatusEnum';
 
 jest.mock('../../../api/controller');
 

@@ -4,7 +4,7 @@ import { useState, FormEvent } from "react";
 import { findUser } from "../../api/controller";
 import SearchUserForm from "../forms/search-user-form";
 import Popup from "../popups/popup";
-import { IUser } from "@/interfaces/IUser";
+import { IUser } from "@/types/IUser";
 
 interface IAddStudent {
   handleInput: (e: React.FormEvent<HTMLInputElement>) => void,

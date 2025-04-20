@@ -2,7 +2,7 @@ import { linkAccount } from "../../api/controller";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { addNewStudent, saveStudentDetails } from "@/store/actions/userActions";
-import { IUser } from "@/interfaces/IUser";
+import { IUser } from "@/types/IUser";
 import { LinkIcon, XMarkIcon } from "@heroicons/react/24/solid";
 
 export default function LinkAccountPopup({onClose, showModal, ...childArgs}: {onClose: any, showModal: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>}) {

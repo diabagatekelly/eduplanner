@@ -1,5 +1,5 @@
-import { IUser } from "../../src/interfaces/IUser";
-import { ISODateString } from "../../src/interfaces/isoDateType";
+import { IUser } from "../../src/types/IUser";
+import { ISODateString } from "../../src/types/isoDateType";
 import { mockActivity, mockStudent, mockUser } from "../../src/specs/mocks";
 
 describe('Add Activity', () => {

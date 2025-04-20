@@ -2,14 +2,14 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import React from "react";
-import { IActivity } from "@/interfaces/IActivity";
-import { IUser } from "@/interfaces/IUser";
-import { IResponse } from "@/interfaces/IApiResponse";
+import { IActivity } from "@/types/IActivity";
+import { IUser } from "@/types/IUser";
+import { IResponse } from "@/types/IApiResponse";
 import Popup from "../popups/popup";
-import { ICard } from "@/interfaces/ICard";
+import { ICard } from "@/types/ICard";
 import { createUserCard } from "@/store/actions/userActions";
 import { useDispatch } from "react-redux";
-import { CompletionStatus } from "@/interfaces/CompletionStatusEnum";
+import { CompletionStatus } from "@/types/CompletionStatusEnum";
 import { createCards } from "@/api/controller";
 import { DocumentMinusIcon } from "@heroicons/react/24/solid";
 

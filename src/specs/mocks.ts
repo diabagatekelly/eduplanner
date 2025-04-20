@@ -1,9 +1,9 @@
-import { IUser } from "../../src/interfaces/IUser";
-import { ICard } from "../../src/interfaces/ICard";
-import { IActivity } from "../../src/interfaces/IActivity";
-import { CompletionStatus } from "../../src/interfaces/CompletionStatusEnum";
-import { ISODateString } from "../../src/interfaces/isoDateType";
-import { IQuranSurahCard, IQuranJuzCard } from "@/interfaces/ICard";
+import { IUser } from "../types/IUser";
+import { ICard } from "../types/ICard";
+import { IActivity } from "../types/IActivity";
+import { CompletionStatus } from "../types/CompletionStatusEnum";
+import { ISODateString } from "../types/isoDateType";
+import { IQuranSurahCard, IQuranJuzCard } from "@/types/ICard";
 
 export const mockUser: IUser = {
   userId: btoa('mock.user@email.com'),

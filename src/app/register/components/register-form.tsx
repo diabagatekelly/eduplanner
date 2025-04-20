@@ -1,5 +1,5 @@
 import { FormEvent } from "react";
-import { IUserFormData } from "../../../interfaces/IUser";
+import { IUserFormData } from "../../../types/IUser";
 
 export default function RegisterForm({
   handleInput,

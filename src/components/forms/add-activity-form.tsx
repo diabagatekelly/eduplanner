@@ -1,5 +1,5 @@
 import { FormEvent } from "react";
-import { IActivityFormData } from "../../interfaces/IActivity";
+import { IActivityFormData } from "../../types/IActivity";
 
 export default function AddActivityForm({
   handleInput,

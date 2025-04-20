@@ -6,8 +6,8 @@ import UnlinkAccountPopup from "./unlinkAccountPopup";
 import DeleteActivityPopup from "./deleteActivityPopup";
 import ManageCardPopup from "./manageCardPopup";
 import ValidatePopup from "./validatePopup";
-import { IUser } from "@/interfaces/IUser";
-import { IActivity } from "@/interfaces/IActivity";
+import { IUser } from "@/types/IUser";
+import { IActivity } from "@/types/IActivity";
 
 export default function Popup({ onClose, showModal, modalType, isMain, ...childArgs }: {onClose: any, showModal: boolean, modalType: string, isMain?: boolean, newStudent?: IUser | Partial<IUser>, user?: IUser | Partial<IUser>, item?: any, activity?: IActivity}) {
   if (modalType === 'deleteAccount') {

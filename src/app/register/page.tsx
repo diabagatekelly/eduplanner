@@ -4,11 +4,11 @@ import React, { useState, FormEvent } from "react";
 import { useRouter } from 'next/navigation';
 import { useDispatch } from "react-redux";
 import RegisterForm from "@/app/register/components/register-form";
-import { IUser, IUserFormData } from "@/interfaces/IUser";
-import { IResponse } from "@/interfaces/IApiResponse";
+import { IUser, IUserFormData } from "@/types/IUser";
+import { IResponse } from "@/types/IApiResponse";
 import { setAuthToken } from "@/store/actions/authActions";
 import { registerUser } from "@/api/controller";
-import { ISODateString } from "@/interfaces/isoDateType";
+import { ISODateString } from "@/types/isoDateType";
 
 interface IRegister {
   handleInput: (e: React.FormEvent<HTMLInputElement>) => void,

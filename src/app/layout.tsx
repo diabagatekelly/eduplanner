@@ -1,16 +1,16 @@
 'use client'
 
-import './globals.css'
 import { Inter } from 'next/font/google'
 import { Provider, useDispatch } from "react-redux";
+import { Suspense, useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation'
+import '@/styles/globals.css'
 import store from "@/store/store";
+import { hasExpired, hasToken } from '@/store/actions/authActions';
+import { populateUser } from '@/store/actions/userActions';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
-import { Suspense, useEffect, useState } from 'react';
-import { hasExpired, hasToken } from '@/store/actions/authActions';
-import { usePathname, useRouter } from 'next/navigation'
-import { populateUser } from '@/store/actions/userActions';
-import { useMounted } from '@/utils/useMounted';
+import { useMounted } from '@/lib/helpers/useMounted';
 
 const inter = Inter({ subsets: ['latin'] })
 

@@ -5,13 +5,13 @@ import { editActivity, requestCardReview } from "../../api/controller"
 import { useDispatch } from "react-redux"
 import { editUserActivity } from "../../store/actions/userActions"
 import ListUi from "@/components/lists/lists-ui";
-import { CompletionStatus } from "../../interfaces/CompletionStatusEnum"
-import { IActivity } from "@/interfaces/IActivity"
-import { IUser } from "@/interfaces/IUser"
-import { ISODateString } from "@/interfaces/isoDateType"
-import { IResponse } from "@/interfaces/IApiResponse"
-import { ICard } from "@/interfaces/ICard"
-import { fromDbFormat } from "@/utils/formatActivityName"
+import { CompletionStatus } from "../../types/CompletionStatusEnum"
+import { IActivity } from "@/types/IActivity"
+import { IUser } from "@/types/IUser"
+import { ISODateString } from "@/types/isoDateType"
+import { IResponse } from "@/types/IApiResponse"
+import { ICard } from "@/types/ICard"
+import { fromDbFormat } from "@/lib/helpers/formatActivityName"
 
 interface IViewActivity {
   submit: () => Promise<void>

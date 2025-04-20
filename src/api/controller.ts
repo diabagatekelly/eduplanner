@@ -1,7 +1,7 @@
 import { deleteCommand, getCommand, patchCommand, postCommand } from "@/api/service";
-import { IActivity } from "@/interfaces/IActivity";
-import { ICard } from "@/interfaces/ICard";
-import { IUser, IUserLogin } from "@/interfaces/IUser";
+import { IActivity } from "@/types/IActivity";
+import { ICard } from "@/types/ICard";
+import { IUser, IUserLogin } from "@/types/IUser";
 
 export const findUser = async (params: {userId: string}) => {
   const url = process.env.NEXT_GET_USER_URL

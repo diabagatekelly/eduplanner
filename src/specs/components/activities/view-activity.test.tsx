@@ -5,9 +5,9 @@ import { render } from '../../util';
 import * as React from 'react';
 import { editActivity, requestCardReview } from '../../../api/controller';
 import { mockUser, mockActivity, mockStudent } from '../../mocks';
-import { CompletionStatus } from '../../../interfaces/CompletionStatusEnum';
+import { CompletionStatus } from '../../../types/CompletionStatusEnum';
 import ListUi from "../../../components/lists/lists-ui";
-import { ISODateString } from '../../../interfaces/isoDateType';
+import { ISODateString } from '../../../types/isoDateType';
 
 jest.mock('../../../components/lists/lists-ui');
 jest.mock('../../../api/controller');
