@@ -1,33 +1,39 @@
-"use client"
+'use client'
 
-import Link from "next/link";
+import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
-import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useDispatch } from "react-redux";
-import { removeAuthToken } from "../store/actions/authActions";
-import { resetUser } from "../store/actions/userActions";
+import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useDispatch } from 'react-redux'
+import { removeAuthToken } from '../store/actions/authActions'
+import { resetUser } from '../store/actions/userActions'
 import { usePathname, useRouter } from 'next/navigation'
-import { editUser } from "../api/controller";
-import store from "../store/store";
-import { IUser } from "@/types/IUser";
-import { ISODateString } from "@/types/isoDateType";
+import { editUser } from '../api/controller'
+import store from '../store/store'
+import { IUser } from '@/types/IUser'
+import { ISODateString } from '@/types/isoDateType'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Navbar({ isAuthenticated, username }: {isAuthenticated: boolean, username: string}) {
-  let args;
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const pathname = usePathname();
+export default function Navbar({
+  isAuthenticated,
+  username,
+}: {
+  isAuthenticated: boolean
+  username: string
+}) {
+  let args
+  const dispatch = useDispatch()
+  const router = useRouter()
+  const pathname = usePathname()
 
   const [user, getUserData] = useState<IUser>({ ...args })
 
   useEffect(() => {
     const { userReducer } = store.getState()
-    getUserData(userReducer);
+    getUserData(userReducer)
   }, [user])
 
   const navigation = [
@@ -36,11 +42,17 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
 
   async function logout() {
     try {
-      await editUser({ userId: user.userId, editData: {lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString}})
+      await editUser({
+        userId: user.userId,
+        editData: {
+          lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {
+            timeZone: 'EST',
+          }) as ISODateString,
+        },
+      })
       dispatch(removeAuthToken())
       dispatch(resetUser())
-      router.push('/login');
-            
+      router.push('/login')
     } catch (error) {
       console.log(error)
 
@@ -49,15 +61,16 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
         return
       }
 
-      const {status, data} = error.response;
+      const { status, data } = error.response
 
       if (status === 500) {
-        console.log('Oops, something went wrong in updating and logging out. Please try again later.')
+        console.log(
+          'Oops, something went wrong in updating and logging out. Please try again later.'
+        )
       } else {
         console.log(data.message)
       }
     }
-
   }
 
   return (
@@ -72,9 +85,17 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                   <span className="absolute -inset-0.5" />
                   <span className="sr-only">Open main menu</span>
                   {open ? (
-                    <XMarkIcon data-testid="x-icon-btn" className="block h-6 w-6" aria-hidden="true" />
+                    <XMarkIcon
+                      data-testid="x-icon-btn"
+                      className="block h-6 w-6"
+                      aria-hidden="true"
+                    />
                   ) : (
-                    <Bars3Icon data-testid="bars-icon-btn" className="block h-6 w-6" aria-hidden="true" />
+                    <Bars3Icon
+                      data-testid="bars-icon-btn"
+                      className="block h-6 w-6"
+                      aria-hidden="true"
+                    />
                   )}
                 </Disclosure.Button>
               </div>
@@ -87,7 +108,9 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                         key={item.name}
                         href={item.href}
                         className={classNames(
-                          item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                          item.current
+                            ? 'bg-gray-900 text-white'
+                            : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                           'rounded-md px-3 py-2 text-sm font-medium'
                         )}
                         aria-current={item.current ? 'page' : undefined}
@@ -95,20 +118,27 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                         {item.name}
                       </Link>
                     ))}
-                    {isAuthenticated && !pathname.includes(`${username}`) ?
+                    {isAuthenticated && !pathname.includes(`${username}`) ? (
                       <Link
                         key="Dashboard"
                         href={`/${username}`}
-                        className='text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium'
+                        className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
                       >
                         Dashboard
                       </Link>
-                      : ''}
+                    ) : (
+                      ''
+                    )}
                   </div>
-
                 </div>
               </div>
-              <div className={classNames(isAuthenticated ? "absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0" : "hidden")}>
+              <div
+                className={classNames(
+                  isAuthenticated
+                    ? 'absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0'
+                    : 'hidden'
+                )}
+              >
                 <button
                   type="button"
                   className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
@@ -121,7 +151,10 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
                   <div>
-                    <Menu.Button data-testid="user-icon" className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                    <Menu.Button
+                      data-testid="user-icon"
+                      className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                    >
                       <span className="absolute -inset-1.5" />
                       <span className="sr-only">Open user menu</span>
                       <UserCircleIcon className="h-6 w-6" aria-hidden="true" />
@@ -138,17 +171,18 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <Menu.Item>
-                        {({ active }) =>(
+                        {({ active }) => (
                           <Link
                             data-testid="profile-link"
                             href={`/${username}/profile`}
-                            className={
-                              classNames(
-                                /* istanbul ignore next */
-                                active ? 'bg-gray-200' : '', 
-                                pathname.includes(`/${username}/profile`) ? 'italic rounded-md border-2 border-gray-700' : '', 
-                                'block px-4 py-2 text-sm text-gray-700'
-                              )}
+                            className={classNames(
+                              /* istanbul ignore next */
+                              active ? 'bg-gray-200' : '',
+                              pathname.includes(`/${username}/profile`)
+                                ? 'italic rounded-md border-2 border-gray-700'
+                                : '',
+                              'block px-4 py-2 text-sm text-gray-700'
+                            )}
                           >
                             Your Profile
                           </Link>
@@ -156,14 +190,13 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-
                           <Link
                             data-testid="logout-link"
                             onClick={logout}
                             href="#"
                             className={classNames(
                               /* istanbul ignore next */
-                              active ? 'bg-gray-100' : '', 
+                              active ? 'bg-gray-100' : '',
                               'block px-4 py-2 text-sm text-gray-700'
                             )}
                           >
@@ -175,14 +208,22 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                   </Transition>
                 </Menu>
               </div>
-              <div className={classNames(!isAuthenticated ? "hidden inset-y-0 right-0 flex items-center sm:ml-6 sm:block" : "hidden")}>
+              <div
+                className={classNames(
+                  !isAuthenticated
+                    ? 'hidden inset-y-0 right-0 flex items-center sm:ml-6 sm:block'
+                    : 'hidden'
+                )}
+              >
                 <div className="flex space-x-4">
                   <Link
                     data-testid="login-btn"
                     key="Login"
                     href="/login"
                     className={classNames(
-                      pathname === '/login' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                      pathname === '/login'
+                        ? 'bg-gray-900 text-white'
+                        : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                       'rounded-md px-3 py-2 text-sm font-medium'
                     )}
                     aria-current={pathname === '/login' ? 'page' : undefined}
@@ -202,7 +243,9 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                   as="a"
                   href={item.href}
                   className={classNames(
-                    item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    item.current
+                      ? 'bg-gray-900 text-white'
+                      : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                     'block rounded-md px-3 py-2 text-base font-medium'
                   )}
                   aria-current={item.current ? 'page' : undefined}
@@ -210,33 +253,36 @@ export default function Navbar({ isAuthenticated, username }: {isAuthenticated: 
                   {item.name}
                 </Disclosure.Button>
               ))}
-              {
-                isAuthenticated && !pathname.includes(`${username}`) ?
-                  <Disclosure.Button
-                    key="Dashboard"
-                    as="a"
-                    href={`/${username}`}
-                    className='text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium'
-                  >
-                    Dashboard
-                  </Disclosure.Button> : ""
-              }
-              {
-                !isAuthenticated ?
-                  <Disclosure.Button
-                    key="Login"
-                    as="a"
-                    href="/login"
-                    className={classNames(
-                      pathname === '/login' ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                      'block rounded-md px-3 py-2 text-base font-medium'
-                    )}
-                    aria-current={pathname === '/login' ? 'page' : undefined}
-                  >
-                    Login
-                  </Disclosure.Button> : ""
-              }
-
+              {isAuthenticated && !pathname.includes(`${username}`) ? (
+                <Disclosure.Button
+                  key="Dashboard"
+                  as="a"
+                  href={`/${username}`}
+                  className="text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium"
+                >
+                  Dashboard
+                </Disclosure.Button>
+              ) : (
+                ''
+              )}
+              {!isAuthenticated ? (
+                <Disclosure.Button
+                  key="Login"
+                  as="a"
+                  href="/login"
+                  className={classNames(
+                    pathname === '/login'
+                      ? 'bg-gray-900 text-white'
+                      : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    'block rounded-md px-3 py-2 text-base font-medium'
+                  )}
+                  aria-current={pathname === '/login' ? 'page' : undefined}
+                >
+                  Login
+                </Disclosure.Button>
+              ) : (
+                ''
+              )}
             </div>
           </Disclosure.Panel>
         </>

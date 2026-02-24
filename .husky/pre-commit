@@ -1,5 +1,5 @@
 # Run dev in one process and the other commands in another process
 npx concurrently --kill-others --success first \
   "npm run dev" \
-  "npm run lint && npm test && npm run test:ui" && \
+  "prettier --check . && npm run lint && npm test && npm run test:ui" && \
 npm run build

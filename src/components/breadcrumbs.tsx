@@ -1,28 +1,28 @@
-"use client"
+'use client'
 
 import { ChevronRightIcon, HomeIcon } from '@heroicons/react/24/solid'
 import { useParams, usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 export default function Breadcrumbs() {
-  const pathUsername = (useParams().username as string)
-  const pathCurrentActivity = (useParams().activity as string)
-  const pathStudent = (useParams().student as string)
+  const pathUsername = useParams().username as string
+  const pathCurrentActivity = useParams().activity as string
+  const pathStudent = useParams().student as string
   const pathName = usePathname()
   const pathSegments = useMemo(() => pathName?.split('/'), [pathName])
 
   const [breadcrumbs, updateBreadcrumbs] = useState<any[]>([])
 
   useEffect(() => {
-    const breadcrumbsDict = {};
+    const breadcrumbsDict = {}
     pathSegments.forEach((_seg, idx) => {
-      switch(idx) {
+      switch (idx) {
         case 1:
           breadcrumbsDict['Home'] = '/home'
-          break;
+          break
         case 2:
           breadcrumbsDict['Dashboard'] = `/${pathUsername}`
-          break;
+          break
         case 3:
           if (pathSegments[2] === 'activities') {
             breadcrumbsDict[`${pathCurrentActivity}`] = null
@@ -30,22 +30,23 @@ export default function Breadcrumbs() {
             if (pathSegments.length === 4) {
               breadcrumbsDict[`${pathStudent}`] = null
             } else if (pathSegments.length > 4) {
-              breadcrumbsDict[`All ${pathStudent}'s Activities`] = `/${pathUsername}/students/${pathStudent}`
+              breadcrumbsDict[`All ${pathStudent}'s Activities`] =
+                `/${pathUsername}/students/${pathStudent}`
               breadcrumbsDict[`${pathCurrentActivity}`] = null
             }
           }
-          break;
+          break
         default:
-          break;
+          break
       }
-    });
+    })
 
-    updateBreadcrumbs(Object.entries(breadcrumbsDict));
+    updateBreadcrumbs(Object.entries(breadcrumbsDict))
   }, [pathSegments, pathUsername, pathCurrentActivity, pathStudent])
 
   function formatBreadcrumbText(text: string) {
     return text.split('-').join(' ')
-  }  
+  }
 
   return (
     <>
@@ -53,44 +54,47 @@ export default function Breadcrumbs() {
         <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
           {breadcrumbs.map((crumb, i) => (
             <li className="inline-flex items-center" key={`${crumb}-${i}`}>
-              {crumb[0] === 'Home' && 
-                <a data-testid={`breadcrumbs-${crumb[0]}`} href={`${crumb[1]}`} className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
-                  <HomeIcon 
-                    className="w-4 h-4 me-2.5"
-                    aria-hidden="true"
-                    fill="currentColor"
-                  />
+              {crumb[0] === 'Home' && (
+                <a
+                  data-testid={`breadcrumbs-${crumb[0]}`}
+                  href={`${crumb[1]}`}
+                  className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+                >
+                  <HomeIcon className="w-4 h-4 me-2.5" aria-hidden="true" fill="currentColor" />
                   {formatBreadcrumbText(crumb[0])}
                 </a>
-              }
-              {crumb[0] !== 'Home' && 
+              )}
+              {crumb[0] !== 'Home' && (
                 <>
-                  <ChevronRightIcon 
-                    className="rtl:rotate-180 w-4 h-4 text-gray-400 mx-1" 
+                  <ChevronRightIcon
+                    className="rtl:rotate-180 w-4 h-4 text-gray-400 mx-1"
                     strokeWidth={2}
                     aria-hidden="true"
-                    fill="none" 
+                    fill="none"
                     stroke="currentColor"
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
-                  {crumb[1] === null && 
-                    <span 
-                      data-testid={`breadcrumbs-${crumb[0]}`} 
-                      className="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">
-                        {formatBreadcrumbText(crumb[0])}
+                  {crumb[1] === null && (
+                    <span
+                      data-testid={`breadcrumbs-${crumb[0]}`}
+                      className="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400"
+                    >
+                      {formatBreadcrumbText(crumb[0])}
                     </span>
-                  }
-                
-                  {crumb[1] !== null && 
-                    <a 
-                      data-testid={`breadcrumbs-${crumb[0]}`} href={`${crumb[1]}`} 
-                      className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">
-                        {formatBreadcrumbText(crumb[0])}
+                  )}
+
+                  {crumb[1] !== null && (
+                    <a
+                      data-testid={`breadcrumbs-${crumb[0]}`}
+                      href={`${crumb[1]}`}
+                      className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
+                    >
+                      {formatBreadcrumbText(crumb[0])}
                     </a>
-                  }
+                  )}
                 </>
-              }
+              )}
             </li>
           ))}
         </ol>

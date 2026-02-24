@@ -1,6 +1,9 @@
 const INITIAL_STATE = {}
 
-export default function user(userData = INITIAL_STATE, action: { type: string, userInfo?: string, editProps?: { propKey: any }[], allData?: {} }) {
+export default function user(
+  userData = INITIAL_STATE,
+  action: { type: string; userInfo?: string; editProps?: { propKey: any }[]; allData?: {} }
+) {
   /* istanbul ignore next */
   switch (action.type) {
     case 'SCAN':
@@ -28,6 +31,6 @@ export default function user(userData = INITIAL_STATE, action: { type: string, u
       return { ...userData }
 
     default:
-      return userData;
+      return userData
   }
 }

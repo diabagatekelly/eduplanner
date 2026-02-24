@@ -1,29 +1,29 @@
-"use client"
+'use client'
 
-import { useState, FormEvent } from "react";
-import { findUser } from "../../api/controller";
-import SearchUserForm from "../forms/search-user-form";
-import Popup from "../popups/popup";
-import { IUser } from "@/types/IUser";
+import { useState, FormEvent } from 'react'
+import { findUser } from '../../api/controller'
+import SearchUserForm from '../forms/search-user-form'
+import Popup from '../popups/popup'
+import { IUser } from '@/types/IUser'
 
 interface IAddStudent {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
+  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
   submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
 }
 
-export default function AddStudent<IAddStudent>({ user }: {user: IUser}) {
-  let args;
+export default function AddStudent<IAddStudent>({ user }: { user: IUser }) {
+  let args
 
   const [formData, setFormData] = useState({
-    email: ""
-  });
+    email: '',
+  })
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
-  const [newStudent, getStudentInfo] = useState<IUser>({ ...args });
-  const [showModal, setShowModal] = useState(false);
+  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
+  const [newStudent, getStudentInfo] = useState<IUser>({ ...args })
+  const [showModal, setShowModal] = useState(false)
 
-  const modalType = 'addStudent';
+  const modalType = 'addStudent'
 
   function handleInput(e: React.FormEvent<HTMLInputElement>) {
     if (formSubmitOutcomeMessage.length) {
@@ -31,19 +31,19 @@ export default function AddStudent<IAddStudent>({ user }: {user: IUser}) {
     }
 
     const target = e.target as HTMLInputElement
-    const fieldName: string = target.name;
-    const fieldValue: any = target.value;
+    const fieldName: string = target.name
+    const fieldValue: any = target.value
 
     setFormData((prevState) => ({
       ...prevState,
-      [fieldName]: fieldValue
-    }));
+      [fieldName]: fieldValue,
+    }))
   }
 
   function _resetForm() {
     setFormData({
-      email: ""
-    });
+      email: '',
+    })
     setIsLoading(false)
   }
 
@@ -57,32 +57,30 @@ export default function AddStudent<IAddStudent>({ user }: {user: IUser}) {
       const newStudent = { email: '' }
 
       for (const pair of formData.entries()) {
-        newStudent[pair[0]] = `${pair[1]}`;
+        newStudent[pair[0]] = `${pair[1]}`
       }
 
       if (newStudent.email === user.email) {
-        setFormSubmitOutcomeMessage("You can't add yourself as a student.");
+        setFormSubmitOutcomeMessage("You can't add yourself as a student.")
         _resetForm()
-        return;
+        return
       }
 
       const currentStudents = user?.linkedAccountsData?.students
-      if (currentStudents?.some(tuple => tuple[0] === btoa(newStudent.email))) {
+      if (currentStudents?.some((tuple) => tuple[0] === btoa(newStudent.email))) {
         setFormSubmitOutcomeMessage('This is already one of your students.')
         _resetForm()
         return
-      } 
+      }
 
-      const newStudentUserId = {userId: btoa(newStudent.email)}
+      const newStudentUserId = { userId: btoa(newStudent.email) }
 
       const response = await findUser(newStudentUserId)
-      const {data} = response;
-      const {details}: {message: string, details: {student: IUser}} = data;
+      const { data } = response
+      const { details }: { message: string; details: { student: IUser } } = data
       setIsLoading(false)
       getStudentInfo(details.student)
       setShowModal(true)
-      
-
     } catch (error) {
       setIsLoading(false)
       console.log(error)
@@ -92,10 +90,12 @@ export default function AddStudent<IAddStudent>({ user }: {user: IUser}) {
         return
       }
 
-      const {status, data} = error.response;
+      const { status, data } = error.response
 
       if (status === 500) {
-        setFormSubmitOutcomeMessage('Failed to add new student due to an internal error. Please try again later.')
+        setFormSubmitOutcomeMessage(
+          'Failed to add new student due to an internal error. Please try again later.'
+        )
       } else {
         setFormSubmitOutcomeMessage(data.message)
       }
@@ -107,7 +107,7 @@ export default function AddStudent<IAddStudent>({ user }: {user: IUser}) {
       <h3 className="component-sub-title">Add a new student:</h3>
       <p>Enter your student&#39;s email:</p>
       <SearchUserForm {...{ handleInput, formData, isLoading, submitForm }} />
-      <Popup {...{ showModal, modalType, user, newStudent}} onClose={() => setShowModal(false)} />
+      <Popup {...{ showModal, modalType, user, newStudent }} onClose={() => setShowModal(false)} />
       <div data-testid="find-student-submit-message">{formSubmitOutcomeMessage}</div>
     </div>
   )

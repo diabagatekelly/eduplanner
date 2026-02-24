@@ -1,18 +1,18 @@
-"use client"
+'use client'
 
-import LoginForm from "@/app/login/components/login-form";
-import React, { useState, FormEvent } from "react";
+import LoginForm from '@/app/login/components/login-form'
+import React, { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { IUserLogin } from "@/types/IUser";
-import { IResponse } from "@/types/IApiResponse";
-import Link from "next/link";
-import { setAuthToken } from "@/store/actions/authActions";
-import { useDispatch } from "react-redux";
-import { populateUser } from "@/store/actions/userActions";
-import { loginUser } from "@/api/controller";
+import { IUserLogin } from '@/types/IUser'
+import { IResponse } from '@/types/IApiResponse'
+import Link from 'next/link'
+import { setAuthToken } from '@/store/actions/authActions'
+import { useDispatch } from 'react-redux'
+import { populateUser } from '@/store/actions/userActions'
+import { loginUser } from '@/api/controller'
 
 interface ILogin {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
+  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
   submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
 }
 
@@ -20,27 +20,27 @@ export default function Login<ILogin>() {
   const dispatch = useDispatch()
   const router = useRouter()
 
-  const [formData, setFormData] = useState<{email: string, password: string}>({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState<{ email: string; password: string }>({
+    email: '',
+    password: '',
+  })
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
+  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
 
   function handleInput(e: React.FormEvent<HTMLInputElement>) {
     if (formSubmitOutcomeMessage.length) {
       setFormSubmitOutcomeMessage('')
     }
-    
+
     const target = e.target as HTMLInputElement
-    const fieldName: string = target.name;
-    const fieldValue: any = target.value;
+    const fieldName: string = target.name
+    const fieldValue: any = target.value
 
     setFormData((prevState) => ({
       ...prevState,
-      [fieldName]: fieldValue
-    }));
+      [fieldName]: fieldValue,
+    }))
   }
 
   async function submitForm(e: FormEvent<HTMLFormElement>) {
@@ -50,30 +50,33 @@ export default function Login<ILogin>() {
       setIsLoading(true) // Set loading to true when the request starts
 
       const rawFormData = new FormData(e.currentTarget)
-      const userFormInfo: {email: string, password: string} = {
-        email: "",
-        password: ""
+      const userFormInfo: { email: string; password: string } = {
+        email: '',
+        password: '',
       }
 
       for (const pair of rawFormData.entries()) {
-        userFormInfo[pair[0]] = `${pair[1]}`;
+        userFormInfo[pair[0]] = `${pair[1]}`
       }
 
-      const userCredentials: IUserLogin = {userId: btoa(userFormInfo.email), password: userFormInfo.password}
+      const userCredentials: IUserLogin = {
+        userId: btoa(userFormInfo.email),
+        password: userFormInfo.password,
+      }
 
-      const response = await loginUser(userCredentials) as unknown as IResponse;
-      const {data} = response;
-      const {details} = data;
+      const response = (await loginUser(userCredentials)) as unknown as IResponse
+      const { data } = response
+      const { details } = data
 
       setIsLoading(false)
       setFormData({
-        email: "",
-        password: ""
-      });
+        email: '',
+        password: '',
+      })
       setFormSubmitOutcomeMessage('Logging in ...')
-      dispatch(setAuthToken(details));
-      dispatch(populateUser());
-      router.push('/' + details.user.username )
+      dispatch(setAuthToken(details))
+      dispatch(populateUser())
+      router.push('/' + details.user.username)
     } catch (error) {
       setIsLoading(false)
       console.log(error)
@@ -83,21 +86,24 @@ export default function Login<ILogin>() {
         return
       }
 
-      const {status, data} = error.response;
+      const { status, data } = error.response
 
       if (status === 500) {
-        setFormSubmitOutcomeMessage('Failed to login due to an internal error. Please try again later.')
+        setFormSubmitOutcomeMessage(
+          'Failed to login due to an internal error. Please try again later.'
+        )
       } else {
         setFormSubmitOutcomeMessage(data.message)
       }
-
     }
   }
 
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign in to your account</h2>
+        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+          Sign in to your account
+        </h2>
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -106,7 +112,13 @@ export default function Login<ILogin>() {
 
         <p className="mt-10 text-center text-sm text-gray-500">
           <span>No account yet? </span>
-          <Link data-testid="register-link" href="/register" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Create an account</Link>
+          <Link
+            data-testid="register-link"
+            href="/register"
+            className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+          >
+            Create an account
+          </Link>
         </p>
       </div>
     </div>

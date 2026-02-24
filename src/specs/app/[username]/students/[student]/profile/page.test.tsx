@@ -1,17 +1,21 @@
 import '@testing-library/jest-dom'
-import { render } from '../../../../../util';
+import { render } from '../../../../../util'
 import { screen, act } from '@testing-library/react'
-import * as React from 'react';
-import { mockUser, mockStudent } from '../../../../../../specs/mocks';
-import store from '../../../../../../store/store';
-import Profile from '../../../../../../app/[username]/students/[student]/profile/page';
+import * as React from 'react'
+import { mockUser, mockStudent } from '../../../../../../specs/mocks'
+import store from '../../../../../../store/store'
+import Profile from '../../../../../../app/[username]/students/[student]/profile/page'
 
-const student = {...mockStudent, linkedAccountsData: {teacher: btoa('mock.user@email.com')}, lastLogin: '2/15/2024'}
+const student = {
+  ...mockStudent,
+  linkedAccountsData: { teacher: btoa('mock.user@email.com') },
+  lastLogin: '2/15/2024',
+}
 const teacher = {
   ...mockUser,
-  linkedAccountsData: {students: [btoa('mock.student@email.com')]}, 
+  linkedAccountsData: { students: [btoa('mock.student@email.com')] },
   lastLogin: '2/15/2024',
-  students: {'mock-student': student} 
+  students: { 'mock-student': student },
 }
 
 jest.mock('next/navigation', () => {
@@ -21,9 +25,9 @@ jest.mock('next/navigation', () => {
       replace: jest.fn(),
     })),
     usePathname: jest.fn(),
-    useParams: jest.fn()
+    useParams: jest.fn(),
   }
-});
+})
 
 describe('Non-main Profile', () => {
   beforeEach(() => {
@@ -40,19 +44,19 @@ describe('Non-main Profile', () => {
 
   describe('Non-main student profiles', () => {
     it('should display student from teacher account', async () => {
-      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
-      const useParams = jest.spyOn(require("next/navigation"), "useParams")
-      useParams.mockReturnValue({student: 'mock-student', username: 'mock-user'})
+      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
+      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      const useParams = jest.spyOn(require('next/navigation'), 'useParams')
+      useParams.mockReturnValue({ student: 'mock-student', username: 'mock-user' })
 
       render(<Profile />)
-      const firstName = await screen.findByTestId("profile-first");
-      const lastName = await screen.findByTestId("profile-last");
-      const email = await screen.findByTestId("profile-email");
-      const accountType = await screen.findByTestId("profile-accountType");
-      const linked = await screen.findByTestId("profile-linkedAccounts");
-      const loginDate = await screen.findByTestId("profile-login");
-    
+      const firstName = await screen.findByTestId('profile-first')
+      const lastName = await screen.findByTestId('profile-last')
+      const email = await screen.findByTestId('profile-email')
+      const accountType = await screen.findByTestId('profile-accountType')
+      const linked = await screen.findByTestId('profile-linkedAccounts')
+      const loginDate = await screen.findByTestId('profile-login')
+
       expect(firstName).toHaveTextContent('mock')
       expect(lastName).toHaveTextContent('student')
       expect(email).toHaveTextContent('mock.student@email.com')
@@ -62,16 +66,15 @@ describe('Non-main Profile', () => {
     })
   })
 
-
   describe('Modal behavior', () => {
     it('should show profile', async () => {
-      const mockStoreState = {authReducer: {isAuthenticated: true}, userReducer: teacher}
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState);
-      const useParams = jest.spyOn(require("next/navigation"), "useParams")
-      useParams.mockReturnValue({student: 'mock-student', username: 'mock-user'})
+      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
+      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      const useParams = jest.spyOn(require('next/navigation'), 'useParams')
+      useParams.mockReturnValue({ student: 'mock-student', username: 'mock-user' })
 
       const profile = render(<Profile />)
-      const deleteBtn = profile.container.querySelector('#delete-button') as HTMLButtonElement;
+      const deleteBtn = profile.container.querySelector('#delete-button') as HTMLButtonElement
       const popup = profile.container.querySelector('#popup-modal')
 
       act(() => {
@@ -79,7 +82,7 @@ describe('Non-main Profile', () => {
       })
       expect(popup).toBeVisible()
 
-      const popupClosebtn = profile.container.querySelector('#popup-close-btn') as HTMLButtonElement;
+      const popupClosebtn = profile.container.querySelector('#popup-close-btn') as HTMLButtonElement
 
       act(() => {
         popupClosebtn.click()
@@ -89,8 +92,3 @@ describe('Non-main Profile', () => {
     })
   })
 })
-
-
-
-
-

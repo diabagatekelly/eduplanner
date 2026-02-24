@@ -1,22 +1,41 @@
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { editUserCard, removeUserCard } from "@/store/actions/userActions";
-import { activateCard, deleteCard, editCardStage, editAnyCardAttr, requestCardReview, resetCardStage } from "../../api/controller";
-import { IResponse } from "@/types/IApiResponse";
-import { ICard } from "@/types/ICard";
-import { IUser } from "@/types/IUser";
-import { CompletionStatus } from "@/types/CompletionStatusEnum";
-import { IActivity } from "@/types/IActivity";
-import formatCardName from "@/lib/helpers/formatCardName";
-import { ClipboardDocumentCheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { editUserCard, removeUserCard } from '@/store/actions/userActions'
+import {
+  activateCard,
+  deleteCard,
+  editCardStage,
+  editAnyCardAttr,
+  requestCardReview,
+  resetCardStage,
+} from '../../api/controller'
+import { IResponse } from '@/types/IApiResponse'
+import { ICard } from '@/types/ICard'
+import { IUser } from '@/types/IUser'
+import { CompletionStatus } from '@/types/CompletionStatusEnum'
+import { IActivity } from '@/types/IActivity'
+import formatCardName from '@/lib/helpers/formatCardName'
+import { ClipboardDocumentCheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
 
-export default function ManageCardPopup({onClose, showModal, isMain, ...childArgs}: {onClose: any, showModal: boolean, isMain: boolean, user?: IUser | Partial<IUser>, activity?: IActivity, item?: {card: ICard, action: string}}) {
+export default function ManageCardPopup({
+  onClose,
+  showModal,
+  isMain,
+  ...childArgs
+}: {
+  onClose: any
+  showModal: boolean
+  isMain: boolean
+  user?: IUser | Partial<IUser>
+  activity?: IActivity
+  item?: { card: ICard; action: string }
+}) {
   const dispatch = useDispatch()
 
-  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user });
-  const [card, getCardDetails] = useState<ICard>({...childArgs.item.card});
-  const [activity, getActivityDetails] = useState<IActivity>({ ...childArgs.activity });
-  const [statusMessage, setStatusMessage] = useState('');
+  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })
+  const [card, getCardDetails] = useState<ICard>({ ...childArgs.item.card })
+  const [activity, getActivityDetails] = useState<IActivity>({ ...childArgs.activity })
+  const [statusMessage, setStatusMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [newStage, setNewStage] = useState('')
 
@@ -24,31 +43,31 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
     const cardDetails = childArgs.item.card
     const user = childArgs.user
     const activityDetails = childArgs.activity
-    
-    getCardDetails(cardDetails)
-    getUserInfo(user);
-    getActivityDetails(activityDetails)
 
+    getCardDetails(cardDetails)
+    getUserInfo(user)
+    getActivityDetails(activityDetails)
   }, [showModal, childArgs, statusMessage, newStage])
 
   async function resetStage() {
     try {
-      const resetPayload = { 
-        userId: userInfo.userId, 
-        activity: activity.name, 
-        cardId: card.cardId
+      const resetPayload = {
+        userId: userInfo.userId,
+        activity: activity.name,
+        cardId: card.cardId,
       }
       const response = await resetCardStage(resetPayload)
-      const {data} = response;
-      const {details}: {message: string, details: ICard} = data;
-      dispatch(editUserCard({
-        username: userInfo.username,
-        activityName: activity.name, 
-        updatedCard: details
-      }))
+      const { data } = response
+      const { details }: { message: string; details: ICard } = data
+      dispatch(
+        editUserCard({
+          username: userInfo.username,
+          activityName: activity.name,
+          updatedCard: details,
+        })
+      )
       setStatusMessage('Successfully reset card')
       window.location.reload()
-    
     } catch (error) {
       setIsLoading(false)
       console.log(error)
@@ -58,7 +77,7 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
         return
       }
 
-      const {status, data} = error.response;
+      const { status, data } = error.response
 
       if (status === 500) {
         setStatusMessage('Failed to reset card due to an internal error. Please try again later.')
@@ -76,35 +95,39 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
         student: {
           id: userInfo.userId,
           fullName: `${userInfo.firstName} ${userInfo.lastName}`,
-          email: userInfo.email
-        }
+          email: userInfo.email,
+        },
       }
 
-      await requestCardReview(requestReview);
+      await requestCardReview(requestReview)
 
-      dispatch(removeUserCard({
-        username: userInfo.username,
-        activityName: activity.name, 
-        cardId: card.cardId
-      }))
+      dispatch(
+        removeUserCard({
+          username: userInfo.username,
+          activityName: activity.name,
+          cardId: card.cardId,
+        })
+      )
 
-      const editPayload = { 
-        userId: userInfo.userId, 
-        activity: activity.name, 
+      const editPayload = {
+        userId: userInfo.userId,
+        activity: activity.name,
         cardId: card.cardId,
         editData: {
-          completionStatus: CompletionStatus.REVIEW
-        }
+          completionStatus: CompletionStatus.REVIEW,
+        },
       }
 
       const response = await editCardStage(editPayload)
-      const {data} = response;
-      const {details}: {message: string, details: ICard} = data;
-      dispatch(editUserCard({
-        username: userInfo.username,
-        activityName: activity.name, 
-        updatedCard: details
-      }))
+      const { data } = response
+      const { details }: { message: string; details: ICard } = data
+      dispatch(
+        editUserCard({
+          username: userInfo.username,
+          activityName: activity.name,
+          updatedCard: details,
+        })
+      )
 
       setIsLoading(false)
 
@@ -119,10 +142,12 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
         return
       }
 
-      const {status, data} = error.response;
+      const { status, data } = error.response
 
       if (status === 500) {
-        setStatusMessage('Failed to request review due to an internal error. Please try again later.')
+        setStatusMessage(
+          'Failed to request review due to an internal error. Please try again later.'
+        )
       } else {
         setStatusMessage(data.message)
       }
@@ -131,28 +156,29 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
 
   async function overrideStage(e: React.FormEvent<any>) {
     try {
-      e.preventDefault();
-      const editPayload = { 
-        userId: userInfo.userId, 
-        activity: activity.name, 
+      e.preventDefault()
+      const editPayload = {
+        userId: userInfo.userId,
+        activity: activity.name,
         cardId: card.cardId,
         editData: {
-          stage: newStage
-        }
+          stage: newStage,
+        },
       }
 
       const response = await editAnyCardAttr(editPayload)
-      const {data} = response;
-      const {details}: {message: string, details: ICard} = data;
-      dispatch(editUserCard({
-        username: userInfo.username,
-        activityName: activity.name, 
-        updatedCard: details
-      }))
+      const { data } = response
+      const { details }: { message: string; details: ICard } = data
+      dispatch(
+        editUserCard({
+          username: userInfo.username,
+          activityName: activity.name,
+          updatedCard: details,
+        })
+      )
       setStatusMessage('Successfully overrode status.')
       getCardDetails(details)
       window.location.reload()
-
     } catch (error) {
       setIsLoading(false)
       console.log(error)
@@ -162,10 +188,12 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
         return
       }
 
-      const {status, data} = error.response;
+      const { status, data } = error.response
 
       if (status === 500) {
-        setStatusMessage('Failed to override card stage due to an internal error. Please try again later.')
+        setStatusMessage(
+          'Failed to override card stage due to an internal error. Please try again later.'
+        )
       } else {
         setStatusMessage(data.message)
       }
@@ -174,27 +202,28 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
 
   async function submitEditStage(newStageStatus: boolean) {
     try {
-      const editPayload = { 
-        userId: userInfo.userId, 
-        activity: activity.name, 
+      const editPayload = {
+        userId: userInfo.userId,
+        activity: activity.name,
         cardId: card.cardId,
         editData: {
           stage: card.stage,
-          promote: newStageStatus
-        }
+          promote: newStageStatus,
+        },
       }
 
       const response = await editCardStage(editPayload)
-      const {data} = response;
-      const {details}: {message: string, details: ICard} = data;
-      dispatch(editUserCard({
-        username: userInfo.username,
-        activityName: activity.name, 
-        updatedCard: details
-      }))
+      const { data } = response
+      const { details }: { message: string; details: ICard } = data
+      dispatch(
+        editUserCard({
+          username: userInfo.username,
+          activityName: activity.name,
+          updatedCard: details,
+        })
+      )
       setStatusMessage('Successfully edited status.')
       window.location.reload()
-
     } catch (error) {
       setIsLoading(false)
       console.log(error)
@@ -204,10 +233,12 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
         return
       }
 
-      const {status, data} = error.response;
+      const { status, data } = error.response
 
       if (status === 500) {
-        setStatusMessage('Failed to update card status due to an internal error. Please try again later.')
+        setStatusMessage(
+          'Failed to update card status due to an internal error. Please try again later.'
+        )
       } else {
         setStatusMessage(data.message)
       }
@@ -216,20 +247,23 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
 
   async function removeCard() {
     try {
-      const deletePayload = [{ 
-        userId: userInfo.userId, 
-        activity: activity.name, 
-        cardId: card.cardId
-      }]
-      await deleteCard(deletePayload) as unknown as IResponse;
-      dispatch(removeUserCard({
-        username: userInfo.username,
-        activityName: activity.name, 
-        cardId: card.cardId
-      }))
+      const deletePayload = [
+        {
+          userId: userInfo.userId,
+          activity: activity.name,
+          cardId: card.cardId,
+        },
+      ]
+      ;(await deleteCard(deletePayload)) as unknown as IResponse
+      dispatch(
+        removeUserCard({
+          username: userInfo.username,
+          activityName: activity.name,
+          cardId: card.cardId,
+        })
+      )
       setStatusMessage('Successfully removed card')
       window.location.reload()
-
     } catch (error) {
       setIsLoading(false)
       console.log(error)
@@ -239,7 +273,7 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
         return
       }
 
-      const {status, data} = error.response;
+      const { status, data } = error.response
 
       if (status === 500) {
         setStatusMessage('Failed to remove card due to an internal error. Please try again later.')
@@ -251,22 +285,23 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
 
   async function activate() {
     try {
-      const activatePayload = { 
-        userId: userInfo.userId, 
-        activity: activity.name, 
-        cardId: card.cardId
+      const activatePayload = {
+        userId: userInfo.userId,
+        activity: activity.name,
+        cardId: card.cardId,
       }
-      const response = await activateCard(activatePayload) as unknown as IResponse;
-      const {data} = response;
-      const {details}: {message: string, details: ICard} = data;
-      dispatch(editUserCard({
-        username: userInfo.username,
-        activityName: activity.name, 
-        updatedCard: details
-      }))
+      const response = (await activateCard(activatePayload)) as unknown as IResponse
+      const { data } = response
+      const { details }: { message: string; details: ICard } = data
+      dispatch(
+        editUserCard({
+          username: userInfo.username,
+          activityName: activity.name,
+          updatedCard: details,
+        })
+      )
       setStatusMessage('Successfully activated card')
       window.location.reload()
-
     } catch (error) {
       setIsLoading(false)
       console.log(error)
@@ -276,10 +311,12 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
         return
       }
 
-      const {status, data} = error.response;
+      const { status, data } = error.response
 
       if (status === 500) {
-        setStatusMessage('Failed to activate card due to an internal error. Please try again later.')
+        setStatusMessage(
+          'Failed to activate card due to an internal error. Please try again later.'
+        )
       } else {
         setStatusMessage(data.message)
       }
@@ -289,38 +326,51 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
   function formatCardInstructions(cardName) {
     if (cardName.includes('Vocab')) {
       return (
-      <>
-        <ul>
-          <li>1. Recall to / from</li>
-          <li>2. Use in spoken sentences</li>
-          <li>OPTIONAL: Practice spelling</li>
-          <li>OPTIONAL: Use in written sentences</li>
-        </ul>
-      </>)
+        <>
+          <ul>
+            <li>1. Recall to / from</li>
+            <li>2. Use in spoken sentences</li>
+            <li>OPTIONAL: Practice spelling</li>
+            <li>OPTIONAL: Use in written sentences</li>
+          </ul>
+        </>
+      )
     } else {
       return 'None'
-    } 
+    }
   }
 
   function handleOverrideFormChange(e) {
     const selectedStage = e.target.value
     setNewStage(selectedStage)
   }
-  
+
   return (
     <>
-      <div data-testid={`manage-card-popup-${childArgs?.item.action}`} aria-hidden="true" hidden={!showModal} id="popup-modal" className="popup-styling">
+      <div
+        data-testid={`manage-card-popup-${childArgs?.item.action}`}
+        aria-hidden="true"
+        hidden={!showModal}
+        id="popup-modal"
+        className="popup-styling"
+      >
         <div className="relative w-full max-w-md max-h-full">
           <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-            <button data-testid="manage-card-popup-close-btn" onClick={onClose} type="button" className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="popup-modal">
+            <button
+              data-testid="manage-card-popup-close-btn"
+              onClick={onClose}
+              type="button"
+              className="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+              data-modal-hide="popup-modal"
+            >
               <XMarkIcon
                 title="Close modal"
                 className="w-6 h-6"
-                aria-hidden="true" 
+                aria-hidden="true"
                 fill="none"
-                stroke="currentColor" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 strokeWidth="2"
               />
               <span className="sr-only">Close modal</span>
@@ -328,22 +378,32 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
             <div className="p-6 text-center">
               <ClipboardDocumentCheckIcon
                 fill="none"
-                strokeWidth={1} 
-                stroke="currentColor" 
+                strokeWidth={1}
+                stroke="currentColor"
                 className="mx-auto mb-4 text-green-400 w-12 h-12 dark:text-green-200"
-                strokeLinecap="round" 
+                strokeLinecap="round"
                 strokeLinejoin="round"
               />
               <div className="modal-message">
-                <h3 data-testid="card-title" className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Manage Card</h3>
+                <h3
+                  data-testid="card-title"
+                  className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400"
+                >
+                  Manage Card
+                </h3>
                 <div className="text-left">
                   <h6 data-testid="card-name">{formatCardName(card.cardId, activity?.name)}</h6>
-                  {activity?.name !== 'Quran' &&
-                    <h6 data-testid="card-instructions">Instructions: {formatCardInstructions(formatCardName(card.cardId, activity?.name))}</h6>
-                  }
+                  {activity?.name !== 'Quran' && (
+                    <h6 data-testid="card-instructions">
+                      Instructions:{' '}
+                      {formatCardInstructions(formatCardName(card.cardId, activity?.name))}
+                    </h6>
+                  )}
                   <hr />
                   <div data-testid="card-owner-info" className="my-5">
-                    <h6>Owner: {userInfo.firstName} {userInfo.lastName}</h6>
+                    <h6>
+                      Owner: {userInfo.firstName} {userInfo.lastName}
+                    </h6>
                     <h6>Activity: {activity.name}</h6>
                     <h6>Created On: {card.addedOn}</h6>
                     <h6>Last updated: {card.lastUpdatedOn || 'Never'}</h6>
@@ -352,10 +412,19 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                   <hr />
                   <div data-testid="card-stage-management" className="my-5">
                     <h6 className="mb-2">Current status: {card.completionStatus}</h6>
-                    {childArgs?.item.action === 'override' ? 
+                    {childArgs?.item.action === 'override' ? (
                       <form className="max-w-md mx-auto" onChange={handleOverrideFormChange}>
-                        <label htmlFor="countries" className="block mb-2 text-md font-small text-gray-900 dark:text-white">Override current stage: <b>{card.stage}</b></label>
-                        <select data-testid="override-stge-form" id="newStage" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <label
+                          htmlFor="countries"
+                          className="block mb-2 text-md font-small text-gray-900 dark:text-white"
+                        >
+                          Override current stage: <b>{card.stage}</b>
+                        </label>
+                        <select
+                          data-testid="override-stge-form"
+                          id="newStage"
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        >
                           <option>0</option>
                           <option>1</option>
                           <option>3</option>
@@ -364,98 +433,131 @@ export default function ManageCardPopup({onClose, showModal, isMain, ...childArg
                           <option>30</option>
                         </select>
                       </form>
-                      : 
+                    ) : (
                       <h6>Current Stage: {card.stage}</h6>
-                    }
+                    )}
                   </div>
                 </div>
-                {(isMain && userInfo?.accountType === 'teacher' || (!isMain && userInfo?.accountType === 'student')) && childArgs?.item.action === 'override' &&
-                  <div className="delete-actions mt-5">
-                    <button 
-                      data-testid="override-stage-btn"
-                      onClick={overrideStage} 
-                      data-modal-hide="popup-modal" 
-                      type="submit" 
-                      className="green-btn mr-2">
+                {((isMain && userInfo?.accountType === 'teacher') ||
+                  (!isMain && userInfo?.accountType === 'student')) &&
+                  childArgs?.item.action === 'override' && (
+                    <div className="delete-actions mt-5">
+                      <button
+                        data-testid="override-stage-btn"
+                        onClick={overrideStage}
+                        data-modal-hide="popup-modal"
+                        type="submit"
+                        className="green-btn mr-2"
+                      >
                         Override Stage
-                    </button>
-                  </div>
-                }
-                {(isMain && userInfo?.accountType === 'teacher' || (!isMain && userInfo?.accountType === 'student')) && childArgs?.item.action === 'delete' &&
-                  <div className="delete-actions mt-5">
-                    <button 
-                      data-testid='delete-card-btn'
-                      onClick={removeCard} 
-                      data-modal-hide="popup-modal" 
-                      type="button" 
-                      className="green-btn mr-2">
+                      </button>
+                    </div>
+                  )}
+                {((isMain && userInfo?.accountType === 'teacher') ||
+                  (!isMain && userInfo?.accountType === 'student')) &&
+                  childArgs?.item.action === 'delete' && (
+                    <div className="delete-actions mt-5">
+                      <button
+                        data-testid="delete-card-btn"
+                        onClick={removeCard}
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        className="green-btn mr-2"
+                      >
                         Delete card
-                    </button>
-                  </div>
-                }
-                {(isMain && userInfo?.accountType === 'teacher' || (!isMain && userInfo?.accountType === 'student')) && childArgs?.item.action === 'activate' &&
-                  <div className="activate-actions mt-5">
-                    <button 
-                      data-testid='activate-card-btn'
-                      onClick={activate} 
-                      data-modal-hide="popup-modal" 
-                      type="button" 
-                      className="green-btn mr-2">
+                      </button>
+                    </div>
+                  )}
+                {((isMain && userInfo?.accountType === 'teacher') ||
+                  (!isMain && userInfo?.accountType === 'student')) &&
+                  childArgs?.item.action === 'activate' && (
+                    <div className="activate-actions mt-5">
+                      <button
+                        data-testid="activate-card-btn"
+                        onClick={activate}
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        className="green-btn mr-2"
+                      >
                         Activate card
-                    </button>
-                  </div>
-                }
-                {(isMain && userInfo?.accountType === 'teacher' || (!isMain && userInfo?.accountType === 'student')) && childArgs?.item.action === 'edit' &&
-                  
-                  <div className="teacher-actions">
-                    <button 
-                      data-testid="reset-stage-btn"
-                      onClick={resetStage} 
-                      data-modal-hide="popup-modal" 
-                      type="button" 
-                      className="green-btn mr-2">
+                      </button>
+                    </div>
+                  )}
+                {((isMain && userInfo?.accountType === 'teacher') ||
+                  (!isMain && userInfo?.accountType === 'student')) &&
+                  childArgs?.item.action === 'edit' && (
+                    <div className="teacher-actions">
+                      <button
+                        data-testid="reset-stage-btn"
+                        onClick={resetStage}
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        className="green-btn mr-2"
+                      >
                         Reset Stage
-                    </button>
-                    <button 
-                      data-testid="promote-stage-btn"
-                      disabled={false}  //TODO - revert to card.completionStatus === completed once pending reset automatically
-                      onClick={async () => await submitEditStage(true)} 
-                      data-modal-hide="popup-modal" 
-                      type="button" 
-                      className="green-btn mr-2">
+                      </button>
+                      <button
+                        data-testid="promote-stage-btn"
+                        disabled={false} //TODO - revert to card.completionStatus === completed once pending reset automatically
+                        onClick={async () => await submitEditStage(true)}
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        className="green-btn mr-2"
+                      >
                         Promote
-                    </button>
+                      </button>
 
-                    <button 
-                      data-testid="demote-stage-btn"
-                      disabled={false} //TODO - revert to card.completionStatus === completed once pending reset automatically
-                      onClick={async () => await submitEditStage(false)} 
-                      data-modal-hide="popup-modal" 
-                      type="button" 
-                      className="green-btn mr-2">
+                      <button
+                        data-testid="demote-stage-btn"
+                        disabled={false} //TODO - revert to card.completionStatus === completed once pending reset automatically
+                        onClick={async () => await submitEditStage(false)}
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        className="green-btn mr-2"
+                      >
                         Demote
-                    </button>
-                  </div>
-                }
+                      </button>
+                    </div>
+                  )}
 
-                {isMain && userInfo?.accountType === 'student' && childArgs.item.action !== 'show' &&
-                  <div className="student-actions">
-                    <button 
-                      disabled={[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(card.completionStatus)}
-                      onClick={submitForReview} 
-                      data-testid="submit-review-btn"
-                      data-modal-hide="popup-modal" 
-                      type="button" 
-                      className={[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(card.completionStatus) ? 'disabled-btn mr-2' : 
-                      'green-btn'}>
-                        {[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(card.completionStatus) ? 'Already submitted for review' : 'Submit for review'}
-                    </button>
-                  </div>
-                }
-                
+                {isMain &&
+                  userInfo?.accountType === 'student' &&
+                  childArgs.item.action !== 'show' && (
+                    <div className="student-actions">
+                      <button
+                        disabled={[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
+                          card.completionStatus
+                        )}
+                        onClick={submitForReview}
+                        data-testid="submit-review-btn"
+                        data-modal-hide="popup-modal"
+                        type="button"
+                        className={
+                          [CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
+                            card.completionStatus
+                          )
+                            ? 'disabled-btn mr-2'
+                            : 'green-btn'
+                        }
+                      >
+                        {[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
+                          card.completionStatus
+                        )
+                          ? 'Already submitted for review'
+                          : 'Submit for review'}
+                      </button>
+                    </div>
+                  )}
               </div>
               <div className="mt-5">
-                <button onClick={onClose} data-modal-hide="popup-modal" type="button" className="neutral-btn">Cancel</button>
+                <button
+                  onClick={onClose}
+                  data-modal-hide="popup-modal"
+                  type="button"
+                  className="neutral-btn"
+                >
+                  Cancel
+                </button>
               </div>
               <p data-testid="status-message">{statusMessage}</p>
             </div>
