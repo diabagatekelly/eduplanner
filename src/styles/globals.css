@@ -1,69 +1,94 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 255, 255, 255;
+@theme {
+  --text-*: initial;
+  --text-sm: 0.8rem;
+  --text-base: 1rem;
+  --text-xl: 1.35rem;
+  --text-2xl: 1.563rem;
+  --text-3xl: 1.953rem;
+  --text-4xl: 2.441rem;
+  --text-5xl: 3.052rem;
 }
 
-@media (prefers-color-scheme: dark) {
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility component-title {
+  @apply text-2xl md:text-3xl mt-3 font-bold;
+}
+
+@utility component-sub-title {
+  @apply text-xl md:text-2xl mt-3 font-bold;
+}
+
+@utility component-heading {
+  @apply text-xl md:text-2xl font-bold;
+}
+
+@utility list-item-card {
+  @apply flex justify-between mb-3 p-2 md:p-4 bg-white border-4 rounded-lg shadow-sm dark:bg-gray-800;
+}
+
+@utility list-text {
+  width: 100%;
+}
+
+@utility popup-styling {
+  @apply fixed top-0 [@media(max-height:500px)]:top-0 md:top-[5%] max-[450px]:left-[15%] min-[451px]:left-[25%] min-[667px]:left-[38%] md:left-[25%] lg:left-1/3 max-[479px]:w-[75%] md:w-full max-w-md max-h-full [@media(max-height:550px)]:max-h-[80%] border-4 border-gray-800 rounded-lg overflow-y-auto;
+}
+
+@utility default-btn {
+  @apply my-3 md:my-5 rounded-md bg-indigo-600 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600;
+}
+
+@utility red-btn {
+  @apply my-3 md:my-5 rounded-md bg-red-600 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-xs hover:bg-red-500 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600;
+}
+
+@utility green-btn {
+  @apply my-3 md:my-5 rounded-md bg-green-600 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-xs hover:bg-green-500 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600;
+}
+
+@utility disabled-btn {
+  @apply my-3 md:my-5 rounded-md bg-gray-500 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-xs focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600;
+}
+
+@utility neutral-btn {
+  @apply my-3 md:my-5 rounded-md bg-white px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-gray-800 shadow-xs border border-gray-600 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800 hover:outline-solid hover:outline-2 hover:outline-gray-800;
+}
+
+@layer utilities {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-rgb: 0, 0, 0;
-  }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
-}
-
-@layer components {
-  .component-title { 
-    @apply text-2xl md:text-3xl mt-3 font-bold;
-  }
-}
-
-@layer components {
-  .component-sub-title {
-    @apply text-xl md:text-2xl mt-3 font-bold;
+    --foreground-rgb: 0, 0, 0;
+    --background-rgb: 255, 255, 255;
   }
 
-  .component-heading {
-    @apply text-xl md:text-2xl font-bold;
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --foreground-rgb: 255, 255, 255;
+      --background-rgb: 0, 0, 0;
+    }
   }
 
-  .list-item-card {
-    @apply flex justify-between mb-3 p-2 md:p-4 bg-white border-4 rounded-lg shadow dark:bg-gray-800
-  }
-
-  .list-text {
-    width: 100%
-  }
-
-  .popup-styling {
-    @apply fixed top-0 [@media(max-height:500px)]:top-[0] md:top-[5%] max-[450px]:left-[15%] min-[451px]:left-[25%] min-[667px]:left-[38%] md:left-[25%] lg:left-1/3 max-[479px]:w-[75%] md:w-full max-w-md max-h-full [@media(max-height:550px)]:max-h-[80%] border-4 border-gray-800 rounded-lg overflow-y-auto
-  }
-
-  .default-btn {
-    @apply my-3 md:my-5 rounded-md bg-indigo-600 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
-  }
-
-  .red-btn {
-    @apply my-3 md:my-5 rounded-md bg-red-600 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600
-  }
-
-  .green-btn {
-    @apply my-3 md:my-5 rounded-md bg-green-600 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600
-  }
-
-  .disabled-btn {
-    @apply my-3 md:my-5 rounded-md bg-gray-500 px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600
-  }
-
-  .neutral-btn {
-    @apply my-3 md:my-5 rounded-md bg-white px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-gray-800 shadow-sm border border-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800 hover:outline hover:outline-2 hover:outline-gray-800
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: rgb(var(--background-rgb));
   }
 }
 
