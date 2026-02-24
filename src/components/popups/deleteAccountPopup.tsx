@@ -11,23 +11,21 @@ import { UserMinusIcon, XMarkIcon } from '@heroicons/react/24/solid'
 export default function DeleteAccountPopup({
   onClose,
   showModal,
-  ...childArgs
+  user,
 }: {
-  onClose: any
+  onClose: () => void
   showModal: boolean
-  newStudent?: IUser | Partial<IUser>
   user?: IUser | Partial<IUser>
 }) {
   const dispatch = useAppDispatch()
   const router = useRouter()
 
-  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })
+  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
   const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
-    const user = childArgs.user
     getUserInfo(user)
-  }, [showModal, childArgs])
+  }, [showModal, user])
 
   async function deleteAccount() {
     try {

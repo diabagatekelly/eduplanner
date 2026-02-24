@@ -9,31 +9,28 @@ import { XMarkIcon, MinusIcon } from '@heroicons/react/24/solid'
 export default function UnlinkAccountPopup({
   onClose,
   showModal,
-  ...childArgs
+  user,
 }: {
-  onClose: any
+  onClose: () => void
   showModal: boolean
-  newStudent?: IUser | Partial<IUser>
   user?: IUser | Partial<IUser>
 }) {
   const dispatch = useAppDispatch()
-  let args
 
-  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })
-  const [user, getUserData] = useState<IUser | Partial<IUser>>({ ...args })
+  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...user })
+  const [teacherInfo, getTeacherInfo] = useState<IUser | Partial<IUser>>({})
   const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
-    const student = childArgs.user
-    getStudentInfo(student)
+    getStudentInfo(user)
 
     const { userReducer } = store.getState()
-    getUserData(userReducer)
-  }, [showModal, childArgs, studentInfo, user])
+    getTeacherInfo(userReducer)
+  }, [showModal, user])
 
   async function removeOldStudent() {
     try {
-      await unlinkAccount({ teacherId: user.userId, studentId: studentInfo.userId })
+      await unlinkAccount({ teacherId: teacherInfo.userId, studentId: studentInfo.userId })
       onUnlinkAccountSuccess()
     } catch (error) {
       console.log(error)

@@ -14,9 +14,14 @@ export default function Popup({
   showModal,
   modalType,
   isMain,
-  ...childArgs
+  newStudent,
+  user,
+  item,
+  activity,
+  submitList,
+  setFormSubmitOutcomeMessage,
 }: {
-  onClose: any
+  onClose: () => void
   showModal: boolean
   modalType: string
   isMain?: boolean
@@ -24,18 +29,46 @@ export default function Popup({
   user?: IUser | Partial<IUser>
   item?: any
   activity?: IActivity
+  submitList?: (list: string) => void
+  setFormSubmitOutcomeMessage?: (msg: string) => void
 }) {
   if (modalType === 'deleteAccount') {
-    return <DeleteAccountPopup {...{ onClose, showModal, ...childArgs }} />
+    return <DeleteAccountPopup onClose={onClose} showModal={showModal} user={user} />
   } else if (modalType === 'addStudent') {
-    return <LinkAccountPopup {...{ onClose, showModal, ...childArgs }} />
+    return (
+      <LinkAccountPopup
+        onClose={onClose}
+        showModal={showModal}
+        newStudent={newStudent}
+        user={user}
+      />
+    )
   } else if (modalType === 'removeStudent') {
-    return <UnlinkAccountPopup {...{ onClose, showModal, ...childArgs }} />
+    return <UnlinkAccountPopup onClose={onClose} showModal={showModal} user={user} />
   } else if (modalType === 'removeActivity') {
-    return <DeleteActivityPopup {...{ onClose, showModal, ...childArgs }} />
+    return (
+      <DeleteActivityPopup onClose={onClose} showModal={showModal} user={user} item={item} />
+    )
   } else if (modalType === 'manageCard') {
-    return <ManageCardPopup {...{ onClose, showModal, isMain, ...childArgs }} />
+    return (
+      <ManageCardPopup
+        onClose={onClose}
+        showModal={showModal}
+        isMain={!!isMain}
+        user={user}
+        item={item}
+        activity={activity}
+      />
+    )
   } else if (modalType === 'validate') {
-    return <ValidatePopup {...{ onClose, showModal, ...childArgs }} />
+    return (
+      <ValidatePopup
+        onClose={onClose}
+        showModal={showModal}
+        item={item}
+        submitList={submitList}
+        setFormSubmitOutcomeMessage={setFormSubmitOutcomeMessage}
+      />
+    )
   }
 }

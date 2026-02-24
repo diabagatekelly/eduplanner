@@ -4,28 +4,30 @@ import { useEffect, useState } from 'react'
 export default function ValidatePopup({
   onClose,
   showModal,
-  ...childArgs
+  item,
+  submitList,
+  setFormSubmitOutcomeMessage,
 }: {
-  onClose: any
+  onClose: () => void
   showModal: boolean
-  item?: any
-  submitList?: any
-  setFormSubmitOutcomeMessage?: any
+  item?: { list: string }
+  submitList?: (list: string) => void
+  setFormSubmitOutcomeMessage?: (msg: string) => void
 }) {
   const [itemsToValidate, getItemsToValidate] = useState('')
 
   useEffect(() => {
-    const items: string = childArgs?.item.list
-    getItemsToValidate(items)
-  }, [showModal, childArgs])
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    getItemsToValidate(item!.list)
+  }, [showModal, item])
 
   function validate() {
-    childArgs?.submitList(itemsToValidate)
+    submitList?.(itemsToValidate)
     onClose()
   }
 
   function cancel() {
-    childArgs?.setFormSubmitOutcomeMessage('Validation canceled.')
+    setFormSubmitOutcomeMessage?.('Validation canceled.')
     onClose()
   }
 

@@ -21,9 +21,11 @@ export default function ManageCardPopup({
   onClose,
   showModal,
   isMain,
-  ...childArgs
+  user,
+  item,
+  activity: activityProp,
 }: {
-  onClose: any
+  onClose: () => void
   showModal: boolean
   isMain: boolean
   user?: IUser | Partial<IUser>
@@ -32,22 +34,21 @@ export default function ManageCardPopup({
 }) {
   const dispatch = useAppDispatch()
 
-  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })
-  const [card, getCardDetails] = useState<ICard>({ ...childArgs.item.card })
-  const [activity, getActivityDetails] = useState<IActivity>({ ...childArgs.activity })
+  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const [card, getCardDetails] = useState<ICard>({ ...item!.card })
+  const [activity, getActivityDetails] = useState<IActivity>({ ...activityProp } as IActivity)
   const [statusMessage, setStatusMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [newStage, setNewStage] = useState('')
 
   useEffect(() => {
-    const cardDetails = childArgs.item.card
-    const user = childArgs.user
-    const activityDetails = childArgs.activity
-
-    getCardDetails(cardDetails)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    getCardDetails(item!.card)
     getUserInfo(user)
-    getActivityDetails(activityDetails)
-  }, [showModal, childArgs, statusMessage, newStage])
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    getActivityDetails(activityProp!)
+  }, [showModal, user, item, activityProp, statusMessage, newStage])
 
   async function resetStage() {
     try {
@@ -154,7 +155,7 @@ export default function ManageCardPopup({
     }
   }
 
-  async function overrideStage(e: React.FormEvent<any>) {
+  async function overrideStage(e: React.FormEvent<HTMLFormElement>) {
     try {
       e.preventDefault()
       const editPayload = {
@@ -323,7 +324,7 @@ export default function ManageCardPopup({
     }
   }
 
-  function formatCardInstructions(cardName) {
+  function formatCardInstructions(cardName: string) {
     if (cardName.includes('Vocab')) {
       return (
         <>
@@ -340,7 +341,7 @@ export default function ManageCardPopup({
     }
   }
 
-  function handleOverrideFormChange(e) {
+  function handleOverrideFormChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const selectedStage = e.target.value
     setNewStage(selectedStage)
   }
@@ -348,7 +349,7 @@ export default function ManageCardPopup({
   return (
     <>
       <div
-        data-testid={`manage-card-popup-${childArgs?.item.action}`}
+        data-testid={`manage-card-popup-${item?.action}`}
         aria-hidden="true"
         hidden={!showModal}
         id="popup-modal"
@@ -412,7 +413,7 @@ export default function ManageCardPopup({
                   <hr />
                   <div data-testid="card-stage-management" className="my-5">
                     <h6 className="mb-2">Current status: {card.completionStatus}</h6>
-                    {childArgs?.item.action === 'override' ? (
+                    {item?.action === 'override' ? (
                       <form className="max-w-md mx-auto" onChange={handleOverrideFormChange}>
                         <label
                           htmlFor="countries"
@@ -440,7 +441,7 @@ export default function ManageCardPopup({
                 </div>
                 {((isMain && userInfo?.accountType === 'teacher') ||
                   (!isMain && userInfo?.accountType === 'student')) &&
-                  childArgs?.item.action === 'override' && (
+                  item?.action === 'override' && (
                     <div className="delete-actions mt-5">
                       <button
                         data-testid="override-stage-btn"
@@ -455,7 +456,7 @@ export default function ManageCardPopup({
                   )}
                 {((isMain && userInfo?.accountType === 'teacher') ||
                   (!isMain && userInfo?.accountType === 'student')) &&
-                  childArgs?.item.action === 'delete' && (
+                  item?.action === 'delete' && (
                     <div className="delete-actions mt-5">
                       <button
                         data-testid="delete-card-btn"
@@ -470,7 +471,7 @@ export default function ManageCardPopup({
                   )}
                 {((isMain && userInfo?.accountType === 'teacher') ||
                   (!isMain && userInfo?.accountType === 'student')) &&
-                  childArgs?.item.action === 'activate' && (
+                  item?.action === 'activate' && (
                     <div className="activate-actions mt-5">
                       <button
                         data-testid="activate-card-btn"
@@ -485,7 +486,7 @@ export default function ManageCardPopup({
                   )}
                 {((isMain && userInfo?.accountType === 'teacher') ||
                   (!isMain && userInfo?.accountType === 'student')) &&
-                  childArgs?.item.action === 'edit' && (
+                  item?.action === 'edit' && (
                     <div className="teacher-actions">
                       <button
                         data-testid="reset-stage-btn"
@@ -522,7 +523,7 @@ export default function ManageCardPopup({
 
                 {isMain &&
                   userInfo?.accountType === 'student' &&
-                  childArgs.item.action !== 'show' && (
+                  item?.action !== 'show' && (
                     <div className="student-actions">
                       <button
                         disabled={[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(

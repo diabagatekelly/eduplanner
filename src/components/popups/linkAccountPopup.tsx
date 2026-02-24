@@ -8,35 +8,31 @@ import { LinkIcon, XMarkIcon } from '@heroicons/react/24/solid'
 export default function LinkAccountPopup({
   onClose,
   showModal,
-  ...childArgs
+  newStudent,
+  user,
 }: {
-  onClose: any
+  onClose: () => void
   showModal: boolean
   newStudent?: IUser | Partial<IUser>
   user?: IUser | Partial<IUser>
 }) {
   const dispatch = useAppDispatch()
 
-  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({
-    ...childArgs.newStudent,
-  })
-  const [user, getUserData] = useState<IUser | Partial<IUser>>({ ...childArgs.user })
+  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...newStudent })
+  const [teacher, getTeacherData] = useState<IUser | Partial<IUser>>({ ...user })
   const [outcomeMessage, setOutcomeMessage] = useState('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
-    const student = childArgs.newStudent
-    getStudentInfo(student)
-
-    const teacher = childArgs.user
-    getUserData(teacher)
-  }, [showModal, childArgs, studentInfo, user])
+    getStudentInfo(newStudent)
+    getTeacherData(user)
+  }, [showModal, newStudent, user])
 
   async function addStudent() {
     try {
       setIsLoading(true)
       const linkAccountsData: { teacherId: string; studentId: [string, string] } = {
-        teacherId: user.userId,
+        teacherId: teacher.userId,
         studentId: [studentInfo.userId, studentInfo.username],
       }
       await linkAccount(linkAccountsData)
