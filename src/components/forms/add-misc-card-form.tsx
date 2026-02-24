@@ -21,7 +21,6 @@ export default function AddMiscCardForm({
   user: IUser
   activity: IActivity
 }) {
-  let args
   const dispatch = useAppDispatch()
 
   const [typedList, getTypedList] = useState({
@@ -30,7 +29,7 @@ export default function AddMiscCardForm({
 
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
   const [modalType, setModalType] = useState('')
-  const [popupItem, getPopupItem] = useState<{ list: string }>({ ...args })
+  const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
   const [showModal, setShowModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 

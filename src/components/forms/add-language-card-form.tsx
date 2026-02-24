@@ -27,7 +27,6 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
   user: IUser
   activity: IActivity
 }) {
-  let args
   const dispatch = useAppDispatch()
 
   const [file, uploadFile] = useState({
@@ -46,17 +45,18 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState('')
-  const [popupItem, getPopupItem] = useState<{ list: string }>({ ...args })
+  const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
 
   useEffect(() => {}, [user, activity, file])
 
   async function onFileInput(e: React.FormEvent<HTMLInputElement>) {
-    if ((e.target as HTMLInputElement).files[0].type !== 'text/plain') {
+    const files = (e.target as HTMLInputElement).files
+    if (files?.[0]?.type !== 'text/plain') {
       setFormSubmitOutcomeMessage('The file uploaded is not a text (.txt) file.')
       return
     }
 
-    const content = await (e.target as HTMLInputElement).files[0]?.text()
+    const content = await files[0].text()
     const cleanedContent = cleanUpList(content)
     setFormSubmitOutcomeMessage('')
     uploadFile({
@@ -145,7 +145,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
       return
     }
 
-    let listOfItemsToValidate: string
+    let listOfItemsToValidate = ''
     if (shouldType || grammarCard) {
       listOfItemsToValidate = cleanUpList(typedList.words)
       ;(document.querySelector('#typed') as HTMLTextAreaElement).value = listOfItemsToValidate

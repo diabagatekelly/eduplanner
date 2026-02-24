@@ -130,13 +130,13 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
 
     if (isChecked && !alreadySelected.includes(newlySelected)) {
       alreadySelected.push(newlySelected)
-      if (newlySelectedCard.level === 'Juz') {
+      if (newlySelectedCard?.level === 'Juz') {
         ajzah.push(newlySelectedCard.juz)
       }
     } else if (!isChecked && alreadySelected.includes(newlySelected)) {
       alreadySelected.splice(alreadySelected.indexOf(newlySelected), 1)
 
-      if (ajzah.includes(newlySelectedCard.juz)) {
+      if (newlySelectedCard && ajzah.includes(newlySelectedCard.juz)) {
         ajzah.splice(ajzah.indexOf(newlySelectedCard.juz), 1)
       }
     }
@@ -171,7 +171,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
     e.preventDefault()
     try {
       const rawFormData = new FormData(e.currentTarget)
-      const jsonData = {
+      const jsonData: Record<string, string> = {
         content: '',
       }
       for (const pair of rawFormData.entries()) {
