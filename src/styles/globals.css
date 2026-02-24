@@ -50,7 +50,7 @@
 }
 
 @utility popup-styling {
-  @apply fixed top-0 [@media(max-height:500px)]:top-0 md:top-[5%] max-[450px]:left-[15%] min-[451px]:left-[25%] min-[667px]:left-[38%] md:left-[25%] lg:left-1/3 max-[479px]:w-[75%] md:w-full max-w-md max-h-full [@media(max-height:550px)]:max-h-[80%] border-4 border-gray-800 rounded-lg overflow-y-auto;
+  @apply fixed top-0 md:top-[5%] max-[450px]:left-[15%] min-[451px]:left-[25%] min-[667px]:left-[38%] md:left-[25%] lg:left-1/3 max-[479px]:w-[75%] md:w-full max-w-md max-h-full [@media(max-height:550px)]:max-h-[80%] border-4 border-gray-800 rounded-lg overflow-y-auto;
 }
 
 @utility default-btn {
@@ -73,7 +73,7 @@
   @apply my-3 md:my-5 rounded-md bg-white px-5 md:px-7 py-2.5 md:py-4 text-base md:text-xl font-semibold leading-6 text-gray-800 shadow-xs border border-gray-600 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800 hover:outline-solid hover:outline-2 hover:outline-gray-800;
 }
 
-@layer utilities {
+@layer base {
   :root {
     --foreground-rgb: 0, 0, 0;
     --background-rgb: 255, 255, 255;
