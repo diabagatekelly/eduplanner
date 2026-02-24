@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { removeUserActivity } from '@/store/actions/userActions'
 import { deleteActivity } from '../../api/controller'
 import { IUser } from '@/types/IUser'
@@ -15,7 +15,7 @@ export default function DeleteActivityPopup({
   item?: { activityName: string }
   user?: IUser | Partial<IUser>
 }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })
   const [activityName, getActivityName] = useState('')

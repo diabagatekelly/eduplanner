@@ -2,7 +2,7 @@
 
 import React, { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import RegisterForm from '@/app/register/components/register-form'
 import { IUser, IUserFormData } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
@@ -16,7 +16,7 @@ interface IRegister {
 }
 
 export default function Register<IRegister>() {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const router = useRouter()
 
   const [formData, setFormData] = useState<IUserFormData>({

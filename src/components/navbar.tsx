@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { removeAuthToken } from '../store/actions/authActions'
 import { resetUser } from '../store/actions/userActions'
 import { usePathname, useRouter } from 'next/navigation'
@@ -25,7 +25,7 @@ export default function Navbar({
   username: string
 }) {
   let args
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const router = useRouter()
   const pathname = usePathname()
 

@@ -9,7 +9,7 @@ import Popup from '../popups/popup'
 import { createCards } from '@/api/controller'
 import { IResponse } from '@/types/IApiResponse'
 import { createUserCard } from '@/store/actions/userActions'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 
 export default function AddMiscCardForm({
@@ -22,7 +22,7 @@ export default function AddMiscCardForm({
   activity: IActivity
 }) {
   let args
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [typedList, getTypedList] = useState({
     words: '',

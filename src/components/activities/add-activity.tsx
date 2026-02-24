@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react'
 import { createActivity } from '../../api/controller'
 import AddActivityForm from '../forms/add-activity-form'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { createUserActivity } from '../../store/actions/userActions'
 import { IActivity, IActivityFormData } from '../../types/IActivity'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
@@ -18,7 +18,7 @@ interface IAddActivity {
 }
 
 export default function AddActivity<IAddActivity>({ userDetails }: { userDetails: IUser }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [formData, setFormData] = useState<IActivityFormData>({
     name: '',

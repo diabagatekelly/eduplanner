@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { editUserCard, removeUserCard } from '@/store/actions/userActions'
 import {
   activateCard,
@@ -30,7 +30,7 @@ export default function ManageCardPopup({
   activity?: IActivity
   item?: { card: ICard; action: string }
 }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })
   const [card, getCardDetails] = useState<ICard>({ ...childArgs.item.card })

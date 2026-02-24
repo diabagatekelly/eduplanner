@@ -1,7 +1,8 @@
 'use client'
 
 import { Inter } from 'next/font/google'
-import { Provider, useDispatch } from 'react-redux'
+import { Provider } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { Suspense, useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import '@/styles/globals.css'
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 const Reloader = () => {
   let args
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const pathname = usePathname()
   // const searchParams = useSearchParams()
   const router = useRouter()

@@ -7,7 +7,7 @@ import { IUserLogin } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
 import Link from 'next/link'
 import { setAuthToken } from '@/store/actions/authActions'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { populateUser } from '@/store/actions/userActions'
 import { loginUser } from '@/api/controller'
 
@@ -17,7 +17,7 @@ interface ILogin {
 }
 
 export default function Login<ILogin>() {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const router = useRouter()
 
   const [formData, setFormData] = useState<{ email: string; password: string }>({

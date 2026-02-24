@@ -5,7 +5,7 @@ import { ICard, IQuranCards } from '../../types/ICard'
 import React from 'react'
 import { IActivity } from '@/types/IActivity'
 import { IUser } from '@/types/IUser'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { createCards, deleteCard } from '@/api/controller'
 import { quranCards } from '@/lib/constants/quran-bank'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
@@ -27,7 +27,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
   user: IUser
   activity: IActivity
 }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [formData, setFormData] = useState<IQuranCards[]>([])
   const [custom, setCustom] = useState({

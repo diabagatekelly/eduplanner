@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import store from '../../store/store'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { removeStudent } from '@/store/actions/userActions'
 import { unlinkAccount } from '../../api/controller'
 import { IUser } from '@/types/IUser'
@@ -16,7 +16,7 @@ export default function UnlinkAccountPopup({
   newStudent?: IUser | Partial<IUser>
   user?: IUser | Partial<IUser>
 }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   let args
 
   const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })

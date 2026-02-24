@@ -8,7 +8,7 @@ import { IResponse } from '@/types/IApiResponse'
 import Popup from '../popups/popup'
 import { ICard } from '@/types/ICard'
 import { createUserCard } from '@/store/actions/userActions'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 import { createCards } from '@/api/controller'
 import { DocumentMinusIcon } from '@heroicons/react/24/solid'
@@ -28,7 +28,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
   activity: IActivity
 }) {
   let args
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [file, uploadFile] = useState({
     content: '',

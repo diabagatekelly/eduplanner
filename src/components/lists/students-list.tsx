@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Popup from '../popups/popup'
 import { findUser } from '@/api/controller'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { saveStudentDetails } from '@/store/actions/userActions'
 import { useRouter } from 'next/navigation'
 import { IUser } from '@/types/IUser'
@@ -12,7 +12,7 @@ import { TrashIcon } from '@heroicons/react/24/solid'
 
 export default function StudentsList({ userDetails }: { userDetails: IUser }) {
   let args
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const router = useRouter()
 
   const [studentIdsList, getStudentIdsList] = useState<[string, string][]>([])

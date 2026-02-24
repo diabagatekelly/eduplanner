@@ -3,7 +3,7 @@ import { resetUser } from '@/store/actions/userActions'
 import { useRouter } from 'next/navigation'
 import { deleteUser } from '../../api/controller'
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { IUser } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
 import { UserMinusIcon, XMarkIcon } from '@heroicons/react/24/solid'
@@ -18,7 +18,7 @@ export default function DeleteAccountPopup({
   newStudent?: IUser | Partial<IUser>
   user?: IUser | Partial<IUser>
 }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const router = useRouter()
 
   const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { editActivity, requestCardReview } from '../../api/controller'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { editUserActivity } from '../../store/actions/userActions'
 import ListUi from '@/components/lists/lists-ui'
 import { CompletionStatus } from '../../types/CompletionStatusEnum'
@@ -26,7 +26,7 @@ export default function ViewActivity<IViewActivity>({
   userActivity: IActivity
   isMain: boolean
 }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   let args
 
   const [isLoading, setIsLoading] = useState(false)
