@@ -4,30 +4,33 @@ orbs:
   cypress: cypress-io/cypress@3.4.3
 jobs:
   run-unit-tests:
-    executor: node/default
+    executor:
+      name: node/default
+      tag: '22.13.0'
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: npm install
+          command: npm install --legacy-peer-deps
       - run:
           name: Run frontend tests
           command: npm run test
   install-and-persist:
-    executor: 
+    executor:
       name: cypress/default
-      node-version: '18.18.0'
+      node-version: '22.13.0'
     steps:
-      - cypress/install
+      - cypress/install:
+          install-command: npm install --legacy-peer-deps
       - persist_to_workspace:
           paths:
             - .cache/Cypress
             - project
           root: ~/
   run-integration-tests:
-    executor: 
+    executor:
       name: cypress/default
-      node-version: '18.18.0'
+      node-version: '22.13.0'
     steps:
       - attach_workspace:
           at: ~/
