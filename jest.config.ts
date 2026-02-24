@@ -3,8 +3,8 @@
  * https://jestjs.io/docs/configuration
  */
 
-import type {Config} from 'jest';
-import nextJest from 'next/jest.js';
+import type { Config } from 'jest'
+import nextJest from 'next/jest.js'
 
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
@@ -28,12 +28,7 @@ const config: Config = {
   collectCoverage: true,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  collectCoverageFrom: [
-    '**/*.{ts,tsx}',
-    '!**/node_modules/**',
-    '!**/vendor/**',
-    '!**/specs/**',
-  ],
+  collectCoverageFrom: ['**/*.{ts,tsx}', '!**/node_modules/**', '!**/vendor/**', '!**/specs/**'],
   coverageThreshold: {
     global: {
       branches: 100,
@@ -44,7 +39,7 @@ const config: Config = {
   },
 
   // The directory where Jest should output its coverage files
-  coverageDirectory: "../coverage",
+  coverageDirectory: '../coverage',
 
   // An array of regexp pattern strings used to skip coverage collection
   // coveragePathIgnorePatterns: [
@@ -165,7 +160,7 @@ const config: Config = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: "jsdom",
+  testEnvironment: 'jsdom',
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -213,6 +208,6 @@ const config: Config = {
 
   // Whether to use watchman for file crawling
   // watchman: true,
-};
+}
 
 export default createJestConfig(config)

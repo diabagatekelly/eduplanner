@@ -9,8 +9,8 @@ export default function formatCardName(cardId: string, activityName: string) {
 }
 
 function _formatQuranCardName(cardId) {
-  const cardName = atob(cardId);
-  const cardNameNoHyphens = cardName.split('-');
+  const cardName = atob(cardId)
+  const cardNameNoHyphens = cardName.split('-')
 
   if (cardNameNoHyphens[0] === 'juz') {
     return `${_capitalizeFirstLetter(cardNameNoHyphens[0])} ${cardNameNoHyphens[1]}`
@@ -22,17 +22,17 @@ function _formatQuranCardName(cardId) {
 }
 
 function _formatLanguageCardName(cardId) {
-  const cardName = atob(cardId);
-  const cardNameNoHyphens = cardName.split('-');
+  const cardName = atob(cardId)
+  const cardNameNoHyphens = cardName.split('-')
   return `${_capitalizeFirstLetter(cardNameNoHyphens[0])} ${_capitalizeFirstLetter(cardNameNoHyphens[1])}: ${cardNameNoHyphens[2]}`
 }
 
 function _formatMiscCardName(cardId) {
-  const cardName = atob(cardId);
-  const cardNameNoHyphens = cardName.split('-');
-  return `Miscellaneous Card: ${cardNameNoHyphens[2]}`;
+  const cardName = atob(cardId)
+  const cardNameNoHyphens = cardName.split('-')
+  return `Miscellaneous Card: ${cardNameNoHyphens[2]}`
 }
 
 function _capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+  return string.charAt(0).toUpperCase() + string.slice(1)
 }

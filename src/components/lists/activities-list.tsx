@@ -1,83 +1,102 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react";
-import Popup from "../popups/popup";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from 'react'
+import Popup from '../popups/popup'
+import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
-import { IUser } from "@/types/IUser";
-import { IActivity } from "@/types/IActivity";
-import { fromDbFormat } from "@/lib/helpers/formatActivityName";
-import { getBorderColor } from "@/lib/helpers/getBorderColor";
-import { TrashIcon } from "@heroicons/react/24/solid";
+import { IUser } from '@/types/IUser'
+import { IActivity } from '@/types/IActivity'
+import { fromDbFormat } from '@/lib/helpers/formatActivityName'
+import { getBorderColor } from '@/lib/helpers/getBorderColor'
+import { TrashIcon } from '@heroicons/react/24/solid'
 
-export default function ActivitiesList({isMain, userDetails}: {isMain: boolean, userDetails: IUser}) {
-  let args;
-  const router = useRouter();
-  const pathName = usePathname();
+export default function ActivitiesList({
+  isMain,
+  userDetails,
+}: {
+  isMain: boolean
+  userDetails: IUser
+}) {
+  let args
+  const router = useRouter()
+  const pathName = usePathname()
 
   const [activitiesList, getActivitiesList] = useState<IActivity[]>([])
-  const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState('');
-  const [popupUserDetails, getPopupUserDetails] = useState<IUser>({ ...args });
-  const [popupItem, getPopupItem] = useState<{activityName: string}>({ ...args })
+  const [showModal, setShowModal] = useState(false)
+  const [modalType, setModalType] = useState('')
+  const [popupUserDetails, getPopupUserDetails] = useState<IUser>({ ...args })
+  const [popupItem, getPopupItem] = useState<{ activityName: string }>({ ...args })
 
   useEffect(() => {
     const activities: IActivity[] = userDetails?.activities
     getActivitiesList([...[].concat(activities)])
   }, [userDetails])
 
-
   function deleteActivity(activityName: string) {
     getPopupItem({ activityName })
     getPopupUserDetails(userDetails)
     setModalType('removeActivity')
-    setShowModal(true);
+    setShowModal(true)
   }
 
   function fetchActivity(activityName: string) {
     setShowModal(false)
-    let url;
+    let url
     if (isMain) {
       url = `activities/${activityName}`
-      router.push(`/${userDetails.username}/${url}`);
+      router.push(`/${userDetails.username}/${url}`)
     } else {
       let mainUser = pathName.split('/')[1]
       url = `students/${userDetails.username}/activities/${activityName}`
-      router.push(`/${mainUser}/${url}`);
+      router.push(`/${mainUser}/${url}`)
     }
   }
 
-
   return (
     <>
-      {activitiesList?.length ?
-      <>
-        <h3 className="component-sub-title">Current activities:</h3>
-        <ul data-testid="activities-list" className="py-3">
-          {activitiesList?.map((activity) => (
-            <li style={{ borderColor: getBorderColor(activity) }} className="list-item-card" key={activity?.name}>
-              <p data-testid="activity-in-list" className="hover:cursor-pointer list-text" onClick={() => fetchActivity(activity?.name)}>{fromDbFormat(activity?.name)}</p>
-              <span data-testid="delete-activities-in-list" onClick={() => deleteActivity(activity?.name)}>
-                <TrashIcon 
-                  title="Delete activity"
-                  fill="none" 
-                  strokeWidth="1.5" 
-                  stroke="currentColor" 
-                  className="w-6 h-6"
-                  strokeLinecap="round" 
-                  strokeLinejoin="round"
-                />
-              </span>
-            </li>
-          ))}
-        </ul> 
-      </>
-        :
+      {activitiesList?.length ? (
+        <>
+          <h3 className="component-sub-title">Current activities:</h3>
+          <ul data-testid="activities-list" className="py-3">
+            {activitiesList?.map((activity) => (
+              <li
+                style={{ borderColor: getBorderColor(activity) }}
+                className="list-item-card"
+                key={activity?.name}
+              >
+                <p
+                  data-testid="activity-in-list"
+                  className="hover:cursor-pointer list-text"
+                  onClick={() => fetchActivity(activity?.name)}
+                >
+                  {fromDbFormat(activity?.name)}
+                </p>
+                <span
+                  data-testid="delete-activities-in-list"
+                  onClick={() => deleteActivity(activity?.name)}
+                >
+                  <TrashIcon
+                    title="Delete activity"
+                    fill="none"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
         <p data-testid="no-activities-message">You have no activities yet.</p>
-      }
+      )}
 
-      <Popup {...{ showModal, modalType, isMain, user: popupUserDetails, item: popupItem }} onClose={() => setShowModal(false)} />
+      <Popup
+        {...{ showModal, modalType, isMain, user: popupUserDetails, item: popupItem }}
+        onClose={() => setShowModal(false)}
+      />
     </>
   )
-
 }

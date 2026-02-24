@@ -1,10 +1,10 @@
 export interface IResponse {
-  status: number,
+  status: number
   data: IResponseBody
 }
 
 interface IResponseBody {
-  status: string,
-  message: string,
+  status: string
+  message: string
   details: any
 }

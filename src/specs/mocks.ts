@@ -1,9 +1,9 @@
-import { IUser } from "../types/IUser";
-import { ICard } from "../types/ICard";
-import { IActivity } from "../types/IActivity";
-import { CompletionStatus } from "../types/CompletionStatusEnum";
-import { ISODateString } from "../types/isoDateType";
-import { IQuranSurahCard, IQuranJuzCard } from "@/types/ICard";
+import { IUser } from '../types/IUser'
+import { ICard } from '../types/ICard'
+import { IActivity } from '../types/IActivity'
+import { CompletionStatus } from '../types/CompletionStatusEnum'
+import { ISODateString } from '../types/isoDateType'
+import { IQuranSurahCard, IQuranJuzCard } from '@/types/ICard'
 
 export const mockUser: IUser = {
   userId: btoa('mock.user@email.com'),
@@ -13,9 +13,9 @@ export const mockUser: IUser = {
   email: 'mock.user@email.com',
   password: 'password',
   accountType: 'teacher',
-  linkedAccountsData: {students: []},
-  lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
-  activities: []
+  linkedAccountsData: { students: [] },
+  lastLogin: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
+  activities: [],
 }
 
 export const mockStudent: IUser = {
@@ -26,9 +26,9 @@ export const mockStudent: IUser = {
   email: 'mock.student@email.com',
   password: 'password',
   accountType: 'student',
-  linkedAccountsData: {teacher: null},
-  lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
-  activities: [] 
+  linkedAccountsData: { teacher: null },
+  lastLogin: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
+  activities: [],
 }
 
 export const mockActivity: IActivity = {
@@ -38,8 +38,8 @@ export const mockActivity: IActivity = {
   description: 'Quran memorization',
   completionStatus: CompletionStatus.PENDING,
   hasCards: true,
-  createdOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
-  lastUpdatedOn: null
+  createdOn: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
+  lastUpdatedOn: null,
 }
 
 export const mockLanguageActivity: IActivity = {
@@ -49,8 +49,8 @@ export const mockLanguageActivity: IActivity = {
   description: 'Arabic language',
   completionStatus: CompletionStatus.PENDING,
   hasCards: true,
-  createdOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
-  lastUpdatedOn: null
+  createdOn: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
+  lastUpdatedOn: null,
 }
 
 export const mockCookingActivity: IActivity = {
@@ -60,8 +60,8 @@ export const mockCookingActivity: IActivity = {
   description: 'practice cooking',
   completionStatus: CompletionStatus.PENDING,
   hasCards: true,
-  createdOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
-  lastUpdatedOn: null
+  createdOn: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
+  lastUpdatedOn: null,
 }
 
 export const mockUserCard: ICard = {
@@ -72,7 +72,7 @@ export const mockUserCard: ICard = {
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE
+  completionStatus: CompletionStatus.INACTIVE,
 }
 
 export const mockUserLanguageVocabCard: ICard = {
@@ -83,7 +83,7 @@ export const mockUserLanguageVocabCard: ICard = {
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE
+  completionStatus: CompletionStatus.INACTIVE,
 }
 
 export const mockUserLanguageGrammarCard: ICard = {
@@ -94,7 +94,7 @@ export const mockUserLanguageGrammarCard: ICard = {
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE
+  completionStatus: CompletionStatus.INACTIVE,
 }
 
 export const mockUserMiscCard: ICard = {
@@ -105,7 +105,7 @@ export const mockUserMiscCard: ICard = {
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE
+  completionStatus: CompletionStatus.INACTIVE,
 }
 
 export const mockBankSurahCard: IQuranSurahCard = {
@@ -114,12 +114,12 @@ export const mockBankSurahCard: IQuranSurahCard = {
   level: 'Surah',
   name: 'Naas',
   juz: 30,
-  number: 114
+  number: 114,
 }
 
 export const mockBankJuzCard: IQuranJuzCard = {
   cardId: `${btoa('juz-30')}`,
   type: 'Quran',
   level: 'Juz',
-  juz: 30
+  juz: 30,
 }
