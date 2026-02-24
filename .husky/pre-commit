@@ -1,6 +1,3 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 # Run dev in one process and the other commands in another process
 npx concurrently --kill-others --success first \
   "npm run dev" \

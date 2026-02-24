@@ -4,24 +4,25 @@
 
 Before doing any work in this codebase, read:
 
-1. **`CODEBASE_CONTEXT.md`** — Full architectural context: tech stack, patterns, anti-patterns, Redux shape, API layer, types, known issues, refactor goals. Read this to understand how the app works without re-exploring.
+1. **`.claude/CODEBASE_CONTEXT.md`** — Full architectural context: tech stack, patterns, anti-patterns, Redux shape, API layer, types, known issues, refactor goals. Read this to understand how the app works without re-exploring.
 
-2. **`FILE_INDEX.md`** — Complete index of every file with its purpose. Use this to find files directly instead of running grep/glob searches. Includes a "Quick Lookup by Feature" section at the bottom.
+2. **`.claude/FILE_INDEX.md`** — Complete index of every file with its purpose. Use this to find files directly instead of running grep/glob searches. Includes a "Quick Lookup by Feature" section at the bottom.
 
-3. **`REFACTOR_PLAN.md`** — The master refactor plan. Check current layer progress, branch strategy, and sub-task checklist before starting any work. Update checkboxes as tasks are completed.
+3. **`.claude/REFACTOR_PLAN.md`** — The master refactor plan. Check current layer progress, branch strategy, and sub-task checklist before starting any work. Update checkboxes as tasks are completed.
 
-Do not explore the codebase from scratch. Do not run broad glob or grep searches if the file location is already in FILE_INDEX.md. Read the context docs first, then go directly to the relevant files.
+These files live in `.claude/` (gitignored — local only). Do not explore the codebase from scratch. Do not run broad glob or grep searches if the file location is already in FILE_INDEX.md. Read the context docs first, then go directly to the relevant files.
 
 ---
 
 ## Project Overview
 
-**Eduplanner** is a Next.js 15 + React 19 + TypeScript frontend for an Islamic education management platform. It has:
+**Eduplanner** is a Next.js 16 + React 19 + TypeScript frontend for an Islamic education management platform. It has:
 - Teacher/student role system
 - Activities (subjects/courses) with Quran, Language, and Misc flashcard types
 - Spaced repetition (SRS) card progression
-- Redux Toolkit for state management
-- Tailwind CSS for styling
+- next-auth v5 for authentication (replacing Redux + sessionStorage)
+- React Query v5 for server state (replacing Redux)
+- Tailwind CSS v4 for styling
 - Jest + Cypress for testing
 - REST API backend at `http://localhost:8080` (separate repo)
 
@@ -51,10 +52,11 @@ This codebase has significant issues that are being systematically refactored. K
 - File naming: kebab-case (already in use)
 - Path alias: `@/*` maps to `src/*`
 
-### State Management Direction (Refactor Target)
-- Redux → UI state only (auth status, modals)
-- Server state → React Query (data fetching, caching, mutations)
-- sessionStorage → eliminated in favor of React Query cache + httpOnly cookies for auth
+### State Management
+- **No Redux** — removed as part of the refactor
+- Auth state → next-auth `useSession()`
+- Server state → React Query v5
+- UI state → local `useState`
 
 ### Testing Standards
 - No `/* istanbul ignore */` workarounds
@@ -62,14 +64,14 @@ This codebase has significant issues that are being systematically refactored. K
 - E2E: cover critical user flows (login, create activity, add card, student management)
 
 ### Before Making Changes
-1. Read CODEBASE_CONTEXT.md and FILE_INDEX.md
-2. Use FILE_INDEX.md to find the exact files to edit
+1. Read `.claude/CODEBASE_CONTEXT.md` and `.claude/FILE_INDEX.md`
+2. Use `.claude/FILE_INDEX.md` to find the exact files to edit
 3. Read those files before modifying them
 4. Understand the current pattern before replacing it
 5. Make focused changes — don't refactor adjacent code unless asked
 
 ### Refactor Tracking
-When the refactor plan is finalized, it will be documented here or in a separate `REFACTOR_PLAN.md`. Always check what phase of the refactor we're in before starting work.
+See `.claude/REFACTOR_PLAN.md` for the full layer-based plan and task checklist. Always check what layer we're on before starting work.
 
 ---
 
