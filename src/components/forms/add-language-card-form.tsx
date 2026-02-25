@@ -192,7 +192,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
         cards,
       }
 
-      const createdCards = (await createCards(payload)) as IResponse
+      const createdCards = (await createCards(payload)) as unknown as IResponse<ICard[]>
       const { data } = createdCards
       const { message, details }: { message: string; details: ICard[] } = data
       dispatch(

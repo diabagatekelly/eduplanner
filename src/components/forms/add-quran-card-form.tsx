@@ -231,7 +231,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
         userId: user.userId,
         activity: activity.name,
         cards,
-      })) as IResponse
+      })) as unknown as IResponse<ICard[]>
       const { data } = createResponse
       const { message, details }: { message: string; details: ICard[] } = data
       dispatch(

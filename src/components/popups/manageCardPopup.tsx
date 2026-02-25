@@ -293,7 +293,7 @@ export default function ManageCardPopup({
         activity: activity.name,
         cardId: card.cardId,
       }
-      const response = (await activateCard(activatePayload)) as unknown as IResponse
+      const response = (await activateCard(activatePayload)) as unknown as IResponse<ICard>
       const { data } = response
       const { details }: { message: string; details: ICard } = data
       dispatch(

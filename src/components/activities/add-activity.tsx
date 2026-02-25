@@ -97,7 +97,7 @@ export default function AddActivity<IAddActivity>({ userDetails }: { userDetails
       const response = (await createActivity({
         userActivity,
         userId: userDetails.userId,
-      })) as unknown as IResponse
+      })) as unknown as IResponse<{ userId: string; userActivity: IActivity }>
       const { data } = response
       const {
         message,

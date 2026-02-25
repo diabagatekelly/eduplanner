@@ -1,10 +1,10 @@
-export interface IResponse {
+export interface IResponse<TDetails = unknown> {
   status: number
-  data: IResponseBody
+  data: IResponseBody<TDetails>
 }
 
-interface IResponseBody {
+interface IResponseBody<TDetails = unknown> {
   status: string
   message: string
-  details: any
+  details: TDetails
 }

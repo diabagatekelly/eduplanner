@@ -79,7 +79,10 @@ export default function Register<IRegister>() {
         linkedAccountsData,
       }
 
-      const response = (await registerUser(userData)) as unknown as IResponse
+      const response = (await registerUser(userData)) as unknown as IResponse<{
+        token: string
+        user: IUser
+      }>
 
       const { data } = response
       setIsLoading(false)

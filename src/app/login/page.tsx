@@ -3,7 +3,7 @@
 import LoginForm from '@/app/login/components/login-form'
 import React, { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { IUserLogin } from '@/types/IUser'
+import { IUser, IUserLogin } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
 import Link from 'next/link'
 import { setAuthToken } from '@/store/actions/authActions'
@@ -64,7 +64,10 @@ export default function Login<ILogin>() {
         password: userFormInfo.password,
       }
 
-      const response = (await loginUser(userCredentials)) as unknown as IResponse
+      const response = (await loginUser(userCredentials)) as unknown as IResponse<{
+        token: string
+        user: IUser
+      }>
       const { data } = response
       const { details } = data
 

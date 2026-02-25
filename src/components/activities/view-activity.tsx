@@ -75,7 +75,7 @@ export default function ViewActivity<IViewActivity>({
       const response = (await editActivity({
         userId: userDetails.userId,
         updatedActivity,
-      })) as unknown as IResponse
+      })) as unknown as IResponse<IActivity>
       const { data } = response
       const { message, details }: { message: string; details: IActivity } = data
       dispatch(editUserActivity({ username: userDetails.username, updatedActivity: details }))
@@ -118,7 +118,7 @@ export default function ViewActivity<IViewActivity>({
       const response = (await editActivity({
         userId: userDetails.userId,
         updatedActivity,
-      })) as unknown as IResponse
+      })) as unknown as IResponse<IActivity>
       const { data } = response
       const { message, details }: { message: string; details: IActivity } = data
       dispatch(editUserActivity({ username: userDetails.username, updatedActivity: details }))
