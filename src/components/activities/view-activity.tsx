@@ -54,7 +54,7 @@ export default function ViewActivity<IViewActivity>({
     try {
       const requestReview = {
         id: userActivity.activityId,
-        teacherId: userDetails.linkedAccountsData.teacher,
+        teacherId: userDetails.linkedAccountsData.teacher!,
         student: {
           id: userDetails.userId,
           fullName: `${userDetails.firstName} ${userDetails.lastName}`,
@@ -84,7 +84,7 @@ export default function ViewActivity<IViewActivity>({
 
       setFormSubmitOutcomeMessage('Request for review successfully sent.')
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 
@@ -124,7 +124,7 @@ export default function ViewActivity<IViewActivity>({
       dispatch(editUserActivity({ username: userDetails.username, updatedActivity: details }))
       setFormSubmitOutcomeMessage(message)
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

@@ -10,7 +10,7 @@ export interface IActivity {
   completionStatus: CompletionStatus
   hasCards: boolean | string
   createdOn: ISODateString
-  lastUpdatedOn: ISODateString
+  lastUpdatedOn: ISODateString | null
   cards?: ICard[] | []
 }
 

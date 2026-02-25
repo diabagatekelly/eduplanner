@@ -12,15 +12,13 @@ interface IAddStudent {
 }
 
 export default function AddStudent<IAddStudent>({ user }: { user: IUser }) {
-  let args
-
   const [formData, setFormData] = useState({
     email: '',
   })
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
-  const [newStudent, getStudentInfo] = useState<IUser>({ ...args })
+  const [newStudent, getStudentInfo] = useState<IUser>({} as IUser)
   const [showModal, setShowModal] = useState(false)
 
   const modalType = 'addStudent'
@@ -57,7 +55,7 @@ export default function AddStudent<IAddStudent>({ user }: { user: IUser }) {
       const newStudent = { email: '' }
 
       for (const pair of formData.entries()) {
-        newStudent[pair[0]] = `${pair[1]}`
+        ;(newStudent as Record<string, string>)[pair[0]] = `${pair[1]}`
       }
 
       if (newStudent.email === user.email) {
@@ -81,7 +79,7 @@ export default function AddStudent<IAddStudent>({ user }: { user: IUser }) {
       setIsLoading(false)
       getStudentInfo(details.student)
       setShowModal(true)
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

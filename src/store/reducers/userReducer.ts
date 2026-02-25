@@ -18,13 +18,16 @@ export default function user(userData: IUser = INITIAL_STATE, action: UserAction
       /* istanbul ignore next */
       return { ...userData }
 
-    case 'QUERY':
+    case 'QUERY': {
       /* istanbul ignore next */
-      return userData[action.userInfo] as unknown as IUser
+      const queryAction = action as { type: 'QUERY'; userInfo: keyof IUser }
+      return userData[queryAction.userInfo] as unknown as IUser
+    }
 
     case 'EDIT': {
+      const editAction = action as { type: 'EDIT'; editProps: Record<string, unknown>[] }
       const newUserData: Record<string, unknown> = { ...userData }
-      action.editProps.forEach((prop) => {
+      editAction.editProps.forEach((prop) => {
         const [key] = Object.keys(prop)
         const [value] = Object.values(prop)
         newUserData[key] = value
@@ -32,8 +35,10 @@ export default function user(userData: IUser = INITIAL_STATE, action: UserAction
       return newUserData as unknown as IUser
     }
 
-    case 'POPULATE':
-      return { ...userData, ...action.allData } as IUser
+    case 'POPULATE': {
+      const populateAction = action as { type: 'POPULATE'; allData: Partial<IUser> }
+      return { ...userData, ...populateAction.allData } as IUser
+    }
 
     case 'RESET':
       return {} as IUser

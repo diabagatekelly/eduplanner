@@ -158,9 +158,7 @@ export default function CardsList({
                   className="list-item-card"
                   key={card.cardId}
                 >
-                  <p data-testid="today-card-name">
-                    {formatCardName(card.cardId, activity?.name)}
-                  </p>
+                  <p data-testid="today-card-name">{formatCardName(card.cardId, activity?.name)}</p>
                   <div className="flex">
                     <span
                       data-testid="today-card-show-btn"
@@ -379,7 +377,7 @@ export default function CardsList({
         </>
       )}
 
-      {hash === '#add' && <AddCard {...{ isMain, userDetails, activity: activity }} />}
+      {hash === '#add' && <AddCard {...{ isMain, userDetails, activity: activity! }} />}
 
       <Popup
         {...{

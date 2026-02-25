@@ -9,15 +9,14 @@ import { IUser } from '@/types/IUser'
 import { useParams } from 'next/navigation'
 
 export default function Profile() {
-  let args
   const student = useParams().student as string
 
   const [showModal, setShowModal] = useState(false)
-  const [user, getUserData] = useState<IUser>({ ...args })
+  const [user, getUserData] = useState<IUser>({} as IUser)
 
   useEffect(() => {
     const { userReducer } = store.getState()
-    const user = userReducer.students[student]
+    const user = userReducer.students![student]
     getUserData(user)
   }, [student])
 

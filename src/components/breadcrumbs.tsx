@@ -14,7 +14,7 @@ export default function Breadcrumbs() {
   const [breadcrumbs, updateBreadcrumbs] = useState<any[]>([])
 
   useEffect(() => {
-    const breadcrumbsDict = {}
+    const breadcrumbsDict: Record<string, string | null> = {}
     pathSegments.forEach((_seg, idx) => {
       switch (idx) {
         case 1:

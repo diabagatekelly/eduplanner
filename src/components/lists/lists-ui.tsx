@@ -22,7 +22,9 @@ export default function ListUi({
       <div className={`${listType}-list`}>
         {listType === 'students' && <StudentsList {...{ userDetails }} />}
         {listType === 'activities' && <ActivitiesList {...{ isMain, userDetails }} />}
-        {listType === 'cards' && <CardsList isMain={isMain} userDetails={userDetails} activity={activity} />}
+        {listType === 'cards' && (
+          <CardsList isMain={isMain} userDetails={userDetails} activity={activity} />
+        )}
       </div>
       <div className="status-color-legend my-10">
         <p>

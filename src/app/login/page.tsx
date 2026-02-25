@@ -56,7 +56,7 @@ export default function Login<ILogin>() {
       }
 
       for (const pair of rawFormData.entries()) {
-        userFormInfo[pair[0]] = `${pair[1]}`
+        ;(userFormInfo as Record<string, string>)[pair[0]] = `${pair[1]}`
       }
 
       const userCredentials: IUserLogin = {
@@ -77,7 +77,7 @@ export default function Login<ILogin>() {
       dispatch(setAuthToken(details))
       dispatch(populateUser())
       router.push('/' + details.user.username)
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

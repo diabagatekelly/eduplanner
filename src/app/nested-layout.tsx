@@ -12,7 +12,7 @@ import {
   UserGroupIcon,
 } from '@heroicons/react/24/solid'
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
@@ -26,9 +26,7 @@ export default function NestedLayout({
   const pathname = usePathname()
   const activityPath = useParams().activity
   const student = useParams().student as string
-  let args
-
-  const [user, getUserData] = useState<IUser>({ ...args })
+  const [user, getUserData] = useState<IUser>({} as IUser)
   const [cardSubMenu, showCardSubMenu] = useState(false)
   const [openDrawer, setOpenDrawer] = useState(true)
 
@@ -49,10 +47,10 @@ export default function NestedLayout({
       )?.hasCards
     }
 
-    showCardSubMenu(cardSubMenu)
+    showCardSubMenu(!!cardSubMenu)
   }, [activityPath, student])
 
-  function toggleDrawer(open) {
+  function toggleDrawer(open: boolean) {
     open === true ? setOpenDrawer(true) : setOpenDrawer(false)
     return
   }
@@ -153,7 +151,7 @@ export default function NestedLayout({
                       fill="currentColor"
                     />
                     <span className="flex-1 ml-3 whitespace-nowrap">
-                      Activity: {fromDbFormat(activityPath)}
+                      Activity: {fromDbFormat(activityPath as string)}
                     </span>
                   </a>
                 </li>

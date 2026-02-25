@@ -26,7 +26,7 @@ export const mockStudent: IUser = {
   email: 'mock.student@email.com',
   password: 'password',
   accountType: 'student',
-  linkedAccountsData: { teacher: null },
+  linkedAccountsData: {},
   lastLogin: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
   activities: [],
 }

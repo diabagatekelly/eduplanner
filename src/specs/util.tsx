@@ -11,7 +11,8 @@ function RootLayout({ children }: { children: React.ReactNode }) {
   )
 }
 
-const customRender = (ui, options?) => render(ui, { wrapper: RootLayout, ...options })
+const customRender = (ui: React.ReactElement, options?: any) =>
+  render(ui, { wrapper: RootLayout, ...options })
 
 // re-export everything
 export * from '@testing-library/react'

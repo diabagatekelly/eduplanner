@@ -17,19 +17,18 @@ export default function ActivitiesList({
   isMain: boolean
   userDetails: IUser
 }) {
-  let args
   const router = useRouter()
   const pathName = usePathname()
 
   const [activitiesList, getActivitiesList] = useState<IActivity[]>([])
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState('')
-  const [popupUserDetails, getPopupUserDetails] = useState<IUser>({ ...args })
-  const [popupItem, getPopupItem] = useState<{ activityName: string }>({ ...args })
+  const [popupUserDetails, getPopupUserDetails] = useState<IUser>({} as IUser)
+  const [popupItem, getPopupItem] = useState<{ activityName: string }>({ activityName: '' })
 
   useEffect(() => {
-    const activities: IActivity[] = userDetails?.activities
-    getActivitiesList([...[].concat(activities)])
+    const activities = userDetails?.activities
+    getActivitiesList([...([] as IActivity[]).concat(activities as IActivity[])])
   }, [userDetails])
 
   function deleteActivity(activityName: string) {

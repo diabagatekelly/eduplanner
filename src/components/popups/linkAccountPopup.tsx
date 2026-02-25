@@ -24,21 +24,21 @@ export default function LinkAccountPopup({
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
-    getStudentInfo(newStudent)
-    getTeacherData(user)
+    getStudentInfo({ ...newStudent })
+    getTeacherData({ ...user })
   }, [showModal, newStudent, user])
 
   async function addStudent() {
     try {
       setIsLoading(true)
       const linkAccountsData: { teacherId: string; studentId: [string, string] } = {
-        teacherId: teacher.userId,
-        studentId: [studentInfo.userId, studentInfo.username],
+        teacherId: teacher.userId!,
+        studentId: [studentInfo.userId!, studentInfo.username!],
       }
       await linkAccount(linkAccountsData)
       onLinkAccountSuccess()
       setIsLoading(false)
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

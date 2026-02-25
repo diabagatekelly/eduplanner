@@ -13,7 +13,7 @@ import store from '../store/store'
 import { IUser } from '@/types/IUser'
 import { ISODateString } from '@/types/isoDateType'
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
@@ -24,12 +24,11 @@ export default function Navbar({
   isAuthenticated: boolean
   username: string
 }) {
-  let args
   const dispatch = useAppDispatch()
   const router = useRouter()
   const pathname = usePathname()
 
-  const [user, getUserData] = useState<IUser>({ ...args })
+  const [user, getUserData] = useState<IUser>({} as IUser)
 
   useEffect(() => {
     const { userReducer } = store.getState()
@@ -53,7 +52,7 @@ export default function Navbar({
       dispatch(removeAuthToken())
       dispatch(resetUser())
       router.push('/login')
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
 
       if (!error.response) {

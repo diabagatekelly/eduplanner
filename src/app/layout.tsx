@@ -12,6 +12,7 @@ import { populateUser } from '@/store/actions/userActions'
 import Navbar from '@/components/navbar'
 import Footer from '@/components/footer'
 import { useMounted } from '@/lib/helpers/useMounted'
+import { IUser } from '@/types/IUser'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,14 +31,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 
 const Reloader = () => {
-  let args
   const dispatch = useAppDispatch()
   const pathname = usePathname()
   // const searchParams = useSearchParams()
   const router = useRouter()
   const mounted = useMounted()
 
-  const [userState, setUserState] = useState({ isAuthenticated: false, userReducer: { ...args } })
+  const [userState, setUserState] = useState({ isAuthenticated: false, userReducer: {} as IUser })
 
   useEffect(() => {
     /* istanbul ignore next */

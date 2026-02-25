@@ -25,16 +25,16 @@ export default function DeleteActivityPopup({
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     getActivityName(item!.activityName)
-    getUserInfo(user)
+    getUserInfo({ ...user })
   }, [showModal, user, item])
 
   async function deleteUserActivity() {
     try {
-      const activityData = { userId: userInfo.userId, activityName }
+      const activityData = { userId: userInfo.userId!, activityName }
       await deleteActivity(activityData)
       onDeleteActivitySuccess()
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
 
       if (!error.response) {
@@ -55,7 +55,7 @@ export default function DeleteActivityPopup({
   }
 
   function onDeleteActivitySuccess() {
-    dispatch(removeUserActivity(userInfo.username, activityName))
+    dispatch(removeUserActivity(userInfo.username!, activityName))
     setOutcomeMessage('Successfully deleted activity')
     onClose()
   }

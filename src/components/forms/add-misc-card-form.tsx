@@ -81,7 +81,7 @@ export default function AddMiscCardForm({
 
       setFormSubmitOutcomeMessage(message)
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

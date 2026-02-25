@@ -22,7 +22,7 @@ export default function UnlinkAccountPopup({
   const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
-    getStudentInfo(user)
+    getStudentInfo({ ...user })
 
     const { userReducer } = store.getState()
     getTeacherInfo(userReducer)
@@ -30,9 +30,9 @@ export default function UnlinkAccountPopup({
 
   async function removeOldStudent() {
     try {
-      await unlinkAccount({ teacherId: teacherInfo.userId, studentId: studentInfo.userId })
+      await unlinkAccount({ teacherId: teacherInfo.userId!, studentId: studentInfo.userId! })
       onUnlinkAccountSuccess()
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
 
       if (!error.response) {
@@ -53,7 +53,7 @@ export default function UnlinkAccountPopup({
   }
 
   function onUnlinkAccountSuccess() {
-    dispatch(removeStudent(studentInfo.userId))
+    dispatch(removeStudent(studentInfo.userId!))
     setOutcomeMessage('Successfully removed student.')
     onClose()
     window.location.reload()
@@ -102,7 +102,7 @@ export default function UnlinkAccountPopup({
                 </h3>
                 <h5 className="mb-5">
                   <span>
-                    {`${studentInfo?.username.split('-').join(' ')} - ${atob(studentInfo?.userId)} `}{' '}
+                    {`${studentInfo!.username!.split('-').join(' ')} - ${atob(studentInfo!.userId!)} `}{' '}
                   </span>
                 </h5>
               </div>

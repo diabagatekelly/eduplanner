@@ -200,7 +200,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
 
       setFormSubmitOutcomeMessage(message)
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

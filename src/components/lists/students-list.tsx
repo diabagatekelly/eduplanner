@@ -11,7 +11,6 @@ import { getBorderColor } from '@/lib/helpers/getBorderColor'
 import { TrashIcon } from '@heroicons/react/24/solid'
 
 export default function StudentsList({ userDetails }: { userDetails: IUser }) {
-  let args
   const dispatch = useAppDispatch()
   const router = useRouter()
 
@@ -20,7 +19,8 @@ export default function StudentsList({ userDetails }: { userDetails: IUser }) {
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState('')
   const [popupUserDetails, getPopupUserDetails] = useState<{ userId: string; username: string }>({
-    ...args,
+    userId: '',
+    username: '',
   })
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function StudentsList({ userDetails }: { userDetails: IUser }) {
       const { data } = response
       const { details }: { message: string; details: { student: IUser } } = data
       onFetchStudentSuccess(details.student)
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
 
       if (!error.response) {
@@ -93,7 +93,7 @@ export default function StudentsList({ userDetails }: { userDetails: IUser }) {
             {studentIdsList?.map(([userId, username]) => (
               <li
                 data-testid="students-list"
-                style={{ borderColor: getBorderColor({ completionStatus: null }) }}
+                style={{ borderColor: getBorderColor({}) }}
                 className="list-item-card"
                 key={userId}
               >

@@ -70,7 +70,7 @@ export default function AddActivity<IAddActivity>({ userDetails }: { userDetails
       }
 
       for (const pair of formData.entries()) {
-        activityFormInfo[pair[0]] = `${pair[1]}`
+        ;(activityFormInfo as Record<string, any>)[pair[0]] = `${pair[1]}`
       }
 
       if (userDetails.activities.find((activity) => activity.name === activityFormInfo.name)) {
@@ -84,7 +84,7 @@ export default function AddActivity<IAddActivity>({ userDetails }: { userDetails
       const userActivity: IActivity = {
         ...activityFormInfo,
         activityId: btoa(`${userDetails.email}-${dbActivityName}`),
-        name: dbActivityName,
+        name: dbActivityName!,
         points: Number(activityFormInfo.points),
         completionStatus: CompletionStatus.PENDING,
         hasCards: activityFormInfo.hasCards === 'true' ? true : false,
@@ -109,7 +109,7 @@ export default function AddActivity<IAddActivity>({ userDetails }: { userDetails
       setFormSubmitOutcomeMessage(message)
       _resetForm()
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

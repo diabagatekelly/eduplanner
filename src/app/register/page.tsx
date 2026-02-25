@@ -61,13 +61,12 @@ export default function Register<IRegister>() {
       }
 
       for (const pair of rawFormData.entries()) {
-        jsonData[pair[0].trim()] = `${(pair[1] as string).trim()}`
+        ;(jsonData as Record<string, string>)[pair[0].trim()] = `${(pair[1] as string).trim()}`
       }
 
       const userId = btoa(jsonData.email)
       const username = `${jsonData.firstName}-${jsonData.lastName}`
-      const linkedAccountsData =
-        jsonData.accountType === 'teacher' ? { students: [] } : { teacher: null }
+      const linkedAccountsData = jsonData.accountType === 'teacher' ? { students: [] } : {}
 
       const userData: IUser = {
         ...jsonData,
@@ -97,7 +96,7 @@ export default function Register<IRegister>() {
       setFormSubmitOutcomeMessage(message)
       router.push('/' + details.user.username)
       dispatch(setAuthToken(details))
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

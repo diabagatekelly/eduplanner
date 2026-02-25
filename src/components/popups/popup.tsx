@@ -46,9 +46,7 @@ export default function Popup({
   } else if (modalType === 'removeStudent') {
     return <UnlinkAccountPopup onClose={onClose} showModal={showModal} user={user} />
   } else if (modalType === 'removeActivity') {
-    return (
-      <DeleteActivityPopup onClose={onClose} showModal={showModal} user={user} item={item} />
-    )
+    return <DeleteActivityPopup onClose={onClose} showModal={showModal} user={user} item={item} />
   } else if (modalType === 'manageCard') {
     return (
       <ManageCardPopup

@@ -24,14 +24,14 @@ export default function DeleteAccountPopup({
   const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
-    getUserInfo(user)
+    getUserInfo({ ...user })
   }, [showModal, user])
 
   async function deleteAccount() {
     try {
-      ;(await deleteUser(userInfo.userId)) as unknown as IResponse
+      ;(await deleteUser(userInfo.userId!)) as unknown as IResponse
       onDeleteAccountSuccess()
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
 
       if (!error.response) {
