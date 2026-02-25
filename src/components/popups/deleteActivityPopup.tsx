@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { removeUserActivity } from '@/store/actions/userActions'
 import { deleteActivity } from '../../api/controller'
 import { IUser } from '@/types/IUser'
@@ -8,34 +8,33 @@ import { BoltSlashIcon, XMarkIcon } from '@heroicons/react/24/solid'
 export default function DeleteActivityPopup({
   onClose,
   showModal,
-  ...childArgs
+  user,
+  item,
 }: {
-  onClose: any
+  onClose: () => void
   showModal: boolean
-  item?: { activityName: string }
   user?: IUser | Partial<IUser>
+  item?: { activityName: string }
 }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
-  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })
+  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
   const [activityName, getActivityName] = useState('')
   const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
-    const userData = childArgs.user
-    const activityName = childArgs.item.activityName
-
-    getActivityName(activityName)
-    getUserInfo(userData)
-  }, [showModal, childArgs, userInfo, activityName])
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    getActivityName(item!.activityName)
+    getUserInfo({ ...user })
+  }, [showModal, user, item])
 
   async function deleteUserActivity() {
     try {
-      const activityData = { userId: userInfo.userId, activityName }
+      const activityData = { userId: userInfo.userId!, activityName }
       await deleteActivity(activityData)
       onDeleteActivitySuccess()
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
 
       if (!error.response) {
@@ -56,7 +55,7 @@ export default function DeleteActivityPopup({
   }
 
   function onDeleteActivitySuccess() {
-    dispatch(removeUserActivity(userInfo.username, activityName))
+    dispatch(removeUserActivity(userInfo.username!, activityName))
     setOutcomeMessage('Successfully deleted activity')
     onClose()
   }

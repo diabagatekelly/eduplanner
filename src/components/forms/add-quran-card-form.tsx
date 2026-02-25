@@ -4,8 +4,9 @@ import { FormEvent, useEffect, useState } from 'react'
 import { ICard, IQuranCards } from '../../types/ICard'
 import React from 'react'
 import { IActivity } from '@/types/IActivity'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 import { IUser } from '@/types/IUser'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { createCards, deleteCard } from '@/api/controller'
 import { quranCards } from '@/lib/constants/quran-bank'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
@@ -27,7 +28,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
   user: IUser
   activity: IActivity
 }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [formData, setFormData] = useState<IQuranCards[]>([])
   const [custom, setCustom] = useState({
@@ -130,13 +131,13 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
 
     if (isChecked && !alreadySelected.includes(newlySelected)) {
       alreadySelected.push(newlySelected)
-      if (newlySelectedCard.level === 'Juz') {
+      if (newlySelectedCard?.level === 'Juz') {
         ajzah.push(newlySelectedCard.juz)
       }
     } else if (!isChecked && alreadySelected.includes(newlySelected)) {
       alreadySelected.splice(alreadySelected.indexOf(newlySelected), 1)
 
-      if (ajzah.includes(newlySelectedCard.juz)) {
+      if (newlySelectedCard && ajzah.includes(newlySelectedCard.juz)) {
         ajzah.splice(ajzah.indexOf(newlySelectedCard.juz), 1)
       }
     }
@@ -171,7 +172,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
     e.preventDefault()
     try {
       const rawFormData = new FormData(e.currentTarget)
-      const jsonData = {
+      const jsonData: Record<string, string> = {
         content: '',
       }
       for (const pair of rawFormData.entries()) {
@@ -204,7 +205,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
         return {
           cardId: card,
           activity: activity.name,
-          activityType: 'Quran',
+          activityType: CARD_ACTIVITY_TYPES.QURAN,
           addedOn: null,
           lastUpdatedOn: null,
           nextShowDate: null,
@@ -217,7 +218,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
         cards.push({
           cardId: `${btoa(`custom-${jsonData.content}`)}`,
           activity: activity.name,
-          activityType: 'Quran',
+          activityType: CARD_ACTIVITY_TYPES.QURAN,
           addedOn: null,
           lastUpdatedOn: null,
           nextShowDate: null,
@@ -230,7 +231,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
         userId: user.userId,
         activity: activity.name,
         cards,
-      })) as IResponse
+      })) as unknown as IResponse<ICard[]>
       const { data } = createResponse
       const { message, details }: { message: string; details: ICard[] } = data
       dispatch(
@@ -252,7 +253,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
 
       setFormSubmitOutcomeMessage(message)
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

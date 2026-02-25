@@ -8,10 +8,8 @@ import UserProfile from '@/app/[username]/profile/components/user-profile'
 import { IUser } from '@/types/IUser'
 
 export default function Profile() {
-  let args
-
   const [showModal, setShowModal] = useState(false)
-  const [user, getUserData] = useState<IUser>({ ...args })
+  const [user, getUserData] = useState<IUser>({} as IUser)
 
   useEffect(() => {
     const { userReducer } = store.getState()

@@ -2,7 +2,7 @@
 
 import React, { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import RegisterForm from '@/app/register/components/register-form'
 import { IUser, IUserFormData } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
@@ -16,7 +16,7 @@ interface IRegister {
 }
 
 export default function Register<IRegister>() {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const router = useRouter()
 
   const [formData, setFormData] = useState<IUserFormData>({
@@ -61,13 +61,12 @@ export default function Register<IRegister>() {
       }
 
       for (const pair of rawFormData.entries()) {
-        jsonData[pair[0].trim()] = `${(pair[1] as string).trim()}`
+        ;(jsonData as Record<string, string>)[pair[0].trim()] = `${(pair[1] as string).trim()}`
       }
 
       const userId = btoa(jsonData.email)
       const username = `${jsonData.firstName}-${jsonData.lastName}`
-      const linkedAccountsData =
-        jsonData.accountType === 'teacher' ? { students: [] } : { teacher: null }
+      const linkedAccountsData = jsonData.accountType === 'teacher' ? { students: [] } : {}
 
       const userData: IUser = {
         ...jsonData,
@@ -80,7 +79,10 @@ export default function Register<IRegister>() {
         linkedAccountsData,
       }
 
-      const response = (await registerUser(userData)) as unknown as IResponse
+      const response = (await registerUser(userData)) as unknown as IResponse<{
+        token: string
+        user: IUser
+      }>
 
       const { data } = response
       setIsLoading(false)
@@ -97,7 +99,7 @@ export default function Register<IRegister>() {
       setFormSubmitOutcomeMessage(message)
       router.push('/' + details.user.username)
       dispatch(setAuthToken(details))
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

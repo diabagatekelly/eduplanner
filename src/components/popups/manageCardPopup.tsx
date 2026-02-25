@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { editUserCard, removeUserCard } from '@/store/actions/userActions'
 import {
   activateCard,
@@ -13,6 +13,8 @@ import { IResponse } from '@/types/IApiResponse'
 import { ICard } from '@/types/ICard'
 import { IUser } from '@/types/IUser'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
+import { ACTIVITY_TYPES } from '@/lib/constants/activityTypes'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 import { IActivity } from '@/types/IActivity'
 import formatCardName from '@/lib/helpers/formatCardName'
 import { ClipboardDocumentCheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
@@ -21,38 +23,39 @@ export default function ManageCardPopup({
   onClose,
   showModal,
   isMain,
-  ...childArgs
+  user,
+  item,
+  activity: activityProp,
 }: {
-  onClose: any
+  onClose: () => void
   showModal: boolean
   isMain: boolean
   user?: IUser | Partial<IUser>
   activity?: IActivity
   item?: { card: ICard; action: string }
 }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
-  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })
-  const [card, getCardDetails] = useState<ICard>({ ...childArgs.item.card })
-  const [activity, getActivityDetails] = useState<IActivity>({ ...childArgs.activity })
+  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const [card, getCardDetails] = useState<ICard>({ ...item!.card })
+  const [activity, getActivityDetails] = useState<IActivity>({ ...activityProp } as IActivity)
   const [statusMessage, setStatusMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [newStage, setNewStage] = useState('')
 
   useEffect(() => {
-    const cardDetails = childArgs.item.card
-    const user = childArgs.user
-    const activityDetails = childArgs.activity
-
-    getCardDetails(cardDetails)
-    getUserInfo(user)
-    getActivityDetails(activityDetails)
-  }, [showModal, childArgs, statusMessage, newStage])
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    getCardDetails(item!.card)
+    getUserInfo({ ...user })
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    getActivityDetails(activityProp!)
+  }, [showModal, user, item, activityProp, statusMessage, newStage])
 
   async function resetStage() {
     try {
       const resetPayload = {
-        userId: userInfo.userId,
+        userId: userInfo.userId!,
         activity: activity.name,
         cardId: card.cardId,
       }
@@ -61,14 +64,14 @@ export default function ManageCardPopup({
       const { details }: { message: string; details: ICard } = data
       dispatch(
         editUserCard({
-          username: userInfo.username,
+          username: userInfo.username!,
           activityName: activity.name,
           updatedCard: details,
         })
       )
       setStatusMessage('Successfully reset card')
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 
@@ -91,11 +94,11 @@ export default function ManageCardPopup({
     try {
       const requestReview = {
         id: card.cardId,
-        teacherId: userInfo.linkedAccountsData.teacher,
+        teacherId: userInfo.linkedAccountsData!.teacher!,
         student: {
-          id: userInfo.userId,
+          id: userInfo.userId!,
           fullName: `${userInfo.firstName} ${userInfo.lastName}`,
-          email: userInfo.email,
+          email: userInfo.email!,
         },
       }
 
@@ -103,14 +106,14 @@ export default function ManageCardPopup({
 
       dispatch(
         removeUserCard({
-          username: userInfo.username,
+          username: userInfo.username!,
           activityName: activity.name,
           cardId: card.cardId,
         })
       )
 
       const editPayload = {
-        userId: userInfo.userId,
+        userId: userInfo.userId!,
         activity: activity.name,
         cardId: card.cardId,
         editData: {
@@ -123,7 +126,7 @@ export default function ManageCardPopup({
       const { details }: { message: string; details: ICard } = data
       dispatch(
         editUserCard({
-          username: userInfo.username,
+          username: userInfo.username!,
           activityName: activity.name,
           updatedCard: details,
         })
@@ -133,7 +136,7 @@ export default function ManageCardPopup({
 
       setStatusMessage('Request for review successfully sent.')
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 
@@ -154,11 +157,11 @@ export default function ManageCardPopup({
     }
   }
 
-  async function overrideStage(e: React.FormEvent<any>) {
+  async function overrideStage(e: React.MouseEvent<HTMLButtonElement>) {
     try {
       e.preventDefault()
       const editPayload = {
-        userId: userInfo.userId,
+        userId: userInfo.userId!,
         activity: activity.name,
         cardId: card.cardId,
         editData: {
@@ -171,7 +174,7 @@ export default function ManageCardPopup({
       const { details }: { message: string; details: ICard } = data
       dispatch(
         editUserCard({
-          username: userInfo.username,
+          username: userInfo.username!,
           activityName: activity.name,
           updatedCard: details,
         })
@@ -179,7 +182,7 @@ export default function ManageCardPopup({
       setStatusMessage('Successfully overrode status.')
       getCardDetails(details)
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 
@@ -203,7 +206,7 @@ export default function ManageCardPopup({
   async function submitEditStage(newStageStatus: boolean) {
     try {
       const editPayload = {
-        userId: userInfo.userId,
+        userId: userInfo.userId!,
         activity: activity.name,
         cardId: card.cardId,
         editData: {
@@ -217,14 +220,14 @@ export default function ManageCardPopup({
       const { details }: { message: string; details: ICard } = data
       dispatch(
         editUserCard({
-          username: userInfo.username,
+          username: userInfo.username!,
           activityName: activity.name,
           updatedCard: details,
         })
       )
       setStatusMessage('Successfully edited status.')
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 
@@ -249,7 +252,7 @@ export default function ManageCardPopup({
     try {
       const deletePayload = [
         {
-          userId: userInfo.userId,
+          userId: userInfo.userId!,
           activity: activity.name,
           cardId: card.cardId,
         },
@@ -257,14 +260,14 @@ export default function ManageCardPopup({
       ;(await deleteCard(deletePayload)) as unknown as IResponse
       dispatch(
         removeUserCard({
-          username: userInfo.username,
+          username: userInfo.username!,
           activityName: activity.name,
           cardId: card.cardId,
         })
       )
       setStatusMessage('Successfully removed card')
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 
@@ -286,23 +289,23 @@ export default function ManageCardPopup({
   async function activate() {
     try {
       const activatePayload = {
-        userId: userInfo.userId,
+        userId: userInfo.userId!,
         activity: activity.name,
         cardId: card.cardId,
       }
-      const response = (await activateCard(activatePayload)) as unknown as IResponse
+      const response = (await activateCard(activatePayload)) as unknown as IResponse<ICard>
       const { data } = response
       const { details }: { message: string; details: ICard } = data
       dispatch(
         editUserCard({
-          username: userInfo.username,
+          username: userInfo.username!,
           activityName: activity.name,
           updatedCard: details,
         })
       )
       setStatusMessage('Successfully activated card')
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 
@@ -323,8 +326,8 @@ export default function ManageCardPopup({
     }
   }
 
-  function formatCardInstructions(cardName) {
-    if (cardName.includes('Vocab')) {
+  function formatCardInstructions(cardName: string) {
+    if (cardName.includes(CARD_ACTIVITY_TYPES.VOCAB)) {
       return (
         <>
           <ul>
@@ -340,15 +343,15 @@ export default function ManageCardPopup({
     }
   }
 
-  function handleOverrideFormChange(e) {
-    const selectedStage = e.target.value
+  function handleOverrideFormChange(e: React.ChangeEvent<HTMLFormElement>) {
+    const selectedStage = (e.target as unknown as HTMLSelectElement).value
     setNewStage(selectedStage)
   }
 
   return (
     <>
       <div
-        data-testid={`manage-card-popup-${childArgs?.item.action}`}
+        data-testid={`manage-card-popup-${item?.action}`}
         aria-hidden="true"
         hidden={!showModal}
         id="popup-modal"
@@ -393,7 +396,7 @@ export default function ManageCardPopup({
                 </h3>
                 <div className="text-left">
                   <h6 data-testid="card-name">{formatCardName(card.cardId, activity?.name)}</h6>
-                  {activity?.name !== 'Quran' && (
+                  {activity?.name !== ACTIVITY_TYPES.QURAN && (
                     <h6 data-testid="card-instructions">
                       Instructions:{' '}
                       {formatCardInstructions(formatCardName(card.cardId, activity?.name))}
@@ -412,7 +415,7 @@ export default function ManageCardPopup({
                   <hr />
                   <div data-testid="card-stage-management" className="my-5">
                     <h6 className="mb-2">Current status: {card.completionStatus}</h6>
-                    {childArgs?.item.action === 'override' ? (
+                    {item?.action === 'override' ? (
                       <form className="max-w-md mx-auto" onChange={handleOverrideFormChange}>
                         <label
                           htmlFor="countries"
@@ -440,7 +443,7 @@ export default function ManageCardPopup({
                 </div>
                 {((isMain && userInfo?.accountType === 'teacher') ||
                   (!isMain && userInfo?.accountType === 'student')) &&
-                  childArgs?.item.action === 'override' && (
+                  item?.action === 'override' && (
                     <div className="delete-actions mt-5">
                       <button
                         data-testid="override-stage-btn"
@@ -455,7 +458,7 @@ export default function ManageCardPopup({
                   )}
                 {((isMain && userInfo?.accountType === 'teacher') ||
                   (!isMain && userInfo?.accountType === 'student')) &&
-                  childArgs?.item.action === 'delete' && (
+                  item?.action === 'delete' && (
                     <div className="delete-actions mt-5">
                       <button
                         data-testid="delete-card-btn"
@@ -470,7 +473,7 @@ export default function ManageCardPopup({
                   )}
                 {((isMain && userInfo?.accountType === 'teacher') ||
                   (!isMain && userInfo?.accountType === 'student')) &&
-                  childArgs?.item.action === 'activate' && (
+                  item?.action === 'activate' && (
                     <div className="activate-actions mt-5">
                       <button
                         data-testid="activate-card-btn"
@@ -485,7 +488,7 @@ export default function ManageCardPopup({
                   )}
                 {((isMain && userInfo?.accountType === 'teacher') ||
                   (!isMain && userInfo?.accountType === 'student')) &&
-                  childArgs?.item.action === 'edit' && (
+                  item?.action === 'edit' && (
                     <div className="teacher-actions">
                       <button
                         data-testid="reset-stage-btn"
@@ -520,34 +523,32 @@ export default function ManageCardPopup({
                     </div>
                   )}
 
-                {isMain &&
-                  userInfo?.accountType === 'student' &&
-                  childArgs.item.action !== 'show' && (
-                    <div className="student-actions">
-                      <button
-                        disabled={[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
-                          card.completionStatus
-                        )}
-                        onClick={submitForReview}
-                        data-testid="submit-review-btn"
-                        data-modal-hide="popup-modal"
-                        type="button"
-                        className={
-                          [CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
-                            card.completionStatus
-                          )
-                            ? 'disabled-btn mr-2'
-                            : 'green-btn'
-                        }
-                      >
-                        {[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
+                {isMain && userInfo?.accountType === 'student' && item?.action !== 'show' && (
+                  <div className="student-actions">
+                    <button
+                      disabled={[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
+                        card.completionStatus
+                      )}
+                      onClick={submitForReview}
+                      data-testid="submit-review-btn"
+                      data-modal-hide="popup-modal"
+                      type="button"
+                      className={
+                        [CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
                           card.completionStatus
                         )
-                          ? 'Already submitted for review'
-                          : 'Submit for review'}
-                      </button>
-                    </div>
-                  )}
+                          ? 'disabled-btn mr-2'
+                          : 'green-btn'
+                      }
+                    >
+                      {[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
+                        card.completionStatus
+                      )
+                        ? 'Already submitted for review'
+                        : 'Submit for review'}
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="mt-5">
                 <button

@@ -8,7 +8,8 @@ import { IResponse } from '@/types/IApiResponse'
 import Popup from '../popups/popup'
 import { ICard } from '@/types/ICard'
 import { createUserCard } from '@/store/actions/userActions'
-import { useDispatch } from 'react-redux'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
+import { useAppDispatch } from '@/store/hooks'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 import { createCards } from '@/api/controller'
 import { DocumentMinusIcon } from '@heroicons/react/24/solid'
@@ -27,8 +28,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
   user: IUser
   activity: IActivity
 }) {
-  let args
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [file, uploadFile] = useState({
     content: '',
@@ -46,17 +46,18 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState('')
-  const [popupItem, getPopupItem] = useState<{ list: string }>({ ...args })
+  const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
 
   useEffect(() => {}, [user, activity, file])
 
   async function onFileInput(e: React.FormEvent<HTMLInputElement>) {
-    if ((e.target as HTMLInputElement).files[0].type !== 'text/plain') {
+    const files = (e.target as HTMLInputElement).files
+    if (files?.[0]?.type !== 'text/plain') {
       setFormSubmitOutcomeMessage('The file uploaded is not a text (.txt) file.')
       return
     }
 
-    const content = await (e.target as HTMLInputElement).files[0]?.text()
+    const content = await files[0].text()
     const cleanedContent = cleanUpList(content)
     setFormSubmitOutcomeMessage('')
     uploadFile({
@@ -145,7 +146,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
       return
     }
 
-    let listOfItemsToValidate: string
+    let listOfItemsToValidate = ''
     if (shouldType || grammarCard) {
       listOfItemsToValidate = cleanUpList(typedList.words)
       ;(document.querySelector('#typed') as HTMLTextAreaElement).value = listOfItemsToValidate
@@ -180,7 +181,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
           cardId: grammarCard
             ? `${btoa(`${language}-grammar-${word}`)}`
             : `${btoa(`${language}-vocab-${word}`)}`,
-          activityType: grammarCard ? 'Grammar' : 'Vocab',
+          activityType: grammarCard ? CARD_ACTIVITY_TYPES.GRAMMAR : CARD_ACTIVITY_TYPES.VOCAB,
           ...userCardBase,
         })
       })
@@ -191,7 +192,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
         cards,
       }
 
-      const createdCards = (await createCards(payload)) as IResponse
+      const createdCards = (await createCards(payload)) as unknown as IResponse<ICard[]>
       const { data } = createdCards
       const { message, details }: { message: string; details: ICard[] } = data
       dispatch(
@@ -200,7 +201,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
 
       setFormSubmitOutcomeMessage(message)
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

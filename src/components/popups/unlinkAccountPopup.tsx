@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import store from '../../store/store'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { removeStudent } from '@/store/actions/userActions'
 import { unlinkAccount } from '../../api/controller'
 import { IUser } from '@/types/IUser'
@@ -9,33 +9,30 @@ import { XMarkIcon, MinusIcon } from '@heroicons/react/24/solid'
 export default function UnlinkAccountPopup({
   onClose,
   showModal,
-  ...childArgs
+  user,
 }: {
-  onClose: any
+  onClose: () => void
   showModal: boolean
-  newStudent?: IUser | Partial<IUser>
   user?: IUser | Partial<IUser>
 }) {
-  const dispatch = useDispatch()
-  let args
+  const dispatch = useAppDispatch()
 
-  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })
-  const [user, getUserData] = useState<IUser | Partial<IUser>>({ ...args })
+  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...user })
+  const [teacherInfo, getTeacherInfo] = useState<IUser | Partial<IUser>>({})
   const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
-    const student = childArgs.user
-    getStudentInfo(student)
+    getStudentInfo({ ...user })
 
     const { userReducer } = store.getState()
-    getUserData(userReducer)
-  }, [showModal, childArgs, studentInfo, user])
+    getTeacherInfo(userReducer)
+  }, [showModal, user])
 
   async function removeOldStudent() {
     try {
-      await unlinkAccount({ teacherId: user.userId, studentId: studentInfo.userId })
+      await unlinkAccount({ teacherId: teacherInfo.userId!, studentId: studentInfo.userId! })
       onUnlinkAccountSuccess()
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
 
       if (!error.response) {
@@ -56,7 +53,7 @@ export default function UnlinkAccountPopup({
   }
 
   function onUnlinkAccountSuccess() {
-    dispatch(removeStudent(studentInfo.userId))
+    dispatch(removeStudent(studentInfo.userId!))
     setOutcomeMessage('Successfully removed student.')
     onClose()
     window.location.reload()
@@ -105,7 +102,7 @@ export default function UnlinkAccountPopup({
                 </h3>
                 <h5 className="mb-5">
                   <span>
-                    {`${studentInfo?.username.split('-').join(' ')} - ${atob(studentInfo?.userId)} `}{' '}
+                    {`${studentInfo!.username!.split('-').join(' ')} - ${atob(studentInfo!.userId!)} `}{' '}
                   </span>
                 </h5>
               </div>

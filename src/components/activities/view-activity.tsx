@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { editActivity, requestCardReview } from '../../api/controller'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { editUserActivity } from '../../store/actions/userActions'
 import ListUi from '@/components/lists/lists-ui'
 import { CompletionStatus } from '../../types/CompletionStatusEnum'
@@ -26,7 +26,7 @@ export default function ViewActivity<IViewActivity>({
   userActivity: IActivity
   isMain: boolean
 }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   let args
 
   const [isLoading, setIsLoading] = useState(false)
@@ -54,7 +54,7 @@ export default function ViewActivity<IViewActivity>({
     try {
       const requestReview = {
         id: userActivity.activityId,
-        teacherId: userDetails.linkedAccountsData.teacher,
+        teacherId: userDetails.linkedAccountsData.teacher!,
         student: {
           id: userDetails.userId,
           fullName: `${userDetails.firstName} ${userDetails.lastName}`,
@@ -75,7 +75,7 @@ export default function ViewActivity<IViewActivity>({
       const response = (await editActivity({
         userId: userDetails.userId,
         updatedActivity,
-      })) as unknown as IResponse
+      })) as unknown as IResponse<IActivity>
       const { data } = response
       const { message, details }: { message: string; details: IActivity } = data
       dispatch(editUserActivity({ username: userDetails.username, updatedActivity: details }))
@@ -84,7 +84,7 @@ export default function ViewActivity<IViewActivity>({
 
       setFormSubmitOutcomeMessage('Request for review successfully sent.')
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 
@@ -118,13 +118,13 @@ export default function ViewActivity<IViewActivity>({
       const response = (await editActivity({
         userId: userDetails.userId,
         updatedActivity,
-      })) as unknown as IResponse
+      })) as unknown as IResponse<IActivity>
       const { data } = response
       const { message, details }: { message: string; details: IActivity } = data
       dispatch(editUserActivity({ username: userDetails.username, updatedActivity: details }))
       setFormSubmitOutcomeMessage(message)
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

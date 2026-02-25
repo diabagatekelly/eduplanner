@@ -7,11 +7,11 @@ import AddStudent from '@/components/students/add-student'
 import ListUi from '@/components/lists/lists-ui'
 import { useRouter } from 'next/navigation'
 import Breadcrumbs from '@/components/breadcrumbs'
+import { IUser } from '@/types/IUser'
 
 export default function Students() {
   const router = useRouter()
-  let args
-  const [user, getUserData] = useState({ ...args })
+  const [user, getUserData] = useState({} as IUser)
 
   useEffect(() => {
     const { userReducer } = store.getState()

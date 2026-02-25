@@ -1,7 +1,10 @@
 import { IUser } from '@/types/IUser'
 import { ISODateString } from '@/types/isoDateType'
 
-export function setAuthToken({ token, user }: { token: string; user: IUser }) {
+type AuthAction = { type: 'AUTH' }
+type UnauthAction = { type: 'UNAUTH' }
+
+export function setAuthToken({ token, user }: { token: string; user: IUser }): AuthAction {
   sessionStorage.setItem('user_token', token)
   const today = new Date(Date.now()).toLocaleDateString('en-US', {
     timeZone: 'EST',
@@ -13,7 +16,7 @@ export function setAuthToken({ token, user }: { token: string; user: IUser }) {
   }
 }
 
-export function removeAuthToken() {
+export function removeAuthToken(): UnauthAction {
   sessionStorage.removeItem('user_token')
   sessionStorage.removeItem('user_data')
   sessionStorage.removeItem('created_on')
@@ -22,7 +25,7 @@ export function removeAuthToken() {
   }
 }
 
-export function hasToken() {
+export function hasToken(): AuthAction | UnauthAction {
   const hasToken = sessionStorage.getItem('user_token') !== null
   if (hasToken) {
     return {
@@ -35,7 +38,7 @@ export function hasToken() {
   }
 }
 
-export function hasExpired() {
+export function hasExpired(): AuthAction | UnauthAction {
   const createdOn = sessionStorage.getItem('created_on')
   const today = new Date(Date.now()).toLocaleDateString('en-US', {
     timeZone: 'EST',

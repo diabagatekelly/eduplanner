@@ -21,27 +21,27 @@ import {
 export default function CardsList({
   isMain,
   userDetails,
-  ...childArgs
+  activity,
 }: {
   isMain: boolean
   userDetails: IUser
   activity?: IActivity
 }) {
-  let args
   const mounted = useMounted()
 
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState('')
-  const [popupItem, getPopupItem] = useState<{ card: ICard; action: string }>({ ...args })
-  const [popupUserDetails, getPopupUserDetails] = useState<IUser>({ ...args })
+  const [popupItem, getPopupItem] = useState<{ card: ICard; action: string }>(
+    {} as { card: ICard; action: string }
+  )
+  const [popupUserDetails, getPopupUserDetails] = useState<IUser>({} as IUser)
   const [cardsOfTheDay, getCardsOfTheDay] = useState<ICard[]>([])
   const [allActiveCards, getAllActiveCards] = useState<ICard[]>([])
   const [allInactiveCards, getAllInactiveCards] = useState<ICard[]>([])
   const [hash, getHash] = useState('')
 
   useEffect(() => {
-    const extractedActivity = childArgs?.activity
-    const cards: any[] | ICard = extractedActivity.cards || []
+    const cards: any[] | ICard = activity?.cards || []
 
     if (cards.length) {
       //if (cards[0].activity === 'Quran') {
@@ -86,7 +86,7 @@ export default function CardsList({
       const hashReducer = window.location.hash
       getHash(hashReducer)
     }
-  }, [userDetails, childArgs?.activity, mounted])
+  }, [userDetails, activity, mounted])
 
   // function sortQuranCards(cards) {
   //   cards.map(card => {
@@ -158,9 +158,7 @@ export default function CardsList({
                   className="list-item-card"
                   key={card.cardId}
                 >
-                  <p data-testid="today-card-name">
-                    {formatCardName(card.cardId, childArgs?.activity?.name)}
-                  </p>
+                  <p data-testid="today-card-name">{formatCardName(card.cardId, activity?.name)}</p>
                   <div className="flex">
                     <span
                       data-testid="today-card-show-btn"
@@ -235,7 +233,7 @@ export default function CardsList({
                   key={card.cardId}
                 >
                   <p data-testid="active-card-name">
-                    {formatCardName(card.cardId, childArgs?.activity?.name)}
+                    {formatCardName(card.cardId, activity?.name)}
                   </p>
                   <div className="flex">
                     <span
@@ -315,7 +313,7 @@ export default function CardsList({
                   key={card.cardId}
                 >
                   <p data-testid="inactive-card-name">
-                    {formatCardName(card.cardId, childArgs?.activity?.name)}
+                    {formatCardName(card.cardId, activity?.name)}
                   </p>
                   <div className="flex">
                     <span
@@ -379,7 +377,7 @@ export default function CardsList({
         </>
       )}
 
-      {hash === '#add' && <AddCard {...{ isMain, userDetails, activity: childArgs.activity }} />}
+      {hash === '#add' && <AddCard {...{ isMain, userDetails, activity: activity! }} />}
 
       <Popup
         {...{
@@ -387,7 +385,7 @@ export default function CardsList({
           modalType,
           isMain,
           user: popupUserDetails,
-          activity: childArgs.activity,
+          activity: activity,
           item: popupItem,
         }}
         onClose={() => setShowModal(false)}

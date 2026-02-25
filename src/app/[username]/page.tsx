@@ -12,8 +12,7 @@ export default function Main(props: { params: UsernameParams }) {
   const params = use(props.params)
   const usernameFromParams = params.username
 
-  let args
-  const [user, getUserData] = useState<IUser>({ ...args })
+  const [user, getUserData] = useState<IUser>({} as IUser)
 
   useEffect(() => {
     const { userReducer } = store.getState()

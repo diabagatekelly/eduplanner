@@ -11,8 +11,7 @@ import { StudentParams } from '@/types/IParams'
 export default function Main(props: { params: StudentParams }) {
   const params = use(props.params)
   const studentFromParams = params.student
-  let args
-  const [user, getUserData] = useState<IUser>({ ...args })
+  const [user, getUserData] = useState<IUser>({} as IUser)
 
   useEffect(() => {
     const { userReducer } = store.getState()
@@ -29,7 +28,7 @@ export default function Main(props: { params: StudentParams }) {
   return (
     <NestedLayout {...{ isTeacher }}>
       <Breadcrumbs />
-      <Dashboard {...{ userDetails, isMain, isTeacher }} />
+      <Dashboard {...{ userDetails: userDetails!, isMain, isTeacher }} />
       <button className="default-btn" onClick={() => window.history.back()}>
         Back
       </button>

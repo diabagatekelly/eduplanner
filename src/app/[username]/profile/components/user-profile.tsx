@@ -6,7 +6,7 @@ export default function UserProfile({ user }: { user: IUser }) {
   const getStudentListOrTeacher = () => {
     let linkedAccountsMessage = 'None'
     let userLinkedAccounts = user?.linkedAccountsData
-    if (user?.accountType === 'student' && userLinkedAccounts.teacher !== null) {
+    if (user?.accountType === 'student' && userLinkedAccounts?.teacher) {
       linkedAccountsMessage = `${atob(userLinkedAccounts.teacher)} (teacher)`
     } else if (user?.accountType === 'teacher' && userLinkedAccounts.students?.length) {
       const students = userLinkedAccounts.students.map((encodedEmail) =>

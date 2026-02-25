@@ -14,8 +14,7 @@ export default function Main(props: { params: ActivityParams }) {
 
   const isMain = true
 
-  let args
-  const [user, getUserData] = useState<IUser>({ ...args })
+  const [user, getUserData] = useState<IUser>({} as IUser)
 
   useEffect(() => {
     const { userReducer } = store.getState()
@@ -28,7 +27,7 @@ export default function Main(props: { params: ActivityParams }) {
   return (
     <NestedLayout {...{ isTeacher }}>
       <Breadcrumbs />
-      <ViewActivity {...{ userDetails: user, userActivity, isMain }} />
+      <ViewActivity {...{ userDetails: user, userActivity: userActivity!, isMain }} />
       <button className="default-btn" onClick={() => window.history.back()}>
         Back
       </button>

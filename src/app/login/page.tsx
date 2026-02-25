@@ -3,11 +3,11 @@
 import LoginForm from '@/app/login/components/login-form'
 import React, { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { IUserLogin } from '@/types/IUser'
+import { IUser, IUserLogin } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
 import Link from 'next/link'
 import { setAuthToken } from '@/store/actions/authActions'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { populateUser } from '@/store/actions/userActions'
 import { loginUser } from '@/api/controller'
 
@@ -17,7 +17,7 @@ interface ILogin {
 }
 
 export default function Login<ILogin>() {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const router = useRouter()
 
   const [formData, setFormData] = useState<{ email: string; password: string }>({
@@ -56,7 +56,7 @@ export default function Login<ILogin>() {
       }
 
       for (const pair of rawFormData.entries()) {
-        userFormInfo[pair[0]] = `${pair[1]}`
+        ;(userFormInfo as Record<string, string>)[pair[0]] = `${pair[1]}`
       }
 
       const userCredentials: IUserLogin = {
@@ -64,7 +64,10 @@ export default function Login<ILogin>() {
         password: userFormInfo.password,
       }
 
-      const response = (await loginUser(userCredentials)) as unknown as IResponse
+      const response = (await loginUser(userCredentials)) as unknown as IResponse<{
+        token: string
+        user: IUser
+      }>
       const { data } = response
       const { details } = data
 
@@ -77,7 +80,7 @@ export default function Login<ILogin>() {
       dispatch(setAuthToken(details))
       dispatch(populateUser())
       router.push('/' + details.user.username)
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

@@ -4,24 +4,27 @@ import StudentsList from './students-list'
 import ActivitiesList from './activities-list'
 import CardsList from './cards-list'
 import { IUser } from '@/types/IUser'
+import { IActivity } from '@/types/IActivity'
 
 export default function ListUi({
   listType,
   isMain,
   userDetails,
-  ...childArgs
+  activity,
 }: {
   listType: string
   isMain: boolean
   userDetails: IUser
-  childArgs?: any
+  activity?: IActivity
 }) {
   return (
     <>
       <div className={`${listType}-list`}>
         {listType === 'students' && <StudentsList {...{ userDetails }} />}
         {listType === 'activities' && <ActivitiesList {...{ isMain, userDetails }} />}
-        {listType === 'cards' && <CardsList {...{ isMain, userDetails, ...childArgs }} />}
+        {listType === 'cards' && (
+          <CardsList isMain={isMain} userDetails={userDetails} activity={activity} />
+        )}
       </div>
       <div className="status-color-legend my-10">
         <p>

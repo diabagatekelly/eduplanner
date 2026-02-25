@@ -1,14 +1,18 @@
-export default function formatCardName(cardId: string, activityName: string) {
-  if (activityName === 'Quran') {
+import { ACTIVITY_TYPES } from '@/lib/constants/activityTypes'
+
+export default function formatCardName(cardId: string, activityName: string | undefined) {
+  /* istanbul ignore next */
+  if (!activityName) return ''
+  if (activityName === ACTIVITY_TYPES.QURAN) {
     return _formatQuranCardName(cardId)
-  } else if (activityName.includes('Language')) {
+  } else if (activityName.includes(ACTIVITY_TYPES.LANGUAGE)) {
     return _formatLanguageCardName(cardId)
   } else {
     return _formatMiscCardName(cardId)
   }
 }
 
-function _formatQuranCardName(cardId) {
+function _formatQuranCardName(cardId: string) {
   const cardName = atob(cardId)
   const cardNameNoHyphens = cardName.split('-')
 
@@ -21,18 +25,18 @@ function _formatQuranCardName(cardId) {
   }
 }
 
-function _formatLanguageCardName(cardId) {
+function _formatLanguageCardName(cardId: string) {
   const cardName = atob(cardId)
   const cardNameNoHyphens = cardName.split('-')
   return `${_capitalizeFirstLetter(cardNameNoHyphens[0])} ${_capitalizeFirstLetter(cardNameNoHyphens[1])}: ${cardNameNoHyphens[2]}`
 }
 
-function _formatMiscCardName(cardId) {
+function _formatMiscCardName(cardId: string) {
   const cardName = atob(cardId)
   const cardNameNoHyphens = cardName.split('-')
   return `Miscellaneous Card: ${cardNameNoHyphens[2]}`
 }
 
-function _capitalizeFirstLetter(string) {
+function _capitalizeFirstLetter(string: string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }

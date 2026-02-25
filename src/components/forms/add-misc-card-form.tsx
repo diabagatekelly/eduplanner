@@ -9,8 +9,9 @@ import Popup from '../popups/popup'
 import { createCards } from '@/api/controller'
 import { IResponse } from '@/types/IApiResponse'
 import { createUserCard } from '@/store/actions/userActions'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 
 export default function AddMiscCardForm({
   isMain,
@@ -21,8 +22,7 @@ export default function AddMiscCardForm({
   user: IUser
   activity: IActivity
 }) {
-  let args
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [typedList, getTypedList] = useState({
     words: '',
@@ -30,7 +30,7 @@ export default function AddMiscCardForm({
 
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
   const [modalType, setModalType] = useState('')
-  const [popupItem, getPopupItem] = useState<{ list: string }>({ ...args })
+  const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
   const [showModal, setShowModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -62,7 +62,7 @@ export default function AddMiscCardForm({
       finalCardListAsArr.forEach((word) => {
         cards.push({
           cardId: `${btoa(`misc-card-${word}`)}`,
-          activityType: 'Miscellaneous',
+          activityType: CARD_ACTIVITY_TYPES.MISCELLANEOUS,
           ...userCardBase,
         })
       })
@@ -73,7 +73,7 @@ export default function AddMiscCardForm({
         cards,
       }
 
-      const createdCards = (await createCards(payload)) as IResponse
+      const createdCards = (await createCards(payload)) as unknown as IResponse<ICard[]>
       const { data } = createdCards
       const { message, details }: { message: string; details: ICard[] } = data
       dispatch(
@@ -82,7 +82,7 @@ export default function AddMiscCardForm({
 
       setFormSubmitOutcomeMessage(message)
       window.location.reload()
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 

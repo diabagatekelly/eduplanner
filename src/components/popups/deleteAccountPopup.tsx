@@ -3,7 +3,7 @@ import { resetUser } from '@/store/actions/userActions'
 import { useRouter } from 'next/navigation'
 import { deleteUser } from '../../api/controller'
 import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
 import { IUser } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
 import { UserMinusIcon, XMarkIcon } from '@heroicons/react/24/solid'
@@ -11,29 +11,27 @@ import { UserMinusIcon, XMarkIcon } from '@heroicons/react/24/solid'
 export default function DeleteAccountPopup({
   onClose,
   showModal,
-  ...childArgs
+  user,
 }: {
-  onClose: any
+  onClose: () => void
   showModal: boolean
-  newStudent?: IUser | Partial<IUser>
   user?: IUser | Partial<IUser>
 }) {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const router = useRouter()
 
-  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...childArgs.user })
+  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
   const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
-    const user = childArgs.user
-    getUserInfo(user)
-  }, [showModal, childArgs])
+    getUserInfo({ ...user })
+  }, [showModal, user])
 
   async function deleteAccount() {
     try {
-      ;(await deleteUser(userInfo.userId)) as unknown as IResponse
+      ;(await deleteUser(userInfo.userId!)) as unknown as IResponse
       onDeleteAccountSuccess()
-    } catch (error) {
+    } catch (error: any) {
       console.log(error)
 
       if (!error.response) {

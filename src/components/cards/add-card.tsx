@@ -7,6 +7,7 @@ import AddQuranCardForm from '../forms/add-quran-card-form'
 import { IUser } from '@/types/IUser'
 import { IActivity } from '@/types/IActivity'
 import AddLanguageCardForm from '../forms/add-language-card-form'
+import { ACTIVITY_TYPES } from '@/lib/constants/activityTypes'
 
 export default function AddCard({
   isMain,
@@ -21,24 +22,25 @@ export default function AddCard({
 
   return (
     <div className="justify-items-start">
-      {pathname.includes('/activities/Quran') && (
+      {pathname.includes(`/activities/${ACTIVITY_TYPES.QURAN}`) && (
         <>
           <h3 className="component-heading">Add New Quran Cards:</h3>
           <AddQuranCardForm {...{ isMain, user: userDetails, activity }} />
         </>
       )}
-      {pathname.includes('Language') && (
+      {pathname.includes(ACTIVITY_TYPES.LANGUAGE) && (
         <>
           <h3 className="component-heading">Add New Language Cards:</h3>
           <AddLanguageCardForm {...{ isMain, user: userDetails, activity }} />
         </>
       )}
-      {!pathname.includes('/activities/Quran') && !pathname.includes('Language') && (
-        <>
-          <h3 className="component-heading">Add New Cards:</h3>
-          <AddMiscCardForm {...{ isMain, user: userDetails, activity }} />
-        </>
-      )}
+      {!pathname.includes(`/activities/${ACTIVITY_TYPES.QURAN}`) &&
+        !pathname.includes(ACTIVITY_TYPES.LANGUAGE) && (
+          <>
+            <h3 className="component-heading">Add New Cards:</h3>
+            <AddMiscCardForm {...{ isMain, user: userDetails, activity }} />
+          </>
+        )}
     </div>
   )
 }
