@@ -1,9 +1,11 @@
+import { CARD_ACTIVITY_TYPES } from './cardTypes'
+
 export const quranCards = [
   {
     juz: 1,
     level: 'Juz',
     cardId: 'anV6LTE=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 1,
@@ -11,7 +13,7 @@ export const quranCards = [
     juz: 1,
     name: 'Faatiha',
     cardId: 'c3VyYWgtMS1uYW1lLUZhYXRpaGEtanV6LTE=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 2,
@@ -19,13 +21,13 @@ export const quranCards = [
     juz: 1,
     name: 'Baqara',
     cardId: 'c3VyYWgtMi1uYW1lLUJhcWFyYS1qdXotMQ==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 3,
     level: 'Juz',
     cardId: 'anV6LTM=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 3,
@@ -33,13 +35,13 @@ export const quranCards = [
     juz: 3,
     name: 'Imraan',
     cardId: 'c3VyYWgtMy1uYW1lLUltcmFhbi1qdXotMw==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 4,
     level: 'Juz',
     cardId: 'anV6LTQ=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 4,
@@ -47,13 +49,13 @@ export const quranCards = [
     juz: 4,
     name: 'Nisaa',
     cardId: 'c3VyYWgtNC1uYW1lLU5pc2FhLWp1ei00',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 6,
     level: 'Juz',
     cardId: 'anV6LTY=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 5,
@@ -61,13 +63,13 @@ export const quranCards = [
     juz: 6,
     name: 'Maaida',
     cardId: 'c3VyYWgtNS1uYW1lLU1hYWlkYS1qdXotNg==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 7,
     level: 'Juz',
     cardId: 'anV6LTc=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 6,
@@ -75,13 +77,13 @@ export const quranCards = [
     juz: 7,
     name: "An'aam",
     cardId: 'c3VyYWgtNi1uYW1lLUFuJ2FhbS1qdXotNw==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 8,
     level: 'Juz',
     cardId: 'anV6LTg=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 7,
@@ -89,13 +91,13 @@ export const quranCards = [
     juz: 8,
     name: "A'raaf",
     cardId: 'c3VyYWgtNy1uYW1lLUEncmFhZi1qdXotOA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 9,
     level: 'Juz',
     cardId: 'anV6LTk=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 8,
@@ -103,13 +105,13 @@ export const quranCards = [
     juz: 9,
     name: 'Anfaal',
     cardId: 'c3VyYWgtOC1uYW1lLUFuZmFhbC1qdXotOQ==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 10,
     level: 'Juz',
     cardId: 'anV6LTEw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 9,
@@ -117,13 +119,13 @@ export const quranCards = [
     juz: 10,
     name: 'Tawba',
     cardId: 'c3VyYWgtOS1uYW1lLVRhd2JhLWp1ei0xMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 11,
     level: 'Juz',
     cardId: 'anV6LTEx',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 10,
@@ -131,7 +133,7 @@ export const quranCards = [
     juz: 11,
     name: 'Yunus',
     cardId: 'c3VyYWgtMTAtbmFtZS1ZdW51cy1qdXotMTE=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 11,
@@ -139,13 +141,13 @@ export const quranCards = [
     juz: 11,
     name: 'Hud',
     cardId: 'c3VyYWgtMTEtbmFtZS1IdWQtanV6LTEx',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 12,
     level: 'Juz',
     cardId: 'anV6LTEy',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 12,
@@ -153,13 +155,13 @@ export const quranCards = [
     juz: 12,
     name: 'Yusuf',
     cardId: 'c3VyYWgtMTItbmFtZS1ZdXN1Zi1qdXotMTI=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 13,
     level: 'Juz',
     cardId: 'anV6LTEz',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 13,
@@ -167,7 +169,7 @@ export const quranCards = [
     juz: 13,
     name: "Ra'd",
     cardId: 'c3VyYWgtMTMtbmFtZS1SYSdkLWp1ei0xMw==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 14,
@@ -175,13 +177,13 @@ export const quranCards = [
     juz: 13,
     name: 'Ibrahim',
     cardId: 'c3VyYWgtMTQtbmFtZS1JYnJhaGltLWp1ei0xMw==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 14,
     level: 'Juz',
     cardId: 'anV6LTE0',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 15,
@@ -189,7 +191,7 @@ export const quranCards = [
     juz: 14,
     name: 'Hijr',
     cardId: 'c3VyYWgtMTUtbmFtZS1IaWpyLWp1ei0xNA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 16,
@@ -197,13 +199,13 @@ export const quranCards = [
     juz: 14,
     name: 'Nahl',
     cardId: 'c3VyYWgtMTYtbmFtZS1OYWhsLWp1ei0xNA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 15,
     level: 'Juz',
     cardId: 'anV6LTE1',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 17,
@@ -211,7 +213,7 @@ export const quranCards = [
     juz: 15,
     name: 'Israa',
     cardId: 'c3VyYWgtMTctbmFtZS1Jc3JhYS1qdXotMTU=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 18,
@@ -219,13 +221,13 @@ export const quranCards = [
     juz: 15,
     name: 'Kahf',
     cardId: 'c3VyYWgtMTgtbmFtZS1LYWhmLWp1ei0xNQ==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 16,
     level: 'Juz',
     cardId: 'anV6LTE2',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 19,
@@ -233,7 +235,7 @@ export const quranCards = [
     juz: 16,
     name: 'Maryam',
     cardId: 'c3VyYWgtMTktbmFtZS1NYXJ5YW0tanV6LTE2',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 20,
@@ -241,13 +243,13 @@ export const quranCards = [
     juz: 16,
     name: 'Tahaa',
     cardId: 'c3VyYWgtMjAtbmFtZS1UYWhhYS1qdXotMTY=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 17,
     level: 'Juz',
     cardId: 'anV6LTE3',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 21,
@@ -255,7 +257,7 @@ export const quranCards = [
     juz: 17,
     name: 'Anbiyaa',
     cardId: 'c3VyYWgtMjEtbmFtZS1BbmJpeWFhLWp1ei0xNw==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 22,
@@ -263,13 +265,13 @@ export const quranCards = [
     juz: 17,
     name: 'Hajj',
     cardId: 'c3VyYWgtMjItbmFtZS1IYWpqLWp1ei0xNw==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 18,
     level: 'Juz',
     cardId: 'anV6LTE4',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 23,
@@ -277,7 +279,7 @@ export const quranCards = [
     juz: 18,
     name: 'Muminoon',
     cardId: 'c3VyYWgtMjMtbmFtZS1NdW1pbm9vbi1qdXotMTg=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 24,
@@ -285,7 +287,7 @@ export const quranCards = [
     juz: 18,
     name: 'Noor',
     cardId: 'c3VyYWgtMjQtbmFtZS1Ob29yLWp1ei0xOA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 25,
@@ -293,13 +295,13 @@ export const quranCards = [
     juz: 18,
     name: 'Furqaan',
     cardId: 'c3VyYWgtMjUtbmFtZS1GdXJxYWFuLWp1ei0xOA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 19,
     level: 'Juz',
     cardId: 'anV6LTE5',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 26,
@@ -307,7 +309,7 @@ export const quranCards = [
     juz: 19,
     name: "Shu'araa",
     cardId: 'c3VyYWgtMjYtbmFtZS1TaHUnYXJhYS1qdXotMTk=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 27,
@@ -315,13 +317,13 @@ export const quranCards = [
     juz: 19,
     name: 'Naml',
     cardId: 'c3VyYWgtMjctbmFtZS1OYW1sLWp1ei0xOQ==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 20,
     level: 'Juz',
     cardId: 'anV6LTIw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 28,
@@ -329,7 +331,7 @@ export const quranCards = [
     juz: 20,
     name: 'Qasas',
     cardId: 'c3VyYWgtMjgtbmFtZS1RYXNhcy1qdXotMjA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 29,
@@ -337,13 +339,13 @@ export const quranCards = [
     juz: 20,
     name: 'Ankaboot',
     cardId: 'c3VyYWgtMjktbmFtZS1BbmthYm9vdC1qdXotMjA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 21,
     level: 'Juz',
     cardId: 'anV6LTIx',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 30,
@@ -351,7 +353,7 @@ export const quranCards = [
     juz: 21,
     name: 'Room',
     cardId: 'c3VyYWgtMzAtbmFtZS1Sb29tLWp1ei0yMQ==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 31,
@@ -359,7 +361,7 @@ export const quranCards = [
     juz: 21,
     name: 'Luqman',
     cardId: 'c3VyYWgtMzEtbmFtZS1MdXFtYW4tanV6LTIx',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 32,
@@ -367,7 +369,7 @@ export const quranCards = [
     juz: 21,
     name: 'Sajda',
     cardId: 'c3VyYWgtMzItbmFtZS1TYWpkYS1qdXotMjE=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 33,
@@ -375,13 +377,13 @@ export const quranCards = [
     juz: 21,
     name: 'Ahzaab',
     cardId: 'c3VyYWgtMzMtbmFtZS1BaHphYWItanV6LTIx',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 22,
     level: 'Juz',
     cardId: 'anV6LTIy',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 34,
@@ -389,7 +391,7 @@ export const quranCards = [
     juz: 22,
     name: 'Saba',
     cardId: 'c3VyYWgtMzQtbmFtZS1TYWJhLWp1ei0yMg==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 35,
@@ -397,7 +399,7 @@ export const quranCards = [
     juz: 22,
     name: 'Faatir',
     cardId: 'c3VyYWgtMzUtbmFtZS1GYWF0aXItanV6LTIy',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 36,
@@ -405,13 +407,13 @@ export const quranCards = [
     juz: 22,
     name: 'Yaseen',
     cardId: 'c3VyYWgtMzYtbmFtZS1ZYXNlZW4tanV6LTIy',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 23,
     level: 'Juz',
     cardId: 'anV6LTIz',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 37,
@@ -419,7 +421,7 @@ export const quranCards = [
     juz: 23,
     name: 'Saaffaat',
     cardId: 'c3VyYWgtMzctbmFtZS1TYWFmZmFhdC1qdXotMjM=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 38,
@@ -427,7 +429,7 @@ export const quranCards = [
     juz: 23,
     name: 'Saad',
     cardId: 'c3VyYWgtMzgtbmFtZS1TYWFkLWp1ei0yMw==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 39,
@@ -435,13 +437,13 @@ export const quranCards = [
     juz: 23,
     name: 'Zumar',
     cardId: 'c3VyYWgtMzktbmFtZS1adW1hci1qdXotMjM=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 24,
     level: 'Juz',
     cardId: 'anV6LTI0',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 40,
@@ -449,7 +451,7 @@ export const quranCards = [
     juz: 24,
     name: 'Ghafir',
     cardId: 'c3VyYWgtNDAtbmFtZS1HaGFmaXItanV6LTI0',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 41,
@@ -457,13 +459,13 @@ export const quranCards = [
     juz: 24,
     name: 'Fussilat',
     cardId: 'c3VyYWgtNDEtbmFtZS1GdXNzaWxhdC1qdXotMjQ=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 25,
     level: 'Juz',
     cardId: 'anV6LTI1',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 42,
@@ -471,7 +473,7 @@ export const quranCards = [
     juz: 25,
     name: 'Shura',
     cardId: 'c3VyYWgtNDItbmFtZS1TaHVyYS1qdXotMjU=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 43,
@@ -479,7 +481,7 @@ export const quranCards = [
     juz: 25,
     name: 'Zukhruf',
     cardId: 'c3VyYWgtNDMtbmFtZS1adWtocnVmLWp1ei0yNQ==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 44,
@@ -487,7 +489,7 @@ export const quranCards = [
     juz: 25,
     name: 'Dukhaan',
     cardId: 'c3VyYWgtNDQtbmFtZS1EdWtoYWFuLWp1ei0yNQ==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 45,
@@ -495,13 +497,13 @@ export const quranCards = [
     juz: 25,
     name: 'Jaathiya',
     cardId: 'c3VyYWgtNDUtbmFtZS1KYWF0aGl5YS1qdXotMjU=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 26,
     level: 'Juz',
     cardId: 'anV6LTI2',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 46,
@@ -509,7 +511,7 @@ export const quranCards = [
     juz: 26,
     name: 'Ahqaf',
     cardId: 'c3VyYWgtNDYtbmFtZS1BaHFhZi1qdXotMjY=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 47,
@@ -517,7 +519,7 @@ export const quranCards = [
     juz: 26,
     name: 'Muhammad',
     cardId: 'c3VyYWgtNDctbmFtZS1NdWhhbW1hZC1qdXotMjY=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 48,
@@ -525,7 +527,7 @@ export const quranCards = [
     juz: 26,
     name: 'Fath',
     cardId: 'c3VyYWgtNDgtbmFtZS1GYXRoLWp1ei0yNg==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 49,
@@ -533,7 +535,7 @@ export const quranCards = [
     juz: 26,
     name: 'Hujuraat',
     cardId: 'c3VyYWgtNDktbmFtZS1IdWp1cmFhdC1qdXotMjY=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 50,
@@ -541,7 +543,7 @@ export const quranCards = [
     juz: 26,
     name: 'Qaaf',
     cardId: 'c3VyYWgtNTAtbmFtZS1RYWFmLWp1ei0yNg==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 51,
@@ -549,13 +551,13 @@ export const quranCards = [
     juz: 26,
     name: 'Dhaariyat',
     cardId: 'c3VyYWgtNTEtbmFtZS1EaGFhcml5YXQtanV6LTI2',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 27,
     level: 'Juz',
     cardId: 'anV6LTI3',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 52,
@@ -563,7 +565,7 @@ export const quranCards = [
     juz: 27,
     name: 'Tur',
     cardId: 'c3VyYWgtNTItbmFtZS1UdXItanV6LTI3',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 53,
@@ -571,7 +573,7 @@ export const quranCards = [
     juz: 27,
     name: 'Najm',
     cardId: 'c3VyYWgtNTMtbmFtZS1OYWptLWp1ei0yNw==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 54,
@@ -579,7 +581,7 @@ export const quranCards = [
     juz: 27,
     name: 'Qamar',
     cardId: 'c3VyYWgtNTQtbmFtZS1RYW1hci1qdXotMjc=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 55,
@@ -587,7 +589,7 @@ export const quranCards = [
     juz: 27,
     name: 'Rahmaan',
     cardId: 'c3VyYWgtNTUtbmFtZS1SYWhtYWFuLWp1ei0yNw==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 56,
@@ -595,7 +597,7 @@ export const quranCards = [
     juz: 27,
     name: 'Waaqia',
     cardId: 'c3VyYWgtNTYtbmFtZS1XYWFxaWEtanV6LTI3',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 57,
@@ -603,13 +605,13 @@ export const quranCards = [
     juz: 27,
     name: 'Hadid',
     cardId: 'c3VyYWgtNTctbmFtZS1IYWRpZC1qdXotMjc=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 28,
     level: 'Juz',
     cardId: 'anV6LTI4',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 58,
@@ -617,7 +619,7 @@ export const quranCards = [
     juz: 28,
     name: 'Mujaadila',
     cardId: 'c3VyYWgtNTgtbmFtZS1NdWphYWRpbGEtanV6LTI4',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 59,
@@ -625,7 +627,7 @@ export const quranCards = [
     juz: 28,
     name: 'Hashr',
     cardId: 'c3VyYWgtNTktbmFtZS1IYXNoci1qdXotMjg=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 60,
@@ -633,7 +635,7 @@ export const quranCards = [
     juz: 28,
     name: 'Mumtahana',
     cardId: 'c3VyYWgtNjAtbmFtZS1NdW10YWhhbmEtanV6LTI4',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 61,
@@ -641,7 +643,7 @@ export const quranCards = [
     juz: 28,
     name: 'Saff',
     cardId: 'c3VyYWgtNjEtbmFtZS1TYWZmLWp1ei0yOA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 62,
@@ -649,7 +651,7 @@ export const quranCards = [
     juz: 28,
     name: "Jumu'a",
     cardId: 'c3VyYWgtNjItbmFtZS1KdW11J2EtanV6LTI4',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 63,
@@ -657,7 +659,7 @@ export const quranCards = [
     juz: 28,
     name: 'Munaafiqoon',
     cardId: 'c3VyYWgtNjMtbmFtZS1NdW5hYWZpcW9vbi1qdXotMjg=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 64,
@@ -665,7 +667,7 @@ export const quranCards = [
     juz: 28,
     name: 'Taghaabun',
     cardId: 'c3VyYWgtNjQtbmFtZS1UYWdoYWFidW4tanV6LTI4',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 65,
@@ -673,7 +675,7 @@ export const quranCards = [
     juz: 28,
     name: 'Talaaq',
     cardId: 'c3VyYWgtNjUtbmFtZS1UYWxhYXEtanV6LTI4',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 66,
@@ -681,13 +683,13 @@ export const quranCards = [
     juz: 28,
     name: 'Tahrim',
     cardId: 'c3VyYWgtNjYtbmFtZS1UYWhyaW0tanV6LTI4',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 29,
     level: 'Juz',
     cardId: 'anV6LTI5',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 67,
@@ -695,7 +697,7 @@ export const quranCards = [
     juz: 29,
     name: 'Mulk',
     cardId: 'c3VyYWgtNjctbmFtZS1NdWxrLWp1ei0yOQ==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 68,
@@ -703,7 +705,7 @@ export const quranCards = [
     juz: 29,
     name: 'Qalam',
     cardId: 'c3VyYWgtNjgtbmFtZS1RYWxhbS1qdXotMjk=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 69,
@@ -711,7 +713,7 @@ export const quranCards = [
     juz: 29,
     name: 'Haaqqa',
     cardId: 'c3VyYWgtNjktbmFtZS1IYWFxcWEtanV6LTI5',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 70,
@@ -719,7 +721,7 @@ export const quranCards = [
     juz: 29,
     name: "Ma'aarij",
     cardId: 'c3VyYWgtNzAtbmFtZS1NYSdhYXJpai1qdXotMjk=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 71,
@@ -727,7 +729,7 @@ export const quranCards = [
     juz: 29,
     name: 'Nooh',
     cardId: 'c3VyYWgtNzEtbmFtZS1Ob29oLWp1ei0yOQ==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 72,
@@ -735,7 +737,7 @@ export const quranCards = [
     juz: 29,
     name: 'Jinn',
     cardId: 'c3VyYWgtNzItbmFtZS1KaW5uLWp1ei0yOQ==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 73,
@@ -743,7 +745,7 @@ export const quranCards = [
     juz: 29,
     name: 'Muzzammil',
     cardId: 'c3VyYWgtNzMtbmFtZS1NdXp6YW1taWwtanV6LTI5',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 74,
@@ -751,7 +753,7 @@ export const quranCards = [
     juz: 29,
     name: 'Muddaththir',
     cardId: 'c3VyYWgtNzQtbmFtZS1NdWRkYXRodGhpci1qdXotMjk=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 75,
@@ -759,7 +761,7 @@ export const quranCards = [
     juz: 29,
     name: 'Qiyaama',
     cardId: 'c3VyYWgtNzUtbmFtZS1RaXlhYW1hLWp1ei0yOQ==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 76,
@@ -767,7 +769,7 @@ export const quranCards = [
     juz: 29,
     name: 'Insaan',
     cardId: 'c3VyYWgtNzYtbmFtZS1JbnNhYW4tanV6LTI5',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 77,
@@ -775,13 +777,13 @@ export const quranCards = [
     juz: 29,
     name: 'Mursalaat',
     cardId: 'c3VyYWgtNzctbmFtZS1NdXJzYWxhYXQtanV6LTI5',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     juz: 30,
     level: 'Juz',
     cardId: 'anV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 78,
@@ -789,7 +791,7 @@ export const quranCards = [
     juz: 30,
     name: 'Naba',
     cardId: 'c3VyYWgtNzgtbmFtZS1OYWJhLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 79,
@@ -797,7 +799,7 @@ export const quranCards = [
     juz: 30,
     name: "Naazi'aat",
     cardId: 'c3VyYWgtNzktbmFtZS1OYWF6aSdhYXQtanV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 80,
@@ -805,7 +807,7 @@ export const quranCards = [
     juz: 30,
     name: 'Abasa',
     cardId: 'c3VyYWgtODAtbmFtZS1BYmFzYS1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 81,
@@ -813,7 +815,7 @@ export const quranCards = [
     juz: 30,
     name: 'Takwir',
     cardId: 'c3VyYWgtODEtbmFtZS1UYWt3aXItanV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 82,
@@ -821,7 +823,7 @@ export const quranCards = [
     juz: 30,
     name: 'Infitaar',
     cardId: 'c3VyYWgtODItbmFtZS1JbmZpdGFhci1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 83,
@@ -829,7 +831,7 @@ export const quranCards = [
     juz: 30,
     name: 'Mutaffifin',
     cardId: 'c3VyYWgtODMtbmFtZS1NdXRhZmZpZmluLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 84,
@@ -837,7 +839,7 @@ export const quranCards = [
     juz: 30,
     name: 'Inshiqaaq',
     cardId: 'c3VyYWgtODQtbmFtZS1JbnNoaXFhYXEtanV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 85,
@@ -845,7 +847,7 @@ export const quranCards = [
     juz: 30,
     name: 'Burooj',
     cardId: 'c3VyYWgtODUtbmFtZS1CdXJvb2otanV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 86,
@@ -853,7 +855,7 @@ export const quranCards = [
     juz: 30,
     name: 'Taariq',
     cardId: 'c3VyYWgtODYtbmFtZS1UYWFyaXEtanV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 87,
@@ -861,7 +863,7 @@ export const quranCards = [
     juz: 30,
     name: "A'laa",
     cardId: 'c3VyYWgtODctbmFtZS1BJ2xhYS1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 88,
@@ -869,7 +871,7 @@ export const quranCards = [
     juz: 30,
     name: 'Ghaashiya',
     cardId: 'c3VyYWgtODgtbmFtZS1HaGFhc2hpeWEtanV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 89,
@@ -877,7 +879,7 @@ export const quranCards = [
     juz: 30,
     name: 'Fajr',
     cardId: 'c3VyYWgtODktbmFtZS1GYWpyLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 90,
@@ -885,7 +887,7 @@ export const quranCards = [
     juz: 30,
     name: 'Balad',
     cardId: 'c3VyYWgtOTAtbmFtZS1CYWxhZC1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 91,
@@ -893,7 +895,7 @@ export const quranCards = [
     juz: 30,
     name: 'Shams',
     cardId: 'c3VyYWgtOTEtbmFtZS1TaGFtcy1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 92,
@@ -901,7 +903,7 @@ export const quranCards = [
     juz: 30,
     name: 'Lail',
     cardId: 'c3VyYWgtOTItbmFtZS1MYWlsLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 93,
@@ -909,7 +911,7 @@ export const quranCards = [
     juz: 30,
     name: 'Dhuhaa',
     cardId: 'c3VyYWgtOTMtbmFtZS1EaHVoYWEtanV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 94,
@@ -917,7 +919,7 @@ export const quranCards = [
     juz: 30,
     name: 'Sharh',
     cardId: 'c3VyYWgtOTQtbmFtZS1TaGFyaC1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 95,
@@ -925,7 +927,7 @@ export const quranCards = [
     juz: 30,
     name: 'Tin',
     cardId: 'c3VyYWgtOTUtbmFtZS1UaW4tanV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 96,
@@ -933,7 +935,7 @@ export const quranCards = [
     juz: 30,
     name: 'Alaq',
     cardId: 'c3VyYWgtOTYtbmFtZS1BbGFxLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 97,
@@ -941,7 +943,7 @@ export const quranCards = [
     juz: 30,
     name: 'Qadr',
     cardId: 'c3VyYWgtOTctbmFtZS1RYWRyLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 98,
@@ -949,7 +951,7 @@ export const quranCards = [
     juz: 30,
     name: 'Bayyina',
     cardId: 'c3VyYWgtOTgtbmFtZS1CYXl5aW5hLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 99,
@@ -957,7 +959,7 @@ export const quranCards = [
     juz: 30,
     name: 'Zalzala',
     cardId: 'c3VyYWgtOTktbmFtZS1aYWx6YWxhLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 100,
@@ -965,7 +967,7 @@ export const quranCards = [
     juz: 30,
     name: 'Aadiyaat',
     cardId: 'c3VyYWgtMTAwLW5hbWUtQWFkaXlhYXQtanV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 101,
@@ -973,7 +975,7 @@ export const quranCards = [
     juz: 30,
     name: "Qaari'a",
     cardId: 'c3VyYWgtMTAxLW5hbWUtUWFhcmknYS1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 102,
@@ -981,7 +983,7 @@ export const quranCards = [
     juz: 30,
     name: 'Takaathur',
     cardId: 'c3VyYWgtMTAyLW5hbWUtVGFrYWF0aHVyLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 103,
@@ -989,7 +991,7 @@ export const quranCards = [
     juz: 30,
     name: 'Asr',
     cardId: 'c3VyYWgtMTAzLW5hbWUtQXNyLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 104,
@@ -997,7 +999,7 @@ export const quranCards = [
     juz: 30,
     name: 'Humaza',
     cardId: 'c3VyYWgtMTA0LW5hbWUtSHVtYXphLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 105,
@@ -1005,7 +1007,7 @@ export const quranCards = [
     juz: 30,
     name: 'Fil',
     cardId: 'c3VyYWgtMTA1LW5hbWUtRmlsLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 106,
@@ -1013,7 +1015,7 @@ export const quranCards = [
     juz: 30,
     name: 'Quraish',
     cardId: 'c3VyYWgtMTA2LW5hbWUtUXVyYWlzaC1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 107,
@@ -1021,7 +1023,7 @@ export const quranCards = [
     juz: 30,
     name: "Maa'un",
     cardId: 'c3VyYWgtMTA3LW5hbWUtTWFhJ3VuLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 108,
@@ -1029,7 +1031,7 @@ export const quranCards = [
     juz: 30,
     name: 'Kawthar',
     cardId: 'c3VyYWgtMTA4LW5hbWUtS2F3dGhhci1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 109,
@@ -1037,7 +1039,7 @@ export const quranCards = [
     juz: 30,
     name: 'Kaafiroon',
     cardId: 'c3VyYWgtMTA5LW5hbWUtS2FhZmlyb29uLWp1ei0zMA==',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 110,
@@ -1045,7 +1047,7 @@ export const quranCards = [
     juz: 30,
     name: 'Nasr',
     cardId: 'c3VyYWgtMTEwLW5hbWUtTmFzci1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 111,
@@ -1053,7 +1055,7 @@ export const quranCards = [
     juz: 30,
     name: 'Masad',
     cardId: 'c3VyYWgtMTExLW5hbWUtTWFzYWQtanV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 112,
@@ -1061,7 +1063,7 @@ export const quranCards = [
     juz: 30,
     name: 'Ikhlaas',
     cardId: 'c3VyYWgtMTEyLW5hbWUtSWtobGFhcy1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 113,
@@ -1069,7 +1071,7 @@ export const quranCards = [
     juz: 30,
     name: 'Falaq',
     cardId: 'c3VyYWgtMTEzLW5hbWUtRmFsYXEtanV6LTMw',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
   {
     number: 114,
@@ -1077,6 +1079,6 @@ export const quranCards = [
     juz: 30,
     name: 'Naas',
     cardId: 'c3VyYWgtMTE0LW5hbWUtTmFhcy1qdXotMzA=',
-    type: 'Quran',
+    type: CARD_ACTIVITY_TYPES.QURAN,
   },
 ]

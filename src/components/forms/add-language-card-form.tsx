@@ -8,6 +8,7 @@ import { IResponse } from '@/types/IApiResponse'
 import Popup from '../popups/popup'
 import { ICard } from '@/types/ICard'
 import { createUserCard } from '@/store/actions/userActions'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 import { useAppDispatch } from '@/store/hooks'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 import { createCards } from '@/api/controller'
@@ -180,7 +181,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
           cardId: grammarCard
             ? `${btoa(`${language}-grammar-${word}`)}`
             : `${btoa(`${language}-vocab-${word}`)}`,
-          activityType: grammarCard ? 'Grammar' : 'Vocab',
+          activityType: grammarCard ? CARD_ACTIVITY_TYPES.GRAMMAR : CARD_ACTIVITY_TYPES.VOCAB,
           ...userCardBase,
         })
       })

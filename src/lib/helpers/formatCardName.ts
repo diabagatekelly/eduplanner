@@ -1,9 +1,11 @@
+import { ACTIVITY_TYPES } from '@/lib/constants/activityTypes'
+
 export default function formatCardName(cardId: string, activityName: string | undefined) {
   /* istanbul ignore next */
   if (!activityName) return ''
-  if (activityName === 'Quran') {
+  if (activityName === ACTIVITY_TYPES.QURAN) {
     return _formatQuranCardName(cardId)
-  } else if (activityName.includes('Language')) {
+  } else if (activityName.includes(ACTIVITY_TYPES.LANGUAGE)) {
     return _formatLanguageCardName(cardId)
   } else {
     return _formatMiscCardName(cardId)

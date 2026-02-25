@@ -1,7 +1,7 @@
 import { CompletionStatus } from './CompletionStatusEnum'
 import { ISODateString } from './isoDateType'
-
-export type CardActivityType = 'Quran' | 'Vocab' | 'Grammar' | 'Miscellaneous'
+import type { CardActivityType } from '@/lib/constants/cardTypes'
+export type { CardActivityType } from '@/lib/constants/cardTypes'
 
 export interface ICard {
   cardId: string

@@ -11,6 +11,7 @@ import { IResponse } from '@/types/IApiResponse'
 import { createUserCard } from '@/store/actions/userActions'
 import { useAppDispatch } from '@/store/hooks'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 
 export default function AddMiscCardForm({
   isMain,
@@ -61,7 +62,7 @@ export default function AddMiscCardForm({
       finalCardListAsArr.forEach((word) => {
         cards.push({
           cardId: `${btoa(`misc-card-${word}`)}`,
-          activityType: 'Miscellaneous',
+          activityType: CARD_ACTIVITY_TYPES.MISCELLANEOUS,
           ...userCardBase,
         })
       })

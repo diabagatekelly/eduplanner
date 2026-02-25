@@ -13,6 +13,8 @@ import { IResponse } from '@/types/IApiResponse'
 import { ICard } from '@/types/ICard'
 import { IUser } from '@/types/IUser'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
+import { ACTIVITY_TYPES } from '@/lib/constants/activityTypes'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 import { IActivity } from '@/types/IActivity'
 import formatCardName from '@/lib/helpers/formatCardName'
 import { ClipboardDocumentCheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
@@ -325,7 +327,7 @@ export default function ManageCardPopup({
   }
 
   function formatCardInstructions(cardName: string) {
-    if (cardName.includes('Vocab')) {
+    if (cardName.includes(CARD_ACTIVITY_TYPES.VOCAB)) {
       return (
         <>
           <ul>
@@ -394,7 +396,7 @@ export default function ManageCardPopup({
                 </h3>
                 <div className="text-left">
                   <h6 data-testid="card-name">{formatCardName(card.cardId, activity?.name)}</h6>
-                  {activity?.name !== 'Quran' && (
+                  {activity?.name !== ACTIVITY_TYPES.QURAN && (
                     <h6 data-testid="card-instructions">
                       Instructions:{' '}
                       {formatCardInstructions(formatCardName(card.cardId, activity?.name))}

@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from 'react'
 import { ICard, IQuranCards } from '../../types/ICard'
 import React from 'react'
 import { IActivity } from '@/types/IActivity'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 import { IUser } from '@/types/IUser'
 import { useAppDispatch } from '@/store/hooks'
 import { createCards, deleteCard } from '@/api/controller'
@@ -204,7 +205,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
         return {
           cardId: card,
           activity: activity.name,
-          activityType: 'Quran',
+          activityType: CARD_ACTIVITY_TYPES.QURAN,
           addedOn: null,
           lastUpdatedOn: null,
           nextShowDate: null,
@@ -217,7 +218,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
         cards.push({
           cardId: `${btoa(`custom-${jsonData.content}`)}`,
           activity: activity.name,
-          activityType: 'Quran',
+          activityType: CARD_ACTIVITY_TYPES.QURAN,
           addedOn: null,
           lastUpdatedOn: null,
           nextShowDate: null,
