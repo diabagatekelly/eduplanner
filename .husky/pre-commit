@@ -1,5 +1,13 @@
-# Run dev in one process and the other commands in another process
-npx concurrently --kill-others --success first \
-  "npm run dev" \
-  "prettier --check . && npm run lint && npm test && npm run test:ui" && \
-npm run build
+# If port 3000 is already in use, skip starting a new dev server
+node -e "require('net').createConnection({port:3000}).on('connect',function(){process.exit(0)}).on('error',function(){process.exit(1)})" 2>/dev/null
+PORT_IN_USE=$?
+
+if [ $PORT_IN_USE -eq 0 ]; then
+  # Dev server already running — run checks directly against it
+  prettier --check . && npm run lint && npm test && npm run test:ui
+else
+  # No server running — start one alongside checks, kill it when done
+  npx concurrently --kill-others --success first \
+    "npm run dev" \
+    "prettier --check . && npm run lint && npm test && npm run test:ui"
+fi && npm run build
