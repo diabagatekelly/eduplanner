@@ -47,7 +47,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   session: {
-    maxAge: 24 * 60 * 60, // 24 hours — replaces the hasExpired() date-change hack (Layer 3)
+    // 24 hours from login time. Note: the previous hasExpired() implementation expired
+    // sessions at midnight (when the calendar date changed), not after a fixed duration.
+    // This is intentionally stricter — a session created at 11:55pm now lasts until 11:55pm
+    // the next day rather than expiring 5 minutes later.
+    maxAge: 24 * 60 * 60,
   },
   pages: {
     signIn: '/login',
