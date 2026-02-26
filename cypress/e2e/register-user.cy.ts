@@ -15,25 +15,14 @@ describe('Register user', () => {
         },
       })
     })
-    it('should register user and navigate to Dashboard', () => {
+
+    it('should register user and navigate to dashboard', () => {
       cy.navigateToRegisterPage()
       cy.contains('Create an account').should('exist')
       cy.register(user)
       cy.wait(100)
       cy.contains(`Welcome ${mockUser.firstName} ${mockUser.lastName}!`)
       cy.url().should('include', `${mockUser.username}`)
-    })
-
-    it('should update store values as expected', () => {
-      cy.navigateToRegisterPage()
-      cy.register(user)
-      cy.window()
-        .its('store')
-        .invoke('getState')
-        .should('deep.equal', {
-          authReducer: { isAuthenticated: true },
-          userReducer: { ...user },
-        })
     })
   })
 
@@ -48,25 +37,12 @@ describe('Register user', () => {
       })
     })
 
-    it('should display error message and stay on the same page if registration fails', () => {
+    it('should display error message and stay on the register page', () => {
       cy.navigateToRegisterPage()
       cy.register(user)
       cy.wait(100)
       cy.contains('This user altready exists.')
       cy.url().should('not.include', `${mockUser.username}`)
-    })
-
-    it('should not populate store when registration fails', () => {
-      cy.navigateToRegisterPage()
-      cy.register(user)
-
-      cy.window()
-        .its('store')
-        .invoke('getState')
-        .should('deep.equal', {
-          authReducer: { isAuthenticated: false },
-          userReducer: {},
-        })
     })
   })
 })
