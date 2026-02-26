@@ -12,14 +12,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       authorize: async (credentials) => {
-        const response = (await loginUser({
-          userId: credentials.userId as string,
-          password: credentials.password as string,
-        })) as unknown as IResponse<{ token: string; user: IUser }>
+        if (!credentials?.userId || !credentials?.password) return null
 
-        if (response?.status === 200) {
-          const { token, user } = response.data.details
-          return { ...user, id: user.userId, accessToken: token }
+        try {
+          const response = (await loginUser({
+            userId: credentials.userId as string,
+            password: credentials.password as string,
+          })) as unknown as IResponse<{ token: string; user: IUser }>
+
+          if (response?.status === 200) {
+            const { token, user } = response.data.details
+            return { ...user, id: user.userId, accessToken: token }
+          }
+        } catch {
+          // Login request failed — return null to signal auth failure
         }
 
         return null

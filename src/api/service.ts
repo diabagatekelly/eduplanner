@@ -9,6 +9,7 @@ axiosInstance.interceptors.request.use(async (config) => {
       const { getSession } = await import('next-auth/react')
       const session = await getSession()
       if ((session as any)?.accessToken) {
+        config.headers = config.headers ?? {}
         config.headers.Authorization = `Bearer ${(session as any).accessToken}`
       }
     } catch {
