@@ -1,5 +1,6 @@
-if curl -s http://localhost:3000/home > /dev/null 2>&1; then
-  npm run test:ui
-else
-  npx start-server-and-test dev http://localhost:3000/home test:ui
+if ! curl -s http://localhost:3000/home > /dev/null 2>&1; then
+  echo ""
+  echo "pre-push: dev server not running. Start it with 'npm run dev' before pushing."
+  exit 1
 fi
+npm run test:ui
