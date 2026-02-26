@@ -1,3 +1,5 @@
-npx kill-port 3000 2>/dev/null || true
-rm -f .next/dev/lock 2>/dev/null || true
-npx start-server-and-test dev http://localhost:3000 test:ui
+if curl -s http://localhost:3000 > /dev/null 2>&1; then
+  npm run test:ui
+else
+  npx start-server-and-test dev http://localhost:3000 test:ui
+fi
