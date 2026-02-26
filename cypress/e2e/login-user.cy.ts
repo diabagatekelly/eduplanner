@@ -3,23 +3,27 @@ import { IUser } from '../../src/types/IUser'
 
 describe('Login User', () => {
   const user: IUser = { ...mockUser }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
+  const loginRoute = { method: 'GET', pathname: '/user/login' }
+
+  beforeEach(() => {
+    cy.window().then((win) => win.sessionStorage.clear())
+  })
 
   describe('Successful login', () => {
     beforeEach(() => {
-      cy.intercept(loginUrl, {
+      cy.intercept(loginRoute, {
         statusCode: 200,
         body: {
           status: 'success',
           message: 'User found',
           details: { token: 'xxxxxx', user },
         },
-      })
+      }).as('loginSuccess')
     })
 
     it('should login user and redirect to dashboard', () => {
       cy.login({ email: user.email, password: user.password })
-      cy.wait(100)
+      cy.wait('@loginSuccess')
       cy.contains(`Welcome ${mockUser.firstName} ${mockUser.lastName}!`)
       cy.url().should('include', `${mockUser.username}`)
     })
@@ -27,18 +31,18 @@ describe('Login User', () => {
 
   describe('Unsuccessful login', () => {
     beforeEach(() => {
-      cy.intercept(loginUrl, {
+      cy.intercept(loginRoute, {
         statusCode: 500,
         body: {
           status: 'error',
           message: 'Some error message which should be overriden by default.',
         },
-      })
+      }).as('loginFail')
     })
 
     it('should display error message and stay on the login page', () => {
       cy.login({ email: user.email, password: user.password })
-      cy.wait(100)
+      cy.wait('@loginFail')
       cy.contains('Failed to login due to an internal error. Please try again later.')
       cy.url().should('not.include', `${mockUser.username}`)
     })
