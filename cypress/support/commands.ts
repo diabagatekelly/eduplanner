@@ -33,7 +33,7 @@ Cypress.Commands.add('navigateToRegisterPage', () => {
   cy.get('[data-testid="register-link"]').click()
 })
 
-Cypress.Commands.add('register', (mockUser: IUser) => { 
+Cypress.Commands.add('register', (mockUser: IUser) => {
   cy.get('[data-testid="register-form"]').within(() => {
     cy.get('input[name="firstName"]').type(mockUser.firstName)
     cy.get('input[name="lastName"]').type(mockUser.lastName)
@@ -44,7 +44,7 @@ Cypress.Commands.add('register', (mockUser: IUser) => {
   })
 })
 
-Cypress.Commands.add('login', (credentials: {email: string, password: string}) => { 
+Cypress.Commands.add('login', (credentials: { email: string; password: string }) => {
   cy.visit('/home')
   cy.get('[data-testid="login-btn"]').click()
   cy.get('[data-testid="login-form"]').within(() => {
@@ -54,7 +54,7 @@ Cypress.Commands.add('login', (credentials: {email: string, password: string}) =
   })
 })
 
-Cypress.Commands.add('createActivity', () => { 
+Cypress.Commands.add('createActivity', () => {
   cy.get('[data-testid="add-activity-form"]').within(() => {
     cy.get('input[name="name"]').type('Quran')
     cy.get('input[name="description"]').type('Quran memorization')
@@ -68,9 +68,9 @@ declare global {
   namespace Cypress {
     interface Chainable {
       navigateToRegisterPage(): void
-      register(user: IUser): void,
-      login(credentials: {email: string, password: string}): void,
-      createActivity(): void,
+      register(user: IUser): void
+      login(credentials: { email: string; password: string }): void
+      createActivity(): void
       // drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
       // dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
       // visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>

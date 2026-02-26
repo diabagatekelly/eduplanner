@@ -1,48 +1,48 @@
-"use client"
+'use client'
 
-import React, { useState, FormEvent } from "react";
-import { useRouter } from 'next/navigation';
-import { useDispatch } from "react-redux";
-import RegisterForm from "@/app/register/components/register-form";
-import { IUser, IUserFormData } from "@/types/IUser";
-import { IResponse } from "@/types/IApiResponse";
-import { setAuthToken } from "@/store/actions/authActions";
-import { registerUser } from "@/api/controller";
-import { ISODateString } from "@/types/isoDateType";
+import React, { useState, FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAppDispatch } from '@/store/hooks'
+import RegisterForm from '@/app/register/components/register-form'
+import { IUser, IUserFormData } from '@/types/IUser'
+import { IResponse } from '@/types/IApiResponse'
+import { setAuthToken } from '@/store/actions/authActions'
+import { registerUser } from '@/api/controller'
+import { ISODateString } from '@/types/isoDateType'
 
 interface IRegister {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
+  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
   submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
 }
 
 export default function Register<IRegister>() {
-  const dispatch = useDispatch();
-  const router = useRouter();
+  const dispatch = useAppDispatch()
+  const router = useRouter()
 
   const [formData, setFormData] = useState<IUserFormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    accountType: ""
-  });
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    accountType: '',
+  })
 
   const [isLoading, setIsLoading] = useState(false)
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
+  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
 
   function handleInput(e: React.FormEvent<HTMLInputElement>) {
     if (formSubmitOutcomeMessage.length) {
       setFormSubmitOutcomeMessage('')
     }
-    
+
     const target = e.target as HTMLInputElement
-    const fieldName = target.name;
-    const fieldValue = target.value;
+    const fieldName = target.name
+    const fieldValue = target.value
 
     setFormData((prevState) => ({
       ...prevState,
-      [fieldName]: fieldValue
-    }));
+      [fieldName]: fieldValue,
+    }))
   }
 
   async function submitForm(e: FormEvent<HTMLFormElement>) {
@@ -53,48 +53,53 @@ export default function Register<IRegister>() {
 
       const rawFormData = new FormData(e.currentTarget)
       const jsonData: IUserFormData = {
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        accountType: ""
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        accountType: '',
       }
 
       for (const pair of rawFormData.entries()) {
-        jsonData[pair[0].trim()] = `${(pair[1] as string).trim()}`;
+        ;(jsonData as Record<string, string>)[pair[0].trim()] = `${(pair[1] as string).trim()}`
       }
 
       const userId = btoa(jsonData.email)
       const username = `${jsonData.firstName}-${jsonData.lastName}`
-      const linkedAccountsData = jsonData.accountType === 'teacher' ? {students: []} : {teacher: null}
+      const linkedAccountsData = jsonData.accountType === 'teacher' ? { students: [] } : {}
 
       const userData: IUser = {
         ...jsonData,
         userId,
         username,
-        lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
+        lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {
+          timeZone: 'EST',
+        }) as ISODateString,
         activities: [],
-        linkedAccountsData 
-      };
+        linkedAccountsData,
+      }
 
-      const response = await registerUser(userData) as unknown as IResponse;
+      const response = (await registerUser(userData)) as unknown as IResponse<{
+        token: string
+        user: IUser
+      }>
 
-      const {data} = response;
+      const { data } = response
       setIsLoading(false)
 
-      const {message, details} = data;
+      const { message, details } = data
 
       setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        accountType: "",
-      });
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        accountType: '',
+      })
       setFormSubmitOutcomeMessage(message)
-      router.push('/' + details.user.username )
-      dispatch(setAuthToken(details));
-    } catch (error) {
+      router.push('/' + details.user.username)
+      dispatch(setAuthToken(details))
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 
@@ -103,14 +108,15 @@ export default function Register<IRegister>() {
         return
       }
 
-      const {status, data} = error.response;
+      const { status, data } = error.response
 
       if (status === 500) {
-        setFormSubmitOutcomeMessage('Failed to create user due to an internal error. Please try again later.')
+        setFormSubmitOutcomeMessage(
+          'Failed to create user due to an internal error. Please try again later.'
+        )
       } else {
         setFormSubmitOutcomeMessage(data.message)
       }
-      
     }
   }
 
@@ -118,7 +124,9 @@ export default function Register<IRegister>() {
     <div>
       <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Create an account</h2>
+          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+            Create an account
+          </h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -128,4 +136,4 @@ export default function Register<IRegister>() {
       </div>
     </div>
   )
-};
+}

@@ -1,30 +1,21 @@
 import React from 'react'
-import {render} from '@testing-library/react'
+import { render } from '@testing-library/react'
 import store from '@/store/store'
 import { Provider } from 'react-redux'
 
-
-function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
-      <div className="py-20 px-5">
-        {children}
-      </div>
+      <div className="py-20 px-5">{children}</div>
     </Provider>
   )
 }
 
-
-
-const customRender = (ui, options?) =>
-  render(ui, {wrapper: RootLayout, ...options})
+const customRender = (ui: React.ReactElement, options?: any) =>
+  render(ui, { wrapper: RootLayout, ...options })
 
 // re-export everything
 export * from '@testing-library/react'
 
 // override render method
-export {customRender as render}
+export { customRender as render }

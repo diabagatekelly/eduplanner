@@ -1,32 +1,28 @@
 'use client'
 
 import { Inter } from 'next/font/google'
-import { Provider, useDispatch } from "react-redux";
-import { Suspense, useEffect, useState } from 'react';
+import { Provider } from 'react-redux'
+import { useAppDispatch } from '@/store/hooks'
+import { Suspense, useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import '@/styles/globals.css'
-import store from "@/store/store";
-import { hasExpired, hasToken } from '@/store/actions/authActions';
-import { populateUser } from '@/store/actions/userActions';
-import Navbar from '@/components/navbar';
-import Footer from '@/components/footer';
-import { useMounted } from '@/lib/helpers/useMounted';
+import store from '@/store/store'
+import { hasExpired, hasToken } from '@/store/actions/authActions'
+import { populateUser } from '@/store/actions/userActions'
+import Navbar from '@/components/navbar'
+import Footer from '@/components/footer'
+import { useMounted } from '@/lib/helpers/useMounted'
+import { IUser } from '@/types/IUser'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${inter.className}`}>
         <Provider store={store}>
           <Reloader />
-          <div className="py-20 px-5">
-            {children}
-          </div>
+          <div className="py-20 px-5">{children}</div>
           <Footer />
         </Provider>
       </body>
@@ -34,16 +30,14 @@ export default function RootLayout({
   )
 }
 
-
 const Reloader = () => {
-  let args;
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const pathname = usePathname()
   // const searchParams = useSearchParams()
   const router = useRouter()
-  const mounted = useMounted();
-  
-  const [userState, setUserState] = useState({isAuthenticated: false, userReducer: {...args}})
+  const mounted = useMounted()
+
+  const [userState, setUserState] = useState({ isAuthenticated: false, userReducer: {} as IUser })
 
   useEffect(() => {
     /* istanbul ignore next */
@@ -54,24 +48,27 @@ const Reloader = () => {
     dispatch(hasExpired())
     dispatch(hasToken())
     dispatch(populateUser())
-    const {authReducer, userReducer} = store.getState()
-    const isAuthenticated = authReducer.isAuthenticated;
-    setUserState({isAuthenticated, userReducer})
-
+    const { authReducer, userReducer } = store.getState()
+    const isAuthenticated = authReducer.isAuthenticated
+    setUserState({ isAuthenticated, userReducer })
   }, [pathname, dispatch])
 
-  const username = userState.userReducer.username;
-  const isAuthenticated = userState.isAuthenticated;
+  const username = userState.userReducer.username
+  const isAuthenticated = userState.isAuthenticated
 
   if (mounted) {
-    if (!window?.sessionStorage.getItem('user_token') && pathname !== '/login' && pathname !== '/register') {
+    if (
+      !window?.sessionStorage.getItem('user_token') &&
+      pathname !== '/login' &&
+      pathname !== '/register'
+    ) {
       router.push('/login')
     }
   }
 
-  return ( 
+  return (
     <Suspense fallback={null}>
-      <Navbar {...{isAuthenticated, username}} />
+      <Navbar {...{ isAuthenticated, username }} />
     </Suspense>
-  );
+  )
 }

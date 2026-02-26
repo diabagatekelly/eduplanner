@@ -1,9 +1,11 @@
-import { IUser } from "../types/IUser";
-import { ICard } from "../types/ICard";
-import { IActivity } from "../types/IActivity";
-import { CompletionStatus } from "../types/CompletionStatusEnum";
-import { ISODateString } from "../types/isoDateType";
-import { IQuranSurahCard, IQuranJuzCard } from "@/types/ICard";
+import { IUser } from '../types/IUser'
+import { ICard } from '../types/ICard'
+import { IActivity } from '../types/IActivity'
+import { CompletionStatus } from '../types/CompletionStatusEnum'
+import { ISODateString } from '../types/isoDateType'
+import { IQuranSurahCard, IQuranJuzCard } from '@/types/ICard'
+import { ACTIVITY_TYPES } from '../lib/constants/activityTypes'
+import { CARD_ACTIVITY_TYPES } from '../lib/constants/cardTypes'
 
 export const mockUser: IUser = {
   userId: btoa('mock.user@email.com'),
@@ -13,9 +15,9 @@ export const mockUser: IUser = {
   email: 'mock.user@email.com',
   password: 'password',
   accountType: 'teacher',
-  linkedAccountsData: {students: []},
-  lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
-  activities: []
+  linkedAccountsData: { students: [] },
+  lastLogin: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
+  activities: [],
 }
 
 export const mockStudent: IUser = {
@@ -26,20 +28,20 @@ export const mockStudent: IUser = {
   email: 'mock.student@email.com',
   password: 'password',
   accountType: 'student',
-  linkedAccountsData: {teacher: null},
-  lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString,
-  activities: [] 
+  linkedAccountsData: {},
+  lastLogin: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
+  activities: [],
 }
 
 export const mockActivity: IActivity = {
-  activityId: btoa('mock.user@email.com-Quran'), // btoa(userEmail-activityName)
-  name: 'Quran',
+  activityId: btoa(`mock.user@email.com-${ACTIVITY_TYPES.QURAN}`), // btoa(userEmail-activityName)
+  name: ACTIVITY_TYPES.QURAN,
   points: 15,
   description: 'Quran memorization',
   completionStatus: CompletionStatus.PENDING,
   hasCards: true,
-  createdOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
-  lastUpdatedOn: null
+  createdOn: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
+  lastUpdatedOn: null,
 }
 
 export const mockLanguageActivity: IActivity = {
@@ -49,8 +51,8 @@ export const mockLanguageActivity: IActivity = {
   description: 'Arabic language',
   completionStatus: CompletionStatus.PENDING,
   hasCards: true,
-  createdOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
-  lastUpdatedOn: null
+  createdOn: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
+  lastUpdatedOn: null,
 }
 
 export const mockCookingActivity: IActivity = {
@@ -60,66 +62,66 @@ export const mockCookingActivity: IActivity = {
   description: 'practice cooking',
   completionStatus: CompletionStatus.PENDING,
   hasCards: true,
-  createdOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
-  lastUpdatedOn: null
+  createdOn: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
+  lastUpdatedOn: null,
 }
 
 export const mockUserCard: ICard = {
   cardId: `${btoa('surah-114-name-Naas-juz-30')}`,
-  activity: 'Quran',
-  activityType: 'Quran',
+  activity: ACTIVITY_TYPES.QURAN,
+  activityType: CARD_ACTIVITY_TYPES.QURAN,
   addedOn: null,
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE
+  completionStatus: CompletionStatus.INACTIVE,
 }
 
 export const mockUserLanguageVocabCard: ICard = {
   cardId: `${btoa('arabic-vocab-house')}`,
   activity: 'Arabic-Language',
-  activityType: 'Vocab',
+  activityType: CARD_ACTIVITY_TYPES.VOCAB,
   addedOn: null,
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE
+  completionStatus: CompletionStatus.INACTIVE,
 }
 
 export const mockUserLanguageGrammarCard: ICard = {
   cardId: `${btoa('arabic-grammar-house')}`,
   activity: 'Arabic-Language',
-  activityType: 'Grammar',
+  activityType: CARD_ACTIVITY_TYPES.GRAMMAR,
   addedOn: null,
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE
+  completionStatus: CompletionStatus.INACTIVE,
 }
 
 export const mockUserMiscCard: ICard = {
   cardId: `${btoa('misc-card-cook an egg')}`,
   activity: 'Cooking',
-  activityType: 'Miscellaneous',
+  activityType: CARD_ACTIVITY_TYPES.MISCELLANEOUS,
   addedOn: null,
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE
+  completionStatus: CompletionStatus.INACTIVE,
 }
 
 export const mockBankSurahCard: IQuranSurahCard = {
   cardId: `${btoa('surah-114-name-Naas-juz-30')}`,
-  type: 'Quran',
+  type: CARD_ACTIVITY_TYPES.QURAN,
   level: 'Surah',
   name: 'Naas',
   juz: 30,
-  number: 114
+  number: 114,
 }
 
 export const mockBankJuzCard: IQuranJuzCard = {
   cardId: `${btoa('juz-30')}`,
-  type: 'Quran',
+  type: CARD_ACTIVITY_TYPES.QURAN,
   level: 'Juz',
-  juz: 30
+  juz: 30,
 }

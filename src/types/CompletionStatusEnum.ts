@@ -3,5 +3,5 @@ export enum CompletionStatus {
   'PENDING' = 'pending',
   'REVIEW' = 'review',
   'DELINQUENT' = 'delinquent',
-  'INACTIVE' = 'inactive'
+  'INACTIVE' = 'inactive',
 }

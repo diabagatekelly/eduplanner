@@ -1,12 +1,12 @@
 import AddStudent from '../../../components/students/add-student'
 import '@testing-library/jest-dom'
 import { screen, fireEvent, act } from '@testing-library/react'
-import { render } from '../../util';
-import * as React from 'react';
-import { findUser } from '../../../api/controller';
-import { mockUser, mockStudent } from '../../../specs/mocks';
+import { render } from '../../util'
+import * as React from 'react'
+import { findUser } from '../../../api/controller'
+import { mockUser, mockStudent } from '../../../specs/mocks'
 
-jest.mock('../../../api/controller');
+jest.mock('../../../api/controller')
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(() => ({
@@ -14,13 +14,13 @@ jest.mock('next/navigation', () => {
       replace: jest.fn(),
     })),
   }
-});
+})
 
 describe('Add student', () => {
-  const user = {...mockUser, accountType: 'teacher'}
+  const user = { ...mockUser, accountType: 'teacher' }
 
   beforeAll(() => {
-    sessionStorage.setItem("user_data", JSON.stringify(user))
+    sessionStorage.setItem('user_data', JSON.stringify(user))
   })
 
   afterAll(() => {
@@ -28,50 +28,50 @@ describe('Add student', () => {
   })
 
   it('should render form to search for student', async () => {
-    render(<AddStudent {...{user}} />)
- 
+    render(<AddStudent {...{ user }} />)
+
     const heading = await screen.findByRole('heading', { level: 3 })
     const findStudentForm = await screen.findByTestId('find-student-form')
- 
+
     expect(heading).toHaveTextContent('Add a new student:')
     expect(findStudentForm).toBeInTheDocument()
   })
 
   it('should invoke findUser controller when form is submitted', async () => {
-    (findUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({status: 200, data: {message: null, details: {}}})
+    ;(findUser as jest.Mock).mockImplementationOnce(() => {
+      return Promise.resolve({ status: 200, data: { message: null, details: {} } })
     })
-    render(<AddStudent {...{user}} />)
+    render(<AddStudent {...{ user }} />)
 
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
-    
-    const studentDTO = {userId: mockStudent.userId}
+
+    const studentDTO = { userId: mockStudent.userId }
 
     await act(() => {
       fireEvent.change(email, {
-        target: {value: mockStudent.email}
+        target: { value: mockStudent.email },
       })
     })
 
     await act(async () => {
       await fireEvent.click(submitButton)
     })
-    
+
     await expect(findUser).toHaveBeenCalledWith(studentDTO)
   })
 
   it('should not add same user as his own student', async () => {
-    const invalidStudent = {...mockStudent, email: user.email}
-    render(<AddStudent {...{user}} />)
+    const invalidStudent = { ...mockStudent, email: user.email }
+    render(<AddStudent {...{ user }} />)
 
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
-    const submitMessage = screen.getByTestId("find-student-submit-message")
+    const submitMessage = screen.getByTestId('find-student-submit-message')
 
     await act(() => {
       fireEvent.change(email, {
-        target: {value: invalidStudent.email}
+        target: { value: invalidStudent.email },
       })
     })
 
@@ -84,16 +84,19 @@ describe('Add student', () => {
   })
 
   it('should not add pre-existing student', async () => {
-    const userWithStudents = {...mockUser, linkedAccountsData: {students: [[mockStudent.userId, mockStudent.username]]}}
-    render(<AddStudent {...{user: userWithStudents}} />)
+    const userWithStudents = {
+      ...mockUser,
+      linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]] },
+    }
+    render(<AddStudent {...{ user: userWithStudents }} />)
 
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
-    const submitMessage = screen.getByTestId("find-student-submit-message")
+    const submitMessage = screen.getByTestId('find-student-submit-message')
 
     await act(() => {
       fireEvent.change(email, {
-        target: {value: mockStudent.email}
+        target: { value: mockStudent.email },
       })
     })
 
@@ -101,21 +104,24 @@ describe('Add student', () => {
       await fireEvent.click(submitButton)
     })
 
-    expect(submitMessage).toHaveTextContent("This is already one of your students.")
+    expect(submitMessage).toHaveTextContent('This is already one of your students.')
     expect(email).toHaveValue('')
   })
 
   it('should clear pre-existing message when form in focus', async () => {
-    const userWithStudents = {...mockUser, linkedAccountsData: {students: [[mockStudent.userId, mockStudent.username]]}}
-    render(<AddStudent {...{user: userWithStudents}} />)
+    const userWithStudents = {
+      ...mockUser,
+      linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]] },
+    }
+    render(<AddStudent {...{ user: userWithStudents }} />)
 
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
-    const submitMessage = screen.getByTestId("find-student-submit-message")
+    const submitMessage = screen.getByTestId('find-student-submit-message')
 
     await act(() => {
       fireEvent.change(email, {
-        target: {value: mockStudent.email}
+        target: { value: mockStudent.email },
       })
     })
 
@@ -123,24 +129,27 @@ describe('Add student', () => {
       await fireEvent.click(submitButton)
     })
 
-    expect(submitMessage).toHaveTextContent("This is already one of your students.")
+    expect(submitMessage).toHaveTextContent('This is already one of your students.')
     expect(email).toHaveValue('')
 
     await act(() => {
       fireEvent.change(email, {
-        target: {value: mockStudent.email}
+        target: { value: mockStudent.email },
       })
     })
 
-    expect(submitMessage).toHaveTextContent("")
+    expect(submitMessage).toHaveTextContent('')
   })
 
   it('should reset form when response is successful and display popup with student info', async () => {
-    (findUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({status: 200, data: {message: 'User found.', details: {student: mockStudent}}})
+    ;(findUser as jest.Mock).mockImplementationOnce(() => {
+      return Promise.resolve({
+        status: 200,
+        data: { message: 'User found.', details: { student: mockStudent } },
+      })
     })
-  
-    render(<AddStudent {...{user}} />)
+
+    render(<AddStudent {...{ user }} />)
 
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
@@ -150,7 +159,7 @@ describe('Add student', () => {
 
     await act(() => {
       fireEvent.change(email, {
-        target: {value: mockStudent.email}
+        target: { value: mockStudent.email },
       })
     })
 
@@ -158,7 +167,7 @@ describe('Add student', () => {
       await fireEvent.click(submitButton)
     })
 
-    const expectedHTML = 'mock student - mock.student@email.com';
+    const expectedHTML = 'mock student - mock.student@email.com'
 
     expect(linkAccountPopup).toBeVisible()
     expect(linkAccountPopup).toHaveTextContent(expectedHTML)
@@ -170,19 +179,24 @@ describe('Add student', () => {
 
   it('should not reset form when response is not 200 or 500 and display error message', async () => {
     jest.spyOn(console, 'log').mockImplementation(() => null)
-    const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
-    (findUser as jest.Mock).mockImplementation(() => {
+    const error = {
+      response: {
+        status: 400,
+        data: { status: 'failedTransaction', message: 'Erroneous response' },
+      },
+    }
+    ;(findUser as jest.Mock).mockImplementation(() => {
       return Promise.reject(error)
     })
 
-    render(<AddStudent {...{user}} />)
+    render(<AddStudent {...{ user }} />)
 
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
 
     await act(() => {
       fireEvent.change(email, {
-        target: {value: mockStudent.email}
+        target: { value: mockStudent.email },
       })
     })
 
@@ -197,24 +211,26 @@ describe('Add student', () => {
     })
 
     const errorMessage = await screen.findByText(/Erroneous response/i)
-  
+
     expect(email).toHaveValue(mockStudent.email)
     expect(errorMessage).toBeInTheDocument()
   })
 
   it('should not reset form when response is 500 and display error message', async () => {
-    const error = {response: {status: 500, data: {status: 'internalServerError', message: 'Server error'}}};
-    (findUser as jest.Mock).mockImplementation(() => {
+    const error = {
+      response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
+    }
+    ;(findUser as jest.Mock).mockImplementation(() => {
       return Promise.reject(error)
     })
-    render(<AddStudent {...{user}} />)
+    render(<AddStudent {...{ user }} />)
 
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
 
     await act(() => {
       fireEvent.change(email, {
-        target: {value: mockStudent.email}
+        target: { value: mockStudent.email },
       })
     })
 
@@ -228,26 +244,27 @@ describe('Add student', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(/Failed to add new student due to an internal error. Please try again later./i)
-  
+    const errorMessage = await screen.getByText(
+      /Failed to add new student due to an internal error. Please try again later./i
+    )
+
     expect(email).toHaveValue(mockStudent.email)
     expect(errorMessage).toBeInTheDocument()
     expect(console.log).toHaveBeenCalledWith(error)
   })
 
   it('should not reset form when error is thrown with no response', async () => {
-    
-    (findUser as jest.Mock).mockImplementation(() => {
-      return Promise.reject({status: 500, message: 'Error thrown and caught.'});
-    });
-    render(<AddStudent {...{user}} />)
+    ;(findUser as jest.Mock).mockImplementation(() => {
+      return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
+    })
+    render(<AddStudent {...{ user }} />)
 
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
 
     await act(() => {
       fireEvent.change(email, {
-        target: {value: mockStudent.email}
+        target: { value: mockStudent.email },
       })
     })
 
@@ -262,7 +279,7 @@ describe('Add student', () => {
     })
 
     const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-    expect(errorMessage).toBeInTheDocument()  
-    expect(console.log).toHaveBeenCalledWith({status: 500, message: 'Error thrown and caught.'})
+    expect(errorMessage).toBeInTheDocument()
+    expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
   })
 })

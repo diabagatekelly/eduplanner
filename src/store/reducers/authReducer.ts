@@ -1,14 +1,16 @@
-const INITIAL_STATE = {isAuthenticated : false}
+type AuthAction = { type: 'AUTH' | 'UNAUTH' | string }
 
-export default function auth(state = INITIAL_STATE, action) {
-  switch(action.type) {
+const INITIAL_STATE = { isAuthenticated: false }
+
+export default function auth(state = INITIAL_STATE, action: AuthAction) {
+  switch (action.type) {
     case 'AUTH':
-      return {...state, isAuthenticated: true}
+      return { ...state, isAuthenticated: true }
 
     case 'UNAUTH':
-      return {...state, isAuthenticated: false}
+      return { ...state, isAuthenticated: false }
 
     default:
-      return state;
+      return state
   }
 }

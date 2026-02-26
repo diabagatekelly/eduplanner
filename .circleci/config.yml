@@ -6,7 +6,7 @@ jobs:
   run-unit-tests:
     executor:
       name: node/default
-      tag: '22.13.0'
+      tag: '24.0.0'
     steps:
       - checkout
       - run:
@@ -18,7 +18,7 @@ jobs:
   install-and-persist:
     executor:
       name: cypress/default
-      node-version: '22.13.0'
+      node-version: '24.0.0'
     steps:
       - cypress/install:
           install-command: npm install --legacy-peer-deps
@@ -30,14 +30,14 @@ jobs:
   run-integration-tests:
     executor:
       name: cypress/default
-      node-version: '22.13.0'
+      node-version: '24.0.0'
     steps:
       - attach_workspace:
           at: ~/
       - cypress/run-tests:
           start-command: npm run dev
           cypress-command: NODE_ENV=production npx nyc cypress run
-            
+
 workflows:
   test_frontend_app:
     jobs:

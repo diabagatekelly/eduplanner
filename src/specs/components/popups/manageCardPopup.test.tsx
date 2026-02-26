@@ -1,40 +1,47 @@
-import ManageCardPopup from '../../../components/popups/manageCardPopup';
+import ManageCardPopup from '../../../components/popups/manageCardPopup'
 import '@testing-library/jest-dom'
 import { screen, fireEvent, act } from '@testing-library/react'
-import { render } from '../../util';
-import * as React from 'react';
-import { 
+import { render } from '../../util'
+import * as React from 'react'
+import {
   activateCard,
   deleteCard,
   editCardStage,
   editAnyCardAttr,
   requestCardReview,
-  resetCardStage
-} from '../../../api/controller';
-import { mockUser, mockStudent, mockActivity, mockUserCard, mockLanguageActivity, mockUserLanguageVocabCard } from '../../../specs/mocks';
-import { CompletionStatus } from '../../../types/CompletionStatusEnum';
+  resetCardStage,
+} from '../../../api/controller'
+import {
+  mockUser,
+  mockStudent,
+  mockActivity,
+  mockUserCard,
+  mockLanguageActivity,
+  mockUserLanguageVocabCard,
+} from '../../../specs/mocks'
+import { CompletionStatus } from '../../../types/CompletionStatusEnum'
 
-jest.mock('../../../api/controller');
+jest.mock('../../../api/controller')
 
 describe('Manage Card Popup', () => {
-  const reload = window.location.reload;
-  
+  const reload = window.location.reload
+
   describe('Reset stage', () => {
-    const myUser = {...mockUser, activities: [{...mockActivity, cards: [mockUserCard]}]}
+    const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
     beforeAll(() => {
       Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() }
-      });
+        value: { reload: jest.fn() },
+      })
     })
-  
+
     afterAll(() => {
-      window.location.reload = reload;
+      window.location.reload = reload
     })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem("user_data", JSON.stringify(myUser))
+      sessionStorage.setItem('user_data', JSON.stringify(myUser))
       window.sessionStorage.setItem('user_token', 'xxxxxx')
       window.sessionStorage.setItem('created_on', '2/3/2024')
     })
@@ -46,16 +53,29 @@ describe('Manage Card Popup', () => {
     })
 
     it('should render popup to reset card stage', async () => {
-      let showModal;
-      let onClose = () => {showModal = false};
-  
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, addedOn: '1/24/2024'}, action: 'edit'}}} />)
-   
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: { ...mockUserCard, addedOn: '1/24/2024' }, action: 'edit' },
+          }}
+        />
+      )
+
       const heading = await screen.findByTestId('card-title')
-      const cardName = await screen.findByTestId("card-name") 
+      const cardName = await screen.findByTestId('card-name')
       const cardOwnerInfo = await screen.findByTestId('card-owner-info')
       const cardInstructions = await screen.queryByTestId('card-instructions')
-      
+
       expect(heading).toHaveTextContent('Manage Card')
       expect(cardName).toHaveTextContent('Surah 114: Naas')
       expect(cardOwnerInfo).toHaveTextContent('Owner: mock user')
@@ -67,41 +87,70 @@ describe('Manage Card Popup', () => {
     })
 
     it('should invoke resetCardStage controller when form is submitted', async () => {
-      (resetCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: null, details: mockUserCard}})
+      ;(resetCardStage as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
       })
 
-      let showModal;
-      let onClose = () => {showModal = false};
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
 
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
 
       const resetStageBtn = await screen.findByTestId('reset-stage-btn')
-      const resetCardStageDTO = { 
-        userId: mockUser.userId, 
-        activity: mockActivity.name, 
-        cardId: mockUserCard.cardId
+      const resetCardStageDTO = {
+        userId: mockUser.userId,
+        activity: mockActivity.name,
+        cardId: mockUserCard.cardId,
       }
-      
+
       await act(async () => {
         await fireEvent.click(resetStageBtn)
       })
-      
+
       await expect(resetCardStage).toHaveBeenCalledWith(resetCardStageDTO)
     })
 
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      (resetCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: 'Successfully reset card.', details: {}}})
-      });
-      
-      let showModal;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      ;(resetCardStage as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({
+          status: 200,
+          data: { message: 'Successfully reset card.', details: {} },
+        })
+      })
+
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
 
       const resetStageBtn = await screen.findByTestId('reset-stage-btn')
-      const submitMessage = await screen.findByTestId('status-message');
+      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(resetStageBtn)
@@ -111,16 +160,34 @@ describe('Manage Card Popup', () => {
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => null);
-      const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
-      (resetCardStage as jest.Mock).mockImplementation(() => {
+      jest.spyOn(console, 'log').mockImplementation(() => null)
+      const error = {
+        response: {
+          status: 400,
+          data: { status: 'failedTransaction', message: 'Erroneous response' },
+        },
+      }
+      ;(resetCardStage as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
       const resetStageBtn = await screen.findByTestId('reset-stage-btn')
 
       await act(async () => {
@@ -132,35 +199,65 @@ describe('Manage Card Popup', () => {
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {response: {status: 500, data: {status: 'internalServerError', message: 'Server error'}}};
-      (resetCardStage as jest.Mock).mockImplementation(() => {
+      const error = {
+        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
+      }
+      ;(resetCardStage as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
       const resetStageBtn = await screen.findByTestId('reset-stage-btn')
 
       await act(async () => {
         await fireEvent.click(resetStageBtn)
       })
 
-      const errorMessage = await screen.getByText(/Failed to reset card due to an internal error. Please try again later./i)
-    
+      const errorMessage = await screen.getByText(
+        /Failed to reset card due to an internal error. Please try again later./i
+      )
+
       expect(errorMessage).toBeInTheDocument()
       expect(console.log).toHaveBeenCalledWith(error)
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      (resetCardStage as jest.Mock).mockImplementation(() => {
-        return Promise.reject({status: 500, message: 'Error thrown and caught.'});
-      });
+      ;(resetCardStage as jest.Mock).mockImplementation(() => {
+        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
+      })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
       const resetStageBtn = await screen.findByTestId('reset-stage-btn')
 
       await act(async () => {
@@ -168,27 +265,31 @@ describe('Manage Card Popup', () => {
       })
 
       const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()  
-      expect(console.log).toHaveBeenCalledWith({status: 500, message: 'Error thrown and caught.'})
+      expect(errorMessage).toBeInTheDocument()
+      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
     })
   })
 
   describe('Submit form review', () => {
-    const myUser = {...mockStudent, linkedAccountsData: {teacher: mockUser.userId}, activities: [{...mockActivity, cards: [mockUserCard]}]}
+    const myUser = {
+      ...mockStudent,
+      linkedAccountsData: { teacher: mockUser.userId },
+      activities: [{ ...mockActivity, cards: [mockUserCard] }],
+    }
     beforeAll(() => {
       Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() }
-      });
+        value: { reload: jest.fn() },
+      })
     })
-  
+
     afterAll(() => {
-      window.location.reload = reload;
+      window.location.reload = reload
     })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem("user_data", JSON.stringify(myUser))
+      sessionStorage.setItem('user_data', JSON.stringify(myUser))
       window.sessionStorage.setItem('user_token', 'xxxxxx')
       window.sessionStorage.setItem('created_on', '2/3/2024')
     })
@@ -200,64 +301,108 @@ describe('Manage Card Popup', () => {
     })
 
     it('should render popup to submit form for review', async () => {
-      let showModal;
-      let onClose = () => {showModal = false};
-  
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockLanguageActivity, item: {card: mockUserLanguageVocabCard, action: 'edit'}}} />)
-   
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockLanguageActivity,
+            item: { card: mockUserLanguageVocabCard, action: 'edit' },
+          }}
+        />
+      )
+
       const cardOwnerInfo = await screen.findByTestId('card-owner-info')
       const cardInstructions = await screen.findByTestId('card-instructions')
-      
+
       expect(cardOwnerInfo).toHaveTextContent('Owner: mock student')
-      expect(cardInstructions).toHaveTextContent('Instructions: 1. Recall to / from2. Use in spoken sentencesOPTIONAL: Practice spellingOPTIONAL: Use in written sentences')
+      expect(cardInstructions).toHaveTextContent(
+        'Instructions: 1. Recall to / from2. Use in spoken sentencesOPTIONAL: Practice spellingOPTIONAL: Use in written sentences'
+      )
     })
 
     it('should invoke requestCardReview controller when form is submitted', async () => {
-      (requestCardReview as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: null, details: {}}})
-      });
-      (editCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: null, details: mockUserCard}})
-      });
+      ;(requestCardReview as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({ status: 200, data: { message: null, details: {} } })
+      })
+      ;(editCardStage as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
+      })
 
-      let showModal;
-      let onClose = () => {showModal = false};
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
 
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
 
       const requestReviewBtn = await screen.findByTestId('submit-review-btn')
-      const resetCardStageDTO = { 
+      const resetCardStageDTO = {
         id: mockUserCard.cardId,
         teacherId: mockUser.userId,
         student: {
           id: mockStudent.userId,
           fullName: `${mockStudent.firstName} ${mockStudent.lastName}`,
-          email: mockStudent.email
-        }
+          email: mockStudent.email,
+        },
       }
-      
+
       await act(async () => {
         await fireEvent.click(requestReviewBtn)
       })
-      
+
       await expect(requestCardReview).toHaveBeenCalledWith(resetCardStageDTO)
     })
 
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      (requestCardReview as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: 'Successfully request review for card.', details: {}}})
-      });
-      (editCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: null, details: mockUserCard}})
-      });
-      
-      let showModal;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      ;(requestCardReview as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({
+          status: 200,
+          data: { message: 'Successfully request review for card.', details: {} },
+        })
+      })
+      ;(editCardStage as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
+      })
+
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
 
       const requestReviewBtn = await screen.findByTestId('submit-review-btn')
-      const submitMessage = await screen.findByTestId('status-message');
+      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(requestReviewBtn)
@@ -267,15 +412,33 @@ describe('Manage Card Popup', () => {
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
-      (requestCardReview as jest.Mock).mockImplementation(() => {
+      const error = {
+        response: {
+          status: 400,
+          data: { status: 'failedTransaction', message: 'Erroneous response' },
+        },
+      }
+      ;(requestCardReview as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
       const requestReviewBtn = await screen.findByTestId('submit-review-btn')
 
       await act(async () => {
@@ -287,35 +450,65 @@ describe('Manage Card Popup', () => {
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {response: {status: 500, data: {status: 'internalServerError', message: 'Server error'}}};
-      (requestCardReview as jest.Mock).mockImplementation(() => {
+      const error = {
+        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
+      }
+      ;(requestCardReview as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
       const requestReviewBtn = await screen.findByTestId('submit-review-btn')
 
       await act(async () => {
         await fireEvent.click(requestReviewBtn)
       })
 
-      const errorMessage = await screen.getByText(/Failed to request review due to an internal error. Please try again later./i)
-    
+      const errorMessage = await screen.getByText(
+        /Failed to request review due to an internal error. Please try again later./i
+      )
+
       expect(errorMessage).toBeInTheDocument()
       expect(console.log).toHaveBeenCalledWith(error)
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      (requestCardReview as jest.Mock).mockImplementation(() => {
-        return Promise.reject({status: 500, message: 'Error thrown and caught.'});
-      });
+      ;(requestCardReview as jest.Mock).mockImplementation(() => {
+        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
+      })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'edit'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
       const requestReviewBtn = await screen.findByTestId('submit-review-btn')
 
       await act(async () => {
@@ -323,17 +516,42 @@ describe('Manage Card Popup', () => {
       })
 
       const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()  
-      expect(console.log).toHaveBeenCalledWith({status: 500, message: 'Error thrown and caught.'})
+      expect(errorMessage).toBeInTheDocument()
+      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
     })
 
     it('should display disabled button when card already reviewed', async () => {
-      const myUser2 = {...mockStudent, linkedAccountsData: {teacher: mockUser.userId}, activities: [{...mockActivity, cards: [{...mockUserCard, completionStatus: CompletionStatus.REVIEW}]}]}
+      const myUser2 = {
+        ...mockStudent,
+        linkedAccountsData: { teacher: mockUser.userId },
+        activities: [
+          {
+            ...mockActivity,
+            cards: [{ ...mockUserCard, completionStatus: CompletionStatus.REVIEW }],
+          },
+        ],
+      }
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.REVIEW}, action: 'edit'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.REVIEW },
+              action: 'edit',
+            },
+          }}
+        />
+      )
       const requestReviewBtn = await screen.findByTestId('submit-review-btn')
 
       expect(requestReviewBtn).toBeDisabled()
@@ -341,21 +559,29 @@ describe('Manage Card Popup', () => {
   })
 
   describe('Override stage', () => {
-    const myUser = {...mockUser, activities: [{...mockActivity, cards: [{...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7'}]}]}
+    const myUser = {
+      ...mockUser,
+      activities: [
+        {
+          ...mockActivity,
+          cards: [{ ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' }],
+        },
+      ],
+    }
     beforeAll(() => {
       Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() }
-      });
+        value: { reload: jest.fn() },
+      })
     })
-  
+
     afterAll(() => {
-      window.location.reload = reload;
+      window.location.reload = reload
     })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem("user_data", JSON.stringify(myUser))
+      sessionStorage.setItem('user_data', JSON.stringify(myUser))
       window.sessionStorage.setItem('user_token', 'xxxxxx')
       window.sessionStorage.setItem('created_on', '2/3/2024')
     })
@@ -367,53 +593,87 @@ describe('Manage Card Popup', () => {
     })
 
     it('should invoke editAnyCardAttr controller when form is submitted', async () => {
-      expect(myUser.activities[0].cards[0].stage).toEqual('7');
-      
-      (editAnyCardAttr as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: null, details: mockUserCard}})
-      });
+      expect(myUser.activities[0].cards[0].stage).toEqual('7')
+      ;(editAnyCardAttr as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
+      })
 
-      let showModal;
-      let onClose = () => {showModal = false};
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
 
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7'}, action: 'override'}}} />)
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              action: 'override',
+            },
+          }}
+        />
+      )
 
       const overrideStageForm = await screen.findByTestId('override-stge-form')
-      const overrideStageBtn = await screen.findByTestId("override-stage-btn")
+      const overrideStageBtn = await screen.findByTestId('override-stage-btn')
       const stageManagementBlock = await screen.findByTestId('card-stage-management')
-      
+
       expect(stageManagementBlock).toHaveTextContent('Override current stage: 7')
-      
-      const overrideStageDTO = { 
+
+      const overrideStageDTO = {
         userId: mockUser.userId,
         activity: 'Quran',
         cardId: mockUserCard.cardId,
         editData: {
-          stage: '30'
-        }
+          stage: '30',
+        },
       }
 
       await act(async () => {
         fireEvent.change(overrideStageForm, { target: { value: '30' } })
         await fireEvent.click(overrideStageBtn)
       })
-      
+
       await expect(editAnyCardAttr).toHaveBeenCalledWith(overrideStageDTO)
     })
 
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      (editAnyCardAttr as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: 'Successfully overrode status.', details: mockUserCard}})
-      });
-      
-      let showModal;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7'}, action: 'override'}}} />)
+      ;(editAnyCardAttr as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({
+          status: 200,
+          data: { message: 'Successfully overrode status.', details: mockUserCard },
+        })
+      })
+
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              action: 'override',
+            },
+          }}
+        />
+      )
 
       const overrideStageForm = await screen.findByTestId('override-stge-form')
-      const overrideStageBtn = await screen.findByTestId("override-stage-btn")
-      const submitMessage = await screen.findByTestId('status-message');
+      const overrideStageBtn = await screen.findByTestId('override-stage-btn')
+      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         fireEvent.change(overrideStageForm, { target: { value: '30' } })
@@ -424,16 +684,37 @@ describe('Manage Card Popup', () => {
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
-      (editAnyCardAttr as jest.Mock).mockImplementation(() => {
+      const error = {
+        response: {
+          status: 400,
+          data: { status: 'failedTransaction', message: 'Erroneous response' },
+        },
+      }
+      ;(editAnyCardAttr as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7'}, action: 'override'}}} />)
-      const overrideStageBtn = await screen.findByTestId("override-stage-btn")
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              action: 'override',
+            },
+          }}
+        />
+      )
+      const overrideStageBtn = await screen.findByTestId('override-stage-btn')
 
       await act(async () => {
         await fireEvent.click(overrideStageBtn)
@@ -444,63 +725,107 @@ describe('Manage Card Popup', () => {
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {response: {status: 500, data: {status: 'internalServerError', message: 'Server error'}}};
-      (editAnyCardAttr as jest.Mock).mockImplementation(() => {
+      const error = {
+        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
+      }
+      ;(editAnyCardAttr as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7'}, action: 'override'}}} />)
-      const overrideStageBtn = await screen.findByTestId("override-stage-btn")
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              action: 'override',
+            },
+          }}
+        />
+      )
+      const overrideStageBtn = await screen.findByTestId('override-stage-btn')
 
       await act(async () => {
         await fireEvent.click(overrideStageBtn)
       })
 
-      const errorMessage = await screen.getByText(/Failed to override card stage due to an internal error. Please try again later./i)
-    
+      const errorMessage = await screen.getByText(
+        /Failed to override card stage due to an internal error. Please try again later./i
+      )
+
       expect(errorMessage).toBeInTheDocument()
       expect(console.log).toHaveBeenCalledWith(error)
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      (editAnyCardAttr as jest.Mock).mockImplementation(() => {
-        return Promise.reject({status: 500, message: 'Error thrown and caught.'});
-      });
+      ;(editAnyCardAttr as jest.Mock).mockImplementation(() => {
+        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
+      })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7'}, action: 'override'}}} />)
-      const overrideStageBtn = await screen.findByTestId("override-stage-btn")
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              action: 'override',
+            },
+          }}
+        />
+      )
+      const overrideStageBtn = await screen.findByTestId('override-stage-btn')
 
       await act(async () => {
         await fireEvent.click(overrideStageBtn)
       })
 
       const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()  
-      expect(console.log).toHaveBeenCalledWith({status: 500, message: 'Error thrown and caught.'})
+      expect(errorMessage).toBeInTheDocument()
+      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
     })
   })
 
   describe('Promote/demote stage and update status', () => {
-    const myUser = {...mockUser, activities: [{...mockActivity, cards: [{...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7'}]}]}
+    const myUser = {
+      ...mockUser,
+      activities: [
+        {
+          ...mockActivity,
+          cards: [{ ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' }],
+        },
+      ],
+    }
     beforeAll(() => {
       Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() }
-      });
+        value: { reload: jest.fn() },
+      })
     })
-  
+
     afterAll(() => {
-      window.location.reload = reload;
+      window.location.reload = reload
     })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem("user_data", JSON.stringify(myUser))
+      sessionStorage.setItem('user_data', JSON.stringify(myUser))
       window.sessionStorage.setItem('user_token', 'xxxxxx')
       window.sessionStorage.setItem('created_on', '2/3/2024')
     })
@@ -511,96 +836,167 @@ describe('Manage Card Popup', () => {
       jest.useRealTimers()
     })
 
-    it('should invoke editCardStage controller when promote form is submitted', async () => {      
-      (editCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: null, details: mockUserCard}})
-      });
+    it('should invoke editCardStage controller when promote form is submitted', async () => {
+      ;(editCardStage as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
+      })
 
-      let showModal;
-      let onClose = () => {showModal = false};
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
 
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7'}, action: 'edit'}}} />)
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              action: 'edit',
+            },
+          }}
+        />
+      )
 
-      const promoteStageBtn = await screen.findByTestId("promote-stage-btn")
-            
-      const promoteStageDTO = { 
+      const promoteStageBtn = await screen.findByTestId('promote-stage-btn')
+
+      const promoteStageDTO = {
         userId: mockUser.userId,
         activity: 'Quran',
         cardId: mockUserCard.cardId,
         editData: {
           stage: '7',
-          promote: true
-        }
+          promote: true,
+        },
       }
 
       await act(async () => {
         await fireEvent.click(promoteStageBtn)
       })
-      
+
       await expect(editCardStage).toHaveBeenCalledWith(promoteStageDTO)
     })
 
-    it('should invoke editCardStage controller when demote form is submitted', async () => {      
-      (editCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: null, details: mockUserCard}})
-      });
+    it('should invoke editCardStage controller when demote form is submitted', async () => {
+      ;(editCardStage as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
+      })
 
-      let showModal;
-      let onClose = () => {showModal = false};
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
 
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7'}, action: 'edit'}}} />)
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              action: 'edit',
+            },
+          }}
+        />
+      )
 
-      const demoteStageBtn = await screen.findByTestId("demote-stage-btn")
-            
-      const demoteStageDTO = { 
+      const demoteStageBtn = await screen.findByTestId('demote-stage-btn')
+
+      const demoteStageDTO = {
         userId: mockUser.userId,
         activity: 'Quran',
         cardId: mockUserCard.cardId,
         editData: {
           stage: '7',
-          promote: false
-        }
+          promote: false,
+        },
       }
 
       await act(async () => {
         await fireEvent.click(demoteStageBtn)
       })
-      
+
       await expect(editCardStage).toHaveBeenCalledWith(demoteStageDTO)
     })
 
-
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      (editCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: 'Successfully edited status.', details: mockUserCard}})
-      });
-      
-      let showModal;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7'}, action: 'edit'}}} />)
+      ;(editCardStage as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({
+          status: 200,
+          data: { message: 'Successfully edited status.', details: mockUserCard },
+        })
+      })
 
-      const demoteStageBtn = await screen.findByTestId("demote-stage-btn")
-      const submitMessage = await screen.findByTestId('status-message');
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              action: 'edit',
+            },
+          }}
+        />
+      )
+
+      const demoteStageBtn = await screen.findByTestId('demote-stage-btn')
+      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(demoteStageBtn)
       })
-      
+
       expect(submitMessage).toHaveTextContent('Successfully edited status.')
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
-      (editCardStage as jest.Mock).mockImplementation(() => {
+      const error = {
+        response: {
+          status: 400,
+          data: { status: 'failedTransaction', message: 'Erroneous response' },
+        },
+      }
+      ;(editCardStage as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7'}, action: 'edit'}}} />)
-      const demoteStageBtn = await screen.findByTestId("demote-stage-btn")
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              action: 'edit',
+            },
+          }}
+        />
+      )
+      const demoteStageBtn = await screen.findByTestId('demote-stage-btn')
 
       await act(async () => {
         await fireEvent.click(demoteStageBtn)
@@ -611,63 +1007,99 @@ describe('Manage Card Popup', () => {
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {response: {status: 500, data: {status: 'internalServerError', message: 'Server error'}}};
-      (editCardStage as jest.Mock).mockImplementation(() => {
+      const error = {
+        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
+      }
+      ;(editCardStage as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7'}, action: 'edit'}}} />)
-      const demoteStageBtn = await screen.findByTestId("demote-stage-btn")
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              action: 'edit',
+            },
+          }}
+        />
+      )
+      const demoteStageBtn = await screen.findByTestId('demote-stage-btn')
 
       await act(async () => {
         await fireEvent.click(demoteStageBtn)
       })
 
-      const errorMessage = await screen.getByText(/Failed to update card status due to an internal error. Please try again later./i)
-    
+      const errorMessage = await screen.getByText(
+        /Failed to update card status due to an internal error. Please try again later./i
+      )
+
       expect(errorMessage).toBeInTheDocument()
       expect(console.log).toHaveBeenCalledWith(error)
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      (editCardStage as jest.Mock).mockImplementation(() => {
-        return Promise.reject({status: 500, message: 'Error thrown and caught.'});
-      });
+      ;(editCardStage as jest.Mock).mockImplementation(() => {
+        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
+      })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7'}, action: 'edit'}}} />)
-      const demoteStageBtn = await screen.findByTestId("demote-stage-btn")
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: {
+              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              action: 'edit',
+            },
+          }}
+        />
+      )
+      const demoteStageBtn = await screen.findByTestId('demote-stage-btn')
 
       await act(async () => {
         await fireEvent.click(demoteStageBtn)
       })
 
       const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()  
-      expect(console.log).toHaveBeenCalledWith({status: 500, message: 'Error thrown and caught.'})
+      expect(errorMessage).toBeInTheDocument()
+      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
     })
   })
 
   describe('Remove card', () => {
-    const myUser = {...mockUser, activities: [{...mockActivity, cards: [mockUserCard]}]}
+    const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
     beforeAll(() => {
       Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() }
-      });
+        value: { reload: jest.fn() },
+      })
     })
-  
+
     afterAll(() => {
-      window.location.reload = reload;
+      window.location.reload = reload
     })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem("user_data", JSON.stringify(myUser))
+      sessionStorage.setItem('user_data', JSON.stringify(myUser))
       window.sessionStorage.setItem('user_token', 'xxxxxx')
       window.sessionStorage.setItem('created_on', '2/3/2024')
     })
@@ -679,41 +1111,72 @@ describe('Manage Card Popup', () => {
     })
 
     it('should invoke deleteCard controller when form is submitted', async () => {
-      (deleteCard as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: null, details: {}}})
+      ;(deleteCard as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({ status: 200, data: { message: null, details: {} } })
       })
 
-      let showModal;
-      let onClose = () => {showModal = false};
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
 
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'delete'}}} />)
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'delete' },
+          }}
+        />
+      )
 
       const deleteCardBtn = await screen.findByTestId('delete-card-btn')
-      const deleteCardDTO = [{ 
-        userId: mockUser.userId, 
-        activity: mockActivity.name, 
-        cardId: mockUserCard.cardId
-      }]
-      
+      const deleteCardDTO = [
+        {
+          userId: mockUser.userId,
+          activity: mockActivity.name,
+          cardId: mockUserCard.cardId,
+        },
+      ]
+
       await act(async () => {
         await fireEvent.click(deleteCardBtn)
       })
-      
+
       await expect(deleteCard).toHaveBeenCalledWith(deleteCardDTO)
     })
 
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      (deleteCard as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: 'Successfully removed card.', details: {}}})
-      });
-      
-      let showModal;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'delete'}}} />)
+      ;(deleteCard as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({
+          status: 200,
+          data: { message: 'Successfully removed card.', details: {} },
+        })
+      })
+
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'delete' },
+          }}
+        />
+      )
 
       const deleteCardBtn = await screen.findByTestId('delete-card-btn')
-      const submitMessage = await screen.findByTestId('status-message');
+      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(deleteCardBtn)
@@ -723,15 +1186,33 @@ describe('Manage Card Popup', () => {
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
-      (deleteCard as jest.Mock).mockImplementation(() => {
+      const error = {
+        response: {
+          status: 400,
+          data: { status: 'failedTransaction', message: 'Erroneous response' },
+        },
+      }
+      ;(deleteCard as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'delete'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'delete' },
+          }}
+        />
+      )
       const deleteCardBtn = await screen.findByTestId('delete-card-btn')
 
       await act(async () => {
@@ -743,35 +1224,65 @@ describe('Manage Card Popup', () => {
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {response: {status: 500, data: {status: 'internalServerError', message: 'Server error'}}};
-      (deleteCard as jest.Mock).mockImplementation(() => {
+      const error = {
+        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
+      }
+      ;(deleteCard as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'delete'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'delete' },
+          }}
+        />
+      )
       const deleteCardBtn = await screen.findByTestId('delete-card-btn')
 
       await act(async () => {
         await fireEvent.click(deleteCardBtn)
       })
 
-      const errorMessage = await screen.getByText(/Failed to remove card due to an internal error. Please try again later./i)
-    
+      const errorMessage = await screen.getByText(
+        /Failed to remove card due to an internal error. Please try again later./i
+      )
+
       expect(errorMessage).toBeInTheDocument()
       expect(console.log).toHaveBeenCalledWith(error)
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      (deleteCard as jest.Mock).mockImplementation(() => {
-        return Promise.reject({status: 500, message: 'Error thrown and caught.'});
-      });
+      ;(deleteCard as jest.Mock).mockImplementation(() => {
+        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
+      })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'delete'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'delete' },
+          }}
+        />
+      )
       const deleteCardBtn = await screen.findByTestId('delete-card-btn')
 
       await act(async () => {
@@ -779,27 +1290,27 @@ describe('Manage Card Popup', () => {
       })
 
       const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()  
-      expect(console.log).toHaveBeenCalledWith({status: 500, message: 'Error thrown and caught.'})
+      expect(errorMessage).toBeInTheDocument()
+      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
     })
   })
 
   describe('Activate card', () => {
-    const myUser = {...mockUser, activities: [{...mockActivity, cards: [mockUserCard]}]}
+    const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
     beforeAll(() => {
       Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() }
-      });
+        value: { reload: jest.fn() },
+      })
     })
-  
+
     afterAll(() => {
-      window.location.reload = reload;
+      window.location.reload = reload
     })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem("user_data", JSON.stringify(myUser))
+      sessionStorage.setItem('user_data', JSON.stringify(myUser))
       window.sessionStorage.setItem('user_token', 'xxxxxx')
       window.sessionStorage.setItem('created_on', '2/3/2024')
     })
@@ -811,41 +1322,70 @@ describe('Manage Card Popup', () => {
     })
 
     it('should invoke activateCard controller when form is submitted', async () => {
-      (activateCard as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: null, details: mockUserCard}})
+      ;(activateCard as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
       })
 
-      let showModal;
-      let onClose = () => {showModal = false};
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
 
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'activate'}}} />)
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'activate' },
+          }}
+        />
+      )
 
       const activateCardBtn = await screen.findByTestId('activate-card-btn')
-      const activateCardDTO = { 
-        userId: mockUser.userId, 
-        activity: mockActivity.name, 
-        cardId: mockUserCard.cardId
+      const activateCardDTO = {
+        userId: mockUser.userId,
+        activity: mockActivity.name,
+        cardId: mockUserCard.cardId,
       }
-      
+
       await act(async () => {
         await fireEvent.click(activateCardBtn)
       })
-      
+
       await expect(activateCard).toHaveBeenCalledWith(activateCardDTO)
     })
 
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      (activateCard as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({status: 200, data: {message: 'Successfully activated card.', details: {}}})
-      });
-      
-      let showModal;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'activate'}}} />)
+      ;(activateCard as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({
+          status: 200,
+          data: { message: 'Successfully activated card.', details: {} },
+        })
+      })
+
+      let showModal
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'activate' },
+          }}
+        />
+      )
 
       const activateCardBtn = await screen.findByTestId('activate-card-btn')
-      const submitMessage = await screen.findByTestId('status-message');
+      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(activateCardBtn)
@@ -855,15 +1395,33 @@ describe('Manage Card Popup', () => {
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      const error = {response: {status: 400, data: {status: 'failedTransaction', message: 'Erroneous response'}}};
-      (activateCard as jest.Mock).mockImplementation(() => {
+      const error = {
+        response: {
+          status: 400,
+          data: { status: 'failedTransaction', message: 'Erroneous response' },
+        },
+      }
+      ;(activateCard as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'activate'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'activate' },
+          }}
+        />
+      )
       const activateCardBtn = await screen.findByTestId('activate-card-btn')
 
       await act(async () => {
@@ -875,35 +1433,65 @@ describe('Manage Card Popup', () => {
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {response: {status: 500, data: {status: 'internalServerError', message: 'Server error'}}};
-      (activateCard as jest.Mock).mockImplementation(() => {
+      const error = {
+        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
+      }
+      ;(activateCard as jest.Mock).mockImplementation(() => {
         return Promise.reject(error)
       })
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'activate'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'activate' },
+          }}
+        />
+      )
       const activateCardBtn = await screen.findByTestId('activate-card-btn')
 
       await act(async () => {
         await fireEvent.click(activateCardBtn)
       })
 
-      const errorMessage = await screen.getByText(/Failed to activate card due to an internal error. Please try again later./i)
-    
+      const errorMessage = await screen.getByText(
+        /Failed to activate card due to an internal error. Please try again later./i
+      )
+
       expect(errorMessage).toBeInTheDocument()
       expect(console.log).toHaveBeenCalledWith(error)
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      (activateCard as jest.Mock).mockImplementation(() => {
-        return Promise.reject({status: 500, message: 'Error thrown and caught.'});
-      });
+      ;(activateCard as jest.Mock).mockImplementation(() => {
+        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
+      })
 
-      let showModal = true;
-      let onClose = () => {showModal = false};
-    
-      render(<ManageCardPopup {...{onClose, showModal: true, isMain: true, user: myUser, activity: mockActivity, item: {card: mockUserCard, action: 'activate'}}} />)
+      let showModal = true
+      let onClose = () => {
+        showModal = false
+      }
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'activate' },
+          }}
+        />
+      )
       const activateCardBtn = await screen.findByTestId('activate-card-btn')
 
       await act(async () => {
@@ -911,68 +1499,92 @@ describe('Manage Card Popup', () => {
       })
 
       const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()  
-      expect(console.log).toHaveBeenCalledWith({status: 500, message: 'Error thrown and caught.'})
+      expect(errorMessage).toBeInTheDocument()
+      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
     })
   })
 
   describe('Student', () => {
-    const myUser = {...mockStudent, activities: [{...mockActivity, cards: [{...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7'}]}]};
+    const myUser = {
+      ...mockStudent,
+      activities: [
+        {
+          ...mockActivity,
+          cards: [{ ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' }],
+        },
+      ],
+    }
     describe('Override stage', () => {
       beforeAll(() => {
         Object.defineProperty(window, 'location', {
-          value: { reload: jest.fn() }
-        });
+          value: { reload: jest.fn() },
+        })
       })
-    
+
       afterAll(() => {
-        window.location.reload = reload;
+        window.location.reload = reload
       })
-  
+
       beforeEach(() => {
         jest.useFakeTimers()
         jest.setSystemTime(new Date('2/3/2024'))
-        sessionStorage.setItem("user_data", JSON.stringify(myUser))
+        sessionStorage.setItem('user_data', JSON.stringify(myUser))
         window.sessionStorage.setItem('user_token', 'xxxxxx')
         window.sessionStorage.setItem('created_on', '2/3/2024')
       })
-  
+
       afterEach(() => {
         sessionStorage.clear()
         jest.clearAllMocks()
         jest.useRealTimers()
       })
-  
-      it('should invoke editAnyCardAttr controller when form is submitted', async () => {        
-        (editAnyCardAttr as jest.Mock).mockImplementationOnce(() => {
-          return Promise.resolve({status: 200, data: {message: null, details: mockUserCard}})
-        });
-  
-        let showModal;
-        let onClose = () => {showModal = false};
-  
-        render(<ManageCardPopup {...{onClose, showModal: true, isMain: false, user: myUser, activity: mockActivity, item: {card: {...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7'}, action: 'override'}}} />)
-  
+
+      it('should invoke editAnyCardAttr controller when form is submitted', async () => {
+        ;(editAnyCardAttr as jest.Mock).mockImplementationOnce(() => {
+          return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
+        })
+
+        let showModal
+        let onClose = () => {
+          showModal = false
+        }
+
+        render(
+          <ManageCardPopup
+            {...{
+              onClose,
+              showModal: true,
+              isMain: false,
+              user: myUser,
+              activity: mockActivity,
+              item: {
+                card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+                action: 'override',
+              },
+            }}
+          />
+        )
+
         const overrideStageForm = await screen.findByTestId('override-stge-form')
-        const overrideStageBtn = await screen.findByTestId("override-stage-btn")
+        const overrideStageBtn = await screen.findByTestId('override-stage-btn')
         const stageManagementBlock = await screen.findByTestId('card-stage-management')
-        
+
         expect(stageManagementBlock).toHaveTextContent('Override current stage: 7')
-        
-        const overrideStageDTO = { 
+
+        const overrideStageDTO = {
           userId: mockStudent.userId,
           activity: 'Quran',
           cardId: mockUserCard.cardId,
           editData: {
-            stage: '30'
-          }
+            stage: '30',
+          },
         }
-  
+
         await act(async () => {
           fireEvent.change(overrideStageForm, { target: { value: '30' } })
           await fireEvent.click(overrideStageBtn)
         })
-        
+
         await expect(editAnyCardAttr).toHaveBeenCalledWith(overrideStageDTO)
       })
     })

@@ -1,34 +1,34 @@
-"use client"
+'use client'
 
-import { useState, FormEvent } from "react";
-import { createActivity } from "../../api/controller";
-import AddActivityForm from "../forms/add-activity-form";
-import { useDispatch } from "react-redux";
-import { createUserActivity } from "../../store/actions/userActions";
-import { IActivity, IActivityFormData } from "../../types/IActivity";
-import { CompletionStatus } from "@/types/CompletionStatusEnum";
-import { ISODateString } from "@/types/isoDateType";
-import { IUser } from "@/types/IUser";
-import { toDbFormat } from "@/lib/helpers/formatActivityName";
-import { IResponse } from "@/types/IApiResponse";
+import { useState, FormEvent } from 'react'
+import { createActivity } from '../../api/controller'
+import AddActivityForm from '../forms/add-activity-form'
+import { useAppDispatch } from '@/store/hooks'
+import { createUserActivity } from '../../store/actions/userActions'
+import { IActivity, IActivityFormData } from '../../types/IActivity'
+import { CompletionStatus } from '@/types/CompletionStatusEnum'
+import { ISODateString } from '@/types/isoDateType'
+import { IUser } from '@/types/IUser'
+import { toDbFormat } from '@/lib/helpers/formatActivityName'
+import { IResponse } from '@/types/IApiResponse'
 
 interface IAddActivity {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void,
+  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
   submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
 }
 
-export default function AddActivity<IAddActivity>({ userDetails }: {userDetails: IUser}) {
-  const dispatch = useDispatch()
+export default function AddActivity<IAddActivity>({ userDetails }: { userDetails: IUser }) {
+  const dispatch = useAppDispatch()
 
   const [formData, setFormData] = useState<IActivityFormData>({
-    name: "",
-    description: "",
+    name: '',
+    description: '',
     points: 0,
-    hasCards: ""
-  });
+    hasCards: '',
+  })
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState("")
+  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
 
   function handleInput(e: React.FormEvent<HTMLInputElement>) {
     if (formSubmitOutcomeMessage.length) {
@@ -36,22 +36,22 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
     }
 
     const target = e.target as HTMLInputElement
-    const fieldName: string = target.name;
-    const fieldValue: any = target.value;
+    const fieldName: string = target.name
+    const fieldValue: any = target.value
 
     setFormData((prevState) => ({
       ...prevState,
-      [fieldName]: fieldValue
-    }));
+      [fieldName]: fieldValue,
+    }))
   }
 
   function _resetForm() {
     setFormData({
-      name: "",
-      description: "",
+      name: '',
+      description: '',
       points: 0,
-      hasCards: ""
-    });
+      hasCards: '',
+    })
     setIsLoading(false)
   }
 
@@ -62,16 +62,21 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
       setIsLoading(true) // Set loading to true when the request starts
 
       const formData = new FormData(e.currentTarget)
-      const activityFormInfo: IActivityFormData = { name: '', description: '', points: 0, hasCards: '' }
-
-      for (const pair of formData.entries()) {
-        activityFormInfo[pair[0]] = `${pair[1]}`;
+      const activityFormInfo: IActivityFormData = {
+        name: '',
+        description: '',
+        points: 0,
+        hasCards: '',
       }
 
-      if (userDetails.activities.find(activity => activity.name === activityFormInfo.name)) {
-        setFormSubmitOutcomeMessage("This is already one of your activities.");
+      for (const pair of formData.entries()) {
+        ;(activityFormInfo as Record<string, any>)[pair[0]] = `${pair[1]}`
+      }
+
+      if (userDetails.activities.find((activity) => activity.name === activityFormInfo.name)) {
+        setFormSubmitOutcomeMessage('This is already one of your activities.')
         _resetForm()
-        return;
+        return
       }
 
       const dbActivityName = toDbFormat(activityFormInfo.name)
@@ -79,25 +84,32 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
       const userActivity: IActivity = {
         ...activityFormInfo,
         activityId: btoa(`${userDetails.email}-${dbActivityName}`),
-        name: dbActivityName,
+        name: dbActivityName!,
         points: Number(activityFormInfo.points),
         completionStatus: CompletionStatus.PENDING,
         hasCards: activityFormInfo.hasCards === 'true' ? true : false,
-        createdOn: new Date(Date.now()).toLocaleDateString('en-US', {timeZone: 'EST'}) as ISODateString, 
-        lastUpdatedOn: null
-      } 
+        createdOn: new Date(Date.now()).toLocaleDateString('en-US', {
+          timeZone: 'EST',
+        }) as ISODateString,
+        lastUpdatedOn: null,
+      }
 
-      const response = await createActivity({userActivity, userId: userDetails.userId}) as unknown as IResponse;
-      const {data} = response;
-      const {message, details}: {message: string, details: {userId: string, userActivity: IActivity}} = data;
+      const response = (await createActivity({
+        userActivity,
+        userId: userDetails.userId,
+      })) as unknown as IResponse<{ userId: string; userActivity: IActivity }>
+      const { data } = response
+      const {
+        message,
+        details,
+      }: { message: string; details: { userId: string; userActivity: IActivity } } = data
 
-      let augmentedDetails = {userActivity: details.userActivity, username: userDetails.username}
+      let augmentedDetails = { userActivity: details.userActivity, username: userDetails.username }
       dispatch(createUserActivity(augmentedDetails))
       setFormSubmitOutcomeMessage(message)
       _resetForm()
       window.location.reload()
-
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false)
       console.log(error)
 
@@ -106,25 +118,34 @@ export default function AddActivity<IAddActivity>({ userDetails }: {userDetails:
         return
       }
 
-      const {status, data} = error.response;
+      const { status, data } = error.response
 
       if (status === 500) {
-        setFormSubmitOutcomeMessage('Failed to create activity due to an internal error. Please try again later.')
+        setFormSubmitOutcomeMessage(
+          'Failed to create activity due to an internal error. Please try again later.'
+        )
       } else {
         setFormSubmitOutcomeMessage(data.message)
       }
     }
   }
-  
 
   return (
     <div className="justify-items-start">
       <h3 className="component-sub-title">Add a new activity:</h3>
       <div>
         <h6 className="text-1xl py-3 font-bold">Instructions on naming activity:</h6>
-        <p><span className="font-bold">For Quran: </span>Quran</p>
-        <p><span className="font-bold">For language: </span>(Target language) Language, ie. Arabic Language</p>
-        <p><span className="font-bold">Any other subject: </span>A name that isn&#39;t &#39;Quran&#39; and doesn&#39;t contain &#39;Language&#39;</p>
+        <p>
+          <span className="font-bold">For Quran: </span>Quran
+        </p>
+        <p>
+          <span className="font-bold">For language: </span>(Target language) Language, ie. Arabic
+          Language
+        </p>
+        <p>
+          <span className="font-bold">Any other subject: </span>A name that isn&#39;t
+          &#39;Quran&#39; and doesn&#39;t contain &#39;Language&#39;
+        </p>
       </div>
       <AddActivityForm {...{ handleInput, formData, isLoading, submitForm }} />
       <div data-testid="add-activity-submit-message">{formSubmitOutcomeMessage}</div>

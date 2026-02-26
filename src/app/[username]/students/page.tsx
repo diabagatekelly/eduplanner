@@ -1,32 +1,32 @@
-"use client"
+'use client'
 
-import NestedLayout from "@/app/nested-layout";
-import store from "@/store/store";
-import { useEffect, useState } from "react"
-import AddStudent from "@/components/students/add-student";
-import ListUi from "@/components/lists/lists-ui";
-import { useRouter } from "next/navigation";
-import Breadcrumbs from "@/components/breadcrumbs";
+import NestedLayout from '@/app/nested-layout'
+import store from '@/store/store'
+import { useEffect, useState } from 'react'
+import AddStudent from '@/components/students/add-student'
+import ListUi from '@/components/lists/lists-ui'
+import { useRouter } from 'next/navigation'
+import Breadcrumbs from '@/components/breadcrumbs'
+import { IUser } from '@/types/IUser'
 
 export default function Students() {
-  const router = useRouter();
-  let args;
-  const [user, getUserData] = useState({ ...args })
-  
+  const router = useRouter()
+  const [user, getUserData] = useState({} as IUser)
+
   useEffect(() => {
     const { userReducer } = store.getState()
-    getUserData(userReducer);
+    getUserData(userReducer)
   }, [])
 
   const isTeacher = user.accountType?.includes('teacher')
-  const isMain = true;
-  const userDetails = user;
+  const isMain = true
+  const userDetails = user
 
   return (
     <NestedLayout {...{ isTeacher }}>
       <div className="flex flex-col px-3">
         <Breadcrumbs />
-        <AddStudent {...{user}} />
+        <AddStudent {...{ user }} />
         <hr className="mt-4"></hr>
         <div className="my-5">
           <h3 className="component-sub-title">Current students:</h3>
@@ -39,6 +39,3 @@ export default function Students() {
     </NestedLayout>
   )
 }
-
-
-

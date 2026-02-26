@@ -44,3 +44,7 @@ next-env.d.ts
 e2e-test-results
 cypress/downloads
 cypress/screenshots
+
+# Claude Code working files (local only)
+CLAUDE.md
+.claude/

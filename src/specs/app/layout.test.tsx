@@ -1,9 +1,9 @@
-import RootLayout from '../../app/layout';
-import Home from '../../app/home/page';
-import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
-import * as React from 'react';
-import {act} from 'react';
+import RootLayout from '../../app/layout'
+import Home from '../../app/home/page'
+import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
+import * as React from 'react'
+import { act } from 'react'
 
 jest.mock('next/navigation', () => {
   return {
@@ -12,9 +12,9 @@ jest.mock('next/navigation', () => {
       replace: jest.fn(),
     })),
     usePathname: jest.fn(),
-    useSearchParams: jest.fn()
+    useSearchParams: jest.fn(),
   }
-});
+})
 
 describe('Root layout', () => {
   afterEach(() => {
@@ -24,7 +24,7 @@ describe('Root layout', () => {
   it('should render as expected', async () => {
     jest.spyOn(console, 'error').mockImplementation(() => null)
     await act(async () => {
-      render(<RootLayout {...{children: <Home />}}/>)
+      render(<RootLayout {...{ children: <Home /> }} />)
     })
     expect(await screen.findByTestId('home')).toBeInTheDocument()
   })
