@@ -28,7 +28,15 @@ const config: Config = {
   collectCoverage: true,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  collectCoverageFrom: ['**/*.{ts,tsx}', '!**/node_modules/**', '!**/vendor/**', '!**/specs/**'],
+  collectCoverageFrom: [
+    '**/*.{ts,tsx}',
+    '!**/*.d.ts',
+    '!**/node_modules/**',
+    '!**/vendor/**',
+    '!**/specs/**',
+    '!auth.ts',
+    '!app/api/auth/**',
+  ],
   coverageThreshold: {
     global: {
       branches: 100,

@@ -5,6 +5,10 @@ import { render, screen } from '@testing-library/react'
 import * as React from 'react'
 import { act } from 'react'
 
+jest.mock('next-auth/react', () => ({
+  SessionProvider: ({ children }: { children: React.ReactNode }) => children,
+}))
+
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(() => ({
