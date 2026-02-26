@@ -46,6 +46,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session
     },
   },
+  session: {
+    maxAge: 24 * 60 * 60, // 24 hours — replaces the hasExpired() date-change hack (Layer 3)
+  },
   pages: {
     signIn: '/login',
   },
