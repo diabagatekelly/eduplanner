@@ -2,6 +2,7 @@
 
 import { Inter } from 'next/font/google'
 import { Provider } from 'react-redux'
+import { SessionProvider } from 'next-auth/react'
 import { useAppDispatch } from '@/store/hooks'
 import { Suspense, useEffect, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
@@ -20,11 +21,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${inter.className}`}>
-        <Provider store={store}>
-          <Reloader />
-          <div className="py-20 px-5">{children}</div>
-          <Footer />
-        </Provider>
+        <SessionProvider>
+          <Provider store={store}>
+            <Reloader />
+            <div className="py-20 px-5">{children}</div>
+            <Footer />
+          </Provider>
+        </SessionProvider>
       </body>
     </html>
   )
