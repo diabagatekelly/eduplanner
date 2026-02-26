@@ -4,6 +4,9 @@ import { IUser } from '@/types/IUser'
 
 type EditAction = { type: 'EDIT'; editProps: Record<string, unknown>[] }
 
+/**
+ * @deprecated User data will come from next-auth session via `useSession()`. Full removal in Layer 3.
+ */
 export function populateUser(): { type: 'POPULATE'; allData: IUser } {
   return {
     type: 'POPULATE',

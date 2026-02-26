@@ -9,6 +9,8 @@ const store = configureStore({
   },
 })
 
+/** @deprecated Redux removed in Layer 3. */
 export type RootState = ReturnType<typeof store.getState>
+/** @deprecated Redux removed in Layer 3. */
 export type AppDispatch = typeof store.dispatch
 export default store
