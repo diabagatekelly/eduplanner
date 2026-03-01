@@ -56,6 +56,9 @@ export default function Login() {
     setFormSubmitOutcomeMessage('Logging in ...')
 
     const session = await getSession()
+    if (session?.user) {
+      sessionStorage.setItem('user_data', JSON.stringify(session.user))
+    }
     router.push('/' + (session?.user as any)?.username)
   }
 

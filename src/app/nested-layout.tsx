@@ -11,6 +11,7 @@ import {
   LightBulbIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/solid'
+import { populateUser } from '@/store/actions/userActions'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -31,6 +32,7 @@ export default function NestedLayout({
   const [openDrawer, setOpenDrawer] = useState(true)
 
   useEffect(() => {
+    store.dispatch(populateUser())
     const { userReducer }: { userReducer: IUser } = store.getState()
     getUserData(userReducer)
 

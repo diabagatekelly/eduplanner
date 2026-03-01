@@ -30,7 +30,11 @@ import { IUser } from '@/types/IUser'
 Cypress.Commands.add('loginBySession', (user: IUser) => {
   cy.task('auth:createSession', user).then((token) => {
     cy.setCookie('authjs.session-token', token as string)
-    cy.visit(`/${user.username}`)
+    cy.visit(`/${user.username}`, {
+      onBeforeLoad: (win) => {
+        win.sessionStorage.setItem('user_data', JSON.stringify(user))
+      },
+    })
   })
 })
 

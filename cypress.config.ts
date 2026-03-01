@@ -14,7 +14,7 @@ export default defineConfig({
         async 'auth:createSession'(user: Record<string, unknown>) {
           const { encode } = await import('next-auth/jwt')
           return encode({
-            token: { user },
+            token: { user, accessToken: 'mock-access-token' },
             secret: process.env.AUTH_SECRET ?? 'test-secret',
             salt: 'authjs.session-token',
           })
