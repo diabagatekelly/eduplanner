@@ -9,8 +9,9 @@ jest.mock('../../auth', () => ({
   auth: jest.fn().mockResolvedValue(null),
 }))
 
-jest.mock('next-auth/react', () => ({
-  SessionProvider: ({ children }: { children: React.ReactNode }) => children,
+jest.mock('../../app/providers', () => ({
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
 jest.mock('next/navigation', () => {
