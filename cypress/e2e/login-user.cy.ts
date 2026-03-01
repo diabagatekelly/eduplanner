@@ -14,10 +14,7 @@ describe('Login User', () => {
 
   describe('Unsuccessful login', () => {
     beforeEach(() => {
-      cy.intercept('POST', '/api/auth/signin/credentials', {
-        statusCode: 401,
-        body: { error: 'CredentialsSignin' },
-      }).as('loginFail')
+      cy.intercept('POST', '/api/auth/callback/credentials*').as('loginFail')
     })
 
     it('should display error message and stay on the login page', () => {
