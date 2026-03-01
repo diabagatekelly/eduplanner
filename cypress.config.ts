@@ -11,7 +11,7 @@ export default defineConfig({
     baseUrl: 'http://localhost:3000',
     setupNodeEvents(on, config) {
       on('task', {
-        async 'auth:createSession'(user: Record<string, unknown>) {
+        async 'auth:createSession'(user) {
           const { encode } = await import('next-auth/jwt')
           return encode({
             token: { user, accessToken: 'mock-access-token' },

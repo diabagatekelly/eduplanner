@@ -122,4 +122,51 @@ describe('Login page', () => {
     expect(email).toHaveValue('mock.user@email.com')
     expect(errorMessage).toBeInTheDocument()
   })
+
+  it('should display error message when signIn throws', async () => {
+    ;(signIn as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
+
+    render(<Login />)
+
+    const email = screen.getByLabelText(/Email:/i)
+    const password = screen.getByLabelText(/Password:/i)
+    const submitButton = screen.getByTestId('login-button')
+
+    await act(() => {
+      fireEvent.change(email, { target: { value: mockUser.email } })
+      fireEvent.change(password, { target: { value: mockUser.password } })
+    })
+
+    await act(async () => {
+      await fireEvent.click(submitButton)
+    })
+
+    expect(
+      screen.getByText(/Failed to login due to an internal error. Please try again later./i)
+    ).toBeInTheDocument()
+  })
+
+  it('should display error message when session has no username', async () => {
+    ;(signIn as jest.Mock).mockResolvedValueOnce({ error: null })
+    ;(getSession as jest.Mock).mockResolvedValueOnce({ user: {} })
+
+    render(<Login />)
+
+    const email = screen.getByLabelText(/Email:/i)
+    const password = screen.getByLabelText(/Password:/i)
+    const submitButton = screen.getByTestId('login-button')
+
+    await act(() => {
+      fireEvent.change(email, { target: { value: mockUser.email } })
+      fireEvent.change(password, { target: { value: mockUser.password } })
+    })
+
+    await act(async () => {
+      await fireEvent.click(submitButton)
+    })
+
+    expect(
+      screen.getByText(/Failed to login due to an internal error. Please try again later./i)
+    ).toBeInTheDocument()
+  })
 })

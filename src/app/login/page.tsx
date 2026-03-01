@@ -37,29 +37,45 @@ export default function Login() {
     const email = rawFormData.get('email') as string
     const password = rawFormData.get('password') as string
 
-    const result = await signIn('credentials', {
-      userId: btoa(email),
-      password,
-      redirect: false,
-    })
+    try {
+      const result = await signIn('credentials', {
+        userId: btoa(email),
+        password,
+        redirect: false,
+      })
 
-    setIsLoading(false)
+      setIsLoading(false)
 
-    if (result?.error) {
+      if (result?.error) {
+        setFormSubmitOutcomeMessage(
+          'Failed to login due to an internal error. Please try again later.'
+        )
+        return
+      }
+
+      setFormData({ email: '', password: '' })
+      setFormSubmitOutcomeMessage('Logging in ...')
+
+      const session = await getSession()
+      if (session?.user) {
+        sessionStorage.setItem('user_data', JSON.stringify(session.user))
+      }
+
+      const username = (session?.user as any)?.username
+      if (!username) {
+        setFormSubmitOutcomeMessage(
+          'Failed to login due to an internal error. Please try again later.'
+        )
+        return
+      }
+
+      router.push('/' + username)
+    } catch {
+      setIsLoading(false)
       setFormSubmitOutcomeMessage(
         'Failed to login due to an internal error. Please try again later.'
       )
-      return
     }
-
-    setFormData({ email: '', password: '' })
-    setFormSubmitOutcomeMessage('Logging in ...')
-
-    const session = await getSession()
-    if (session?.user) {
-      sessionStorage.setItem('user_data', JSON.stringify(session.user))
-    }
-    router.push('/' + (session?.user as any)?.username)
   }
 
   return (
