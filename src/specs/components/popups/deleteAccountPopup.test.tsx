@@ -5,34 +5,18 @@ import { render } from '../../util'
 import * as React from 'react'
 import { deleteUser } from '../../../api/controller'
 import { mockUser } from '../../../specs/mocks'
-import { useRouter } from 'next/navigation'
-import store from '../../../store/store'
+import { signOut } from 'next-auth/react'
 
 jest.mock('../../../api/controller')
-jest.mock('next/navigation', () => {
-  return {
-    useRouter: jest.fn(() => ({
-      push: jest.fn(),
-    })),
-    usePathname: jest.fn(),
-  }
-})
+jest.mock('next-auth/react', () => ({
+  signOut: jest.fn(),
+}))
 
 describe('Delete Account Popup', () => {
   const childArgs = { user: mockUser }
 
-  beforeEach(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(new Date('2/3/2024'))
-    window.sessionStorage.setItem('user_data', JSON.stringify(mockUser))
-    window.sessionStorage.setItem('user_token', 'xxxxxx')
-    window.sessionStorage.setItem('created_on', '2/3/2024')
-  })
-
   afterEach(() => {
     jest.clearAllMocks()
-    window.sessionStorage.clear()
-    jest.useRealTimers()
   })
 
   it('should render popup to delete account for main', async () => {
@@ -146,17 +130,13 @@ describe('Delete Account Popup', () => {
     expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
   })
 
-  it('should close popup when response is successful and navigate to register page', async () => {
+  it('should close popup and call signOut with register when account is deleted', async () => {
     ;(deleteUser as jest.Mock).mockImplementationOnce(() => {
       return Promise.resolve({
         status: 200,
         data: { message: 'Successfully added new student.', details: {} },
       })
     })
-    const mockRouter = {
-      push: jest.fn(),
-    }
-    ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
 
     let showModal = true
 
@@ -169,50 +149,6 @@ describe('Delete Account Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    expect(mockRouter.push).toHaveBeenCalledWith('/register')
-  })
-
-  it('should remove auth token and reset user data when delete user successfully', async () => {
-    const sessionUserBefore = window.sessionStorage.getItem('user_data')
-    const sessionTokenBefore = window.sessionStorage.getItem('user_token')
-    const sessionCreatedonBefore = window.sessionStorage.getItem('created_on')
-
-    const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: mockUser }
-    const mockStore = jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
-    const userInStoreBefore = store.getState().userReducer
-
-    expect(sessionUserBefore).toBe(JSON.stringify(mockUser))
-    expect(sessionTokenBefore).toBe('xxxxxx')
-    expect(sessionCreatedonBefore).toBe('2/3/2024')
-    expect(userInStoreBefore).toEqual(mockUser)
-    ;(deleteUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({
-        status: 200,
-        data: { message: 'Successfully added new student.', details: {} },
-      })
-    })
-
-    mockStore.mockRestore()
-
-    let showModal = true
-
-    render(
-      <DeleteAccountPopup {...{ onClose: () => (showModal = false), showModal, ...childArgs }} />
-    )
-    const submitButton = await screen.getByTestId('delete-account-btn')
-
-    await act(async () => {
-      await fireEvent.click(submitButton)
-    })
-
-    const sessionUserAfter = window.sessionStorage.getItem('user_data')
-    const sessionTokenAfter = window.sessionStorage.getItem('user_token')
-    const sessionCreatedonAfter = window.sessionStorage.getItem('created_on')
-    const userInStoreAfter = store.getState().userReducer
-
-    expect(sessionUserAfter).toBe(null)
-    expect(sessionTokenAfter).toBe(null)
-    expect(sessionCreatedonAfter).toBe(null)
-    expect(userInStoreAfter).toEqual({})
+    expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/register' })
   })
 })

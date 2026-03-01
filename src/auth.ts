@@ -35,7 +35,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.user = user
+        token.user = user as unknown as IUser
         token.accessToken = (user as any).accessToken
       }
       return token

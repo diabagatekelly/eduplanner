@@ -5,17 +5,7 @@ import { ISODateString } from '../../src/types/isoDateType'
 describe('Logout', () => {
   const user: IUser = { ...mockUser, lastLogin: mockUser.lastLogin as ISODateString }
   beforeEach(() => {
-    cy.intercept(
-      { method: 'GET', pathname: '/user/login' },
-      {
-        statusCode: 200,
-        body: {
-          status: 'success',
-          message: 'User found',
-          details: { token: 'xxxxxx', user },
-        },
-      }
-    ).as('loginSuccess')
+    cy.loginBySession(user)
     cy.intercept(
       { method: 'PATCH', url: Cypress.env('EDIT_USER_URL') },
       {
@@ -26,8 +16,6 @@ describe('Logout', () => {
   })
 
   it('should call edit API and redirect to login page on logout', () => {
-    cy.login({ email: user.email, password: user.password })
-    cy.wait('@loginSuccess')
     cy.get('[data-testid="user-icon"]').click()
     cy.get('[data-testid="logout-link"]').click()
     cy.wait('@editUser')

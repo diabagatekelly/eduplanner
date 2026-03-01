@@ -40,6 +40,12 @@ describe('User actions', () => {
       expect(reducer).toMatchObject({ type: 'POPULATE', allData: teacher })
     })
 
+    it('should call POPULATE reducer with empty object when user_data is absent', () => {
+      sessionStorage.clear()
+      const reducer = populateUser()
+      expect(reducer).toMatchObject({ type: 'POPULATE', allData: {} })
+    })
+
     it('should call RESET reducer when deleting user', () => {
       const reducer = resetUser()
       expect(reducer).toMatchObject({ type: 'RESET' })

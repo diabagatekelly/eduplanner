@@ -27,6 +27,13 @@ import { IUser } from '@/types/IUser'
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
+Cypress.Commands.add('loginBySession', (user: IUser) => {
+  cy.task('auth:createSession', user).then((token) => {
+    cy.setCookie('authjs.session-token', token as string)
+    cy.visit(`/${user.username}`)
+  })
+})
+
 Cypress.Commands.add('navigateToRegisterPage', () => {
   cy.visit('/home')
   cy.get('[data-testid="login-btn"]').click()
@@ -67,6 +74,7 @@ Cypress.Commands.add('createActivity', () => {
 declare global {
   namespace Cypress {
     interface Chainable {
+      loginBySession(user: IUser): void
       navigateToRegisterPage(): void
       register(user: IUser): void
       login(credentials: { email: string; password: string }): void

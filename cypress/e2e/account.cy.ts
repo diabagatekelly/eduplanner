@@ -5,17 +5,7 @@ import { ISODateString } from '../../src/types/isoDateType'
 describe('Delete Account', () => {
   const user: IUser = { ...mockUser, lastLogin: mockUser.lastLogin as ISODateString }
   beforeEach(() => {
-    cy.intercept(
-      { method: 'GET', pathname: '/user/login' },
-      {
-        statusCode: 200,
-        body: {
-          status: 'success',
-          message: 'User found',
-          details: { token: 'xxxxxx', user },
-        },
-      }
-    ).as('loginSuccess')
+    cy.loginBySession(user)
     cy.intercept(
       { method: 'DELETE', url: `${Cypress.env('DELETE_USER_URL')}/**` },
       {
@@ -26,8 +16,6 @@ describe('Delete Account', () => {
   })
 
   it('should open delete account popup and redirect to register on confirm', () => {
-    cy.login({ email: user.email, password: user.password })
-    cy.wait('@loginSuccess')
     cy.get('[data-testid="user-icon"]').click()
     cy.get('[data-testid="profile-link"]').click()
     cy.url().should('include', '/profile')
