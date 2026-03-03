@@ -64,7 +64,8 @@ Cypress.Commands.add('login', (credentials: { email: string; password: string })
 
 Cypress.Commands.add('createActivity', () => {
   cy.get('[data-testid="add-activity-form"]').within(() => {
-    cy.get('input[name="name"]').should('not.be.disabled').type('Quran')
+    cy.get('input[name="name"]').should('not.be.disabled')
+    cy.get('input[name="name"]').type('Quran')
     cy.get('input[name="description"]').type('Quran memorization')
     cy.get('input[name="points"]').clear().type('15')
     cy.get('input[id="yesDecks"]').click()

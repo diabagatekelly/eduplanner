@@ -6,7 +6,7 @@ import store from '@/store/store'
 
 export default function AppProviders({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
+    <SessionProvider refetchOnWindowFocus={false}>
       <Provider store={store}>{children}</Provider>
     </SessionProvider>
   )
