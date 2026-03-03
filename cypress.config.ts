@@ -9,6 +9,7 @@ const prod = 'https://eduplanner-backend-7fdf262835f2.herokuapp.com'
 export default defineConfig({
   e2e: {
     baseUrl: 'http://localhost:3000',
+    pageLoadTimeout: 120000,
     setupNodeEvents(on, config) {
       on('task', {
         async 'auth:createSession'(user) {

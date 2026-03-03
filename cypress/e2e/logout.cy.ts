@@ -16,6 +16,7 @@ describe('Logout', () => {
   })
 
   it('should call edit API and redirect to login page on logout', () => {
+    cy.get('[data-testid="user-icon"]').should('have.attr', 'aria-expanded')
     cy.get('[data-testid="user-icon"]').click()
     cy.get('[data-testid="logout-link"]').click()
     cy.wait('@editUser')

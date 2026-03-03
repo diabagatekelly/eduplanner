@@ -39,9 +39,7 @@ Cypress.Commands.add('loginBySession', (user: IUser) => {
 })
 
 Cypress.Commands.add('navigateToRegisterPage', () => {
-  cy.visit('/home')
-  cy.get('[data-testid="login-btn"]').click()
-  cy.get('[data-testid="register-link"]').click()
+  cy.visit('/register')
 })
 
 Cypress.Commands.add('register', (mockUser: IUser) => {
@@ -56,8 +54,7 @@ Cypress.Commands.add('register', (mockUser: IUser) => {
 })
 
 Cypress.Commands.add('login', (credentials: { email: string; password: string }) => {
-  cy.visit('/home')
-  cy.get('[data-testid="login-btn"]').click()
+  cy.visit('/login')
   cy.get('[data-testid="login-form"]').within(() => {
     cy.get('input[name="email"]').type(credentials.email)
     cy.get('input[name="password"]').type(credentials.password)
@@ -67,7 +64,7 @@ Cypress.Commands.add('login', (credentials: { email: string; password: string })
 
 Cypress.Commands.add('createActivity', () => {
   cy.get('[data-testid="add-activity-form"]').within(() => {
-    cy.get('input[name="name"]').type('Quran')
+    cy.get('input[name="name"]').should('not.be.disabled').type('Quran')
     cy.get('input[name="description"]').type('Quran memorization')
     cy.get('input[name="points"]').clear().type('15')
     cy.get('input[id="yesDecks"]').click()

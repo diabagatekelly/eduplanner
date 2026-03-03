@@ -16,6 +16,7 @@ describe('Delete Account', () => {
   })
 
   it('should open delete account popup and redirect to register on confirm', () => {
+    cy.get('[data-testid="user-icon"]').should('have.attr', 'aria-expanded')
     cy.get('[data-testid="user-icon"]').click()
     cy.get('[data-testid="profile-link"]').click()
     cy.url().should('include', '/profile')
