@@ -14,12 +14,7 @@ export default function AddActivityForm({
 }) {
   return (
     <>
-      <form
-        data-testid="add-activity-form"
-        className="space-y-6"
-        onSubmit={submitForm}
-        method="POST"
-      >
+      <form data-testid="add-activity-form" className="space-y-6" onSubmit={submitForm}>
         <span className="inline-block w-auto mr-2">
           <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">
             Name:
