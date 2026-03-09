@@ -39,6 +39,7 @@ Cypress.Commands.add('loginBySession', (user: IUser) => {
 })
 
 Cypress.Commands.add('navigateToRegisterPage', () => {
+  cy.clearAllCookies()
   cy.visit('/register')
 })
 
@@ -54,6 +55,7 @@ Cypress.Commands.add('register', (mockUser: IUser) => {
 })
 
 Cypress.Commands.add('login', (credentials: { email: string; password: string }) => {
+  cy.clearAllCookies()
   cy.visit('/login')
   cy.get('[data-testid="login-form"]').within(() => {
     cy.get('input[name="email"]').type(credentials.email)

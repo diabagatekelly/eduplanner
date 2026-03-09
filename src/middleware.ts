@@ -11,6 +11,7 @@ export const middleware = auth((req) => {
 
   if (isAuthenticated && (pathname === '/login' || pathname === '/register')) {
     const username = (req.auth?.user as any)?.username
+    if (!username) return
     return Response.redirect(new URL(`/${username}`, req.url))
   }
 })
