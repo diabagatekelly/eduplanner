@@ -31,11 +31,16 @@ jobs:
     executor:
       name: cypress/default
       node-version: '24.0.0'
+    environment:
+      AUTH_SECRET: test-secret
     steps:
       - attach_workspace:
           at: ~/
+      - run:
+          name: Build Next.js app
+          command: npm run build
       - cypress/run-tests:
-          start-command: npm run dev
+          start-command: npm start
           cypress-command: NODE_ENV=production npx nyc cypress run
 
 workflows:
