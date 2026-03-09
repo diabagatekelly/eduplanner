@@ -3,21 +3,10 @@
 import LoginForm from '@/app/login/components/login-form'
 import React, { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { IUser, IUserLogin } from '@/types/IUser'
-import { IResponse } from '@/types/IApiResponse'
+import { signIn, getSession } from 'next-auth/react'
 import Link from 'next/link'
-import { setAuthToken } from '@/store/actions/authActions'
-import { useAppDispatch } from '@/store/hooks'
-import { populateUser } from '@/store/actions/userActions'
-import { loginUser } from '@/api/controller'
 
-interface ILogin {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
-  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
-}
-
-export default function Login<ILogin>() {
-  const dispatch = useAppDispatch()
+export default function Login() {
   const router = useRouter()
 
   const [formData, setFormData] = useState<{ email: string; password: string }>({
@@ -34,70 +23,58 @@ export default function Login<ILogin>() {
     }
 
     const target = e.target as HTMLInputElement
-    const fieldName: string = target.name
-    const fieldValue: any = target.value
-
     setFormData((prevState) => ({
       ...prevState,
-      [fieldName]: fieldValue,
+      [target.name]: target.value,
     }))
   }
 
   async function submitForm(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setIsLoading(true)
+
+    const rawFormData = new FormData(e.currentTarget)
+    const email = rawFormData.get('email') as string
+    const password = rawFormData.get('password') as string
+
     try {
-      // We don't want the page to refresh
-      e.preventDefault()
-      setIsLoading(true) // Set loading to true when the request starts
-
-      const rawFormData = new FormData(e.currentTarget)
-      const userFormInfo: { email: string; password: string } = {
-        email: '',
-        password: '',
-      }
-
-      for (const pair of rawFormData.entries()) {
-        ;(userFormInfo as Record<string, string>)[pair[0]] = `${pair[1]}`
-      }
-
-      const userCredentials: IUserLogin = {
-        userId: btoa(userFormInfo.email),
-        password: userFormInfo.password,
-      }
-
-      const response = (await loginUser(userCredentials)) as unknown as IResponse<{
-        token: string
-        user: IUser
-      }>
-      const { data } = response
-      const { details } = data
-
-      setIsLoading(false)
-      setFormData({
-        email: '',
-        password: '',
+      const result = await signIn('credentials', {
+        userId: btoa(email),
+        password,
+        redirect: false,
       })
-      setFormSubmitOutcomeMessage('Logging in ...')
-      dispatch(setAuthToken(details))
-      dispatch(populateUser())
-      router.push('/' + details.user.username)
-    } catch (error: any) {
+
       setIsLoading(false)
-      console.log(error)
 
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
+      if (result?.error) {
         setFormSubmitOutcomeMessage(
           'Failed to login due to an internal error. Please try again later.'
         )
-      } else {
-        setFormSubmitOutcomeMessage(data.message)
+        return
       }
+
+      setFormData({ email: '', password: '' })
+      setFormSubmitOutcomeMessage('Logging in ...')
+
+      const session = await getSession()
+      if (session?.user) {
+        sessionStorage.setItem('user_data', JSON.stringify(session.user))
+      }
+
+      const username = (session?.user as any)?.username
+      if (!username) {
+        setFormSubmitOutcomeMessage(
+          'Failed to login due to an internal error. Please try again later.'
+        )
+        return
+      }
+
+      router.push('/' + username)
+    } catch {
+      setIsLoading(false)
+      setFormSubmitOutcomeMessage(
+        'Failed to login due to an internal error. Please try again later.'
+      )
     }
   }
 

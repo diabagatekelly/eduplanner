@@ -1,4 +1,7 @@
 import { defineConfig } from 'cypress'
+import * as dotenv from 'dotenv'
+
+dotenv.config({ path: '.env.local' })
 
 const local = 'http://localhost:8080'
 const prod = 'https://eduplanner-backend-7fdf262835f2.herokuapp.com'
@@ -6,7 +9,18 @@ const prod = 'https://eduplanner-backend-7fdf262835f2.herokuapp.com'
 export default defineConfig({
   e2e: {
     baseUrl: 'http://localhost:3000',
+    pageLoadTimeout: 120000,
     setupNodeEvents(on, config) {
+      on('task', {
+        async 'auth:createSession'(user) {
+          const { encode } = await import('next-auth/jwt')
+          return encode({
+            token: { user, accessToken: 'mock-access-token' },
+            secret: process.env.AUTH_SECRET ?? 'test-secret',
+            salt: 'authjs.session-token',
+          })
+        },
+      })
       config.env.REGISTER_USER_URL =
         process.env.CYPRESS_ENV !== 'development'
           ? `${prod}/user/register`

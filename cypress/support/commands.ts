@@ -27,10 +27,20 @@ import { IUser } from '@/types/IUser'
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
+Cypress.Commands.add('loginBySession', (user: IUser) => {
+  cy.task('auth:createSession', user).then((token) => {
+    cy.setCookie('authjs.session-token', token as string)
+    cy.visit(`/${user.username}`, {
+      onBeforeLoad: (win) => {
+        win.sessionStorage.setItem('user_data', JSON.stringify(user))
+      },
+    })
+  })
+})
+
 Cypress.Commands.add('navigateToRegisterPage', () => {
-  cy.visit('/home')
-  cy.get('[data-testid="login-btn"]').click()
-  cy.get('[data-testid="register-link"]').click()
+  cy.clearAllCookies()
+  cy.visit('/register')
 })
 
 Cypress.Commands.add('register', (mockUser: IUser) => {
@@ -45,8 +55,8 @@ Cypress.Commands.add('register', (mockUser: IUser) => {
 })
 
 Cypress.Commands.add('login', (credentials: { email: string; password: string }) => {
-  cy.visit('/home')
-  cy.get('[data-testid="login-btn"]').click()
+  cy.clearAllCookies()
+  cy.visit('/login')
   cy.get('[data-testid="login-form"]').within(() => {
     cy.get('input[name="email"]').type(credentials.email)
     cy.get('input[name="password"]').type(credentials.password)
@@ -56,6 +66,7 @@ Cypress.Commands.add('login', (credentials: { email: string; password: string })
 
 Cypress.Commands.add('createActivity', () => {
   cy.get('[data-testid="add-activity-form"]').within(() => {
+    cy.get('input[name="name"]').should('not.be.disabled')
     cy.get('input[name="name"]').type('Quran')
     cy.get('input[name="description"]').type('Quran memorization')
     cy.get('input[name="points"]').clear().type('15')
@@ -67,6 +78,7 @@ Cypress.Commands.add('createActivity', () => {
 declare global {
   namespace Cypress {
     interface Chainable {
+      loginBySession(user: IUser): void
       navigateToRegisterPage(): void
       register(user: IUser): void
       login(credentials: { email: string; password: string }): void

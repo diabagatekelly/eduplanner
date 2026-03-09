@@ -35,6 +35,7 @@ const config: Config = {
     '!**/vendor/**',
     '!**/specs/**',
     '!auth.ts',
+    '!middleware.ts',
     '!app/api/auth/**',
   ],
   coverageThreshold: {
@@ -218,4 +219,16 @@ const config: Config = {
   // watchman: true,
 }
 
-export default createJestConfig(config)
+const jestConfig = createJestConfig(config)
+
+// Override transformIgnorePatterns to allow next-auth and its ESM dependencies to be transformed
+export default async (...args: any[]) => {
+  const resolvedConfig = await (jestConfig as any)(...args)
+  return {
+    ...resolvedConfig,
+    transformIgnorePatterns: [
+      '/node_modules/(?!(next-auth|@auth|@panva|jose|openid-client|oauth4webapi)/).*',
+      '\\.pnp\\.[^\\/]+$',
+    ],
+  }
+}

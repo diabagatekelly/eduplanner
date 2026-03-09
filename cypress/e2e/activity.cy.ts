@@ -7,22 +7,10 @@ describe('Add Activity', () => {
     const user: IUser = { ...mockStudent, lastLogin: mockStudent.lastLogin as ISODateString }
 
     beforeEach(() => {
-      cy.intercept(
-        { method: 'GET', pathname: '/user/login' },
-        {
-          statusCode: 200,
-          body: {
-            status: 'success',
-            message: 'User found',
-            details: { token: 'xxxxxx', user },
-          },
-        }
-      ).as('loginSuccess')
+      cy.loginBySession(user)
     })
 
     it('should not show a form to add an activity', () => {
-      cy.login({ email: user.email, password: user.password })
-      cy.wait('@loginSuccess')
       cy.contains('Ask your teacher or parent to add you and create some activities for you!')
       cy.get('[data-testid="add-activity-form"]').should('not.exist')
     })
@@ -33,17 +21,7 @@ describe('Add Activity', () => {
     const addActivityUrl = Cypress.env('ADD_ACTIVITY_URL')
 
     beforeEach(() => {
-      cy.intercept(
-        { method: 'GET', pathname: '/user/login' },
-        {
-          statusCode: 200,
-          body: {
-            status: 'success',
-            message: 'User found',
-            details: { token: 'xxxxxx', user },
-          },
-        }
-      ).as('loginSuccess')
+      cy.loginBySession(user)
 
       cy.intercept(addActivityUrl, {
         statusCode: 200,
@@ -56,8 +34,6 @@ describe('Add Activity', () => {
     })
 
     it('should show activity form for teacher and no activities, then add and display new activity', () => {
-      cy.login({ email: user.email, password: user.password })
-      cy.wait('@loginSuccess')
       cy.get('[data-testid="add-activity-form"]').should('exist')
       cy.get('[data-testid="no-activities-message"]').contains('You have no activities yet.')
       cy.createActivity()
@@ -72,17 +48,7 @@ describe('Add Activity', () => {
     const addActivityUrl = Cypress.env('ADD_ACTIVITY_URL')
 
     beforeEach(() => {
-      cy.intercept(
-        { method: 'GET', pathname: '/user/login' },
-        {
-          statusCode: 200,
-          body: {
-            status: 'success',
-            message: 'User found',
-            details: { token: 'xxxxxx', user },
-          },
-        }
-      ).as('loginSuccess')
+      cy.loginBySession(user)
 
       cy.intercept(addActivityUrl, {
         statusCode: 400,
@@ -94,8 +60,6 @@ describe('Add Activity', () => {
     })
 
     it('should show error message and not create activity if error occurs', () => {
-      cy.login({ email: user.email, password: user.password })
-      cy.wait('@loginSuccess')
       cy.get('[data-testid="no-activities-message"]').contains('You have no activities yet.')
       cy.createActivity()
       cy.get('[data-testid="add-activity-submit-message"]').contains('Failed to create activity.')
@@ -115,17 +79,7 @@ describe('Delete Activity', () => {
 
   describe('Successful delete', () => {
     beforeEach(() => {
-      cy.intercept(
-        { method: 'GET', pathname: '/user/login' },
-        {
-          statusCode: 200,
-          body: {
-            status: 'success',
-            message: 'User found',
-            details: { token: 'xxxxxx', user: userWithActivity },
-          },
-        }
-      ).as('loginSuccess')
+      cy.loginBySession(userWithActivity)
       cy.intercept(
         { method: 'DELETE', url: `${Cypress.env('DELETE_ACTIVITY_URL')}/**` },
         {
@@ -136,8 +90,6 @@ describe('Delete Activity', () => {
     })
 
     it('should open delete popup showing activity name and make delete API call on confirm', () => {
-      cy.login({ email: userWithActivity.email, password: userWithActivity.password })
-      cy.wait('@loginSuccess')
       cy.get('[data-testid="activity-in-list"]').contains('Quran')
       cy.get('[data-testid="delete-activities-in-list"]').first().click()
       cy.get('[data-testid="delete-activity-popup"]').should('be.visible')
@@ -150,17 +102,7 @@ describe('Delete Activity', () => {
 
   describe('Failed delete', () => {
     beforeEach(() => {
-      cy.intercept(
-        { method: 'GET', pathname: '/user/login' },
-        {
-          statusCode: 200,
-          body: {
-            status: 'success',
-            message: 'User found',
-            details: { token: 'xxxxxx', user: userWithActivity },
-          },
-        }
-      ).as('loginSuccess')
+      cy.loginBySession(userWithActivity)
       cy.intercept(
         { method: 'DELETE', url: `${Cypress.env('DELETE_ACTIVITY_URL')}/**` },
         {
@@ -171,8 +113,6 @@ describe('Delete Activity', () => {
     })
 
     it('should show error message in popup when delete fails', () => {
-      cy.login({ email: userWithActivity.email, password: userWithActivity.password })
-      cy.wait('@loginSuccess')
       cy.get('[data-testid="delete-activities-in-list"]').first().click()
       cy.get('[data-testid="delete-activity-btn"]').click()
       cy.get('[data-testid="delete-activity-outcome-message"]').contains(
@@ -190,17 +130,7 @@ describe('Request Review for Activity (Student)', () => {
     activities: [{ ...mockActivity, cards: [] }],
   }
   beforeEach(() => {
-    cy.intercept(
-      { method: 'GET', pathname: '/user/login' },
-      {
-        statusCode: 200,
-        body: {
-          status: 'success',
-          message: 'User found',
-          details: { token: 'xxxxxx', user: mockStudentWithTeacher },
-        },
-      }
-    ).as('loginSuccess')
+    cy.loginBySession(mockStudentWithTeacher)
     cy.intercept(Cypress.env('REQUEST_REVIEW_URL'), {
       statusCode: 200,
       body: { status: 'success', message: 'Review requested.' },
@@ -216,8 +146,6 @@ describe('Request Review for Activity (Student)', () => {
   })
 
   it('should show Request review button for student and call both APIs on click', () => {
-    cy.login({ email: mockStudentWithTeacher.email, password: mockStudentWithTeacher.password })
-    cy.wait('@loginSuccess')
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.get('[data-testid="activity-update-btn"]').contains('Request review')
@@ -235,17 +163,7 @@ describe('Mark Activity Complete', () => {
   }
 
   beforeEach(() => {
-    cy.intercept(
-      { method: 'GET', pathname: '/user/login' },
-      {
-        statusCode: 200,
-        body: {
-          status: 'success',
-          message: 'User found',
-          details: { token: 'xxxxxx', user: userWithActivityAndCards },
-        },
-      }
-    ).as('loginSuccess')
+    cy.loginBySession(userWithActivityAndCards)
     cy.intercept(Cypress.env('EDIT_ACTIVITY_URL'), {
       statusCode: 200,
       body: {
@@ -257,8 +175,6 @@ describe('Mark Activity Complete', () => {
   })
 
   it('should navigate to activity page and call edit API when marking complete', () => {
-    cy.login({ email: userWithActivityAndCards.email, password: userWithActivityAndCards.password })
-    cy.wait('@loginSuccess')
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.get('[data-testid="activity-update-btn"]').contains('Mark completed')

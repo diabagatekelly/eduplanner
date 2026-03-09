@@ -15,6 +15,20 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+import { mockUser } from '../../src/specs/mocks'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+// Pre-warm the Next.js dev server before any specs run.
+// On CI the first visit to a route triggers cold-start compilation which can
+// exceed pageLoadTimeout. Visiting here with a generous timeout compiles the
+// two slowest routes once so every spec that follows loads instantly.
+before(() => {
+  cy.task('auth:createSession', mockUser).then((token) => {
+    cy.setCookie('authjs.session-token', token as string)
+    cy.visit(`/${mockUser.username}`, { timeout: 300000 })
+    cy.visit(`/${mockUser.username}/profile`, { timeout: 300000 })
+    cy.clearAllCookies()
+  })
+})

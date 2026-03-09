@@ -1,16 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { useAppDispatch } from '@/store/hooks'
-import { removeAuthToken } from '../store/actions/authActions'
-import { resetUser } from '../store/actions/userActions'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import { editUser } from '../api/controller'
-import store from '../store/store'
-import { IUser } from '@/types/IUser'
 import { ISODateString } from '@/types/isoDateType'
 
 function classNames(...classes: string[]) {
@@ -20,20 +16,13 @@ function classNames(...classes: string[]) {
 export default function Navbar({
   isAuthenticated,
   username,
+  userId,
 }: {
   isAuthenticated: boolean
   username: string
+  userId: string
 }) {
-  const dispatch = useAppDispatch()
-  const router = useRouter()
   const pathname = usePathname()
-
-  const [user, getUserData] = useState<IUser>({} as IUser)
-
-  useEffect(() => {
-    const { userReducer } = store.getState()
-    getUserData(userReducer)
-  }, [user])
 
   const navigation = [
     { name: 'Home', href: '/home', current: pathname === '/home', dataTestId: 'home-btn' },
@@ -42,16 +31,14 @@ export default function Navbar({
   async function logout() {
     try {
       await editUser({
-        userId: user.userId,
+        userId,
         editData: {
           lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {
             timeZone: 'EST',
           }) as ISODateString,
         },
       })
-      dispatch(removeAuthToken())
-      dispatch(resetUser())
-      router.push('/login')
+      await signOut({ callbackUrl: '/login' })
     } catch (error: any) {
       console.log(error)
 

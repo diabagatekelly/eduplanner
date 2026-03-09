@@ -5,8 +5,13 @@ import { render, screen } from '@testing-library/react'
 import * as React from 'react'
 import { act } from 'react'
 
-jest.mock('next-auth/react', () => ({
-  SessionProvider: ({ children }: { children: React.ReactNode }) => children,
+jest.mock('../../auth', () => ({
+  auth: jest.fn().mockResolvedValue(null),
+}))
+
+jest.mock('../../app/providers', () => ({
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
 jest.mock('next/navigation', () => {
@@ -28,7 +33,7 @@ describe('Root layout', () => {
   it('should render as expected', async () => {
     jest.spyOn(console, 'error').mockImplementation(() => null)
     await act(async () => {
-      render(<RootLayout {...{ children: <Home /> }} />)
+      render(await RootLayout({ children: <Home /> }))
     })
     expect(await screen.findByTestId('home')).toBeInTheDocument()
   })

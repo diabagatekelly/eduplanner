@@ -1,9 +1,6 @@
-import { removeAuthToken } from '@/store/actions/authActions'
-import { resetUser } from '@/store/actions/userActions'
-import { useRouter } from 'next/navigation'
 import { deleteUser } from '../../api/controller'
 import { useEffect, useState } from 'react'
-import { useAppDispatch } from '@/store/hooks'
+import { signOut } from 'next-auth/react'
 import { IUser } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
 import { UserMinusIcon, XMarkIcon } from '@heroicons/react/24/solid'
@@ -17,9 +14,6 @@ export default function DeleteAccountPopup({
   showModal: boolean
   user?: IUser | Partial<IUser>
 }) {
-  const dispatch = useAppDispatch()
-  const router = useRouter()
-
   const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
   const [outcomeMessage, setOutcomeMessage] = useState('')
 
@@ -30,7 +24,7 @@ export default function DeleteAccountPopup({
   async function deleteAccount() {
     try {
       ;(await deleteUser(userInfo.userId!)) as unknown as IResponse
-      onDeleteAccountSuccess()
+      await onDeleteAccountSuccess()
     } catch (error: any) {
       console.log(error)
 
@@ -51,11 +45,9 @@ export default function DeleteAccountPopup({
     }
   }
 
-  function onDeleteAccountSuccess() {
-    dispatch(resetUser())
-    dispatch(removeAuthToken())
+  async function onDeleteAccountSuccess() {
     onClose()
-    router.push('/register')
+    await signOut({ callbackUrl: '/register' })
   }
 
   return (
