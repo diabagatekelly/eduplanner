@@ -23,17 +23,19 @@ describe('Students Page', () => {
 
     beforeEach(() => {
       cy.loginBySession(user)
-      cy.intercept(
-        { method: 'GET', url: `${Cypress.env('GET_USER_URL')}*` },
-        {
-          statusCode: 200,
-          body: {
-            status: 'success',
-            message: 'User found.',
-            details: { student },
-          },
+      cy.intercept('GET', `${Cypress.env('GET_USER_URL')}*`, (req) => {
+        const url = new URL(req.url)
+        if (url.searchParams.get('userId') === student.userId) {
+          req.reply({
+            statusCode: 200,
+            body: {
+              status: 'success',
+              message: 'User found.',
+              details: { student },
+            },
+          })
         }
-      ).as('findUser')
+      }).as('findUser')
       cy.intercept(Cypress.env('LINK_ACCOUNT_URL'), {
         statusCode: 200,
         body: { status: 'success', message: 'Accounts linked.' },
@@ -85,19 +87,21 @@ describe('Students Page', () => {
 
     beforeEach(() => {
       cy.loginBySession(userWithStudent)
-      cy.intercept(
-        { method: 'GET', url: `${Cypress.env('GET_USER_URL')}*` },
-        {
-          statusCode: 200,
-          body: {
-            status: 'success',
-            message: 'User found.',
-            details: {
-              student: { ...mockStudent, lastLogin: mockStudent.lastLogin as ISODateString },
+      cy.intercept('GET', `${Cypress.env('GET_USER_URL')}*`, (req) => {
+        const url = new URL(req.url)
+        if (url.searchParams.get('userId') === mockStudent.userId) {
+          req.reply({
+            statusCode: 200,
+            body: {
+              status: 'success',
+              message: 'User found.',
+              details: {
+                student: { ...mockStudent, lastLogin: mockStudent.lastLogin as ISODateString },
+              },
             },
-          },
+          })
         }
-      ).as('findStudent')
+      }).as('findStudent')
     })
 
     it('should navigate to student dashboard when teacher clicks student name', () => {

@@ -34,6 +34,12 @@ describe('Activities List', () => {
       const noActivities = screen.getByTestId('no-activities-message')
       expect(noActivities).toHaveTextContent('You have no activities yet.')
     })
+
+    it('should display "no activities" message when activities is undefined', () => {
+      render(<ActivitiesList {...{ isMain: true, userDetails: {} as IUser }} />)
+      const noActivities = screen.getByTestId('no-activities-message')
+      expect(noActivities).toHaveTextContent('You have no activities yet.')
+    })
   })
 
   describe('With activities', () => {

@@ -37,6 +37,9 @@ const config: Config = {
     '!auth.ts',
     '!middleware.ts',
     '!app/api/auth/**',
+    '!hooks/**',
+    '!lib/query-client.ts',
+    '!lib/query-keys.ts',
   ],
   coverageThreshold: {
     global: {

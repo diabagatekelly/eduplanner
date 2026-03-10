@@ -2,11 +2,9 @@
 
 import React, { useState, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAppDispatch } from '@/store/hooks'
 import RegisterForm from '@/app/register/components/register-form'
 import { IUser, IUserFormData } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
-import { setAuthToken } from '@/store/actions/authActions'
 import { registerUser } from '@/api/controller'
 import { ISODateString } from '@/types/isoDateType'
 
@@ -16,7 +14,6 @@ interface IRegister {
 }
 
 export default function Register<IRegister>() {
-  const dispatch = useAppDispatch()
   const router = useRouter()
 
   const [formData, setFormData] = useState<IUserFormData>({
@@ -97,8 +94,7 @@ export default function Register<IRegister>() {
         accountType: '',
       })
       setFormSubmitOutcomeMessage(message)
-      router.push('/' + details.user.username)
-      dispatch(setAuthToken(details))
+      router.push('/login')
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)

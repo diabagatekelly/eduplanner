@@ -1,20 +1,19 @@
 'use client'
 
 import NestedLayout from '@/app/nested-layout'
-import store from '@/store/store'
 import Popup from '@/components/popups/popup'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import UserProfile from '@/app/[username]/profile/components/user-profile'
 import { IUser } from '@/types/IUser'
+import { useSession } from 'next-auth/react'
+import { useUser } from '@/hooks/use-user'
 
 export default function Profile() {
   const [showModal, setShowModal] = useState(false)
-  const [user, getUserData] = useState<IUser>({} as IUser)
 
-  useEffect(() => {
-    const { userReducer } = store.getState()
-    getUserData(userReducer)
-  }, [])
+  const { data: session } = useSession()
+  const userId = session?.user?.userId ?? ''
+  const { data: user = {} as IUser } = useUser(userId)
 
   const isTeacher = user?.accountType === 'teacher'
   const isMain = true

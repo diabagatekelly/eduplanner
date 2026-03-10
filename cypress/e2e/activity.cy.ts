@@ -19,21 +19,43 @@ describe('Add Activity', () => {
   describe('Teacher view', () => {
     const user: IUser = { ...mockUser, lastLogin: mockUser.lastLogin as ISODateString }
     const addActivityUrl = Cypress.env('ADD_ACTIVITY_URL')
+    let activityCreated: boolean
 
     beforeEach(() => {
+      activityCreated = false
       cy.loginBySession(user)
 
-      cy.intercept(addActivityUrl, {
-        statusCode: 200,
-        body: {
-          status: 'success',
-          message: 'Activity creaed.',
-          details: { userActivity: mockActivity, userId: user.userId },
-        },
+      // Dynamic findUser intercept: after activity is created, return user WITH activities
+      // so that window.location.reload() re-fetches the updated data
+      cy.intercept('GET', `${Cypress.env('GET_USER_URL')}*`, (req) => {
+        req.reply({
+          statusCode: 200,
+          body: {
+            status: 'success',
+            message: 'User found.',
+            details: {
+              student: activityCreated ? { ...user, activities: [mockActivity] } : user,
+            },
+          },
+        })
+      })
+
+      cy.intercept(addActivityUrl, (req) => {
+        activityCreated = true
+        req.reply({
+          statusCode: 200,
+          body: {
+            status: 'success',
+            message: 'Activity creaed.',
+            details: { userActivity: mockActivity, userId: user.userId },
+          },
+        })
       })
     })
 
     it('should show activity form for teacher and no activities, then add and display new activity', () => {
+      // Wait for useUser data to fully load before form interaction
+      cy.contains('Manage Students')
       cy.get('[data-testid="add-activity-form"]').should('exist')
       cy.get('[data-testid="no-activities-message"]').contains('You have no activities yet.')
       cy.createActivity()
@@ -60,6 +82,10 @@ describe('Add Activity', () => {
     })
 
     it('should show error message and not create activity if error occurs', () => {
+      // Wait for useUser data to fully load (isMain/isTeacher settle) before
+      // interacting with the form, to prevent AddActivity from unmounting
+      // mid-submission when Dashboard switches JSX branches.
+      cy.contains('Manage Students')
       cy.get('[data-testid="no-activities-message"]').contains('You have no activities yet.')
       cy.createActivity()
       cy.get('[data-testid="add-activity-submit-message"]').contains('Failed to create activity.')

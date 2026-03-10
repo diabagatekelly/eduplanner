@@ -73,7 +73,7 @@ export default function AddActivity<IAddActivity>({ userDetails }: { userDetails
         ;(activityFormInfo as Record<string, any>)[pair[0]] = `${pair[1]}`
       }
 
-      if (userDetails.activities.find((activity) => activity.name === activityFormInfo.name)) {
+      if (userDetails.activities?.find((activity) => activity.name === activityFormInfo.name)) {
         setFormSubmitOutcomeMessage('This is already one of your activities.')
         _resetForm()
         return

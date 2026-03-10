@@ -3,10 +3,11 @@
 import NestedLayout from '@/app/nested-layout'
 import ViewActivity from '@/components/activities/view-activity'
 import { IUser } from '@/types/IUser'
-import store from '@/store/store'
-import { useEffect, useState, use } from 'react'
+import { use } from 'react'
 import Breadcrumbs from '@/components/breadcrumbs'
 import { ActivityParams } from '@/types/IParams'
+import { useSession } from 'next-auth/react'
+import { useUser } from '@/hooks/use-user'
 
 export default function Main(props: { params: ActivityParams }) {
   const params = use(props.params)
@@ -14,12 +15,9 @@ export default function Main(props: { params: ActivityParams }) {
 
   const isMain = true
 
-  const [user, getUserData] = useState<IUser>({} as IUser)
-
-  useEffect(() => {
-    const { userReducer } = store.getState()
-    getUserData(userReducer)
-  }, [])
+  const { data: session } = useSession()
+  const userId = session?.user?.userId ?? ''
+  const { data: user = {} as IUser } = useUser(userId)
 
   const isTeacher: boolean = user.accountType === 'teacher'
   const userActivity = user.activities?.find((activity) => activity?.name === activityFromParams)

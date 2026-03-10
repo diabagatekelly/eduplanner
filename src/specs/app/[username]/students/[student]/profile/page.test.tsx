@@ -3,8 +3,10 @@ import { render } from '../../../../../util'
 import { screen, act } from '@testing-library/react'
 import * as React from 'react'
 import { mockUser, mockStudent } from '../../../../../../specs/mocks'
-import store from '../../../../../../store/store'
 import Profile from '../../../../../../app/[username]/students/[student]/profile/page'
+import { useSession } from 'next-auth/react'
+import { useUser } from '../../../../../../hooks/use-user'
+import { useStudent } from '../../../../../../hooks/use-student'
 
 const student = {
   ...mockStudent,
@@ -13,9 +15,10 @@ const student = {
 }
 const teacher = {
   ...mockUser,
-  linkedAccountsData: { students: [btoa('mock.student@email.com')] },
+  linkedAccountsData: {
+    students: [[mockStudent.userId, mockStudent.username]],
+  },
   lastLogin: '2/15/2024',
-  students: { 'mock-student': student },
 }
 
 jest.mock('next/navigation', () => {
@@ -28,24 +31,40 @@ jest.mock('next/navigation', () => {
     useParams: jest.fn(),
   }
 })
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(),
+}))
+jest.mock('../../../../../../hooks/use-user')
+jest.mock('../../../../../../hooks/use-student')
 
 describe('Non-main Profile', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/15/2024'))
-    window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
   })
 
   afterEach(() => {
     jest.useRealTimers()
     jest.resetAllMocks()
-    window.sessionStorage.clear()
+  })
+
+  it('should render with no session', async () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: null })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined })
+    ;(useStudent as jest.Mock).mockReturnValue({ data: undefined })
+    const useParams = jest.spyOn(require('next/navigation'), 'useParams')
+    useParams.mockReturnValue({ student: 'mock-student', username: 'mock-user' })
+    render(<Profile />)
+    expect(screen.getByText('Delete Account')).toBeInTheDocument()
   })
 
   describe('Non-main student profiles', () => {
     it('should display student from teacher account', async () => {
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      ;(useSession as jest.Mock).mockReturnValue({
+        data: { user: { userId: mockUser.userId, username: mockUser.username } },
+      })
+      ;(useUser as jest.Mock).mockReturnValue({ data: teacher })
+      ;(useStudent as jest.Mock).mockReturnValue({ data: student })
       const useParams = jest.spyOn(require('next/navigation'), 'useParams')
       useParams.mockReturnValue({ student: 'mock-student', username: 'mock-user' })
 
@@ -68,8 +87,11 @@ describe('Non-main Profile', () => {
 
   describe('Modal behavior', () => {
     it('should show profile', async () => {
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      ;(useSession as jest.Mock).mockReturnValue({
+        data: { user: { userId: mockUser.userId, username: mockUser.username } },
+      })
+      ;(useUser as jest.Mock).mockReturnValue({ data: teacher })
+      ;(useStudent as jest.Mock).mockReturnValue({ data: student })
       const useParams = jest.spyOn(require('next/navigation'), 'useParams')
       useParams.mockReturnValue({ student: 'mock-student', username: 'mock-user' })
 
