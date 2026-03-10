@@ -1,8 +1,7 @@
 'use client'
 
 import { useParams, usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
-import store from '@/store/store'
+import { useState } from 'react'
 import { IUser } from '@/types/IUser'
 import { fromDbFormat } from '@/lib/helpers/formatActivityName'
 import {
@@ -11,7 +10,9 @@ import {
   LightBulbIcon,
   UserGroupIcon,
 } from '@heroicons/react/24/solid'
-import { populateUser } from '@/store/actions/userActions'
+import { useSession } from 'next-auth/react'
+import { useUser } from '@/hooks/use-user'
+import { useStudent } from '@/hooks/use-student'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -26,31 +27,25 @@ export default function NestedLayout({
 }) {
   const pathname = usePathname()
   const activityPath = useParams().activity
-  const student = useParams().student as string
-  const [user, getUserData] = useState<IUser>({} as IUser)
-  const [cardSubMenu, showCardSubMenu] = useState(false)
+  const studentParam = useParams().student as string
   const [openDrawer, setOpenDrawer] = useState(true)
 
-  useEffect(() => {
-    store.dispatch(populateUser())
-    const { userReducer }: { userReducer: IUser } = store.getState()
-    getUserData(userReducer)
+  const { data: session } = useSession()
+  const userId = session?.user?.userId ?? ''
+  const { data: user = {} as IUser } = useUser(userId)
 
-    const isMain = !student
-    let cardSubMenu
+  // For student pages, find studentId from teacher's linkedAccountsData
+  const studentTuple = studentParam
+    ? user?.linkedAccountsData?.students?.find(([, name]) => name === studentParam)
+    : undefined
+  const studentId = studentTuple?.[0] ?? ''
+  const { data: studentUser } = useStudent(studentId)
 
-    if (isMain) {
-      cardSubMenu = userReducer?.activities?.find(
-        (activity) => activity.name === activityPath
-      )?.hasCards
-    } else {
-      cardSubMenu = userReducer?.students?.[student]?.activities?.find(
-        (activity) => activity.name === activityPath
-      )?.hasCards
-    }
-
-    showCardSubMenu(!!cardSubMenu)
-  }, [activityPath, student])
+  const isMain = !studentParam
+  const activitySource = isMain ? user : studentUser
+  const cardSubMenu = !!activitySource?.activities?.find(
+    (activity) => activity.name === activityPath
+  )?.hasCards
 
   function toggleDrawer(open: boolean) {
     open === true ? setOpenDrawer(true) : setOpenDrawer(false)

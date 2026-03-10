@@ -57,9 +57,6 @@ export default function Login() {
       setFormSubmitOutcomeMessage('Logging in ...')
 
       const session = await getSession()
-      if (session?.user) {
-        sessionStorage.setItem('user_data', JSON.stringify(session.user))
-      }
 
       const username = (session?.user as any)?.username
       if (!username) {

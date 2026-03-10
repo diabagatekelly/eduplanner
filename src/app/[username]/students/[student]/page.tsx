@@ -1,28 +1,31 @@
 'use client'
 
 import NestedLayout from '@/app/nested-layout'
-import store from '@/store/store'
-import { useEffect, useState, use } from 'react'
+import { use } from 'react'
 import Dashboard from '@/components/dashboard'
 import { IUser } from '@/types/IUser'
 import Breadcrumbs from '@/components/breadcrumbs'
 import { StudentParams } from '@/types/IParams'
+import { useSession } from 'next-auth/react'
+import { useUser } from '@/hooks/use-user'
+import { useStudent } from '@/hooks/use-student'
 
 export default function Main(props: { params: StudentParams }) {
   const params = use(props.params)
   const studentFromParams = params.student
-  const [user, getUserData] = useState<IUser>({} as IUser)
 
-  useEffect(() => {
-    const { userReducer } = store.getState()
-    getUserData(userReducer)
-  }, [])
+  const { data: session } = useSession()
+  const teacherId = session?.user?.userId ?? ''
+  const { data: teacher } = useUser(teacherId)
+
+  const studentTuple = teacher?.linkedAccountsData?.students?.find(
+    ([, name]) => name === studentFromParams
+  )
+  const studentId = studentTuple?.[0] ?? ''
+  const { data: studentUser } = useStudent(studentId)
 
   const isTeacher = true
-  const student = studentFromParams
-
-  const allStudents = user.students
-  const userDetails = allStudents?.[student]
+  const userDetails = studentUser
   const isMain = false
 
   return (

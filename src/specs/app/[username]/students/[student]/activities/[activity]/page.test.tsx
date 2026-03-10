@@ -5,9 +5,16 @@ import * as React from 'react'
 import { act } from 'react'
 import { mockStudent, mockUser, mockActivity } from '../../../../../../../specs/mocks'
 import NestedLayout from '../../../../../../../app/nested-layout'
-import store from '../../../../../../../store/store'
+import { useSession } from 'next-auth/react'
+import { useUser } from '../../../../../../../hooks/use-user'
+import { useStudent } from '../../../../../../../hooks/use-student'
 
 jest.mock('../../../../../../../app/nested-layout')
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(),
+}))
+jest.mock('../../../../../../../hooks/use-user')
+jest.mock('../../../../../../../hooks/use-student')
 
 describe('Main user page', () => {
   const back = window.history.back
@@ -19,36 +26,46 @@ describe('Main user page', () => {
   })
 
   afterAll(() => {
-    sessionStorage.clear()
     window.history.back = back
   })
 
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/3/2024'))
-    window.sessionStorage.setItem('user_data', JSON.stringify(mockUser))
-    window.sessionStorage.setItem('user_token', 'xxxxxx')
-    window.sessionStorage.setItem('created_on', '2/3/2024')
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-    window.sessionStorage.clear()
     jest.useRealTimers()
+  })
+
+  it('should render with no session', async () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: null })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined })
+    ;(useStudent as jest.Mock).mockReturnValue({ data: undefined })
+    ;(NestedLayout as jest.Mock).mockImplementation(() => null)
+    await act(async () => {
+      render(
+        <Main {...{ params: Promise.resolve({ activity: 'Quran', student: 'mock-student' }) }} />
+      )
+    })
+    expect(NestedLayout).toHaveBeenCalled()
   })
 
   describe('Not main - Teacher', () => {
     const updatedMockStudentWithActivity = { ...mockStudent, activities: [mockActivity] }
-    const updatedMockMainTeacher = {
+    const teacherWithStudentLink = {
       ...mockUser,
-      students: { [`${updatedMockStudentWithActivity.username}`]: updatedMockStudentWithActivity },
+      linkedAccountsData: {
+        students: [[mockStudent.userId, mockStudent.username]],
+      },
     }
     beforeEach(() => {
-      const mockStoreState = {
-        authReducer: { isAuthenticated: true },
-        userReducer: updatedMockMainTeacher,
-      }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      ;(useSession as jest.Mock).mockReturnValue({
+        data: { user: { userId: mockUser.userId, username: mockUser.username } },
+      })
+      ;(useUser as jest.Mock).mockReturnValue({ data: teacherWithStudentLink })
+      ;(useStudent as jest.Mock).mockReturnValue({ data: updatedMockStudentWithActivity })
       ;(NestedLayout as jest.Mock).mockImplementation(() => null)
     })
 
@@ -65,7 +82,7 @@ describe('Main user page', () => {
           />
         )
       })
-      expect((NestedLayout as jest.Mock).mock.calls[1][0]).toEqual(
+      expect((NestedLayout as jest.Mock).mock.calls[0][0]).toEqual(
         expect.objectContaining({ isTeacher: true })
       )
     })
@@ -88,7 +105,7 @@ describe('Main user page', () => {
         userDetails: updatedMockStudentWithActivity,
         userActivity: mockActivity,
       }
-      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[1].props).toMatchObject(
+      expect((NestedLayout as jest.Mock).mock.calls[0][0].children[1].props).toMatchObject(
         expectedViewActivityArgs
       )
     })
@@ -106,10 +123,10 @@ describe('Main user page', () => {
           />
         )
       })
-      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[2].props).toMatchObject({
+      expect((NestedLayout as jest.Mock).mock.calls[0][0].children[2].props).toMatchObject({
         children: 'Back',
       })
-      ;(NestedLayout as jest.Mock).mock.calls[1][0].children[2].props.onClick()
+      ;(NestedLayout as jest.Mock).mock.calls[0][0].children[2].props.onClick()
       expect(window.history.back).toHaveBeenCalled()
     })
   })
