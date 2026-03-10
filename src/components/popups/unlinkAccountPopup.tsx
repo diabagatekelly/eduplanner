@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react'
-import store from '../../store/store'
-import { useAppDispatch } from '@/store/hooks'
-import { removeStudent } from '@/store/actions/userActions'
-import { unlinkAccount } from '../../api/controller'
+import { useUnlinkStudent } from '@/hooks/use-student-mutations'
 import { IUser } from '@/types/IUser'
 import { XMarkIcon, MinusIcon } from '@heroicons/react/24/solid'
 
@@ -10,28 +7,27 @@ export default function UnlinkAccountPopup({
   onClose,
   showModal,
   user,
+  teacherId,
 }: {
   onClose: () => void
   showModal: boolean
   user?: IUser | Partial<IUser>
+  teacherId?: string
 }) {
-  const dispatch = useAppDispatch()
+  const unlinkStudentMutation = useUnlinkStudent(teacherId ?? '')
 
   const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...user })
-  const [teacherInfo, getTeacherInfo] = useState<IUser | Partial<IUser>>({})
   const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
     getStudentInfo({ ...user })
-
-    const { userReducer } = store.getState()
-    getTeacherInfo(userReducer)
   }, [showModal, user])
 
   async function removeOldStudent() {
     try {
-      await unlinkAccount({ teacherId: teacherInfo.userId!, studentId: studentInfo.userId! })
-      onUnlinkAccountSuccess()
+      await unlinkStudentMutation.mutateAsync(studentInfo.userId!)
+      setOutcomeMessage('Successfully removed student.')
+      onClose()
     } catch (error: any) {
       console.log(error)
 
@@ -50,13 +46,6 @@ export default function UnlinkAccountPopup({
         setOutcomeMessage(data.message)
       }
     }
-  }
-
-  function onUnlinkAccountSuccess() {
-    dispatch(removeStudent(studentInfo.userId!))
-    setOutcomeMessage('Successfully removed student.')
-    onClose()
-    window.location.reload()
   }
 
   return (

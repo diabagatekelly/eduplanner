@@ -20,6 +20,7 @@ export default function Popup({
   activity,
   submitList,
   setFormSubmitOutcomeMessage,
+  teacherId,
 }: {
   onClose: () => void
   showModal: boolean
@@ -31,6 +32,7 @@ export default function Popup({
   activity?: IActivity
   submitList?: (list: string) => void
   setFormSubmitOutcomeMessage?: (msg: string) => void
+  teacherId?: string
 }) {
   if (modalType === 'deleteAccount') {
     return <DeleteAccountPopup onClose={onClose} showModal={showModal} user={user} />
@@ -44,7 +46,14 @@ export default function Popup({
       />
     )
   } else if (modalType === 'removeStudent') {
-    return <UnlinkAccountPopup onClose={onClose} showModal={showModal} user={user} />
+    return (
+      <UnlinkAccountPopup
+        onClose={onClose}
+        showModal={showModal}
+        user={user}
+        teacherId={teacherId}
+      />
+    )
   } else if (modalType === 'removeActivity') {
     return <DeleteActivityPopup onClose={onClose} showModal={showModal} user={user} item={item} />
   } else if (modalType === 'manageCard') {

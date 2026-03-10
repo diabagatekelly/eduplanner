@@ -24,30 +24,26 @@ import { CompletionStatus } from '../../../types/CompletionStatusEnum'
 jest.mock('../../../api/controller')
 
 describe('Manage Card Popup', () => {
-  const reload = window.location.reload
+  it('should render with user missing userId', () => {
+    const args = {
+      user: {} as any,
+      activity: mockActivity,
+      item: { card: mockUserCard, action: 'show' },
+    }
+    render(
+      <ManageCardPopup {...{ onClose: jest.fn(), showModal: false, isMain: false, ...args }} />
+    )
+  })
 
   describe('Reset stage', () => {
     const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
     })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
       jest.useRealTimers()
     })
@@ -276,26 +272,13 @@ describe('Manage Card Popup', () => {
       linkedAccountsData: { teacher: mockUser.userId },
       activities: [{ ...mockActivity, cards: [mockUserCard] }],
     }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
     })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
       jest.useRealTimers()
     })
@@ -568,26 +551,13 @@ describe('Manage Card Popup', () => {
         },
       ],
     }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
     })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
       jest.useRealTimers()
     })
@@ -812,26 +782,13 @@ describe('Manage Card Popup', () => {
         },
       ],
     }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
     })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
       jest.useRealTimers()
     })
@@ -1086,26 +1043,13 @@ describe('Manage Card Popup', () => {
 
   describe('Remove card', () => {
     const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
     })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
       jest.useRealTimers()
     })
@@ -1297,26 +1241,13 @@ describe('Manage Card Popup', () => {
 
   describe('Activate card', () => {
     const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
     })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
       jest.useRealTimers()
     })
@@ -1515,26 +1446,12 @@ describe('Manage Card Popup', () => {
       ],
     }
     describe('Override stage', () => {
-      beforeAll(() => {
-        Object.defineProperty(window, 'location', {
-          value: { reload: jest.fn() },
-        })
-      })
-
-      afterAll(() => {
-        window.location.reload = reload
-      })
-
       beforeEach(() => {
         jest.useFakeTimers()
         jest.setSystemTime(new Date('2/3/2024'))
-        sessionStorage.setItem('user_data', JSON.stringify(myUser))
-        window.sessionStorage.setItem('user_token', 'xxxxxx')
-        window.sessionStorage.setItem('created_on', '2/3/2024')
       })
 
       afterEach(() => {
-        sessionStorage.clear()
         jest.clearAllMocks()
         jest.useRealTimers()
       })

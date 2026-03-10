@@ -5,7 +5,6 @@ import { render } from '../../util'
 import * as React from 'react'
 import { IUser } from '../../../types/IUser'
 import { mockActivity, mockStudent, mockUser } from '../../mocks'
-import store from '../../../store/store'
 import { deleteActivity } from '../../../api/controller'
 import { CompletionStatus } from '../../../types/CompletionStatusEnum'
 
@@ -23,11 +22,6 @@ jest.mock('next/navigation', () => {
 describe('Activities List', () => {
   describe('No activities', () => {
     const teacher: IUser = { ...mockUser, activities: [] }
-
-    beforeEach(() => {
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
-    })
 
     it('should display "no activities" message when uer has no activities', () => {
       render(<ActivitiesList {...{ isMain: true, userDetails: teacher }} />)
@@ -56,11 +50,6 @@ describe('Activities List', () => {
         { ...mockActivity2, completionStatus: CompletionStatus.DELINQUENT },
       ],
     }
-
-    beforeEach(() => {
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
-    })
 
     it('should display list of activities', async () => {
       render(<ActivitiesList {...{ isMain: true, userDetails: teacher }} />)

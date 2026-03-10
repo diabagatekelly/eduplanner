@@ -25,7 +25,6 @@ describe('Dashboard', () => {
   })
 
   afterAll(() => {
-    sessionStorage.clear()
     window.history.back = back
   })
 

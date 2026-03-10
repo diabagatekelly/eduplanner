@@ -18,19 +18,6 @@ jest.mock('next/navigation', () => {
 
 describe('Add activity', () => {
   const userDetails = { ...mockUser }
-  const reload = window.location.reload
-
-  beforeAll(() => {
-    sessionStorage.setItem('user_data', JSON.stringify(userDetails))
-    Object.defineProperty(window, 'location', {
-      value: { reload: jest.fn() },
-    })
-  })
-
-  afterAll(() => {
-    sessionStorage.clear()
-    window.location.reload = reload
-  })
 
   it('should render form to add an activity', async () => {
     render(<AddActivity {...{ userDetails }} />)

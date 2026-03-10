@@ -1,7 +1,5 @@
-import { linkAccount } from '../../api/controller'
 import { useEffect, useState } from 'react'
-import { useAppDispatch } from '@/store/hooks'
-import { addNewStudent, saveStudentDetails } from '@/store/actions/userActions'
+import { useLinkStudent } from '@/hooks/use-student-mutations'
 import { IUser } from '@/types/IUser'
 import { LinkIcon, XMarkIcon } from '@heroicons/react/24/solid'
 
@@ -16,7 +14,7 @@ export default function LinkAccountPopup({
   newStudent?: IUser | Partial<IUser>
   user?: IUser | Partial<IUser>
 }) {
-  const dispatch = useAppDispatch()
+  const linkStudentMutation = useLinkStudent(user?.userId ?? '')
 
   const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...newStudent })
   const [teacher, getTeacherData] = useState<IUser | Partial<IUser>>({ ...user })
@@ -31,12 +29,9 @@ export default function LinkAccountPopup({
   async function addStudent() {
     try {
       setIsLoading(true)
-      const linkAccountsData: { teacherId: string; studentId: [string, string] } = {
-        teacherId: teacher.userId!,
-        studentId: [studentInfo.userId!, studentInfo.username!],
-      }
-      await linkAccount(linkAccountsData)
-      onLinkAccountSuccess()
+      await linkStudentMutation.mutateAsync([studentInfo.userId!, studentInfo.username!])
+      setOutcomeMessage('Successfully added a new student')
+      onClose()
       setIsLoading(false)
     } catch (error: any) {
       setIsLoading(false)
@@ -57,14 +52,6 @@ export default function LinkAccountPopup({
         setOutcomeMessage(data.message)
       }
     }
-  }
-
-  function onLinkAccountSuccess() {
-    dispatch(addNewStudent(studentInfo as IUser))
-    dispatch(saveStudentDetails(studentInfo as IUser))
-    setOutcomeMessage('Successfully added a new student')
-    onClose()
-    window.location.reload()
   }
 
   return (

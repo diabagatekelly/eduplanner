@@ -30,10 +30,12 @@ export default function Main(props: { params: ActivityStudentParams }) {
     (activity) => activity?.name === activityFromParams
   )
 
+  if (!userDetails || !userActivity) return null
+
   return (
     <NestedLayout {...{ isTeacher }}>
       <Breadcrumbs />
-      <ViewActivity {...{ userDetails: userDetails!, userActivity: userActivity!, isMain }} />
+      <ViewActivity {...{ userDetails, userActivity, isMain }} />
       <button className="default-btn" onClick={() => window.history.back()}>
         Back
       </button>

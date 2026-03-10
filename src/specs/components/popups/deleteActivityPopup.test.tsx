@@ -20,23 +20,16 @@ describe('Delete Activity Popup', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/3/2024'))
-    window.sessionStorage.setItem('user_data', JSON.stringify(mockUser))
-    window.sessionStorage.setItem('user_token', 'xxxxxx')
-    window.sessionStorage.setItem('created_on', '2/3/2024')
-
-    // Mock window.location.reload
-    Object.defineProperty(window, 'location', {
-      value: {
-        reload: jest.fn(),
-      },
-      writable: true,
-    })
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-    window.sessionStorage.clear()
     jest.useRealTimers()
+  })
+
+  it('should render with user missing userId', () => {
+    const args = { user: {} as any, item: { activityName: 'Test' } }
+    render(<DeleteActivityPopup {...{ onClose: jest.fn(), showModal: false, ...args }} />)
   })
 
   it('should render popup to delete activity for main', async () => {

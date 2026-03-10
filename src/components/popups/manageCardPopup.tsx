@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react'
-import { useAppDispatch } from '@/store/hooks'
-import { editUserCard, removeUserCard } from '@/store/actions/userActions'
 import {
-  activateCard,
-  deleteCard,
-  editCardStage,
-  editAnyCardAttr,
-  requestCardReview,
-  resetCardStage,
-} from '../../api/controller'
-import { IResponse } from '@/types/IApiResponse'
+  useEditCard,
+  useEditCardStage,
+  useResetCardStage,
+  useActivateCard,
+  useDeleteCard,
+  useRequestCardReview,
+} from '@/hooks/use-card-mutations'
 import { ICard } from '@/types/ICard'
 import { IUser } from '@/types/IUser'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
@@ -34,7 +31,13 @@ export default function ManageCardPopup({
   activity?: IActivity
   item?: { card: ICard; action: string }
 }) {
-  const dispatch = useAppDispatch()
+  const userId = user?.userId ?? ''
+  const editCardMutation = useEditCard(userId)
+  const editCardStageMutation = useEditCardStage(userId)
+  const resetCardStageMutation = useResetCardStage(userId)
+  const activateCardMutation = useActivateCard(userId)
+  const deleteCardMutation = useDeleteCard(userId)
+  const requestReviewMutation = useRequestCardReview()
 
   const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -54,23 +57,11 @@ export default function ManageCardPopup({
 
   async function resetStage() {
     try {
-      const resetPayload = {
-        userId: userInfo.userId!,
+      await resetCardStageMutation.mutateAsync({
         activity: activity.name,
         cardId: card.cardId,
-      }
-      const response = await resetCardStage(resetPayload)
-      const { data } = response
-      const { details }: { message: string; details: ICard } = data
-      dispatch(
-        editUserCard({
-          username: userInfo.username!,
-          activityName: activity.name,
-          updatedCard: details,
-        })
-      )
+      })
       setStatusMessage('Successfully reset card')
-      window.location.reload()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -102,40 +93,18 @@ export default function ManageCardPopup({
         },
       }
 
-      await requestCardReview(requestReview)
+      await requestReviewMutation.mutateAsync(requestReview)
 
-      dispatch(
-        removeUserCard({
-          username: userInfo.username!,
-          activityName: activity.name,
-          cardId: card.cardId,
-        })
-      )
-
-      const editPayload = {
-        userId: userInfo.userId!,
+      await editCardStageMutation.mutateAsync({
         activity: activity.name,
         cardId: card.cardId,
         editData: {
           completionStatus: CompletionStatus.REVIEW,
         },
-      }
-
-      const response = await editCardStage(editPayload)
-      const { data } = response
-      const { details }: { message: string; details: ICard } = data
-      dispatch(
-        editUserCard({
-          username: userInfo.username!,
-          activityName: activity.name,
-          updatedCard: details,
-        })
-      )
+      })
 
       setIsLoading(false)
-
       setStatusMessage('Request for review successfully sent.')
-      window.location.reload()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -160,28 +129,16 @@ export default function ManageCardPopup({
   async function overrideStage(e: React.MouseEvent<HTMLButtonElement>) {
     try {
       e.preventDefault()
-      const editPayload = {
-        userId: userInfo.userId!,
+      const response = await editCardMutation.mutateAsync({
         activity: activity.name,
         cardId: card.cardId,
         editData: {
           stage: newStage,
         },
-      }
-
-      const response = await editAnyCardAttr(editPayload)
-      const { data } = response
-      const { details }: { message: string; details: ICard } = data
-      dispatch(
-        editUserCard({
-          username: userInfo.username!,
-          activityName: activity.name,
-          updatedCard: details,
-        })
-      )
+      })
+      const { data } = response as { data: { message: string; details: ICard } }
       setStatusMessage('Successfully overrode status.')
-      getCardDetails(details)
-      window.location.reload()
+      getCardDetails(data.details)
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -205,28 +162,15 @@ export default function ManageCardPopup({
 
   async function submitEditStage(newStageStatus: boolean) {
     try {
-      const editPayload = {
-        userId: userInfo.userId!,
+      await editCardStageMutation.mutateAsync({
         activity: activity.name,
         cardId: card.cardId,
         editData: {
           stage: card.stage,
           promote: newStageStatus,
         },
-      }
-
-      const response = await editCardStage(editPayload)
-      const { data } = response
-      const { details }: { message: string; details: ICard } = data
-      dispatch(
-        editUserCard({
-          username: userInfo.username!,
-          activityName: activity.name,
-          updatedCard: details,
-        })
-      )
+      })
       setStatusMessage('Successfully edited status.')
-      window.location.reload()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -250,23 +194,13 @@ export default function ManageCardPopup({
 
   async function removeCard() {
     try {
-      const deletePayload = [
+      await deleteCardMutation.mutateAsync([
         {
-          userId: userInfo.userId!,
           activity: activity.name,
           cardId: card.cardId,
         },
-      ]
-      ;(await deleteCard(deletePayload)) as unknown as IResponse
-      dispatch(
-        removeUserCard({
-          username: userInfo.username!,
-          activityName: activity.name,
-          cardId: card.cardId,
-        })
-      )
+      ])
       setStatusMessage('Successfully removed card')
-      window.location.reload()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -288,23 +222,11 @@ export default function ManageCardPopup({
 
   async function activate() {
     try {
-      const activatePayload = {
-        userId: userInfo.userId!,
+      await activateCardMutation.mutateAsync({
         activity: activity.name,
         cardId: card.cardId,
-      }
-      const response = (await activateCard(activatePayload)) as unknown as IResponse<ICard>
-      const { data } = response
-      const { details }: { message: string; details: ICard } = data
-      dispatch(
-        editUserCard({
-          username: userInfo.username!,
-          activityName: activity.name,
-          updatedCard: details,
-        })
-      )
+      })
       setStatusMessage('Successfully activated card')
-      window.location.reload()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)

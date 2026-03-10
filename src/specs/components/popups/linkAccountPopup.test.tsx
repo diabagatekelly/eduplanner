@@ -12,18 +12,10 @@ describe('Link Account Popup', () => {
   const teacher = { ...mockUser, accountType: 'teacher', linkedAccountsData: { students: [] } }
   const newStudent = { ...mockStudent }
   const childArgs = { newStudent, user: teacher }
-  const reload = window.location.reload
 
-  beforeAll(() => {
-    sessionStorage.setItem('user_data', JSON.stringify(teacher))
-    Object.defineProperty(window, 'location', {
-      value: { reload: jest.fn() },
-    })
-  })
-
-  afterAll(() => {
-    sessionStorage.clear()
-    window.location.reload = reload
+  it('should render with user missing userId', () => {
+    const args = { user: {} as any, newStudent: {} as any }
+    render(<LinkAccountPopup {...{ onClose: jest.fn(), showModal: false, ...args }} />)
   })
 
   it('should render popup to add new student', async () => {
