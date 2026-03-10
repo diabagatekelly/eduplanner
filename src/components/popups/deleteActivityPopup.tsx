@@ -14,7 +14,8 @@ export default function DeleteActivityPopup({
   user?: IUser | Partial<IUser>
   item?: { activityName: string }
 }) {
-  const deleteActivityMutation = useDeleteActivity(user?.userId ?? '')
+  const userId = user?.userId ?? ''
+  const deleteActivityMutation = useDeleteActivity(userId)
 
   const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
   const [activityName, getActivityName] = useState('')
@@ -28,6 +29,7 @@ export default function DeleteActivityPopup({
 
   async function deleteUserActivity() {
     try {
+      if (!userId) throw new Error('Missing userId for deleteActivity')
       await deleteActivityMutation.mutateAsync(activityName)
       setOutcomeMessage('Successfully deleted activity')
       onClose()

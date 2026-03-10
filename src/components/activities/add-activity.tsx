@@ -92,10 +92,7 @@ export default function AddActivity<IAddActivity>({ userDetails }: { userDetails
       }
 
       const response = await createActivityMutation.mutateAsync(userActivity)
-      const { data } = response as {
-        data: { message: string; details: { userId: string; userActivity: IActivity } }
-      }
-      setFormSubmitOutcomeMessage(data.message)
+      setFormSubmitOutcomeMessage(response.data.message)
       _resetForm()
     } catch (error: any) {
       setIsLoading(false)

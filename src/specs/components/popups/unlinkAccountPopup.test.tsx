@@ -22,9 +22,16 @@ describe('Unlink Account Popup', () => {
     jest.resetAllMocks()
   })
 
-  it('should render with no teacherId', () => {
+  it('should show error when teacherId is missing and submit is clicked', async () => {
+    jest.spyOn(console, 'log').mockImplementation(() => null)
     const args = { user: mockStudent }
-    render(<UnlinkAccountPopup {...{ onClose: jest.fn(), showModal: false, ...args }} />)
+    render(<UnlinkAccountPopup {...{ onClose: jest.fn(), showModal: true, ...args }} />)
+    const submitButton = screen.getByTestId('unlink-accounts-btn')
+    await act(async () => {
+      await fireEvent.click(submitButton)
+    })
+    const errorMessage = screen.getByText(/Server is down. Try again later./i)
+    expect(errorMessage).toBeInTheDocument()
   })
 
   it('should render popup to add new student', async () => {

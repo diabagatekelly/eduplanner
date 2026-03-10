@@ -13,9 +13,16 @@ describe('Link Account Popup', () => {
   const newStudent = { ...mockStudent }
   const childArgs = { newStudent, user: teacher }
 
-  it('should render with user missing userId', () => {
+  it('should show error when teacherId is missing and submit is clicked', async () => {
+    jest.spyOn(console, 'log').mockImplementation(() => null)
     const args = { user: {} as any, newStudent: {} as any }
-    render(<LinkAccountPopup {...{ onClose: jest.fn(), showModal: false, ...args }} />)
+    render(<LinkAccountPopup {...{ onClose: jest.fn(), showModal: true, ...args }} />)
+    const submitButton = screen.getByTestId('link-accounts-btn')
+    await act(async () => {
+      await fireEvent.click(submitButton)
+    })
+    const errorMessage = screen.getByText(/Server is down. Try again later./i)
+    expect(errorMessage).toBeInTheDocument()
   })
 
   it('should render popup to add new student', async () => {

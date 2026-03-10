@@ -24,15 +24,20 @@ import { CompletionStatus } from '../../../types/CompletionStatusEnum'
 jest.mock('../../../api/controller')
 
 describe('Manage Card Popup', () => {
-  it('should render with user missing userId', () => {
+  it('should show error when userId is missing and action is triggered', async () => {
+    jest.spyOn(console, 'log').mockImplementation(() => null)
     const args = {
-      user: {} as any,
+      user: { accountType: 'teacher' } as any,
       activity: mockActivity,
-      item: { card: mockUserCard, action: 'show' },
+      item: { card: mockUserCard, action: 'edit' },
     }
-    render(
-      <ManageCardPopup {...{ onClose: jest.fn(), showModal: false, isMain: false, ...args }} />
-    )
+    render(<ManageCardPopup {...{ onClose: jest.fn(), showModal: true, isMain: true, ...args }} />)
+    const resetBtn = screen.getByTestId('reset-stage-btn')
+    await act(async () => {
+      await fireEvent.click(resetBtn)
+    })
+    const errorMessage = screen.getByText(/Server is down. Try again later./i)
+    expect(errorMessage).toBeInTheDocument()
   })
 
   describe('Reset stage', () => {

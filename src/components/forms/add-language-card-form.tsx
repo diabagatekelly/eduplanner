@@ -187,8 +187,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
         activity: activity?.name,
         cards,
       })
-      const { data } = createdCards as { data: { message: string; details: ICard[] } }
-      setFormSubmitOutcomeMessage(data.message)
+      setFormSubmitOutcomeMessage(createdCards.data.message)
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)

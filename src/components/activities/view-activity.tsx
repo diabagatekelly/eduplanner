@@ -106,8 +106,7 @@ export default function ViewActivity<IViewActivity>({
       }
 
       const response = await editActivityMutation.mutateAsync(updatedActivity)
-      const { data } = response as { data: { message: string; details: IActivity } }
-      setFormSubmitOutcomeMessage(data.message)
+      setFormSubmitOutcomeMessage(response.data.message)
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)

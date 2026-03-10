@@ -55,8 +55,13 @@ export default function ManageCardPopup({
     getActivityDetails(activityProp!)
   }, [showModal, user, item, activityProp, statusMessage, newStage])
 
+  function assertUserId() {
+    if (!userId) throw new Error('Missing userId for card mutation')
+  }
+
   async function resetStage() {
     try {
+      assertUserId()
       await resetCardStageMutation.mutateAsync({
         activity: activity.name,
         cardId: card.cardId,
@@ -83,6 +88,7 @@ export default function ManageCardPopup({
 
   async function submitForReview() {
     try {
+      assertUserId()
       const requestReview = {
         id: card.cardId,
         teacherId: userInfo.linkedAccountsData!.teacher!,
@@ -128,6 +134,7 @@ export default function ManageCardPopup({
 
   async function overrideStage(e: React.MouseEvent<HTMLButtonElement>) {
     try {
+      assertUserId()
       e.preventDefault()
       const response = await editCardMutation.mutateAsync({
         activity: activity.name,
@@ -136,9 +143,8 @@ export default function ManageCardPopup({
           stage: newStage,
         },
       })
-      const { data } = response as { data: { message: string; details: ICard } }
       setStatusMessage('Successfully overrode status.')
-      getCardDetails(data.details)
+      getCardDetails(response.data.details)
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -162,6 +168,7 @@ export default function ManageCardPopup({
 
   async function submitEditStage(newStageStatus: boolean) {
     try {
+      assertUserId()
       await editCardStageMutation.mutateAsync({
         activity: activity.name,
         cardId: card.cardId,
@@ -194,6 +201,7 @@ export default function ManageCardPopup({
 
   async function removeCard() {
     try {
+      assertUserId()
       await deleteCardMutation.mutateAsync([
         {
           activity: activity.name,
@@ -222,6 +230,7 @@ export default function ManageCardPopup({
 
   async function activate() {
     try {
+      assertUserId()
       await activateCardMutation.mutateAsync({
         activity: activity.name,
         cardId: card.cardId,

@@ -229,7 +229,7 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
         activity: activity.name,
         cards,
       })
-      const { data } = createResponse as { data: { message: string; details: ICard[] } }
+      const { data } = createResponse
 
       if (cardsToRemove.length) {
         await deleteCardMutation.mutateAsync(

@@ -14,7 +14,8 @@ export default function UnlinkAccountPopup({
   user?: IUser | Partial<IUser>
   teacherId?: string
 }) {
-  const unlinkStudentMutation = useUnlinkStudent(teacherId ?? '')
+  const resolvedTeacherId = teacherId ?? ''
+  const unlinkStudentMutation = useUnlinkStudent(resolvedTeacherId)
 
   const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...user })
   const [outcomeMessage, setOutcomeMessage] = useState('')
@@ -25,6 +26,7 @@ export default function UnlinkAccountPopup({
 
   async function removeOldStudent() {
     try {
+      if (!resolvedTeacherId) throw new Error('Missing teacherId for unlinkStudent')
       await unlinkStudentMutation.mutateAsync(studentInfo.userId!)
       setOutcomeMessage('Successfully removed student.')
       onClose()

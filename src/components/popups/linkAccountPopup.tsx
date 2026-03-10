@@ -14,7 +14,8 @@ export default function LinkAccountPopup({
   newStudent?: IUser | Partial<IUser>
   user?: IUser | Partial<IUser>
 }) {
-  const linkStudentMutation = useLinkStudent(user?.userId ?? '')
+  const teacherId = user?.userId ?? ''
+  const linkStudentMutation = useLinkStudent(teacherId)
 
   const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...newStudent })
   const [teacher, getTeacherData] = useState<IUser | Partial<IUser>>({ ...user })
@@ -28,6 +29,7 @@ export default function LinkAccountPopup({
 
   async function addStudent() {
     try {
+      if (!teacherId) throw new Error('Missing teacherId for linkStudent')
       setIsLoading(true)
       await linkStudentMutation.mutateAsync([studentInfo.userId!, studentInfo.username!])
       setOutcomeMessage('Successfully added a new student')
