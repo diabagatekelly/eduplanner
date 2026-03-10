@@ -188,4 +188,34 @@ describe('Nested layout', () => {
     const cardSubmenu = document.querySelectorAll('.menu-item-cards')[0] as Element
     expect(cardSubmenu).toHaveTextContent('Cards')
   })
+
+  it('should not render cards submenu when student route has no matching linked student', async () => {
+    jest
+      .spyOn(require('next/navigation'), 'usePathname')
+      .mockImplementation(() => '/mock-user/students/unknown-student/activities/Arabic-Language')
+    jest.spyOn(require('next/navigation'), 'useParams').mockImplementation(() => {
+      return { activity: 'Arabic-Language', student: 'unknown-student' }
+    })
+    const teacherDetails = {
+      ...mockUser,
+      linkedAccountsData: { students: [] },
+      activities: [{ ...mockActivity }],
+    }
+    ;(useSession as jest.Mock).mockReturnValue({
+      data: { user: { userId: mockUser.userId, username: mockUser.username } },
+    })
+    ;(useUser as jest.Mock).mockReturnValue({ data: teacherDetails })
+    ;(useStudent as jest.Mock).mockReturnValue({ data: undefined })
+    render(
+      <NestedLayout
+        {...{
+          children: <div>Content</div>,
+          isTeacher: true,
+        }}
+      />
+    )
+
+    const cardSubmenu = document.querySelectorAll('.menu-item-cards')[0]
+    expect(cardSubmenu).toBeUndefined()
+  })
 })

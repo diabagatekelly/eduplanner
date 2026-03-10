@@ -8,6 +8,7 @@ import { ActivityStudentParams } from '@/types/IParams'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { useStudent } from '@/hooks/use-student'
+import { getStudentId } from '@/lib/helpers/getStudentId'
 
 export default function Main(props: { params: ActivityStudentParams }) {
   const params = use(props.params)
@@ -18,10 +19,7 @@ export default function Main(props: { params: ActivityStudentParams }) {
   const teacherId = session?.user?.userId ?? ''
   const { data: teacher } = useUser(teacherId)
 
-  const studentTuple = teacher?.linkedAccountsData?.students?.find(
-    ([, name]) => name === studentFromParams
-  )
-  const studentId = studentTuple?.[0] ?? ''
+  const studentId = getStudentId(teacher, studentFromParams)
   const { data: studentUser } = useStudent(studentId)
 
   const userDetails = studentUser

@@ -13,6 +13,7 @@ import {
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { useStudent } from '@/hooks/use-student'
+import { getStudentId } from '@/lib/helpers/getStudentId'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -34,11 +35,7 @@ export default function NestedLayout({
   const userId = session?.user?.userId ?? ''
   const { data: user = {} as IUser } = useUser(userId)
 
-  // For student pages, find studentId from teacher's linkedAccountsData
-  const studentTuple = studentParam
-    ? user?.linkedAccountsData?.students?.find(([, name]) => name === studentParam)
-    : undefined
-  const studentId = studentTuple?.[0] ?? ''
+  const studentId = studentParam ? getStudentId(user, studentParam) : ''
   const { data: studentUser } = useStudent(studentId)
 
   const isMain = !studentParam

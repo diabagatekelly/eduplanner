@@ -89,8 +89,8 @@ export function useDeleteCard(userId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (cards: { userId: string; activity: string; cardId: string }[]) =>
-      deleteCard(cards),
+    mutationFn: (cards: { activity: string; cardId: string }[]) =>
+      deleteCard(cards.map((card) => ({ ...card, userId }))),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.user(userId) })
     },

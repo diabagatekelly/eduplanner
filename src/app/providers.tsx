@@ -13,7 +13,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
       <SessionProvider refetchOnWindowFocus={false}>
         <Provider store={store}>{children}</Provider>
       </SessionProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   )
 }

@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { useStudent } from '@/hooks/use-student'
+import { getStudentId } from '@/lib/helpers/getStudentId'
 
 export default function Profile() {
   const studentParam = useParams().student as string
@@ -18,10 +19,7 @@ export default function Profile() {
   const teacherId = session?.user?.userId ?? ''
   const { data: teacher } = useUser(teacherId)
 
-  const studentTuple = teacher?.linkedAccountsData?.students?.find(
-    ([, name]) => name === studentParam
-  )
-  const studentId = studentTuple?.[0] ?? ''
+  const studentId = getStudentId(teacher, studentParam)
   const { data: user = {} as IUser } = useStudent(studentId)
 
   const isTeacher = user?.accountType === 'teacher'
