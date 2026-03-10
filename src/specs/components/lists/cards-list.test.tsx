@@ -89,10 +89,6 @@ describe('Cards List', () => {
 
   describe('Not mounted', () => {
     beforeEach(() => {
-      sessionStorage.setItem(
-        'user_data',
-        JSON.stringify({ ...mockUser, activities: activityWithReviewCards })
-      )
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
     })
@@ -100,7 +96,6 @@ describe('Cards List', () => {
     afterEach(() => {
       jest.clearAllMocks()
       jest.useRealTimers()
-      sessionStorage.clear()
     })
 
     it('should display no list due to not mounted', async () => {
@@ -121,10 +116,6 @@ describe('Cards List', () => {
       describe('Cards of the day', () => {
         describe('No cards of the day', () => {
           beforeEach(() => {
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityNoCards })
-            )
             jest.useFakeTimers()
             jest.setSystemTime(new Date('2/3/2024'))
           })
@@ -132,7 +123,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display no list', async () => {
@@ -156,15 +146,10 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display review cards today', async () => {
             window.location.hash = ''
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithMultipleReviewCards })
-            )
             render(
               <CardsList
                 {...{
@@ -211,10 +196,6 @@ describe('Cards List', () => {
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: updatedActivity })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockUser, activity: updatedActivity }} />
             )
@@ -243,10 +224,6 @@ describe('Cards List', () => {
 
           it('should display pending cards next show date today', async () => {
             window.location.hash = ''
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithPendingShowDate })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithPendingShowDate }}
@@ -278,10 +255,6 @@ describe('Cards List', () => {
 
           it('should not display inactive cards today', async () => {
             window.location.hash = ''
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithInactiveCards })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithInactiveCards }}
@@ -295,10 +268,6 @@ describe('Cards List', () => {
 
           it('should not display completed cards today', async () => {
             window.location.hash = ''
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithCompletedCards })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithCompletedCards }}
@@ -315,10 +284,6 @@ describe('Cards List', () => {
       describe('Active cards', () => {
         describe('No active cards', () => {
           beforeEach(() => {
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityNoCards })
-            )
             jest.useFakeTimers()
             jest.setSystemTime(new Date('2/3/2024'))
           })
@@ -326,7 +291,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display no list', async () => {
@@ -350,7 +314,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display active cards', async () => {
@@ -365,10 +328,6 @@ describe('Cards List', () => {
               ],
             }
             window.location.hash = '#active'
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithReviewCards2 })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithReviewCards2 }}
@@ -411,10 +370,6 @@ describe('Cards List', () => {
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: updatedActivity })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockUser, activity: updatedActivity }} />
             )
@@ -443,10 +398,6 @@ describe('Cards List', () => {
 
           it('should display pending cards next show date active', async () => {
             window.location.hash = '#active'
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithPendingShowDate })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithPendingShowDate }}
@@ -481,10 +432,6 @@ describe('Cards List', () => {
       describe('Inactive cards', () => {
         describe('No inactive cards', () => {
           beforeEach(() => {
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityNoCards })
-            )
             jest.useFakeTimers()
             jest.setSystemTime(new Date('2/3/2024'))
           })
@@ -492,7 +439,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display no list', async () => {
@@ -516,7 +462,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display active cards', async () => {
@@ -531,10 +476,6 @@ describe('Cards List', () => {
               ],
             }
             window.location.hash = '#inactive'
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithReviewCards2 })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithReviewCards2 }}
@@ -577,10 +518,6 @@ describe('Cards List', () => {
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: inactiveCards })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockUser, activity: inactiveCards }} />
             )
@@ -621,10 +558,6 @@ describe('Cards List', () => {
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: inactiveCards })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockUser, activity: inactiveCards }} />
             )
@@ -666,15 +599,10 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display review cards today', async () => {
             window.location.hash = ''
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockStudent, activities: activityWithReviewCards })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockStudent, activity: activityWithReviewCards }}
@@ -697,15 +625,10 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display pending cards added today', async () => {
             window.location.hash = '#active'
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockStudent, activities: activityWithPendingAddedToday })
-            )
             render(
               <CardsList
                 {...{
@@ -726,10 +649,6 @@ describe('Cards List', () => {
 
           it('should display pending cards next show date active', async () => {
             window.location.hash = '#active'
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockStudent, activities: activityWithPendingShowDate })
-            )
             render(
               <CardsList
                 {...{
@@ -761,7 +680,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display inactive cards no activate', async () => {
@@ -777,10 +695,6 @@ describe('Cards List', () => {
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockStudent, activities: inactiveCards })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockStudent, activity: inactiveCards }} />
             )
@@ -806,10 +720,6 @@ describe('Cards List', () => {
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockStudent, activities: inactiveCards })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockStudent, activity: inactiveCards }} />
             )

@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useAppDispatch } from '@/store/hooks'
-import { removeUserActivity } from '@/store/actions/userActions'
-import { deleteActivity } from '../../api/controller'
+import { useDeleteActivity } from '@/hooks/use-activity-mutations'
 import { IUser } from '@/types/IUser'
 import { BoltSlashIcon, XMarkIcon } from '@heroicons/react/24/solid'
 
@@ -16,7 +14,8 @@ export default function DeleteActivityPopup({
   user?: IUser | Partial<IUser>
   item?: { activityName: string }
 }) {
-  const dispatch = useAppDispatch()
+  const userId = user?.userId ?? ''
+  const deleteActivityMutation = useDeleteActivity(userId)
 
   const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
   const [activityName, getActivityName] = useState('')
@@ -30,10 +29,10 @@ export default function DeleteActivityPopup({
 
   async function deleteUserActivity() {
     try {
-      const activityData = { userId: userInfo.userId!, activityName }
-      await deleteActivity(activityData)
-      onDeleteActivitySuccess()
-      window.location.reload()
+      if (!userId) throw new Error('Missing userId for deleteActivity')
+      await deleteActivityMutation.mutateAsync(activityName)
+      setOutcomeMessage('Successfully deleted activity')
+      onClose()
     } catch (error: any) {
       console.log(error)
 
@@ -52,12 +51,6 @@ export default function DeleteActivityPopup({
         setOutcomeMessage(data.message)
       }
     }
-  }
-
-  function onDeleteActivitySuccess() {
-    dispatch(removeUserActivity(userInfo.username!, activityName))
-    setOutcomeMessage('Successfully deleted activity')
-    onClose()
   }
 
   return (

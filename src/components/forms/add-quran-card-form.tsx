@@ -6,13 +6,10 @@ import React from 'react'
 import { IActivity } from '@/types/IActivity'
 import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 import { IUser } from '@/types/IUser'
-import { useAppDispatch } from '@/store/hooks'
-import { createCards, deleteCard } from '@/api/controller'
+import { useCreateCards, useDeleteCard } from '@/hooks/use-card-mutations'
 import { quranCards } from '@/lib/constants/quran-bank'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 import { ISODateString } from '@/types/isoDateType'
-import { createUserCard, removeUserCard } from '@/store/actions/userActions'
-import { IResponse } from '@/types/IApiResponse'
 
 interface IAddQuranCardForm {
   handleInput: (e: React.FormEvent<HTMLInputElement>) => void
@@ -28,7 +25,8 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
   user: IUser
   activity: IActivity
 }) {
-  const dispatch = useAppDispatch()
+  const createCardsMutation = useCreateCards(user.userId)
+  const deleteCardMutation = useDeleteCard(user.userId)
 
   const [formData, setFormData] = useState<IQuranCards[]>([])
   const [custom, setCustom] = useState({
@@ -227,32 +225,19 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
         })
       }
 
-      const createResponse = (await createCards({
-        userId: user.userId,
+      const createResponse = await createCardsMutation.mutateAsync({
         activity: activity.name,
         cards,
-      })) as unknown as IResponse<ICard[]>
+      })
       const { data } = createResponse
-      const { message, details }: { message: string; details: ICard[] } = data
-      dispatch(
-        createUserCard({ username: user.username, activityName: activity.name, newCards: details })
-      )
 
       if (cardsToRemove.length) {
-        await deleteCard(cardsToRemove)
-        for (let card of cardsToRemove) {
-          dispatch(
-            removeUserCard({
-              cardId: card.cardId,
-              activityName: card.activity,
-              username: user.username,
-            })
-          )
-        }
+        await deleteCardMutation.mutateAsync(
+          cardsToRemove.map((card) => ({ activity: card.activity, cardId: card.cardId }))
+        )
       }
 
-      setFormSubmitOutcomeMessage(message)
-      window.location.reload()
+      setFormSubmitOutcomeMessage(data.message)
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)

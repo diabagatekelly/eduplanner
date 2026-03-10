@@ -1,15 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { editActivity, requestCardReview } from '../../api/controller'
-import { useAppDispatch } from '@/store/hooks'
-import { editUserActivity } from '../../store/actions/userActions'
+import { useEditActivity } from '@/hooks/use-activity-mutations'
+import { useRequestCardReview } from '@/hooks/use-card-mutations'
 import ListUi from '@/components/lists/lists-ui'
 import { CompletionStatus } from '../../types/CompletionStatusEnum'
 import { IActivity } from '@/types/IActivity'
 import { IUser } from '@/types/IUser'
 import { ISODateString } from '@/types/isoDateType'
-import { IResponse } from '@/types/IApiResponse'
 import { ICard } from '@/types/ICard'
 import { fromDbFormat } from '@/lib/helpers/formatActivityName'
 
@@ -26,8 +24,8 @@ export default function ViewActivity<IViewActivity>({
   userActivity: IActivity
   isMain: boolean
 }) {
-  const dispatch = useAppDispatch()
-  let args
+  const editActivityMutation = useEditActivity(userDetails.userId)
+  const requestReviewMutation = useRequestCardReview()
 
   const [isLoading, setIsLoading] = useState(false)
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
@@ -62,7 +60,7 @@ export default function ViewActivity<IViewActivity>({
         },
       }
 
-      await requestCardReview(requestReview)
+      await requestReviewMutation.mutateAsync(requestReview)
 
       const updatedActivity: IActivity = {
         ...userActivity,
@@ -72,18 +70,10 @@ export default function ViewActivity<IViewActivity>({
         completionStatus: CompletionStatus.REVIEW,
       }
 
-      const response = (await editActivity({
-        userId: userDetails.userId,
-        updatedActivity,
-      })) as unknown as IResponse<IActivity>
-      const { data } = response
-      const { message, details }: { message: string; details: IActivity } = data
-      dispatch(editUserActivity({ username: userDetails.username, updatedActivity: details }))
+      await editActivityMutation.mutateAsync(updatedActivity)
 
       setIsLoading(false)
-
       setFormSubmitOutcomeMessage('Request for review successfully sent.')
-      window.location.reload()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -115,15 +105,8 @@ export default function ViewActivity<IViewActivity>({
         completionStatus: CompletionStatus.COMPLETED,
       }
 
-      const response = (await editActivity({
-        userId: userDetails.userId,
-        updatedActivity,
-      })) as unknown as IResponse<IActivity>
-      const { data } = response
-      const { message, details }: { message: string; details: IActivity } = data
-      dispatch(editUserActivity({ username: userDetails.username, updatedActivity: details }))
-      setFormSubmitOutcomeMessage(message)
-      window.location.reload()
+      const response = await editActivityMutation.mutateAsync(updatedActivity)
+      setFormSubmitOutcomeMessage(response.data.message)
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)

@@ -6,10 +6,7 @@ import React from 'react'
 import { IUser } from '@/types/IUser'
 import { IActivity } from '@/types/IActivity'
 import Popup from '../popups/popup'
-import { createCards } from '@/api/controller'
-import { IResponse } from '@/types/IApiResponse'
-import { createUserCard } from '@/store/actions/userActions'
-import { useAppDispatch } from '@/store/hooks'
+import { useCreateCards } from '@/hooks/use-card-mutations'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 
@@ -22,7 +19,7 @@ export default function AddMiscCardForm({
   user: IUser
   activity: IActivity
 }) {
-  const dispatch = useAppDispatch()
+  const createCardsMutation = useCreateCards(user.userId)
 
   const [typedList, getTypedList] = useState({
     words: '',
@@ -67,21 +64,11 @@ export default function AddMiscCardForm({
         })
       })
 
-      const payload = {
-        userId: user.userId,
+      const createdCards = await createCardsMutation.mutateAsync({
         activity: activity?.name,
         cards,
-      }
-
-      const createdCards = (await createCards(payload)) as unknown as IResponse<ICard[]>
-      const { data } = createdCards
-      const { message, details }: { message: string; details: ICard[] } = data
-      dispatch(
-        createUserCard({ username: user.username, activityName: activity.name, newCards: details })
-      )
-
-      setFormSubmitOutcomeMessage(message)
-      window.location.reload()
+      })
+      setFormSubmitOutcomeMessage(createdCards.data.message)
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)

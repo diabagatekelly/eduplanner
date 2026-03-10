@@ -54,11 +54,7 @@ Cypress.Commands.add('loginBySession', (user: IUser) => {
       },
     })
 
-    cy.visit(`/${user.username}`, {
-      onBeforeLoad: (win) => {
-        win.sessionStorage.setItem('user_data', JSON.stringify(user))
-      },
-    })
+    cy.visit(`/${user.username}`)
   })
 })
 

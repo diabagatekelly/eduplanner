@@ -4,14 +4,11 @@ import { FormEvent, useEffect, useState } from 'react'
 import React from 'react'
 import { IActivity } from '@/types/IActivity'
 import { IUser } from '@/types/IUser'
-import { IResponse } from '@/types/IApiResponse'
 import Popup from '../popups/popup'
 import { ICard } from '@/types/ICard'
-import { createUserCard } from '@/store/actions/userActions'
+import { useCreateCards } from '@/hooks/use-card-mutations'
 import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
-import { useAppDispatch } from '@/store/hooks'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
-import { createCards } from '@/api/controller'
 import { DocumentMinusIcon } from '@heroicons/react/24/solid'
 
 interface IAddLanguageCardForm {
@@ -28,7 +25,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
   user: IUser
   activity: IActivity
 }) {
-  const dispatch = useAppDispatch()
+  const createCardsMutation = useCreateCards(user.userId)
 
   const [file, uploadFile] = useState({
     content: '',
@@ -186,21 +183,11 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
         })
       })
 
-      const payload = {
-        userId: user.userId,
+      const createdCards = await createCardsMutation.mutateAsync({
         activity: activity?.name,
         cards,
-      }
-
-      const createdCards = (await createCards(payload)) as unknown as IResponse<ICard[]>
-      const { data } = createdCards
-      const { message, details }: { message: string; details: ICard[] } = data
-      dispatch(
-        createUserCard({ username: user.username, activityName: activity.name, newCards: details })
-      )
-
-      setFormSubmitOutcomeMessage(message)
-      window.location.reload()
+      })
+      setFormSubmitOutcomeMessage(createdCards.data.message)
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)

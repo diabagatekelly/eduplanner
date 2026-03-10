@@ -26,10 +26,12 @@ export default function Main(props: { params: StudentParams }) {
   const userDetails = studentUser
   const isMain = false
 
+  if (!userDetails) return null
+
   return (
     <NestedLayout {...{ isTeacher }}>
       <Breadcrumbs />
-      <Dashboard {...{ userDetails: userDetails!, isMain, isTeacher }} />
+      <Dashboard {...{ userDetails, isMain, isTeacher }} />
       <button className="default-btn" onClick={() => window.history.back()}>
         Back
       </button>

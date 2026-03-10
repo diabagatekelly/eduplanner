@@ -1,16 +1,13 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
-import { createActivity } from '../../api/controller'
 import AddActivityForm from '../forms/add-activity-form'
-import { useAppDispatch } from '@/store/hooks'
-import { createUserActivity } from '../../store/actions/userActions'
+import { useCreateActivity } from '@/hooks/use-activity-mutations'
 import { IActivity, IActivityFormData } from '../../types/IActivity'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 import { ISODateString } from '@/types/isoDateType'
 import { IUser } from '@/types/IUser'
 import { toDbFormat } from '@/lib/helpers/formatActivityName'
-import { IResponse } from '@/types/IApiResponse'
 
 interface IAddActivity {
   handleInput: (e: React.FormEvent<HTMLInputElement>) => void
@@ -18,7 +15,7 @@ interface IAddActivity {
 }
 
 export default function AddActivity<IAddActivity>({ userDetails }: { userDetails: IUser }) {
-  const dispatch = useAppDispatch()
+  const createActivityMutation = useCreateActivity(userDetails.userId)
 
   const [formData, setFormData] = useState<IActivityFormData>({
     name: '',
@@ -94,21 +91,9 @@ export default function AddActivity<IAddActivity>({ userDetails }: { userDetails
         lastUpdatedOn: null,
       }
 
-      const response = (await createActivity({
-        userActivity,
-        userId: userDetails.userId,
-      })) as unknown as IResponse<{ userId: string; userActivity: IActivity }>
-      const { data } = response
-      const {
-        message,
-        details,
-      }: { message: string; details: { userId: string; userActivity: IActivity } } = data
-
-      let augmentedDetails = { userActivity: details.userActivity, username: userDetails.username }
-      dispatch(createUserActivity(augmentedDetails))
-      setFormSubmitOutcomeMessage(message)
+      const response = await createActivityMutation.mutateAsync(userActivity)
+      setFormSubmitOutcomeMessage(response.data.message)
       _resetForm()
-      window.location.reload()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)

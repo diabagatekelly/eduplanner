@@ -22,29 +22,18 @@ jest.mock('next/navigation', () => {
 
 describe('View activity', () => {
   const userDetails = { ...mockUser, activities: [mockActivity] }
-  const reload = window.location.reload
 
   beforeAll(() => {
-    Object.defineProperty(window, 'location', {
-      value: { reload: jest.fn() },
-    })
-    sessionStorage.setItem('user_data', JSON.stringify(userDetails))
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/3/2024'))
   })
 
   afterAll(() => {
-    sessionStorage.clear()
-    window.location.reload = reload
     jest.clearAllMocks()
     jest.useRealTimers()
   })
 
   describe('Display', () => {
-    beforeEach(() => {
-      sessionStorage.setItem('user_data', JSON.stringify(userDetails))
-    })
-
     it('should render user activity details', async () => {
       render(
         <ViewActivity {...{ userDetails: userDetails, userActivity: mockActivity, isMain: true }} />
@@ -106,9 +95,6 @@ describe('View activity', () => {
       ...mockUser,
       activities: [{ ...mockActivity, cards: [{ completionStatus: CompletionStatus.PENDING }] }],
     }
-    beforeEach(() => {
-      sessionStorage.setItem('user_data', JSON.stringify(lazyUser))
-    })
 
     it('should not submit and display message if any card is not COMPLETED or is INACTIVE', async () => {
       render(
@@ -137,10 +123,6 @@ describe('View activity', () => {
   })
 
   describe('Update activity', () => {
-    beforeEach(() => {
-      sessionStorage.setItem('user_data', JSON.stringify(userDetails))
-    })
-
     it('should invoke editActivity controller when button is clicked', async () => {
       const userActivityDTO = {
         ...mockActivity,
@@ -167,7 +149,7 @@ describe('View activity', () => {
       })
     })
 
-    it('should display success message, then reload', async () => {
+    it('should display success message', async () => {
       const updatedActivity = {
         ...mockActivity,
         completionStatus: CompletionStatus.COMPLETED,
@@ -191,10 +173,9 @@ describe('View activity', () => {
       })
 
       expect(submitMessage).toHaveTextContent('Success')
-      expect(window.location.reload).toHaveBeenCalled()
     })
 
-    it('should not reload when response is not 200 or 500 and display error message', async () => {
+    it('should display error message when response is not 200 or 500', async () => {
       jest.spyOn(console, 'log').mockImplementation(() => null)
 
       const error = {
@@ -216,10 +197,9 @@ describe('View activity', () => {
 
       const errorMessage = await screen.findByText(/Erroneous response/i)
       expect(errorMessage).toBeInTheDocument()
-      expect(window.location.reload).not.toHaveBeenCalled()
     })
 
-    it('should not reload when response is 500 and display error message', async () => {
+    it('should display error message when response is 500', async () => {
       const error = {
         response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
       }
@@ -239,10 +219,9 @@ describe('View activity', () => {
 
       expect(errorMessage).toBeInTheDocument()
       expect(console.log).toHaveBeenCalledWith(error)
-      expect(window.location.reload).not.toHaveBeenCalled()
     })
 
-    it('should not reload when error is thrown with no response', async () => {
+    it('should display error message when error has no response', async () => {
       ;(editActivity as jest.Mock).mockImplementation(() => {
         return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
       })
@@ -262,9 +241,6 @@ describe('View activity', () => {
 
   describe('Submit for review', () => {
     const studentUserDetails = { ...mockStudent, activities: [mockActivity] }
-    beforeEach(() => {
-      sessionStorage.setItem('user_data', JSON.stringify(studentUserDetails))
-    })
 
     describe('Activity update button', () => {
       it('should display active green button if activity is not completed', async () => {
@@ -338,7 +314,7 @@ describe('View activity', () => {
       })
     })
 
-    it('should display success message, then reload', async () => {
+    it('should display success message', async () => {
       const updatedActivity = {
         ...mockActivity,
         completionStatus: CompletionStatus.REVIEW,
@@ -369,10 +345,9 @@ describe('View activity', () => {
       })
 
       expect(submitMessage).toHaveTextContent('Request for review successfully sent.')
-      expect(window.location.reload).toHaveBeenCalled()
     })
 
-    it('should not reload when response is not 200 or 500 and display error message', async () => {
+    it('should display error message when response is not 200 or 500', async () => {
       const error = {
         response: {
           status: 400,
@@ -396,10 +371,9 @@ describe('View activity', () => {
 
       const errorMessage = await screen.findByText(/Erroneous response/i)
       expect(errorMessage).toBeInTheDocument()
-      expect(window.location.reload).not.toHaveBeenCalled()
     })
 
-    it('should not reload when response is 500 and display error message', async () => {
+    it('should display error message when response is 500', async () => {
       const error = {
         response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
       }
@@ -423,10 +397,9 @@ describe('View activity', () => {
 
       expect(errorMessage).toBeInTheDocument()
       expect(console.log).toHaveBeenCalledWith(error)
-      expect(window.location.reload).not.toHaveBeenCalled()
     })
 
-    it('should not reload when error is thrown with no response', async () => {
+    it('should display error message when error has no response', async () => {
       ;(requestCardReview as jest.Mock).mockImplementation(() => {
         return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
       })

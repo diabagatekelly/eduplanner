@@ -39,7 +39,7 @@ describe('Main user page', () => {
     jest.useRealTimers()
   })
 
-  it('should render with no session', async () => {
+  it('should render nothing with no session (data not yet loaded)', async () => {
     ;(useSession as jest.Mock).mockReturnValue({ data: null })
     ;(useUser as jest.Mock).mockReturnValue({ data: undefined })
     ;(useStudent as jest.Mock).mockReturnValue({ data: undefined })
@@ -49,7 +49,7 @@ describe('Main user page', () => {
         <Main {...{ params: Promise.resolve({ activity: 'Quran', student: 'mock-student' }) }} />
       )
     })
-    expect(NestedLayout).toHaveBeenCalled()
+    expect(NestedLayout).not.toHaveBeenCalled()
   })
 
   describe('Not main - Teacher', () => {

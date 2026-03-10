@@ -18,34 +18,18 @@ jest.mock('next/navigation', () => {
   }
 })
 
-const reload = window.location.reload
-
 describe('Add Quran card form', () => {
-  beforeAll(() => {
-    Object.defineProperty(window, 'location', {
-      value: { reload: jest.fn() },
-    })
-  })
-
-  afterAll(() => {
-    window.location.reload = reload
-  })
-
   describe('Display', () => {
     const user = { ...mockUser, activities: [{ ...mockActivity }] }
 
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/4/2024'))
-      window.sessionStorage.setItem('user_data', JSON.stringify(user))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
     })
 
     afterEach(() => {
       jest.resetAllMocks()
       jest.clearAllMocks()
-      window.sessionStorage.clear()
       jest.useRealTimers()
     })
 
@@ -105,15 +89,11 @@ describe('Add Quran card form', () => {
       beforeEach(() => {
         jest.useFakeTimers()
         jest.setSystemTime(new Date('2/4/2024'))
-        window.sessionStorage.setItem('user_data', JSON.stringify(user))
-        window.sessionStorage.setItem('user_token', 'xxxxxx')
-        window.sessionStorage.setItem('created_on', '2/3/2024')
       })
 
       afterEach(() => {
         jest.resetAllMocks()
         jest.clearAllMocks()
-        window.sessionStorage.clear()
         jest.useRealTimers()
       })
 
@@ -293,15 +273,11 @@ describe('Add Quran card form', () => {
       beforeEach(() => {
         jest.useFakeTimers()
         jest.setSystemTime(new Date('2/4/2024'))
-        window.sessionStorage.setItem('user_data', JSON.stringify(updatedUser))
-        window.sessionStorage.setItem('user_token', 'xxxxxx')
-        window.sessionStorage.setItem('created_on', '2/3/2024')
       })
 
       afterEach(() => {
         jest.resetAllMocks()
         jest.clearAllMocks()
-        window.sessionStorage.clear()
         jest.useRealTimers()
       })
 

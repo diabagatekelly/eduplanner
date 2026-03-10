@@ -5,7 +5,6 @@ import { render } from '../../util'
 import * as React from 'react'
 import { IUser } from '../../../types/IUser'
 import { mockStudent, mockUser } from '../../mocks'
-import store from '../../../store/store'
 import { findUser } from '../../../api/controller'
 import { useRouter } from 'next/navigation'
 
@@ -20,11 +19,6 @@ describe('Students List', () => {
   describe('No students', () => {
     const teacher: IUser = { ...mockUser, linkedAccountsData: { students: [] } }
 
-    beforeEach(() => {
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
-    })
-
     it('should display "no students" message when teacher has no students', () => {
       render(<StudentsList {...{ userDetails: undefined }} />)
       const noStudentsMessage = screen.getByTestId('no-students-message')
@@ -38,11 +32,6 @@ describe('Students List', () => {
       linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]] },
       students: { [mockStudent.username]: mockStudent },
     }
-
-    beforeEach(() => {
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
-    })
 
     it('should open delete popup when trying to remove user as a student', async () => {
       render(<StudentsList {...{ userDetails: teacher }} />)
@@ -80,17 +69,10 @@ describe('Students List', () => {
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
     })
 
     afterEach(() => {
       jest.clearAllMocks()
-      window.sessionStorage.clear()
       jest.useRealTimers()
     })
 
@@ -136,17 +118,10 @@ describe('Students List', () => {
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
     })
 
     afterEach(() => {
       jest.clearAllMocks()
-      window.sessionStorage.clear()
       jest.useRealTimers()
     })
 
@@ -197,17 +172,10 @@ describe('Students List', () => {
     beforeEach(() => {
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
-      window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
     })
 
     afterEach(() => {
       jest.clearAllMocks()
-      window.sessionStorage.clear()
       jest.useRealTimers()
     })
 

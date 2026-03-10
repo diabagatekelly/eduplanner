@@ -9,32 +9,16 @@ import { createCards } from '../../../api/controller'
 jest.mock('../../../api/controller')
 
 describe('Add misc card form', () => {
-  const reload = window.location.reload
-
-  beforeAll(() => {
-    Object.defineProperty(window, 'location', {
-      value: { reload: jest.fn() },
-    })
-  })
-
-  afterAll(() => {
-    window.location.reload = reload
-  })
-
   const user = { ...mockUser, activities: [{ ...mockCookingActivity }] }
 
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/4/2024'))
-    window.sessionStorage.setItem('user_data', JSON.stringify(user))
-    window.sessionStorage.setItem('user_token', 'xxxxxx')
-    window.sessionStorage.setItem('created_on', '2/3/2024')
   })
 
   afterEach(() => {
     jest.resetAllMocks()
     jest.clearAllMocks()
-    window.sessionStorage.clear()
     jest.useRealTimers()
   })
 

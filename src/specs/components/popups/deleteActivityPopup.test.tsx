@@ -20,23 +20,23 @@ describe('Delete Activity Popup', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/3/2024'))
-    window.sessionStorage.setItem('user_data', JSON.stringify(mockUser))
-    window.sessionStorage.setItem('user_token', 'xxxxxx')
-    window.sessionStorage.setItem('created_on', '2/3/2024')
-
-    // Mock window.location.reload
-    Object.defineProperty(window, 'location', {
-      value: {
-        reload: jest.fn(),
-      },
-      writable: true,
-    })
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-    window.sessionStorage.clear()
     jest.useRealTimers()
+  })
+
+  it('should show error when userId is missing and submit is clicked', async () => {
+    jest.spyOn(console, 'log').mockImplementation(() => null)
+    const args = { user: {} as any, item: { activityName: 'Test' } }
+    render(<DeleteActivityPopup {...{ onClose: jest.fn(), showModal: true, ...args }} />)
+    const submitButton = screen.getByTestId('delete-activity-btn')
+    await act(async () => {
+      await fireEvent.click(submitButton)
+    })
+    const errorMessage = screen.getByText(/Server is down. Try again later./i)
+    expect(errorMessage).toBeInTheDocument()
   })
 
   it('should render popup to delete activity for main', async () => {

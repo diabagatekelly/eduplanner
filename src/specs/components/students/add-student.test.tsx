@@ -19,14 +19,6 @@ jest.mock('next/navigation', () => {
 describe('Add student', () => {
   const user = { ...mockUser, accountType: 'teacher' }
 
-  beforeAll(() => {
-    sessionStorage.setItem('user_data', JSON.stringify(user))
-  })
-
-  afterAll(() => {
-    sessionStorage.clear()
-  })
-
   it('should render form to search for student', async () => {
     render(<AddStudent {...{ user }} />)
 

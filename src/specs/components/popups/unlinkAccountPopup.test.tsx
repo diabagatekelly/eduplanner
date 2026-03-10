@@ -5,29 +5,33 @@ import { render } from '../../util'
 import * as React from 'react'
 import { unlinkAccount } from '../../../api/controller'
 import { mockUser, mockStudent } from '../../../specs/mocks'
-import store from '../../../store/store'
 
 jest.mock('../../../api/controller')
 
 describe('Unlink Account Popup', () => {
   const teacher = { ...mockUser, linkedAccountsData: { students: [mockStudent.userId] } }
-  const childArgs = { user: mockStudent }
-  const reload = window.location.reload
+  const childArgs = { user: mockStudent, teacherId: teacher.userId }
 
   beforeAll(() => {
-    Object.defineProperty(window, 'location', {
-      value: { reload: jest.fn() },
-    })
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/15/2024'))
-    sessionStorage.setItem('user_data', JSON.stringify(teacher))
   })
 
   afterAll(() => {
-    window.location.reload = reload
     jest.useRealTimers()
     jest.resetAllMocks()
-    sessionStorage.clear()
+  })
+
+  it('should show error when teacherId is missing and submit is clicked', async () => {
+    jest.spyOn(console, 'log').mockImplementation(() => null)
+    const args = { user: mockStudent }
+    render(<UnlinkAccountPopup {...{ onClose: jest.fn(), showModal: true, ...args }} />)
+    const submitButton = screen.getByTestId('unlink-accounts-btn')
+    await act(async () => {
+      await fireEvent.click(submitButton)
+    })
+    const errorMessage = screen.getByText(/Server is down. Try again later./i)
+    expect(errorMessage).toBeInTheDocument()
   })
 
   it('should render popup to add new student', async () => {
@@ -46,8 +50,6 @@ describe('Unlink Account Popup', () => {
   })
 
   it('should invoke unlinkAccount controller when form is submitted', async () => {
-    const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-    jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
     ;(unlinkAccount as jest.Mock).mockImplementationOnce(() => {
       return Promise.resolve({ status: 200, data: { message: null, details: {} } })
     })
