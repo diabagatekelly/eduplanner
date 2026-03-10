@@ -30,6 +30,30 @@ import { IUser } from '@/types/IUser'
 Cypress.Commands.add('loginBySession', (user: IUser) => {
   cy.task('auth:createSession', user).then((token) => {
     cy.setCookie('authjs.session-token', token as string)
+
+    // Intercept the session endpoint so useSession() resolves immediately
+    // with the correct user data (avoids race conditions on page load).
+    cy.intercept('GET', '/api/auth/session', {
+      statusCode: 200,
+      body: {
+        user,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      },
+    })
+
+    // Pages now fetch user data via useUser hook (findUser API call).
+    // Intercept findUser for the logged-in user so pages get their data.
+    // This is unconditional — test-specific intercepts registered later take
+    // priority (Cypress checks LIFO) and can handle other userIds.
+    cy.intercept('GET', `${Cypress.env('GET_USER_URL')}*`, {
+      statusCode: 200,
+      body: {
+        status: 'success',
+        message: 'User found.',
+        details: { student: user },
+      },
+    })
+
     cy.visit(`/${user.username}`, {
       onBeforeLoad: (win) => {
         win.sessionStorage.setItem('user_data', JSON.stringify(user))

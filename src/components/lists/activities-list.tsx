@@ -27,8 +27,8 @@ export default function ActivitiesList({
   const [popupItem, getPopupItem] = useState<{ activityName: string }>({ activityName: '' })
 
   useEffect(() => {
-    const activities = userDetails?.activities
-    getActivitiesList([...([] as IActivity[]).concat(activities as IActivity[])])
+    const activities = userDetails?.activities ?? []
+    getActivitiesList([...activities])
   }, [userDetails])
 
   function deleteActivity(activityName: string) {
