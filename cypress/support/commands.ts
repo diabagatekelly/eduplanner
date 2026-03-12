@@ -28,7 +28,7 @@ import { IUser } from '@/types/IUser'
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
 Cypress.Commands.add('loginBySession', (user: IUser) => {
-  cy.task('auth:createSession', user).then((token) => {
+  cy.task('auth:createSession', { userId: user.userId, username: user.username }).then((token) => {
     cy.setCookie('authjs.session-token', token as string)
 
     // Intercept the session endpoint so useSession() resolves immediately
@@ -59,7 +59,12 @@ Cypress.Commands.add('loginBySession', (user: IUser) => {
 })
 
 Cypress.Commands.add('navigateToRegisterPage', () => {
-  cy.clearAllCookies()
+  // Overwrite any leftover session cookie with an invalid token so the
+  // middleware treats the request as unauthenticated (avoids redirect).
+  // Visit /login first (real HTTP round-trip) to flush the cookie change
+  // into the browser's network layer before navigating to /register.
+  cy.setCookie('authjs.session-token', 'invalid')
+  cy.visit('/login')
   cy.visit('/register')
 })
 

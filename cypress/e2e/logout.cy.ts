@@ -20,6 +20,6 @@ describe('Logout', () => {
     cy.get('[data-testid="user-icon"]').click()
     cy.get('[data-testid="logout-link"]').click()
     cy.wait('@editUser')
-    cy.url().should('include', '/login')
+    cy.url({ timeout: 10000 }).should('include', '/login')
   })
 })

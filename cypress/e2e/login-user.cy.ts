@@ -20,7 +20,7 @@ describe('Login User', () => {
     it('should display error message and stay on the login page', () => {
       cy.login({ email: user.email, password: user.password })
       cy.wait('@loginFail')
-      cy.contains('Failed to login due to an internal error. Please try again later.')
+      cy.contains('User not found. Incorrect email or password. Please try again.')
       cy.url().should('not.include', mockUser.username)
     })
   })

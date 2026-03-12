@@ -3,7 +3,11 @@ import { auth } from '@/auth'
 export const middleware = auth((req) => {
   const isAuthenticated = !!req.auth
   const pathname = req.nextUrl.pathname
-  const isPublicRoute = ['/', '/home', '/login', '/register'].includes(pathname)
+  if (pathname === '/') {
+    return Response.redirect(new URL('/login', req.url))
+  }
+
+  const isPublicRoute = ['/home', '/login', '/register'].includes(pathname)
 
   if (!isAuthenticated && !isPublicRoute) {
     return Response.redirect(new URL('/login', req.url))

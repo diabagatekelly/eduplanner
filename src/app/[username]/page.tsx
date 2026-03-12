@@ -17,6 +17,8 @@ export default function Main(props: { params: UsernameParams }) {
   const userId = session?.user?.userId ?? ''
   const { data: user = {} as IUser } = useUser(userId)
 
+  if (!user.userId) return null
+
   const isTeacher = user.accountType === 'teacher'
   const userDetails: IUser = user
   const isMain = user.username === usernameFromParams

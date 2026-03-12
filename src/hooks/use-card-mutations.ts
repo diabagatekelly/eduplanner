@@ -11,14 +11,21 @@ import {
 import { queryKeys } from '@/lib/query-keys'
 import { ICard } from '@/types/ICard'
 
+function invalidateUserAndStudent(queryClient: ReturnType<typeof useQueryClient>, userId: string) {
+  return Promise.all([
+    queryClient.invalidateQueries({ queryKey: queryKeys.user(userId) }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.student(userId) }),
+  ])
+}
+
 export function useCreateCards(userId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: ({ activity, cards }: { activity: string; cards: ICard[] }) =>
       createCards({ userId, activity, cards }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user(userId) })
+    onSuccess: async () => {
+      await invalidateUserAndStudent(queryClient, userId)
     },
   })
 }
@@ -36,8 +43,8 @@ export function useEditCard(userId: string) {
       cardId: string
       editData: Record<string, any>
     }) => editAnyCardAttr({ userId, activity, cardId, editData }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user(userId) })
+    onSuccess: async () => {
+      await invalidateUserAndStudent(queryClient, userId)
     },
   })
 }
@@ -55,8 +62,8 @@ export function useEditCardStage(userId: string) {
       cardId: string
       editData: Record<string, any>
     }) => editCardStage({ userId, activity, cardId, editData }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user(userId) })
+    onSuccess: async () => {
+      await invalidateUserAndStudent(queryClient, userId)
     },
   })
 }
@@ -67,8 +74,8 @@ export function useResetCardStage(userId: string) {
   return useMutation({
     mutationFn: ({ activity, cardId }: { activity: string; cardId: string }) =>
       resetCardStage({ userId, activity, cardId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user(userId) })
+    onSuccess: async () => {
+      await invalidateUserAndStudent(queryClient, userId)
     },
   })
 }
@@ -79,8 +86,8 @@ export function useActivateCard(userId: string) {
   return useMutation({
     mutationFn: ({ activity, cardId }: { activity: string; cardId: string }) =>
       activateCard({ userId, activity, cardId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user(userId) })
+    onSuccess: async () => {
+      await invalidateUserAndStudent(queryClient, userId)
     },
   })
 }
@@ -91,8 +98,8 @@ export function useDeleteCard(userId: string) {
   return useMutation({
     mutationFn: (cards: { activity: string; cardId: string }[]) =>
       deleteCard(cards.map((card) => ({ ...card, userId }))),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user(userId) })
+    onSuccess: async () => {
+      await invalidateUserAndStudent(queryClient, userId)
     },
   })
 }

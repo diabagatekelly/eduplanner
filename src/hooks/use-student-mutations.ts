@@ -2,13 +2,20 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { linkAccount, unlinkAccount } from '@/api/controller'
 import { queryKeys } from '@/lib/query-keys'
 
+function invalidateUserAndStudent(queryClient: ReturnType<typeof useQueryClient>, userId: string) {
+  return Promise.all([
+    queryClient.invalidateQueries({ queryKey: queryKeys.user(userId) }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.student(userId) }),
+  ])
+}
+
 export function useLinkStudent(teacherId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (studentId: [string, string]) => linkAccount({ teacherId, studentId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user(teacherId) })
+    onSuccess: async () => {
+      await invalidateUserAndStudent(queryClient, teacherId)
     },
   })
 }
@@ -18,8 +25,8 @@ export function useUnlinkStudent(teacherId: string) {
 
   return useMutation({
     mutationFn: (studentId: string) => unlinkAccount({ teacherId, studentId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.user(teacherId) })
+    onSuccess: async () => {
+      await invalidateUserAndStudent(queryClient, teacherId)
     },
   })
 }

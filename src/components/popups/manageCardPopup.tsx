@@ -53,7 +53,8 @@ export default function ManageCardPopup({
     getUserInfo({ ...user })
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     getActivityDetails(activityProp!)
-  }, [showModal, user, item, activityProp, statusMessage, newStage])
+    setStatusMessage('')
+  }, [showModal, user, item, activityProp, newStage])
 
   function assertUserId() {
     if (!userId) throw new Error('Missing userId for card mutation')
@@ -67,6 +68,7 @@ export default function ManageCardPopup({
         cardId: card.cardId,
       })
       setStatusMessage('Successfully reset card')
+      onClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -111,6 +113,7 @@ export default function ManageCardPopup({
 
       setIsLoading(false)
       setStatusMessage('Request for review successfully sent.')
+      onClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -145,6 +148,7 @@ export default function ManageCardPopup({
       })
       setStatusMessage('Successfully overrode status.')
       getCardDetails(response.data.details)
+      onClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -178,6 +182,7 @@ export default function ManageCardPopup({
         },
       })
       setStatusMessage('Successfully edited status.')
+      onClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -209,6 +214,7 @@ export default function ManageCardPopup({
         },
       ])
       setStatusMessage('Successfully removed card')
+      onClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -236,6 +242,7 @@ export default function ManageCardPopup({
         cardId: card.cardId,
       })
       setStatusMessage('Successfully activated card')
+      onClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)

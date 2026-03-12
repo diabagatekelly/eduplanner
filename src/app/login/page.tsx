@@ -48,7 +48,9 @@ export default function Login() {
 
       if (result?.error) {
         setFormSubmitOutcomeMessage(
-          'Failed to login due to an internal error. Please try again later.'
+          result.code === 'credentials'
+            ? 'User not found. Incorrect email or password. Please try again.'
+            : 'Failed to login due to an internal error. Please try again later.'
         )
         return
       }
@@ -66,7 +68,7 @@ export default function Login() {
         return
       }
 
-      router.push('/' + username)
+      window.location.href = '/' + username
     } catch {
       setIsLoading(false)
       setFormSubmitOutcomeMessage(
