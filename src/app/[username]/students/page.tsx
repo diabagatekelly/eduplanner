@@ -16,6 +16,8 @@ export default function Students() {
   const userId = session?.user?.userId ?? ''
   const { data: user = {} as IUser } = useUser(userId)
 
+  if (!user.userId) return null
+
   const isTeacher = user.accountType?.includes('teacher')
   const isMain = true
   const userDetails = user

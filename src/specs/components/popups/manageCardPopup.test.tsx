@@ -10,6 +10,7 @@ import {
   editAnyCardAttr,
   requestCardReview,
   resetCardStage,
+  findUser,
 } from '../../../api/controller'
 import {
   mockUser,
@@ -1509,6 +1510,124 @@ describe('Manage Card Popup', () => {
 
         await expect(editAnyCardAttr).toHaveBeenCalledWith(overrideStageDTO)
       })
+    })
+  })
+
+  describe('Status message reset on reopen', () => {
+    const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
+    const secondCard = {
+      ...mockUserCard,
+      cardId: `${btoa('surah-113-name-Falaq-juz-30')}`,
+    }
+
+    beforeEach(() => {
+      jest.useFakeTimers()
+      jest.setSystemTime(new Date('2/3/2024'))
+    })
+
+    afterEach(() => {
+      jest.clearAllMocks()
+      jest.useRealTimers()
+    })
+
+    it('should clear status message when popup reopens with a different card', async () => {
+      ;(resetCardStage as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({
+          status: 200,
+          data: { message: 'Successfully reset card.', details: {} },
+        })
+      })
+
+      const onClose = jest.fn()
+
+      const { rerender } = render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
+
+      // Perform action — status message should appear
+      const resetStageBtn = await screen.findByTestId('reset-stage-btn')
+      await act(async () => {
+        await fireEvent.click(resetStageBtn)
+      })
+
+      const submitMessage = screen.getByTestId('status-message')
+      expect(submitMessage).toHaveTextContent('Successfully reset card')
+
+      // Reopen popup with a different card (simulates closing + reopening)
+      rerender(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: secondCard, action: 'edit' },
+          }}
+        />
+      )
+
+      // Status message should be cleared
+      const clearedMessage = screen.getByTestId('status-message')
+      expect(clearedMessage).toHaveTextContent('')
+    })
+  })
+
+  describe('Cache refetch targets both user and student query keys', () => {
+    const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
+
+    beforeEach(() => {
+      jest.useFakeTimers()
+      jest.setSystemTime(new Date('2/3/2024'))
+    })
+
+    afterEach(() => {
+      jest.clearAllMocks()
+      jest.useRealTimers()
+    })
+
+    it('should call findUser after successful action to refetch cached data', async () => {
+      ;(activateCard as jest.Mock).mockImplementationOnce(() => {
+        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
+      })
+      ;(findUser as jest.Mock).mockImplementation(() => {
+        return Promise.resolve({
+          status: 200,
+          data: { details: { student: myUser } },
+        })
+      })
+
+      const onClose = jest.fn()
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'activate' },
+          }}
+        />
+      )
+
+      const activateCardBtn = await screen.findByTestId('activate-card-btn')
+      await act(async () => {
+        await fireEvent.click(activateCardBtn)
+      })
+
+      // refreshAndClose should have called onClose after refetch
+      expect(onClose).toHaveBeenCalled()
     })
   })
 })

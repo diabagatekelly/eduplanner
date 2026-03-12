@@ -1,8 +1,8 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { loginUser } from '@/api/controller'
-import { IUser } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
+import { IUser } from '@/types/IUser'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -35,13 +35,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        token.user = user as unknown as IUser
-        token.accessToken = (user as any).accessToken
+        const u = user as any
+        token.userId = u.userId
+        token.username = u.username
+        token.accessToken = u.accessToken
       }
       return token
     },
     session({ session, token }) {
-      session.user = token.user as any
+      ;(session.user as any).userId = token.userId
+      ;(session.user as any).username = token.username
       session.accessToken = token.accessToken as string
       return session
     },

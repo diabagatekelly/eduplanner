@@ -15,6 +15,8 @@ export default function Profile() {
   const userId = session?.user?.userId ?? ''
   const { data: user = {} as IUser } = useUser(userId)
 
+  if (!user.userId) return null
+
   const isTeacher = user?.accountType === 'teacher'
   const isMain = true
   const modalType = 'deleteAccount'

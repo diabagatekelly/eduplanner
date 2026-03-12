@@ -41,10 +41,12 @@ describe('Main user page', () => {
     ;(useSession as jest.Mock).mockReturnValue({ data: null })
     ;(useUser as jest.Mock).mockReturnValue({ data: undefined })
     ;(NestedLayout as jest.Mock).mockImplementation(() => null)
-    await act(async () => {
-      render(<Main {...{ params: Promise.resolve({ activity: 'Quran' }) }} />)
+    const { container } = await act(async () => {
+      return render(<Main {...{ params: Promise.resolve({ activity: 'Quran' }) }} />)
     })
-    expect(NestedLayout).toHaveBeenCalled()
+    // Loading guard returns null when userId is missing
+    expect(container.querySelector('.py-20')!.innerHTML).toBe('')
+    expect(NestedLayout).not.toHaveBeenCalled()
   })
 
   describe('Main - Student', () => {

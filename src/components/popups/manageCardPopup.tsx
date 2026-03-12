@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   useEditCard,
   useEditCardStage,
@@ -7,6 +8,7 @@ import {
   useDeleteCard,
   useRequestCardReview,
 } from '@/hooks/use-card-mutations'
+import { queryKeys } from '@/lib/query-keys'
 import { ICard } from '@/types/ICard'
 import { IUser } from '@/types/IUser'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
@@ -31,6 +33,7 @@ export default function ManageCardPopup({
   activity?: IActivity
   item?: { card: ICard; action: string }
 }) {
+  const queryClient = useQueryClient()
   const userId = user?.userId ?? ''
   const editCardMutation = useEditCard(userId)
   const editCardStageMutation = useEditCardStage(userId)
@@ -53,7 +56,16 @@ export default function ManageCardPopup({
     getUserInfo({ ...user })
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     getActivityDetails(activityProp!)
-  }, [showModal, user, item, activityProp, statusMessage, newStage])
+    setStatusMessage('')
+  }, [showModal, user, item, activityProp, newStage])
+
+  async function refreshAndClose() {
+    await Promise.all([
+      queryClient.refetchQueries({ queryKey: queryKeys.user(userId) }),
+      queryClient.refetchQueries({ queryKey: queryKeys.student(userId) }),
+    ])
+    onClose()
+  }
 
   function assertUserId() {
     if (!userId) throw new Error('Missing userId for card mutation')
@@ -67,6 +79,7 @@ export default function ManageCardPopup({
         cardId: card.cardId,
       })
       setStatusMessage('Successfully reset card')
+      await refreshAndClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -111,6 +124,7 @@ export default function ManageCardPopup({
 
       setIsLoading(false)
       setStatusMessage('Request for review successfully sent.')
+      await refreshAndClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -145,6 +159,7 @@ export default function ManageCardPopup({
       })
       setStatusMessage('Successfully overrode status.')
       getCardDetails(response.data.details)
+      await refreshAndClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -178,6 +193,7 @@ export default function ManageCardPopup({
         },
       })
       setStatusMessage('Successfully edited status.')
+      await refreshAndClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -209,6 +225,7 @@ export default function ManageCardPopup({
         },
       ])
       setStatusMessage('Successfully removed card')
+      await refreshAndClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)
@@ -236,6 +253,7 @@ export default function ManageCardPopup({
         cardId: card.cardId,
       })
       setStatusMessage('Successfully activated card')
+      await refreshAndClose()
     } catch (error: any) {
       setIsLoading(false)
       console.log(error)

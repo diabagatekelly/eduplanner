@@ -38,6 +38,8 @@ export default function NestedLayout({
   const studentId = studentParam ? getStudentId(user, studentParam) : ''
   const { data: studentUser } = useStudent(studentId)
 
+  if (!user.userId) return <div className="sm:ml-64 py-5 px-3">{children}</div>
+
   const isMain = !studentParam
   const activitySource = isMain ? user : studentUser
   const cardSubMenu = !!activitySource?.activities?.find(

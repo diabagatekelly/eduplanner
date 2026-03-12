@@ -22,6 +22,8 @@ export default function Profile() {
   const studentId = getStudentId(teacher, studentParam)
   const { data: user = {} as IUser } = useStudent(studentId)
 
+  if (!user.userId) return null
+
   const isTeacher = user?.accountType === 'teacher'
   const isMain = false
   const modalType = 'deleteAccount'

@@ -47,7 +47,9 @@ describe('Nested layout', () => {
         }}
       />
     )
-    expect(screen.getByTestId('drawer-button')).toBeInTheDocument()
+    // Loading guard renders minimal wrapper without drawer when userId is missing
+    expect(screen.queryByTestId('drawer-button')).not.toBeInTheDocument()
+    expect(screen.getByText('test')).toBeInTheDocument()
   })
 
   it('should toggle drawer as expected and highlight Manage Students', async () => {

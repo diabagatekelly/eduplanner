@@ -54,8 +54,9 @@ describe('Non-main Profile', () => {
     ;(useStudent as jest.Mock).mockReturnValue({ data: undefined })
     const useParams = jest.spyOn(require('next/navigation'), 'useParams')
     useParams.mockReturnValue({ student: 'mock-student', username: 'mock-user' })
-    render(<Profile />)
-    expect(screen.getByText('Delete Account')).toBeInTheDocument()
+    const { container } = render(<Profile />)
+    // Loading guard returns null when userId is missing
+    expect(container.querySelector('.py-20')!.innerHTML).toBe('')
   })
 
   describe('Non-main student profiles', () => {

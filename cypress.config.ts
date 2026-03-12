@@ -12,10 +12,10 @@ export default defineConfig({
     pageLoadTimeout: 120000,
     setupNodeEvents(on, config) {
       on('task', {
-        async 'auth:createSession'(user) {
+        async 'auth:createSession'({ userId, username }: { userId: string; username: string }) {
           const { encode } = await import('next-auth/jwt')
           return encode({
-            token: { user, accessToken: 'mock-access-token' },
+            token: { userId, username, accessToken: 'mock-access-token' },
             secret: process.env.AUTH_SECRET ?? 'test-secret',
             salt: 'authjs.session-token',
           })

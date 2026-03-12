@@ -45,8 +45,10 @@ describe('Students list', () => {
   it('should render with no session', () => {
     ;(useSession as jest.Mock).mockReturnValue({ data: null })
     ;(useUser as jest.Mock).mockReturnValue({ data: undefined })
-    render(<Students />)
-    expect(NestedLayout).toHaveBeenCalled()
+    const { container } = render(<Students />)
+    // Loading guard returns null when userId is missing
+    expect(container.querySelector('.py-20')!.innerHTML).toBe('')
+    expect(NestedLayout).not.toHaveBeenCalled()
   })
 
   it('should pass the correct isTeacher values for student to NestedLayout', () => {

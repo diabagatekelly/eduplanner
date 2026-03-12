@@ -19,6 +19,8 @@ export default function Main(props: { params: ActivityParams }) {
   const userId = session?.user?.userId ?? ''
   const { data: user = {} as IUser } = useUser(userId)
 
+  if (!user.userId) return null
+
   const isTeacher: boolean = user.accountType === 'teacher'
   const userActivity = user.activities?.find((activity) => activity?.name === activityFromParams)
 

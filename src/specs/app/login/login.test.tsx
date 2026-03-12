@@ -94,7 +94,10 @@ describe('Login page', () => {
   })
 
   it('should display error message and not reset form when signIn fails', async () => {
-    ;(signIn as jest.Mock).mockResolvedValueOnce({ error: 'CredentialsSignin' })
+    ;(signIn as jest.Mock).mockResolvedValueOnce({
+      error: 'CredentialsSignin',
+      code: 'credentials',
+    })
 
     render(<Login />)
 
@@ -115,12 +118,38 @@ describe('Login page', () => {
     })
 
     const errorMessage = await screen.getByText(
-      /Failed to login due to an internal error. Please try again later./i
+      /User not found. Incorrect email or password. Please try again./i
     )
 
     expect(password).toHaveValue('password')
     expect(email).toHaveValue('mock.user@email.com')
     expect(errorMessage).toBeInTheDocument()
+  })
+
+  it('should display generic error message for non-credentials signIn error', async () => {
+    ;(signIn as jest.Mock).mockResolvedValueOnce({
+      error: 'Configuration',
+      code: 'unknown',
+    })
+
+    render(<Login />)
+
+    await act(() => {
+      fireEvent.change(screen.getByLabelText(/Email:/i), {
+        target: { value: mockUser.email },
+      })
+      fireEvent.change(screen.getByLabelText(/Password:/i), {
+        target: { value: mockUser.password },
+      })
+    })
+
+    await act(async () => {
+      await fireEvent.click(screen.getByTestId('login-button'))
+    })
+
+    expect(
+      screen.getByText(/Failed to login due to an internal error. Please try again later./i)
+    ).toBeInTheDocument()
   })
 
   it('should display error message when signIn throws', async () => {
