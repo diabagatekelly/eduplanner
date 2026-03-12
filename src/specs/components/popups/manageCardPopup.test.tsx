@@ -1582,7 +1582,7 @@ describe('Manage Card Popup', () => {
     })
   })
 
-  describe('Cache refetch targets both user and student query keys', () => {
+  describe('Popup closes after successful card mutation', () => {
     const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
 
     beforeEach(() => {
@@ -1595,7 +1595,7 @@ describe('Manage Card Popup', () => {
       jest.useRealTimers()
     })
 
-    it('should call findUser after successful action to refetch cached data', async () => {
+    it('should call onClose after successful card activation', async () => {
       ;(activateCard as jest.Mock).mockImplementationOnce(() => {
         return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
       })
@@ -1626,7 +1626,6 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(activateCardBtn)
       })
 
-      // refreshAndClose should have called onClose after refetch
       expect(onClose).toHaveBeenCalled()
     })
   })
