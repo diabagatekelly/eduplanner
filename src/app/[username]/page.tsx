@@ -8,6 +8,7 @@ import Breadcrumbs from '@/components/breadcrumbs'
 import { UsernameParams } from '@/types/IParams'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
+import { queryGuard } from '@/lib/helpers/query-guard'
 
 export default function Main(props: { params: UsernameParams }) {
   const params = use(props.params)
@@ -15,8 +16,10 @@ export default function Main(props: { params: UsernameParams }) {
 
   const { data: session } = useSession()
   const userId = session?.user?.userId ?? ''
-  const { data: user = {} as IUser } = useUser(userId)
+  const { data: user = {} as IUser, isLoading, isError, error, refetch } = useUser(userId)
 
+  const guard = queryGuard({ isLoading, isError, error, refetch })
+  if (guard) return guard
   if (!user.userId) return null
 
   const isTeacher = user.accountType === 'teacher'

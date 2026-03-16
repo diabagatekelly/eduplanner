@@ -1,6 +1,6 @@
 import Main from '../../../app/[username]/page'
 import '@testing-library/jest-dom'
-import { render } from '../../util'
+import { render, screen } from '../../util'
 import * as React from 'react'
 import { act } from 'react'
 import { mockUser, mockStudent } from '../../../specs/mocks'
@@ -35,6 +35,30 @@ describe('Main user page', () => {
     // Loading guard returns null when userId is missing
     expect(container.querySelector('.py-20')!.innerHTML).toBe('')
     expect(NestedLayout).not.toHaveBeenCalled()
+  })
+
+  it('should render skeleton when loading', async () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined, isLoading: true, isError: false })
+    const { container } = await act(async () => {
+      return render(<Main {...{ params: Promise.resolve({ username: 'mock-user' }) }} />)
+    })
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
+  })
+
+  it('should render error display when query fails', async () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error('Failed'),
+      refetch: jest.fn(),
+    })
+    await act(async () => {
+      render(<Main {...{ params: Promise.resolve({ username: 'mock-user' }) }} />)
+    })
+    expect(screen.getByText('Failed to load data')).toBeInTheDocument()
   })
 
   describe('Main - Student', () => {

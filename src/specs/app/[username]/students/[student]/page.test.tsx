@@ -1,6 +1,6 @@
 import Main from '../../../../../app/[username]/students/[student]/page'
 import '@testing-library/jest-dom'
-import { render } from '../../../../util'
+import { render, screen } from '../../../../util'
 import * as React from 'react'
 import { act } from 'react'
 import { mockStudent, mockUser } from '../../../../../specs/mocks'
@@ -47,6 +47,50 @@ describe('Main user page', () => {
       render(<Main {...{ params: Promise.resolve({ student: 'mock-student' }) }} />)
     })
     expect(NestedLayout).not.toHaveBeenCalled()
+  })
+
+  it('should render skeleton when loading', async () => {
+    ;(useSession as jest.Mock).mockReturnValue({
+      data: { user: { userId: mockUser.userId, username: mockUser.username } },
+    })
+    ;(useUser as jest.Mock).mockReturnValue({
+      data: {
+        ...mockUser,
+        linkedAccountsData: {
+          students: [[mockStudent.userId, mockStudent.username]],
+        },
+      },
+    })
+    ;(useStudent as jest.Mock).mockReturnValue({ data: undefined, isLoading: true, isError: false })
+    const { container } = await act(async () => {
+      return render(<Main {...{ params: Promise.resolve({ student: mockStudent.username }) }} />)
+    })
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
+  })
+
+  it('should render error display when query fails', async () => {
+    ;(useSession as jest.Mock).mockReturnValue({
+      data: { user: { userId: mockUser.userId, username: mockUser.username } },
+    })
+    ;(useUser as jest.Mock).mockReturnValue({
+      data: {
+        ...mockUser,
+        linkedAccountsData: {
+          students: [[mockStudent.userId, mockStudent.username]],
+        },
+      },
+    })
+    ;(useStudent as jest.Mock).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error('Failed'),
+      refetch: jest.fn(),
+    })
+    await act(async () => {
+      render(<Main {...{ params: Promise.resolve({ student: mockStudent.username }) }} />)
+    })
+    expect(screen.getByText('Failed to load data')).toBeInTheDocument()
   })
 
   describe('Not main - Teacher', () => {

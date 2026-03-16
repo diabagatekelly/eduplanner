@@ -47,6 +47,26 @@ describe('Profile', () => {
     expect(container.querySelector('.py-20')!.innerHTML).toBe('')
   })
 
+  it('should render skeleton when loading', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined, isLoading: true, isError: false })
+    const { container } = render(<Profile />)
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
+  })
+
+  it('should render error display when query fails', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error('Failed'),
+      refetch: jest.fn(),
+    })
+    render(<Profile />)
+    expect(screen.getByText('Failed to load data')).toBeInTheDocument()
+  })
+
   describe('Student profiles', () => {
     it('should display student with no teacher', async () => {
       const user = {

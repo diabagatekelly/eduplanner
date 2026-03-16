@@ -7,14 +7,17 @@ import UserProfile from '@/app/[username]/profile/components/user-profile'
 import { IUser } from '@/types/IUser'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
+import { queryGuard } from '@/lib/helpers/query-guard'
 
 export default function Profile() {
   const [showModal, setShowModal] = useState(false)
 
   const { data: session } = useSession()
   const userId = session?.user?.userId ?? ''
-  const { data: user = {} as IUser } = useUser(userId)
+  const { data: user = {} as IUser, isLoading, isError, error, refetch } = useUser(userId)
 
+  const guard = queryGuard({ isLoading, isError, error, refetch })
+  if (guard) return guard
   if (!user.userId) return null
 
   const isTeacher = user?.accountType === 'teacher'
