@@ -1,12 +1,16 @@
 import * as React from 'react'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import AddQuranCardForm from '../../../components/forms/add-quran-card-form'
 import { mockActivity, mockUser, mockUserCard } from '../../mocks'
 import { quranCards } from '../../../lib/constants/quran-bank'
 import { createCards, deleteCard } from '../../../api/controller'
+import { toast } from 'sonner'
 
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
 jest.mock('../../../api/controller')
 jest.mock('next/navigation', () => {
   return {
@@ -112,9 +116,8 @@ describe('Add Quran card form', () => {
           await fireEvent.click(submitButton)
         })
 
-        const outcomeMessage = await screen.findByText(/Please select the cards you want to add./i)
         await expect(createCards).not.toHaveBeenCalled()
-        expect(outcomeMessage).toBeInTheDocument()
+        expect(toast.warning).toHaveBeenCalledWith('Please select the cards you want to add.')
       })
 
       it('should invoke createCards controller when form is submitted', async () => {
@@ -156,13 +159,13 @@ describe('Add Quran card form', () => {
           await fireEvent.click(submitButton)
         })
 
-        const outcomeMessage = await screen.findByText(/Cards added/i)
         await expect(createCards).toHaveBeenCalledWith(expectedPaylod)
-        expect(outcomeMessage).toBeInTheDocument()
+        await waitFor(() => {
+          expect(toast.success).toHaveBeenCalledWith('Cards added')
+        })
       })
 
       it('should not reset form when response is not 200 or 500 and display error message', async () => {
-        jest.spyOn(console, 'log').mockImplementation(() => null)
         const error = {
           response: {
             status: 400,
@@ -190,8 +193,9 @@ describe('Add Quran card form', () => {
 
         expect((inputs[0] as HTMLInputElement).checked).toBe(true)
 
-        const errorMessage = await screen.findByText(/Erroneous response/i)
-        expect(errorMessage).toBeInTheDocument()
+        await waitFor(() => {
+          expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+        })
       })
 
       it('should not reset form when response is 500 and display error message', async () => {
@@ -222,12 +226,11 @@ describe('Add Quran card form', () => {
 
         expect((inputs[2] as HTMLInputElement).checked).toBe(true)
 
-        const errorMessage = await screen.getByText(
-          /Failed to add cards due to an internal error. Please try again later./i
-        )
-
-        expect(errorMessage).toBeInTheDocument()
-        expect(console.log).toHaveBeenCalledWith(error)
+        await waitFor(() => {
+          expect(toast.error).toHaveBeenCalledWith(
+            'Failed to add cards due to an internal error. Please try again later.'
+          )
+        })
       })
 
       it('should not reset form when error is thrown with no response', async () => {
@@ -252,11 +255,8 @@ describe('Add Quran card form', () => {
 
         expect((inputs[3] as HTMLInputElement).checked).toBe(true)
 
-        const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-        expect(errorMessage).toBeInTheDocument()
-        expect(console.log).toHaveBeenCalledWith({
-          status: 500,
-          message: 'Error thrown and caught.',
+        await waitFor(() => {
+          expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
         })
       })
     })

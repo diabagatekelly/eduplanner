@@ -6,13 +6,11 @@ export default function AddActivityForm({
   errors,
   isSubmitting,
   onSubmit,
-  onFieldChange,
 }: {
   register: UseFormRegister<ActivityFormData>
   errors: FieldErrors<ActivityFormData>
   isSubmitting: boolean
   onSubmit: () => void
-  onFieldChange: () => void
 }) {
   return (
     <>
@@ -22,7 +20,7 @@ export default function AddActivityForm({
             Name:
           </label>
           <input
-            {...register('name', { onChange: onFieldChange })}
+            {...register('name')}
             id="name"
             type="text"
             autoComplete="name"
@@ -39,7 +37,7 @@ export default function AddActivityForm({
             Description (optional):
           </label>
           <input
-            {...register('description', { onChange: onFieldChange })}
+            {...register('description')}
             id="description"
             type="text"
             autoComplete="description"
@@ -52,7 +50,7 @@ export default function AddActivityForm({
             Points (optional):
           </label>
           <input
-            {...register('points', { onChange: onFieldChange, valueAsNumber: true })}
+            {...register('points', { valueAsNumber: true })}
             id="points"
             type="number"
             className="inline-block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"

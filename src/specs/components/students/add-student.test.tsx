@@ -1,11 +1,15 @@
 import AddStudent from '../../../components/students/add-student'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
 import { findUser } from '../../../api/controller'
 import { mockUser, mockStudent } from '../../../specs/mocks'
+import { toast } from 'sonner'
 
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
 jest.mock('../../../api/controller')
 jest.mock('next/navigation', () => {
   return {
@@ -18,6 +22,10 @@ jest.mock('next/navigation', () => {
 
 describe('Add student', () => {
   const user = { ...mockUser, accountType: 'teacher' }
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
   it('should render form to search for student', async () => {
     render(<AddStudent {...{ user }} />)
@@ -59,7 +67,6 @@ describe('Add student', () => {
 
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
-    const submitMessage = screen.getByTestId('find-student-submit-message')
 
     await act(() => {
       fireEvent.change(email, {
@@ -71,7 +78,9 @@ describe('Add student', () => {
       await fireEvent.click(submitButton)
     })
 
-    expect(submitMessage).toHaveTextContent("You can't add yourself as a student.")
+    await waitFor(() => {
+      expect(toast.warning).toHaveBeenCalledWith("You can't add yourself as a student.")
+    })
     expect(email).toHaveValue('')
   })
 
@@ -84,7 +93,6 @@ describe('Add student', () => {
 
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
-    const submitMessage = screen.getByTestId('find-student-submit-message')
 
     await act(() => {
       fireEvent.change(email, {
@@ -96,41 +104,10 @@ describe('Add student', () => {
       await fireEvent.click(submitButton)
     })
 
-    expect(submitMessage).toHaveTextContent('This is already one of your students.')
+    await waitFor(() => {
+      expect(toast.warning).toHaveBeenCalledWith('This is already one of your students.')
+    })
     expect(email).toHaveValue('')
-  })
-
-  it('should clear pre-existing message when form in focus', async () => {
-    const userWithStudents = {
-      ...mockUser,
-      linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]] },
-    }
-    render(<AddStudent {...{ user: userWithStudents }} />)
-
-    const email = screen.getByTestId('student-email')
-    const submitButton = screen.getByTestId('find-student-btn')
-    const submitMessage = screen.getByTestId('find-student-submit-message')
-
-    await act(() => {
-      fireEvent.change(email, {
-        target: { value: mockStudent.email },
-      })
-    })
-
-    await act(async () => {
-      await fireEvent.click(submitButton)
-    })
-
-    expect(submitMessage).toHaveTextContent('This is already one of your students.')
-    expect(email).toHaveValue('')
-
-    await act(() => {
-      fireEvent.change(email, {
-        target: { value: mockStudent.email },
-      })
-    })
-
-    expect(submitMessage).toHaveTextContent('')
   })
 
   it('should reset form when response is successful and display popup with student info', async () => {
@@ -170,7 +147,6 @@ describe('Add student', () => {
   })
 
   it('should not reset form when response is not 200 or 500 and display error message', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
     const error = {
       response: {
         status: 400,
@@ -202,10 +178,11 @@ describe('Add student', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.findByText(/Erroneous response/i)
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+    })
 
     expect(email).toHaveValue(mockStudent.email)
-    expect(errorMessage).toBeInTheDocument()
   })
 
   it('should not reset form when response is 500 and display error message', async () => {
@@ -236,13 +213,13 @@ describe('Add student', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(
-      /Failed to add new student due to an internal error. Please try again later./i
-    )
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        'Failed to find student due to an internal error. Please try again later.'
+      )
+    })
 
     expect(email).toHaveValue(mockStudent.email)
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith(error)
   })
 
   it('should not reset form when error is thrown with no response', async () => {
@@ -270,8 +247,8 @@ describe('Add student', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+    })
   })
 })

@@ -13,6 +13,8 @@ import { DocumentMinusIcon } from '@heroicons/react/24/solid'
 import { useForm } from 'react-hook-form'
 import { languageCardSchema, LanguageCardFormData } from '@/lib/schemas/card.schemas'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 export default function AddLanguageCardForm({
   isMain,
@@ -39,7 +41,6 @@ export default function AddLanguageCardForm({
   const [grammarCard, createGrammarCard] = useState(false)
   const [vocabCard, createVocabCard] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState('')
   const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
@@ -47,13 +48,12 @@ export default function AddLanguageCardForm({
   async function onFileInput(e: React.FormEvent<HTMLInputElement>) {
     const files = (e.target as HTMLInputElement).files
     if (files?.[0]?.type !== 'text/plain') {
-      setFormSubmitOutcomeMessage('The file uploaded is not a text (.txt) file.')
+      toast.error('The file uploaded is not a text (.txt) file.')
       return
     }
 
     const content = await files[0].text()
     const cleanedContent = cleanUpList(content)
-    setFormSubmitOutcomeMessage('')
     uploadFile({
       content: cleanedContent,
     })
@@ -81,7 +81,6 @@ export default function AddLanguageCardForm({
   }
 
   function selectWayToInputList(e: FormEvent<HTMLFormElement>) {
-    setFormSubmitOutcomeMessage('')
     const chosenInputMethod = (e.target as HTMLSelectElement).value
 
     if (chosenInputMethod === 'Type list') {
@@ -97,7 +96,6 @@ export default function AddLanguageCardForm({
   }
 
   function setLanguageCardType(e: FormEvent<HTMLFormElement>) {
-    setFormSubmitOutcomeMessage('')
     const languageCardType = (e.target as HTMLSelectElement).value
 
     setValue('words', '')
@@ -122,12 +120,11 @@ export default function AddLanguageCardForm({
 
   function validateInput(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault()
-    setFormSubmitOutcomeMessage('')
 
     const words = getValues('words')
 
     if (((shouldType || grammarCard) && words === '') || (shouldUpload && file.content === '')) {
-      setFormSubmitOutcomeMessage('Oops, you are trying to validate an empty list')
+      toast.warning('Oops, you are trying to validate an empty list')
       return
     }
 
@@ -145,8 +142,6 @@ export default function AddLanguageCardForm({
   }
 
   async function submitList(finalCardList: string) {
-    setFormSubmitOutcomeMessage('')
-
     try {
       const finalCardListAsArr = finalCardList.split(', ')
       const language = activity?.name?.split('-')[0].toLowerCase()
@@ -175,25 +170,9 @@ export default function AddLanguageCardForm({
         activity: activity?.name,
         cards,
       })
-      setFormSubmitOutcomeMessage(createdCards.data.message)
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setFormSubmitOutcomeMessage(
-          'Failed to add cards due to an internal error. Please try again later.'
-        )
-      } else {
-        setFormSubmitOutcomeMessage(data.message)
-      }
+      toast.success(createdCards.data.message)
+    } catch (error: unknown) {
+      handleMutationError(error, 'add cards')
     }
   }
 
@@ -360,9 +339,8 @@ export default function AddLanguageCardForm({
           </div>
         </div>
       </div>
-      <p data-testid="outcome-message">{formSubmitOutcomeMessage}</p>
       <Popup
-        {...{ showModal, modalType, item: popupItem, submitList, setFormSubmitOutcomeMessage }}
+        {...{ showModal, modalType, item: popupItem, submitList }}
         onClose={() => setShowModal(false)}
       />
     </>

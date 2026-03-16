@@ -12,6 +12,8 @@ import { CompletionStatus } from '@/types/CompletionStatusEnum'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { quranCustomSchema, QuranCustomFormData } from '@/lib/schemas/card.schemas'
+import { toast } from 'sonner'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 export default function AddQuranCardForm({
   isMain,
@@ -38,7 +40,6 @@ export default function AddQuranCardForm({
   const [selectedCards, setSelectedCards] = useState<string[]>([])
   const [selectedJuz, setSelectedJuz] = useState<number[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
 
   useEffect(() => {
     const selectedJuz = [...quranCards]
@@ -163,7 +164,7 @@ export default function AddQuranCardForm({
       const customContent = getValues('content').trim()
 
       if (!selectedCards.length && customContent === '') {
-        setFormSubmitOutcomeMessage('Please select the cards you want to add.')
+        toast.warning('Please select the cards you want to add.')
         return
       }
 
@@ -222,25 +223,9 @@ export default function AddQuranCardForm({
         )
       }
 
-      setFormSubmitOutcomeMessage(data.message)
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setFormSubmitOutcomeMessage(
-          'Failed to add cards due to an internal error. Please try again later.'
-        )
-      } else {
-        setFormSubmitOutcomeMessage(data.message)
-      }
+      toast.success(data.message)
+    } catch (error: unknown) {
+      handleMutationError(error, 'add cards')
     }
   }
 
@@ -289,7 +274,6 @@ export default function AddQuranCardForm({
           </button>
         </div>
       </form>
-      <p data-testid="outcome-message">{formSubmitOutcomeMessage}</p>
     </>
   )
 }

@@ -8,6 +8,8 @@ import { IUser } from '@/types/IUser'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { searchStudentSchema, SearchStudentFormData } from '@/lib/schemas/student.schemas'
+import { toast } from 'sonner'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 export default function AddStudent({ user }: { user: IUser }) {
   const {
@@ -20,29 +22,22 @@ export default function AddStudent({ user }: { user: IUser }) {
     defaultValues: { email: '' },
   })
 
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
   const [newStudent, getStudentInfo] = useState<IUser>({} as IUser)
   const [showModal, setShowModal] = useState(false)
 
   const modalType = 'addStudent'
 
-  function clearMessage() {
-    if (formSubmitOutcomeMessage.length) {
-      setFormSubmitOutcomeMessage('')
-    }
-  }
-
   async function submitForm(data: SearchStudentFormData): Promise<void> {
     try {
       if (data.email === user.email) {
-        setFormSubmitOutcomeMessage("You can't add yourself as a student.")
+        toast.warning("You can't add yourself as a student.")
         reset()
         return
       }
 
       const currentStudents = user?.linkedAccountsData?.students
       if (currentStudents?.some((tuple) => tuple[0] === btoa(data.email))) {
-        setFormSubmitOutcomeMessage('This is already one of your students.')
+        toast.warning('This is already one of your students.')
         reset()
         return
       }
@@ -54,23 +49,8 @@ export default function AddStudent({ user }: { user: IUser }) {
       const { details }: { message: string; details: { student: IUser } } = responseData
       getStudentInfo(details.student)
       setShowModal(true)
-    } catch (error: any) {
-      console.log(error)
-
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data: errorData } = error.response
-
-      if (status === 500) {
-        setFormSubmitOutcomeMessage(
-          'Failed to add new student due to an internal error. Please try again later.'
-        )
-      } else {
-        setFormSubmitOutcomeMessage(errorData.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'find student')
     }
   }
 
@@ -83,10 +63,8 @@ export default function AddStudent({ user }: { user: IUser }) {
         errors={errors}
         isSubmitting={isSubmitting}
         onSubmit={handleSubmit(submitForm)}
-        onFieldChange={clearMessage}
       />
       <Popup {...{ showModal, modalType, user, newStudent }} onClose={() => setShowModal(false)} />
-      <div data-testid="find-student-submit-message">{formSubmitOutcomeMessage}</div>
     </div>
   )
 }

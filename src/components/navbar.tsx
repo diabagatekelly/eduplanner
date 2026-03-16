@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { editUser } from '../api/controller'
 import { ISODateString } from '@/types/isoDateType'
+import { toast } from 'sonner'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -40,21 +41,19 @@ export default function Navbar({
       })
       await signOut({ callbackUrl: '/login' })
     } catch (error: any) {
-      console.log(error)
-
       if (!error.response) {
-        console.log('Server is down. Try again later.')
+        toast.error('Server is down. Try again later.')
         return
       }
 
       const { status, data } = error.response
 
       if (status === 500) {
-        console.log(
+        toast.error(
           'Oops, something went wrong in updating and logging out. Please try again later.'
         )
       } else {
-        console.log(data.message)
+        toast.error(data.message)
       }
     }
   }

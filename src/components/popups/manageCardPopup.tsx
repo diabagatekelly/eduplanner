@@ -15,6 +15,8 @@ import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 import { IActivity } from '@/types/IActivity'
 import formatCardName from '@/lib/helpers/formatCardName'
 import { ClipboardDocumentCheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import { toast } from 'sonner'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 export default function ManageCardPopup({
   onClose,
@@ -43,7 +45,6 @@ export default function ManageCardPopup({
 
   const [card, getCardDetails] = useState<ICard>({ ...item!.card })
   const [activity, getActivityDetails] = useState<IActivity>({ ...activityProp } as IActivity)
-  const [statusMessage, setStatusMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [newStage, setNewStage] = useState('')
 
@@ -52,7 +53,6 @@ export default function ManageCardPopup({
     getUserInfo({ ...user })
 
     getActivityDetails(activityProp!)
-    setStatusMessage('')
   }, [showModal, user, item, activityProp, newStage])
 
   function assertUserId() {
@@ -66,24 +66,10 @@ export default function ManageCardPopup({
         activity: activity.name,
         cardId: card.cardId,
       })
-      setStatusMessage('Successfully reset card')
+      toast.success('Successfully reset card')
       onClose()
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setStatusMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setStatusMessage('Failed to reset card due to an internal error. Please try again later.')
-      } else {
-        setStatusMessage(data.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'reset card')
     }
   }
 
@@ -110,27 +96,10 @@ export default function ManageCardPopup({
         },
       })
 
-      setIsLoading(false)
-      setStatusMessage('Request for review successfully sent.')
+      toast.success('Request for review successfully sent.')
       onClose()
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setStatusMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setStatusMessage(
-          'Failed to request review due to an internal error. Please try again later.'
-        )
-      } else {
-        setStatusMessage(data.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'request review')
     }
   }
 
@@ -145,27 +114,11 @@ export default function ManageCardPopup({
           stage: newStage,
         },
       })
-      setStatusMessage('Successfully overrode status.')
+      toast.success('Successfully overrode status.')
       getCardDetails(response.data.details)
       onClose()
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setStatusMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setStatusMessage(
-          'Failed to override card stage due to an internal error. Please try again later.'
-        )
-      } else {
-        setStatusMessage(data.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'override card stage')
     }
   }
 
@@ -180,26 +133,10 @@ export default function ManageCardPopup({
           promote: newStageStatus,
         },
       })
-      setStatusMessage('Successfully edited status.')
+      toast.success('Successfully edited status.')
       onClose()
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setStatusMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setStatusMessage(
-          'Failed to update card status due to an internal error. Please try again later.'
-        )
-      } else {
-        setStatusMessage(data.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'update card status')
     }
   }
 
@@ -212,24 +149,10 @@ export default function ManageCardPopup({
           cardId: card.cardId,
         },
       ])
-      setStatusMessage('Successfully removed card')
+      toast.success('Successfully removed card')
       onClose()
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setStatusMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setStatusMessage('Failed to remove card due to an internal error. Please try again later.')
-      } else {
-        setStatusMessage(data.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'remove card')
     }
   }
 
@@ -240,26 +163,10 @@ export default function ManageCardPopup({
         activity: activity.name,
         cardId: card.cardId,
       })
-      setStatusMessage('Successfully activated card')
+      toast.success('Successfully activated card')
       onClose()
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setStatusMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setStatusMessage(
-          'Failed to activate card due to an internal error. Please try again later.'
-        )
-      } else {
-        setStatusMessage(data.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'activate card')
     }
   }
 
@@ -497,7 +404,6 @@ export default function ManageCardPopup({
                   Cancel
                 </button>
               </div>
-              <p data-testid="status-message">{statusMessage}</p>
             </div>
           </div>
         </div>

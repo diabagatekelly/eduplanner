@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
 import AddLanguageCardForm from '../../../components/forms/add-language-card-form'
@@ -11,7 +11,11 @@ import {
   mockUserLanguageVocabCard,
 } from '../../mocks'
 import { createCards } from '../../../api/controller'
+import { toast } from 'sonner'
 
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
 jest.mock('../../../api/controller')
 
 describe('Add language card form', () => {
@@ -116,7 +120,6 @@ describe('Add language card form', () => {
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element
       const typeListForm = await screen.findByTestId('type-list-form')
       const validateTypeBoxBtn = await screen.findByTestId('add-type-cards-validate-button')
-      const outcomeMsg = await screen.findByTestId('outcome-message')
 
       // Switch 1st dropdown to Grammar card
       await act(async () => {
@@ -129,7 +132,7 @@ describe('Add language card form', () => {
         fireEvent.click(validateTypeBoxBtn)
       })
 
-      expect(outcomeMsg).toHaveTextContent('Oops, you are trying to validate an empty list')
+      expect(toast.warning).toHaveBeenCalledWith('Oops, you are trying to validate an empty list')
     })
 
     it('should allow to create an unlimited number of grammar cards', async () => {
@@ -137,7 +140,6 @@ describe('Add language card form', () => {
 
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element
       const textArea = (await screen.findByTestId('textarea-for-typed-list')) as HTMLTextAreaElement
-      const outcomeMsg = await screen.findByTestId('outcome-message')
 
       // Switch 1st dropdown to Grammar card
       await act(async () => {
@@ -154,7 +156,7 @@ describe('Add language card form', () => {
         })
       })
 
-      expect(outcomeMsg).not.toHaveTextContent('Oops, this is as long as your list can get!')
+      expect(toast.warning).not.toHaveBeenCalledWith('Oops, this is as long as your list can get!')
     })
 
     it('should open popup with expected grammar list', async () => {
@@ -163,7 +165,6 @@ describe('Add language card form', () => {
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element
       const textArea = (await screen.findByTestId('textarea-for-typed-list')) as HTMLTextAreaElement
       const validateTypeBoxBtn = await screen.findByTestId('add-type-cards-validate-button')
-      const outcomeMsg = await screen.findByTestId('outcome-message')
 
       await expect(screen.queryByTestId('validate-popup')).toBeNull()
       // Switch 1st dropdown to Grammar card
@@ -192,7 +193,6 @@ describe('Add language card form', () => {
       })
 
       await expect(screen.queryByTestId('validate-popup')).toHaveAttribute('hidden')
-      expect(outcomeMsg).toHaveTextContent('Validation canceled.')
     })
 
     describe('Submitting', () => {
@@ -253,7 +253,6 @@ describe('Add language card form', () => {
 
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element
       const textArea = (await screen.findByTestId('textarea-for-typed-list')) as HTMLTextAreaElement
-      const outcomeMsg = await screen.findByTestId('outcome-message')
 
       // Switch 1st dropdown to Grammar card
       await act(async () => {
@@ -273,7 +272,7 @@ describe('Add language card form', () => {
         await fireEvent.change(textArea, { target: { value: '1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 2' } })
       })
 
-      expect(outcomeMsg).not.toHaveTextContent('Oops, this is as long as your list can get!')
+      expect(toast.warning).not.toHaveBeenCalledWith('Oops, this is as long as your list can get!')
     })
   })
 
@@ -284,7 +283,6 @@ describe('Add language card form', () => {
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element
       const uploadFileForm = await screen.findByTestId('upload-file-form')
       const validateTypeBoxBtn = await screen.findByTestId('add-type-cards-validate-button')
-      const outcomeMsg = await screen.findByTestId('outcome-message')
 
       // Switch 1st dropdown to Grammar card
       await act(async () => {
@@ -303,7 +301,7 @@ describe('Add language card form', () => {
         fireEvent.click(validateTypeBoxBtn)
       })
 
-      expect(outcomeMsg).toHaveTextContent('Oops, you are trying to validate an empty list')
+      expect(toast.warning).toHaveBeenCalledWith('Oops, you are trying to validate an empty list')
     })
 
     it('should allow to upload an unlimited number of words', async () => {
@@ -311,7 +309,6 @@ describe('Add language card form', () => {
 
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element
       const uploadFileForm = (await screen.findByTestId('upload-form')) as HTMLInputElement
-      const outcomeMsg = await screen.findByTestId('outcome-message')
 
       // Switch 1st dropdown to Vocab card
       await act(async () => {
@@ -343,7 +340,7 @@ describe('Add language card form', () => {
         'cat, man, dog, house, mother, father, brother, sister, fruits, vegetables, chicken'
       )
 
-      expect(outcomeMsg).not.toHaveTextContent(
+      expect(toast.warning).not.toHaveBeenCalledWith(
         'Oops, your uploaded list has more than 10 words! Please remove 1 word.'
       )
     })
@@ -410,7 +407,6 @@ describe('Add language card form', () => {
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element
       const uploadFileForm = (await screen.findByTestId('upload-form')) as HTMLInputElement
       const validateUploadBtn = await screen.findByTestId('add-upload-cards-val-button')
-      const outcomeMsg = await screen.findByTestId('outcome-message')
       const removeUploadBtn = await screen.findByTestId('remove-upload-btn')
 
       await expect(screen.queryByTestId('validate-popup')).toBeNull()
@@ -447,7 +443,7 @@ describe('Add language card form', () => {
       })
 
       await expect(screen.queryByTestId('validate-popup')).toBeNull()
-      expect(outcomeMsg).toHaveTextContent('Oops, you are trying to validate an empty list')
+      expect(toast.warning).toHaveBeenCalledWith('Oops, you are trying to validate an empty list')
     })
 
     it('should not allow upload of non-text file', async () => {
@@ -455,7 +451,6 @@ describe('Add language card form', () => {
 
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element
       const uploadFileForm = (await screen.findByTestId('upload-form')) as HTMLInputElement
-      const outcomeMsg = await screen.findByTestId('outcome-message')
 
       await expect(screen.queryByTestId('validate-popup')).toBeNull()
 
@@ -479,7 +474,7 @@ describe('Add language card form', () => {
         await fireEvent.input(uploadFileForm, { target: { files: [file] } })
       })
 
-      expect(outcomeMsg).toHaveTextContent('The file uploaded is not a text (.txt) file.')
+      expect(toast.error).toHaveBeenCalledWith('The file uploaded is not a text (.txt) file.')
     })
 
     describe('Submitting', () => {
@@ -549,7 +544,6 @@ describe('Add language card form', () => {
 
   describe('Submitting errors', () => {
     it('should not reset form when response is not 200 or 500 and display error message', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => null)
       const error = {
         response: {
           status: 400,
@@ -599,8 +593,9 @@ describe('Add language card form', () => {
         await fireEvent.click(popupYesBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not reset form when response is 500 and display error message', async () => {
@@ -650,12 +645,11 @@ describe('Add language card form', () => {
         await fireEvent.click(popupYesBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to add cards due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to add cards due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not reset form when error is thrown with no response', async () => {
@@ -702,9 +696,9 @@ describe('Add language card form', () => {
         await fireEvent.click(popupYesBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 })

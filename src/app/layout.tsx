@@ -4,6 +4,7 @@ import '@/styles/globals.css'
 import Navbar from '@/components/navbar'
 import Footer from '@/components/footer'
 import AppProviders from './providers'
+import { Toaster } from 'sonner'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,6 +22,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="py-20 px-5">{children}</div>
           <Footer />
         </AppProviders>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   )

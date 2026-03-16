@@ -12,6 +12,8 @@ import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { miscCardSchema, MiscCardFormData } from '@/lib/schemas/card.schemas'
+import { toast } from 'sonner'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 export default function AddMiscCardForm({
   isMain,
@@ -29,15 +31,12 @@ export default function AddMiscCardForm({
     defaultValues: { words: '' },
   })
 
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
   const [modalType, setModalType] = useState('')
   const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
   const [showModal, setShowModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   async function submitList(finalCardList: string) {
-    setFormSubmitOutcomeMessage('')
-
     try {
       const finalCardListAsArr = finalCardList.split(', ')
       let cards: ICard[] = []
@@ -63,35 +62,18 @@ export default function AddMiscCardForm({
         activity: activity?.name,
         cards,
       })
-      setFormSubmitOutcomeMessage(createdCards.data.message)
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setFormSubmitOutcomeMessage(
-          'Failed to add cards due to an internal error. Please try again later.'
-        )
-      } else {
-        setFormSubmitOutcomeMessage(data.message)
-      }
+      toast.success(createdCards.data.message)
+    } catch (error: unknown) {
+      handleMutationError(error, 'add cards')
     }
   }
 
   function validateInput(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault()
-    setFormSubmitOutcomeMessage('')
 
     const words = getValues('words')
     if (words === '') {
-      setFormSubmitOutcomeMessage('Oops, you are trying to validate an empty list')
+      toast.warning('Oops, you are trying to validate an empty list')
       return
     }
 
@@ -157,9 +139,8 @@ export default function AddMiscCardForm({
           </div>
         </div>
       </div>
-      <p data-testid="outcome-message">{formSubmitOutcomeMessage}</p>
       <Popup
-        {...{ showModal, modalType, item: popupItem, submitList, setFormSubmitOutcomeMessage }}
+        {...{ showModal, modalType, item: popupItem, submitList }}
         onClose={() => setShowModal(false)}
       />
     </>

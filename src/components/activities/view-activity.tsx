@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useEditActivity } from '@/hooks/use-activity-mutations'
 import { useRequestCardReview } from '@/hooks/use-card-mutations'
 import ListUi from '@/components/lists/lists-ui'
@@ -10,6 +9,8 @@ import { IUser } from '@/types/IUser'
 import { ISODateString } from '@/types/isoDateType'
 import { ICard } from '@/types/ICard'
 import { fromDbFormat } from '@/lib/helpers/formatActivityName'
+import { toast } from 'sonner'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 interface IViewActivity {
   submit: () => Promise<void>
@@ -27,9 +28,6 @@ export default function ViewActivity<IViewActivity>({
   const editActivityMutation = useEditActivity(userDetails.userId)
   const requestReviewMutation = useRequestCardReview()
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
-
   async function submit(): Promise<void> {
     if (
       userActivity.cards?.some(
@@ -37,7 +35,7 @@ export default function ViewActivity<IViewActivity>({
           ![CompletionStatus.COMPLETED, CompletionStatus.INACTIVE].includes(card.completionStatus)
       )
     ) {
-      setFormSubmitOutcomeMessage('You still have some cards to complete!!')
+      toast.warning('You still have some cards to complete!!')
       return
     }
 
@@ -72,26 +70,9 @@ export default function ViewActivity<IViewActivity>({
 
       await editActivityMutation.mutateAsync(updatedActivity)
 
-      setIsLoading(false)
-      setFormSubmitOutcomeMessage('Request for review successfully sent.')
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setFormSubmitOutcomeMessage(
-          'Failed to request review due to an internal error. Please try again later.'
-        )
-      } else {
-        setFormSubmitOutcomeMessage(data.message)
-      }
+      toast.success('Request for review successfully sent.')
+    } catch (error: unknown) {
+      handleMutationError(error, 'request review')
     }
   }
 
@@ -106,25 +87,9 @@ export default function ViewActivity<IViewActivity>({
       }
 
       const response = await editActivityMutation.mutateAsync(updatedActivity)
-      setFormSubmitOutcomeMessage(response.data.message)
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setFormSubmitOutcomeMessage(
-          'Failed to edit activity due to an internal error. Please try again later.'
-        )
-      } else {
-        setFormSubmitOutcomeMessage(data.message)
-      }
+      toast.success(response.data.message)
+    } catch (error: unknown) {
+      handleMutationError(error, 'edit activity')
     }
   }
 
@@ -166,7 +131,6 @@ export default function ViewActivity<IViewActivity>({
           userActivity?.completionStatus !== CompletionStatus.COMPLETED &&
           'Request review'}
       </button>
-      <p data-testid="update-activity-outcome">{formSubmitOutcomeMessage}</p>
       <hr className="my-5" />
       {userActivity?.hasCards && (
         <div>

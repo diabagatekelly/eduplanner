@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import AddActivityForm from '../forms/add-activity-form'
 import { useCreateActivity } from '@/hooks/use-activity-mutations'
 import { IActivity } from '../../types/IActivity'
@@ -11,6 +10,8 @@ import { toDbFormat } from '@/lib/helpers/formatActivityName'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { activitySchema, ActivityFormData } from '@/lib/schemas/activity.schemas'
+import { toast } from 'sonner'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 export default function AddActivity({ userDetails }: { userDetails: IUser }) {
   const createActivityMutation = useCreateActivity(userDetails.userId)
@@ -30,18 +31,10 @@ export default function AddActivity({ userDetails }: { userDetails: IUser }) {
     },
   })
 
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
-
-  function clearMessage() {
-    if (formSubmitOutcomeMessage.length) {
-      setFormSubmitOutcomeMessage('')
-    }
-  }
-
   async function submitForm(data: ActivityFormData): Promise<void> {
     try {
       if (userDetails.activities?.find((activity) => activity.name === data.name)) {
-        setFormSubmitOutcomeMessage('This is already one of your activities.')
+        toast.warning('This is already one of your activities.')
         reset()
         return
       }
@@ -63,25 +56,10 @@ export default function AddActivity({ userDetails }: { userDetails: IUser }) {
       }
 
       const response = await createActivityMutation.mutateAsync(userActivity)
-      setFormSubmitOutcomeMessage(response.data.message)
+      toast.success(response.data.message)
       reset()
-    } catch (error: any) {
-      console.log(error)
-
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data: errorData } = error.response
-
-      if (status === 500) {
-        setFormSubmitOutcomeMessage(
-          'Failed to create activity due to an internal error. Please try again later.'
-        )
-      } else {
-        setFormSubmitOutcomeMessage(errorData.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'create activity')
     }
   }
 
@@ -107,9 +85,7 @@ export default function AddActivity({ userDetails }: { userDetails: IUser }) {
         errors={errors}
         isSubmitting={isSubmitting}
         onSubmit={handleSubmit(submitForm)}
-        onFieldChange={clearMessage}
       />
-      <div data-testid="add-activity-submit-message">{formSubmitOutcomeMessage}</div>
       <hr className="my-5" />
     </div>
   )

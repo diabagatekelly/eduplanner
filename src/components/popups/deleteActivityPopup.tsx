@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useDeleteActivity } from '@/hooks/use-activity-mutations'
 import { IUser } from '@/types/IUser'
 import { BoltSlashIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
+import { toast } from 'sonner'
 
 export default function DeleteActivityPopup({
   onClose,
@@ -19,7 +21,6 @@ export default function DeleteActivityPopup({
 
   const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
   const [activityName, getActivityName] = useState('')
-  const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
     getActivityName(item!.activityName)
@@ -30,25 +31,10 @@ export default function DeleteActivityPopup({
     try {
       if (!userId) throw new Error('Missing userId for deleteActivity')
       await deleteActivityMutation.mutateAsync(activityName)
-      setOutcomeMessage('Successfully deleted activity')
+      toast.success('Successfully deleted activity')
       onClose()
-    } catch (error: any) {
-      console.log(error)
-
-      if (!error.response) {
-        setOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setOutcomeMessage(
-          'Failed to delete activity due to an internal error. Please try again later.'
-        )
-      } else {
-        setOutcomeMessage(data.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'delete activity')
     }
   }
 
@@ -116,7 +102,6 @@ export default function DeleteActivityPopup({
               >
                 No, cancel
               </button>
-              <p data-testid="delete-activity-outcome-message">{outcomeMessage}</p>
             </div>
           </div>
         </div>

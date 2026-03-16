@@ -1,11 +1,15 @@
 import LinkAccountPopup from '../../../components/popups/linkAccountPopup'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
 import { linkAccount } from '../../../api/controller'
 import { mockUser, mockStudent } from '../../../specs/mocks'
+import { toast } from 'sonner'
 
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
 jest.mock('../../../api/controller')
 
 describe('Link Account Popup', () => {
@@ -14,15 +18,15 @@ describe('Link Account Popup', () => {
   const childArgs = { newStudent, user: teacher }
 
   it('should show error when teacherId is missing and submit is clicked', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
     const args = { user: {} as any, newStudent: {} as any }
     render(<LinkAccountPopup {...{ onClose: jest.fn(), showModal: true, ...args }} />)
     const submitButton = screen.getByTestId('link-accounts-btn')
     await act(async () => {
       await fireEvent.click(submitButton)
     })
-    const errorMessage = screen.getByText(/Server is down. Try again later./i)
-    expect(errorMessage).toBeInTheDocument()
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+    })
   })
 
   it('should render popup to add new student', async () => {
@@ -79,17 +83,17 @@ describe('Link Account Popup', () => {
       <LinkAccountPopup {...{ onClose: () => (showModal = false), showModal, ...childArgs }} />
     )
     const submitButton = await screen.getByTestId('link-accounts-btn')
-    const submitMessage = await screen.findByTestId('add-student-outcome-message')
 
     await act(async () => {
       await fireEvent.click(submitButton)
     })
 
-    expect(submitMessage).toHaveTextContent('Successfully added a new student')
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Successfully added a new student')
+    })
   })
 
   it('should not close popup when response is not 200 or 500 and display error message', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
     const error = {
       response: {
         status: 400,
@@ -111,8 +115,9 @@ describe('Link Account Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.findByText(/Erroneous response/i)
-    expect(errorMessage).toBeInTheDocument()
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+    })
   })
 
   it('should not close popup when response is 500 and display error message', async () => {
@@ -134,12 +139,11 @@ describe('Link Account Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(
-      /Failed to add new student due to an internal error. Please try again later./i
-    )
-
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith(error)
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        'Failed to add new student due to an internal error. Please try again later.'
+      )
+    })
   })
 
   it('should not close popup when error is thrown with no response', async () => {
@@ -158,8 +162,8 @@ describe('Link Account Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+    })
   })
 })
