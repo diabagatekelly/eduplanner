@@ -1,91 +1,62 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState } from 'react'
 import AddActivityForm from '../forms/add-activity-form'
 import { useCreateActivity } from '@/hooks/use-activity-mutations'
-import { IActivity, IActivityFormData } from '../../types/IActivity'
+import { IActivity } from '../../types/IActivity'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 import { ISODateString } from '@/types/isoDateType'
 import { IUser } from '@/types/IUser'
 import { toDbFormat } from '@/lib/helpers/formatActivityName'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { activitySchema, ActivityFormData } from '@/lib/schemas/activity.schemas'
 
-interface IAddActivity {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
-  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
-}
-
-export default function AddActivity<IAddActivity>({ userDetails }: { userDetails: IUser }) {
+export default function AddActivity({ userDetails }: { userDetails: IUser }) {
   const createActivityMutation = useCreateActivity(userDetails.userId)
 
-  const [formData, setFormData] = useState<IActivityFormData>({
-    name: '',
-    description: '',
-    points: 0,
-    hasCards: '',
-  })
-
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
-
-  function handleInput(e: React.FormEvent<HTMLInputElement>) {
-    if (formSubmitOutcomeMessage.length) {
-      setFormSubmitOutcomeMessage('')
-    }
-
-    const target = e.target as HTMLInputElement
-    const fieldName: string = target.name
-    const fieldValue: any = target.value
-
-    setFormData((prevState) => ({
-      ...prevState,
-      [fieldName]: fieldValue,
-    }))
-  }
-
-  function _resetForm() {
-    setFormData({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ActivityFormData>({
+    resolver: zodResolver(activitySchema),
+    defaultValues: {
       name: '',
       description: '',
       points: 0,
-      hasCards: '',
-    })
-    setIsLoading(false)
+      hasCards: 'false',
+    },
+  })
+
+  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
+
+  function clearMessage() {
+    if (formSubmitOutcomeMessage.length) {
+      setFormSubmitOutcomeMessage('')
+    }
   }
 
-  async function submitForm(e: FormEvent<HTMLFormElement>): Promise<void> {
+  async function submitForm(data: ActivityFormData): Promise<void> {
     try {
-      // We don't want the page to refresh
-      e.preventDefault()
-      setIsLoading(true) // Set loading to true when the request starts
-
-      const formData = new FormData(e.currentTarget)
-      const activityFormInfo: IActivityFormData = {
-        name: '',
-        description: '',
-        points: 0,
-        hasCards: '',
-      }
-
-      for (const pair of formData.entries()) {
-        ;(activityFormInfo as Record<string, any>)[pair[0]] = `${pair[1]}`
-      }
-
-      if (userDetails.activities?.find((activity) => activity.name === activityFormInfo.name)) {
+      if (userDetails.activities?.find((activity) => activity.name === data.name)) {
         setFormSubmitOutcomeMessage('This is already one of your activities.')
-        _resetForm()
+        reset()
         return
       }
 
-      const dbActivityName = toDbFormat(activityFormInfo.name)
+      const dbActivityName = toDbFormat(data.name)
+      const now = new Date()
 
       const userActivity: IActivity = {
-        ...activityFormInfo,
+        ...data,
         activityId: btoa(`${userDetails.email}-${dbActivityName}`),
         name: dbActivityName!,
-        points: Number(activityFormInfo.points),
+        points: Number(data.points),
         completionStatus: CompletionStatus.PENDING,
-        hasCards: activityFormInfo.hasCards === 'true' ? true : false,
-        createdOn: new Date(Date.now()).toLocaleDateString('en-US', {
+        hasCards: data.hasCards === 'true' ? true : false,
+        createdOn: now.toLocaleDateString('en-US', {
           timeZone: 'EST',
         }) as ISODateString,
         lastUpdatedOn: null,
@@ -93,9 +64,8 @@ export default function AddActivity<IAddActivity>({ userDetails }: { userDetails
 
       const response = await createActivityMutation.mutateAsync(userActivity)
       setFormSubmitOutcomeMessage(response.data.message)
-      _resetForm()
+      reset()
     } catch (error: any) {
-      setIsLoading(false)
       console.log(error)
 
       if (!error.response) {
@@ -103,14 +73,14 @@ export default function AddActivity<IAddActivity>({ userDetails }: { userDetails
         return
       }
 
-      const { status, data } = error.response
+      const { status, data: errorData } = error.response
 
       if (status === 500) {
         setFormSubmitOutcomeMessage(
           'Failed to create activity due to an internal error. Please try again later.'
         )
       } else {
-        setFormSubmitOutcomeMessage(data.message)
+        setFormSubmitOutcomeMessage(errorData.message)
       }
     }
   }
@@ -132,7 +102,13 @@ export default function AddActivity<IAddActivity>({ userDetails }: { userDetails
           &#39;Quran&#39; and doesn&#39;t contain &#39;Language&#39;
         </p>
       </div>
-      <AddActivityForm {...{ handleInput, formData, isLoading, submitForm }} />
+      <AddActivityForm
+        register={register}
+        errors={errors}
+        isSubmitting={isSubmitting}
+        onSubmit={handleSubmit(submitForm)}
+        onFieldChange={clearMessage}
+      />
       <div data-testid="add-activity-submit-message">{formSubmitOutcomeMessage}</div>
       <hr className="my-5" />
     </div>

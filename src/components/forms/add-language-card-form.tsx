@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useState } from 'react'
 import React from 'react'
 import { IActivity } from '@/types/IActivity'
 import { IUser } from '@/types/IUser'
@@ -10,13 +10,11 @@ import { useCreateCards } from '@/hooks/use-card-mutations'
 import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 import { DocumentMinusIcon } from '@heroicons/react/24/solid'
+import { useForm } from 'react-hook-form'
+import { languageCardSchema, LanguageCardFormData } from '@/lib/schemas/card.schemas'
+import { zodResolver } from '@hookform/resolvers/zod'
 
-interface IAddLanguageCardForm {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
-  submitList: (list: string) => Promise<void>
-}
-
-export default function AddLanguageCardForm<IAddLanguageCardForm>({
+export default function AddLanguageCardForm({
   isMain,
   user,
   activity,
@@ -27,12 +25,13 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
 }) {
   const createCardsMutation = useCreateCards(user.userId)
 
-  const [file, uploadFile] = useState({
-    content: '',
+  const { register, getValues, setValue } = useForm<LanguageCardFormData>({
+    resolver: zodResolver(languageCardSchema),
+    defaultValues: { words: '' },
   })
 
-  const [typedList, getTypedList] = useState({
-    words: '',
+  const [file, uploadFile] = useState({
+    content: '',
   })
 
   const [shouldUpload, getuploadForm] = useState(false)
@@ -44,8 +43,6 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState('')
   const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
-
-  useEffect(() => {}, [user, activity, file])
 
   async function onFileInput(e: React.FormEvent<HTMLInputElement>) {
     const files = (e.target as HTMLInputElement).files
@@ -66,14 +63,6 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
     const uploadInput = document.querySelector('#upload') as HTMLInputElement
     uploadFile({ content: '' })
     uploadInput.value = ''
-  }
-
-  function onTextareaChange(e: React.FormEvent<HTMLTextAreaElement>) {
-    const target = e.target as HTMLTextAreaElement
-    setFormSubmitOutcomeMessage('')
-    getTypedList({
-      words: target.value,
-    })
   }
 
   function cleanUpList(list: string) {
@@ -111,7 +100,7 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
     setFormSubmitOutcomeMessage('')
     const languageCardType = (e.target as HTMLSelectElement).value
 
-    ;(document.querySelector('#typed') as HTMLTextAreaElement).value = ''
+    setValue('words', '')
     if (languageCardType === 'Vocab card') {
       createVocabCard(true)
       createGrammarCard(false)
@@ -135,18 +124,17 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
     e.preventDefault()
     setFormSubmitOutcomeMessage('')
 
-    if (
-      ((shouldType || grammarCard) && typedList.words === '') ||
-      (shouldUpload && file.content === '')
-    ) {
+    const words = getValues('words')
+
+    if (((shouldType || grammarCard) && words === '') || (shouldUpload && file.content === '')) {
       setFormSubmitOutcomeMessage('Oops, you are trying to validate an empty list')
       return
     }
 
     let listOfItemsToValidate = ''
     if (shouldType || grammarCard) {
-      listOfItemsToValidate = cleanUpList(typedList.words)
-      ;(document.querySelector('#typed') as HTMLTextAreaElement).value = listOfItemsToValidate
+      listOfItemsToValidate = cleanUpList(words)
+      setValue('words', listOfItemsToValidate)
     } else if (shouldUpload) {
       listOfItemsToValidate = file.content
     }
@@ -355,9 +343,8 @@ export default function AddLanguageCardForm<IAddLanguageCardForm>({
           <textarea
             data-testid="textarea-for-typed-list"
             className="border border-gray-500 p-3"
-            onChange={onTextareaChange}
+            {...register('words')}
             id="typed"
-            name="typed"
             rows={4}
             cols={50}
           ></textarea>

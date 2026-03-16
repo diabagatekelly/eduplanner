@@ -13,8 +13,3 @@ export interface IActivity {
   lastUpdatedOn: ISODateString | null
   cards?: ICard[] | []
 }
-
-export type IActivityFormData = Omit<
-  IActivity,
-  'activityId' | 'completionStatus' | 'createdOn' | 'lastUpdatedOn' | 'cards'
->

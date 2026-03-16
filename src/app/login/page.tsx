@@ -1,50 +1,42 @@
 'use client'
 
 import LoginForm from '@/app/login/components/login-form'
-import React, { useState, FormEvent } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { signIn, getSession } from 'next-auth/react'
 import Link from 'next/link'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { loginSchema, LoginFormData } from '@/lib/schemas/auth.schemas'
 
 export default function Login() {
   const router = useRouter()
 
-  const [formData, setFormData] = useState<{ email: string; password: string }>({
-    email: '',
-    password: '',
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
   })
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
 
-  function handleInput(e: React.FormEvent<HTMLInputElement>) {
+  function clearMessage() {
     if (formSubmitOutcomeMessage.length) {
       setFormSubmitOutcomeMessage('')
     }
-
-    const target = e.target as HTMLInputElement
-    setFormData((prevState) => ({
-      ...prevState,
-      [target.name]: target.value,
-    }))
   }
 
-  async function submitForm(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setIsLoading(true)
-
-    const rawFormData = new FormData(e.currentTarget)
-    const email = rawFormData.get('email') as string
-    const password = rawFormData.get('password') as string
-
+  async function submitForm(data: LoginFormData) {
     try {
       const result = await signIn('credentials', {
-        userId: btoa(email),
-        password,
+        userId: btoa(data.email),
+        password: data.password,
         redirect: false,
       })
-
-      setIsLoading(false)
 
       if (result?.error) {
         setFormSubmitOutcomeMessage(
@@ -55,7 +47,7 @@ export default function Login() {
         return
       }
 
-      setFormData({ email: '', password: '' })
+      reset()
       setFormSubmitOutcomeMessage('Logging in ...')
 
       const session = await getSession()
@@ -68,9 +60,10 @@ export default function Login() {
         return
       }
 
+      // Full navigation needed to reload auth session — router.push won't suffice
+      // eslint-disable-next-line react-hooks/immutability
       window.location.href = '/' + username
     } catch {
-      setIsLoading(false)
       setFormSubmitOutcomeMessage(
         'Failed to login due to an internal error. Please try again later.'
       )
@@ -86,7 +79,13 @@ export default function Login() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <LoginForm {...{ handleInput, formData, isLoading, submitForm }} />
+        <LoginForm
+          register={register}
+          errors={errors}
+          isSubmitting={isSubmitting}
+          onSubmit={handleSubmit(submitForm)}
+          onFieldChange={clearMessage}
+        />
         <div className="mt-3 text-center">{formSubmitOutcomeMessage}</div>
 
         <p className="mt-10 text-center text-sm text-gray-500">

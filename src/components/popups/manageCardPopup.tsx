@@ -40,7 +40,7 @@ export default function ManageCardPopup({
   const requestReviewMutation = useRequestCardReview()
 
   const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
   const [card, getCardDetails] = useState<ICard>({ ...item!.card })
   const [activity, getActivityDetails] = useState<IActivity>({ ...activityProp } as IActivity)
   const [statusMessage, setStatusMessage] = useState('')
@@ -48,10 +48,9 @@ export default function ManageCardPopup({
   const [newStage, setNewStage] = useState('')
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     getCardDetails(item!.card)
     getUserInfo({ ...user })
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     getActivityDetails(activityProp!)
     setStatusMessage('')
   }, [showModal, user, item, activityProp, newStage])
