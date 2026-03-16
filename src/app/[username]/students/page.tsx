@@ -8,8 +8,7 @@ import Breadcrumbs from '@/components/breadcrumbs'
 import { IUser } from '@/types/IUser'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
-import PageSkeleton from '@/components/skeletons/page-skeleton'
-import QueryErrorDisplay from '@/components/query-error-display'
+import { queryGuard } from '@/lib/helpers/query-guard'
 
 export default function Students() {
   const router = useRouter()
@@ -18,8 +17,8 @@ export default function Students() {
   const userId = session?.user?.userId ?? ''
   const { data: user = {} as IUser, isLoading, isError, error, refetch } = useUser(userId)
 
-  if (isLoading) return <PageSkeleton />
-  if (isError) return <QueryErrorDisplay error={error} onRetry={refetch} />
+  const guard = queryGuard({ isLoading, isError, error, refetch })
+  if (guard) return guard
   if (!user.userId) return null
 
   const isTeacher = user.accountType?.includes('teacher')

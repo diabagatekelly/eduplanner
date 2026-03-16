@@ -10,8 +10,7 @@ import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { useStudent } from '@/hooks/use-student'
 import { getStudentId } from '@/lib/helpers/getStudentId'
-import PageSkeleton from '@/components/skeletons/page-skeleton'
-import QueryErrorDisplay from '@/components/query-error-display'
+import { queryGuard } from '@/lib/helpers/query-guard'
 
 export default function Main(props: { params: StudentParams }) {
   const params = use(props.params)
@@ -28,8 +27,8 @@ export default function Main(props: { params: StudentParams }) {
   const userDetails = studentUser
   const isMain = false
 
-  if (isLoading) return <PageSkeleton />
-  if (isError) return <QueryErrorDisplay error={error} onRetry={refetch} />
+  const guard = queryGuard({ isLoading, isError, error, refetch })
+  if (guard) return guard
   if (!userDetails) return null
 
   return (

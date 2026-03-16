@@ -13,10 +13,27 @@ describe('QueryErrorDisplay', () => {
   })
 
   it('shows fallback message when error has no message', () => {
-    const mockRetry = jest.fn()
-    render(<QueryErrorDisplay error={new Error('')} onRetry={mockRetry} />)
+    render(<QueryErrorDisplay error={new Error('')} />)
 
     expect(screen.getByText('An unexpected error occurred.')).toBeInTheDocument()
+  })
+
+  it('shows fallback message for non-Error objects', () => {
+    render(<QueryErrorDisplay error="string error" />)
+
+    expect(screen.getByText('An unexpected error occurred.')).toBeInTheDocument()
+  })
+
+  it('shows fallback message when error is undefined', () => {
+    render(<QueryErrorDisplay />)
+
+    expect(screen.getByText('An unexpected error occurred.')).toBeInTheDocument()
+  })
+
+  it('hides retry button when onRetry is not provided', () => {
+    render(<QueryErrorDisplay error={new Error('test')} />)
+
+    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument()
   })
 
   it('calls onRetry when Retry button is clicked', () => {
