@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { editUser } from '../api/controller'
 import { ISODateString } from '@/types/isoDateType'
-import { toast } from 'sonner'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -40,21 +40,8 @@ export default function Navbar({
         },
       })
       await signOut({ callbackUrl: '/login' })
-    } catch (error: any) {
-      if (!error.response) {
-        toast.error('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        toast.error(
-          'Oops, something went wrong in updating and logging out. Please try again later.'
-        )
-      } else {
-        toast.error(data.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'update and log out')
     }
   }
 

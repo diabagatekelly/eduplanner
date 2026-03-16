@@ -34,7 +34,6 @@ export default function AddMiscCardForm({
   const [modalType, setModalType] = useState('')
   const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
   const [showModal, setShowModal] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
 
   async function submitList(finalCardList: string) {
     try {
@@ -131,7 +130,7 @@ export default function AddMiscCardForm({
             <button
               data-testid="add-type-cards-validate-button"
               onClick={validateInput}
-              disabled={isLoading || (isMain && user.accountType === 'student')}
+              disabled={createCardsMutation.isPending || (isMain && user.accountType === 'student')}
               className={'inline-block mr-5 default-btn'}
             >
               Validate Typed List

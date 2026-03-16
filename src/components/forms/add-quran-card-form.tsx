@@ -39,7 +39,6 @@ export default function AddQuranCardForm({
   const [formData, setFormData] = useState<IQuranCards[]>([])
   const [selectedCards, setSelectedCards] = useState<string[]>([])
   const [selectedJuz, setSelectedJuz] = useState<number[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
     const selectedJuz = [...quranCards]
@@ -267,7 +266,7 @@ export default function AddQuranCardForm({
           <button
             data-testid="add-cards-submit-button"
             type="submit"
-            disabled={isLoading || (isMain && user.accountType === 'student')}
+            disabled={createCardsMutation.isPending || (isMain && user.accountType === 'student')}
             className={'default-btn'}
           >
             Submit Cards

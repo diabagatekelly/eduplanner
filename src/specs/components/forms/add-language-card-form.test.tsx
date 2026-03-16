@@ -193,6 +193,7 @@ describe('Add language card form', () => {
       })
 
       await expect(screen.queryByTestId('validate-popup')).toHaveAttribute('hidden')
+      expect(toast.info).toHaveBeenCalledWith('Validation canceled.')
     })
 
     describe('Submitting', () => {

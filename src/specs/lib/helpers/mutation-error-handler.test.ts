@@ -47,4 +47,16 @@ describe('handleMutationError', () => {
 
     expect(toast.error).toHaveBeenCalledWith('User not found')
   })
+
+  it('shows generic fallback when response data has no message', () => {
+    const error = {
+      response: {
+        status: 422,
+        data: {},
+      },
+    }
+    handleMutationError(error, 'create activity')
+
+    expect(toast.error).toHaveBeenCalledWith('Failed to create activity. Please try again.')
+  })
 })

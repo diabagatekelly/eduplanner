@@ -45,7 +45,6 @@ export default function ManageCardPopup({
 
   const [card, getCardDetails] = useState<ICard>({ ...item!.card })
   const [activity, getActivityDetails] = useState<IActivity>({ ...activityProp } as IActivity)
-  const [isLoading, setIsLoading] = useState(false)
   const [newStage, setNewStage] = useState('')
 
   useEffect(() => {

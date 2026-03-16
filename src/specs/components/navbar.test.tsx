@@ -296,7 +296,7 @@ describe('Navbar', () => {
 
         await waitFor(() => {
           expect(toast.error).toHaveBeenCalledWith(
-            'Oops, something went wrong in updating and logging out. Please try again later.'
+            'Failed to update and log out due to an internal error. Please try again later.'
           )
         })
         expect(signOut).not.toHaveBeenCalled()
