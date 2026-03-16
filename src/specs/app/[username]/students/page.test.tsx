@@ -1,6 +1,6 @@
 import Students from '../../../../app/[username]/students/page'
 import '@testing-library/jest-dom'
-import { render } from '../../../util'
+import { render, screen } from '../../../util'
 import * as React from 'react'
 import { mockUser } from '../../../../specs/mocks'
 import NestedLayout from '../../../../app/nested-layout'
@@ -49,6 +49,26 @@ describe('Students list', () => {
     // Loading guard returns null when userId is missing
     expect(container.querySelector('.py-20')!.innerHTML).toBe('')
     expect(NestedLayout).not.toHaveBeenCalled()
+  })
+
+  it('should render skeleton when loading', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined, isLoading: true, isError: false })
+    const { container } = render(<Students />)
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
+  })
+
+  it('should render error display when query fails', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error('Failed'),
+      refetch: jest.fn(),
+    })
+    render(<Students />)
+    expect(screen.getByText('Failed to load data')).toBeInTheDocument()
   })
 
   it('should pass the correct isTeacher values for student to NestedLayout', () => {

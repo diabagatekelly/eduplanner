@@ -8,6 +8,8 @@ import Breadcrumbs from '@/components/breadcrumbs'
 import { UsernameParams } from '@/types/IParams'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
+import PageSkeleton from '@/components/skeletons/page-skeleton'
+import QueryErrorDisplay from '@/components/query-error-display'
 
 export default function Main(props: { params: UsernameParams }) {
   const params = use(props.params)
@@ -15,8 +17,10 @@ export default function Main(props: { params: UsernameParams }) {
 
   const { data: session } = useSession()
   const userId = session?.user?.userId ?? ''
-  const { data: user = {} as IUser } = useUser(userId)
+  const { data: user = {} as IUser, isLoading, isError, error, refetch } = useUser(userId)
 
+  if (isLoading) return <PageSkeleton />
+  if (isError) return <QueryErrorDisplay error={error} onRetry={refetch} />
   if (!user.userId) return null
 
   const isTeacher = user.accountType === 'teacher'
