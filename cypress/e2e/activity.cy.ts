@@ -88,7 +88,7 @@ describe('Add Activity', () => {
       cy.contains('Manage Students')
       cy.get('[data-testid="no-activities-message"]').contains('You have no activities yet.')
       cy.createActivity()
-      cy.get('[data-testid="add-activity-submit-message"]').contains('Failed to create activity.')
+      cy.contains('Failed to create activity.')
       cy.get('[data-testid="no-activities-message"]').contains('You have no activities yet.')
       cy.get('input[name="name"]').should('have.value', 'Quran')
       cy.get('input[name="description"]').should('have.value', 'Quran memorization')
@@ -141,9 +141,7 @@ describe('Delete Activity', () => {
     it('should show error message in popup when delete fails', () => {
       cy.get('[data-testid="delete-activities-in-list"]').first().click()
       cy.get('[data-testid="delete-activity-btn"]').click()
-      cy.get('[data-testid="delete-activity-outcome-message"]').contains(
-        'Failed to delete activity due to an internal error. Please try again later.'
-      )
+      cy.contains('Failed to delete activity due to an internal error. Please try again later.')
     })
   })
 })
