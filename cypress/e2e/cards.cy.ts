@@ -41,7 +41,7 @@ describe('Add Quran Cards', () => {
     cy.get('[data-testid="quran-checkbox-input"]').first().check()
     cy.get('[data-testid="add-cards-submit-button"]').click()
     cy.wait('@createCards')
-    cy.get('[data-testid="outcome-message"]').should('not.be.empty')
+    cy.contains('Cards added.')
   })
 })
 
@@ -73,7 +73,7 @@ describe('Add Quran Custom Card', () => {
     cy.get('[data-testid="custom-quran"]').type('Naas 1 to 2')
     cy.get('[data-testid="add-cards-submit-button"]').click()
     cy.wait('@createCards')
-    cy.get('[data-testid="outcome-message"]').should('not.be.empty')
+    cy.contains('Cards added.')
   })
 })
 

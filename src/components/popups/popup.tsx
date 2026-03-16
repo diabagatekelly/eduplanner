@@ -19,7 +19,6 @@ export default function Popup({
   item,
   activity,
   submitList,
-  setFormSubmitOutcomeMessage,
   teacherId,
 }: {
   onClose: () => void
@@ -31,7 +30,6 @@ export default function Popup({
   item?: any
   activity?: IActivity
   submitList?: (list: string) => void
-  setFormSubmitOutcomeMessage?: (msg: string) => void
   teacherId?: string
 }) {
   if (modalType === 'deleteAccount') {
@@ -69,13 +67,7 @@ export default function Popup({
     )
   } else if (modalType === 'validate') {
     return (
-      <ValidatePopup
-        onClose={onClose}
-        showModal={showModal}
-        item={item}
-        submitList={submitList}
-        setFormSubmitOutcomeMessage={setFormSubmitOutcomeMessage}
-      />
+      <ValidatePopup onClose={onClose} showModal={showModal} item={item} submitList={submitList} />
     )
   }
 }

@@ -1,12 +1,16 @@
 import DeleteAccountPopup from '../../../components/popups/deleteAccountPopup'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
 import { deleteUser } from '../../../api/controller'
 import { mockUser } from '../../../specs/mocks'
 import { signOut } from 'next-auth/react'
+import { toast } from 'sonner'
 
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
 jest.mock('../../../api/controller')
 jest.mock('next-auth/react', () => ({
   signOut: jest.fn(),
@@ -56,7 +60,6 @@ describe('Delete Account Popup', () => {
   })
 
   it('should not close popup when response is not 200 or 500 and display error message', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
     const error = {
       response: {
         status: 400,
@@ -78,8 +81,9 @@ describe('Delete Account Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.findByText(/Erroneous response/i)
-    expect(errorMessage).toBeInTheDocument()
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+    })
   })
 
   it('should not close popup when response is 500 and display error message', async () => {
@@ -101,12 +105,11 @@ describe('Delete Account Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(
-      /Failed to delete account due to an internal error. Please try again later./i
-    )
-
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith(error)
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        'Failed to delete account due to an internal error. Please try again later.'
+      )
+    })
   })
 
   it('should not close popup when error is thrown with no response', async () => {
@@ -125,9 +128,9 @@ describe('Delete Account Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+    })
   })
 
   it('should close popup and call signOut with register when account is deleted', async () => {

@@ -6,20 +6,18 @@ export default function SearchUserForm({
   errors,
   isSubmitting,
   onSubmit,
-  onFieldChange,
 }: {
   register: UseFormRegister<SearchStudentFormData>
   errors: FieldErrors<SearchStudentFormData>
   isSubmitting: boolean
   onSubmit: () => void
-  onFieldChange: () => void
 }) {
   return (
     <>
       <form data-testid="find-student-form" className="space-y-6" onSubmit={onSubmit} method="POST">
         <input
           data-testid="student-email"
-          {...register('email', { onChange: onFieldChange })}
+          {...register('email')}
           id="email"
           type="text"
           autoComplete="email"

@@ -1,13 +1,17 @@
 import Navbar from '../../components/navbar'
 import '@testing-library/jest-dom'
-import { act, fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { render } from '../util'
 import * as React from 'react'
 import { mockActivity, mockUser } from '../mocks'
 import { editUser } from '../../api/controller'
 import { ISODateString } from '../../types/isoDateType'
 import { signOut } from 'next-auth/react'
+import { toast } from 'sonner'
 
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(() => ({
@@ -115,8 +119,6 @@ describe('Navbar', () => {
 
   describe('Authorized user', () => {
     it('should display "Home" button and "User" icon', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => null)
-
       render(
         <Navbar
           {...{ isAuthenticated: true, username: mockUser.username, userId: mockUser.userId }}
@@ -190,7 +192,6 @@ describe('Navbar', () => {
       beforeEach(() => {
         jest.useFakeTimers()
         jest.setSystemTime(new Date('2/3/2024'))
-        jest.spyOn(console, 'log').mockImplementation(() => null)
       })
 
       afterEach(() => {
@@ -260,7 +261,9 @@ describe('Navbar', () => {
           await fireEvent.click(logoutMenuItem)
         })
 
-        expect(console.log).toHaveBeenCalledWith('Erroneous response')
+        await waitFor(() => {
+          expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+        })
         expect(signOut).not.toHaveBeenCalled()
       })
 
@@ -291,9 +294,11 @@ describe('Navbar', () => {
           await fireEvent.click(logoutMenuItem)
         })
 
-        expect(console.log).toHaveBeenCalledWith(
-          'Oops, something went wrong in updating and logging out. Please try again later.'
-        )
+        await waitFor(() => {
+          expect(toast.error).toHaveBeenCalledWith(
+            'Failed to update and log out due to an internal error. Please try again later.'
+          )
+        })
         expect(signOut).not.toHaveBeenCalled()
       })
 
@@ -318,7 +323,9 @@ describe('Navbar', () => {
           await fireEvent.click(logoutMenuItem)
         })
 
-        expect(console.log).toHaveBeenCalledWith('Server is down. Try again later.')
+        await waitFor(() => {
+          expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+        })
         expect(signOut).not.toHaveBeenCalled()
       })
     })

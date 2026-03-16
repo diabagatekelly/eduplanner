@@ -1,11 +1,15 @@
 import DeleteActivityPopup from '../../../components/popups/deleteActivityPopup'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
 import { deleteActivity } from '../../../api/controller'
 import { mockActivity, mockUser } from '../../../specs/mocks'
+import { toast } from 'sonner'
 
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
 jest.mock('../../../api/controller')
 jest.mock('next/navigation', () => {
   return {
@@ -28,15 +32,15 @@ describe('Delete Activity Popup', () => {
   })
 
   it('should show error when userId is missing and submit is clicked', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
     const args = { user: {} as any, item: { activityName: 'Test' } }
     render(<DeleteActivityPopup {...{ onClose: jest.fn(), showModal: true, ...args }} />)
     const submitButton = screen.getByTestId('delete-activity-btn')
     await act(async () => {
       await fireEvent.click(submitButton)
     })
-    const errorMessage = screen.getByText(/Server is down. Try again later./i)
-    expect(errorMessage).toBeInTheDocument()
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+    })
   })
 
   it('should render popup to delete activity for main', async () => {
@@ -78,7 +82,6 @@ describe('Delete Activity Popup', () => {
   })
 
   it('should not close popup when response is not 200 or 500 and display error message', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
     const error = {
       response: {
         status: 400,
@@ -101,8 +104,9 @@ describe('Delete Activity Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.findByText(/Erroneous response/i)
-    expect(errorMessage).toBeInTheDocument()
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+    })
   })
 
   it('should not close popup when response is 500 and display error message', async () => {
@@ -125,12 +129,11 @@ describe('Delete Activity Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(
-      /Failed to delete activity due to an internal error. Please try again later./i
-    )
-
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith(error)
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        'Failed to delete activity due to an internal error. Please try again later.'
+      )
+    })
   })
 
   it('should not close popup when error is thrown with no response', async () => {
@@ -150,9 +153,9 @@ describe('Delete Activity Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+    })
   })
 
   it('should close popup when response is successful', async () => {
@@ -170,12 +173,13 @@ describe('Delete Activity Popup', () => {
 
     render(<DeleteActivityPopup {...{ onClose, showModal: true, ...childArgs }} />)
     const submitButton = screen.getByTestId('delete-activity-btn')
-    const submitMessage = await screen.findByTestId('delete-activity-outcome-message')
 
     await act(async () => {
       await fireEvent.click(submitButton)
     })
 
-    expect(submitMessage).toHaveTextContent('Successfully deleted activity')
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Successfully deleted activity')
+    })
   })
 })

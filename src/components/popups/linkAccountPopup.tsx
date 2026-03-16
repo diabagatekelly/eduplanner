@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useLinkStudent } from '@/hooks/use-student-mutations'
 import { IUser } from '@/types/IUser'
 import { LinkIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
+import { toast } from 'sonner'
 
 export default function LinkAccountPopup({
   onClose,
@@ -19,8 +21,6 @@ export default function LinkAccountPopup({
 
   const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...newStudent })
   const [teacher, getTeacherData] = useState<IUser | Partial<IUser>>({ ...user })
-  const [outcomeMessage, setOutcomeMessage] = useState('')
-  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
     getStudentInfo({ ...newStudent })
@@ -30,29 +30,11 @@ export default function LinkAccountPopup({
   async function addStudent() {
     try {
       if (!teacherId) throw new Error('Missing teacherId for linkStudent')
-      setIsLoading(true)
       await linkStudentMutation.mutateAsync([studentInfo.userId!, studentInfo.username!])
-      setOutcomeMessage('Successfully added a new student')
+      toast.success('Successfully added a new student')
       onClose()
-      setIsLoading(false)
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setOutcomeMessage(
-          'Failed to add new student due to an internal error. Please try again later.'
-        )
-      } else {
-        setOutcomeMessage(data.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'add new student')
     }
   }
 
@@ -122,7 +104,6 @@ export default function LinkAccountPopup({
               >
                 No, cancel
               </button>
-              <p data-testid="add-student-outcome-message">{outcomeMessage}</p>
             </div>
           </div>
         </div>

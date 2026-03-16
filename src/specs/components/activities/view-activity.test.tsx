@@ -1,6 +1,6 @@
 import ViewActivity from '../../../components/activities/view-activity'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
 import { editActivity, requestCardReview } from '../../../api/controller'
@@ -8,7 +8,11 @@ import { mockUser, mockActivity, mockStudent } from '../../mocks'
 import { CompletionStatus } from '../../../types/CompletionStatusEnum'
 import ListUi from '../../../components/lists/lists-ui'
 import { ISODateString } from '../../../types/isoDateType'
+import { toast } from 'sonner'
 
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
 jest.mock('../../../components/lists/lists-ui')
 jest.mock('../../../api/controller')
 jest.mock('next/navigation', () => {
@@ -110,7 +114,6 @@ describe('View activity', () => {
         />
       )
       const button = await screen.findByTestId('activity-update-btn')
-      const submitMessage = await screen.findByTestId('update-activity-outcome')
 
       await act(async () => {
         await fireEvent.click(button)
@@ -118,7 +121,7 @@ describe('View activity', () => {
 
       await expect(editActivity).not.toHaveBeenCalled()
       await expect(requestCardReview).not.toHaveBeenCalled()
-      expect(submitMessage).toHaveTextContent('You still have some cards to complete!!')
+      expect(toast.warning).toHaveBeenCalledWith('You still have some cards to complete!!')
     })
   })
 
@@ -166,18 +169,17 @@ describe('View activity', () => {
 
       render(<ViewActivity {...{ userDetails, userActivity: mockActivity, isMain: true }} />)
       const button = await screen.findByTestId('activity-update-btn')
-      const submitMessage = await screen.findByTestId('update-activity-outcome')
 
       await act(async () => {
         await fireEvent.click(button)
       })
 
-      expect(submitMessage).toHaveTextContent('Success')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Success')
+      })
     })
 
     it('should display error message when response is not 200 or 500', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => null)
-
       const error = {
         response: {
           status: 400,
@@ -195,8 +197,9 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should display error message when response is 500', async () => {
@@ -213,12 +216,11 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to edit activity due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to edit activity due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should display error message when error has no response', async () => {
@@ -233,9 +235,9 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 
@@ -338,13 +340,14 @@ describe('View activity', () => {
         />
       )
       const button = await screen.findByTestId('activity-update-btn')
-      const submitMessage = await screen.findByTestId('update-activity-outcome')
 
       await act(async () => {
         await fireEvent.click(button)
       })
 
-      expect(submitMessage).toHaveTextContent('Request for review successfully sent.')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Request for review successfully sent.')
+      })
     })
 
     it('should display error message when response is not 200 or 500', async () => {
@@ -369,8 +372,9 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should display error message when response is 500', async () => {
@@ -391,12 +395,11 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to request review due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to request review due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should display error message when error has no response', async () => {
@@ -414,9 +417,9 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 })

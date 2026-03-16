@@ -1,6 +1,6 @@
 import ManageCardPopup from '../../../components/popups/manageCardPopup'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
 import {
@@ -21,12 +21,15 @@ import {
   mockUserLanguageVocabCard,
 } from '../../../specs/mocks'
 import { CompletionStatus } from '../../../types/CompletionStatusEnum'
+import { toast } from 'sonner'
 
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
 jest.mock('../../../api/controller')
 
 describe('Manage Card Popup', () => {
   it('should show error when userId is missing and action is triggered', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
     const args = {
       user: { accountType: 'teacher' } as any,
       activity: mockActivity,
@@ -37,8 +40,9 @@ describe('Manage Card Popup', () => {
     await act(async () => {
       await fireEvent.click(resetBtn)
     })
-    const errorMessage = screen.getByText(/Server is down. Try again later./i)
-    expect(errorMessage).toBeInTheDocument()
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+    })
   })
 
   describe('Reset stage', () => {
@@ -152,17 +156,17 @@ describe('Manage Card Popup', () => {
       )
 
       const resetStageBtn = await screen.findByTestId('reset-stage-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(resetStageBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Successfully reset card')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully reset card')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => null)
       const error = {
         response: {
           status: 400,
@@ -196,8 +200,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(resetStageBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
@@ -230,12 +235,11 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(resetStageBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to reset card due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to reset card due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
@@ -266,9 +270,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(resetStageBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 
@@ -391,13 +395,14 @@ describe('Manage Card Popup', () => {
       )
 
       const requestReviewBtn = await screen.findByTestId('submit-review-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(requestReviewBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Request for review successfully sent.')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Request for review successfully sent.')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
@@ -434,8 +439,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(requestReviewBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
@@ -468,12 +474,11 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(requestReviewBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to request review due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to request review due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
@@ -504,9 +509,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(requestReviewBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
 
     it('should display disabled button when card already reviewed', async () => {
@@ -649,14 +654,15 @@ describe('Manage Card Popup', () => {
 
       const overrideStageForm = await screen.findByTestId('override-stge-form')
       const overrideStageBtn = await screen.findByTestId('override-stage-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         fireEvent.change(overrideStageForm, { target: { value: '30' } })
         await fireEvent.click(overrideStageBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Successfully overrode status.')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully overrode status.')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
@@ -696,8 +702,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(overrideStageBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
@@ -733,12 +740,11 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(overrideStageBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to override card stage due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to override card stage due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
@@ -772,9 +778,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(overrideStageBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 
@@ -919,13 +925,14 @@ describe('Manage Card Popup', () => {
       )
 
       const demoteStageBtn = await screen.findByTestId('demote-stage-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(demoteStageBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Successfully edited status.')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully edited status.')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
@@ -965,8 +972,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(demoteStageBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
@@ -1002,12 +1010,11 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(demoteStageBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to update card status due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to update card status due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
@@ -1041,9 +1048,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(demoteStageBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 
@@ -1126,13 +1133,14 @@ describe('Manage Card Popup', () => {
       )
 
       const deleteCardBtn = await screen.findByTestId('delete-card-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(deleteCardBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Successfully removed card')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully removed card')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
@@ -1169,8 +1177,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(deleteCardBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
@@ -1203,12 +1212,11 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(deleteCardBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to remove card due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to remove card due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
@@ -1239,9 +1247,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(deleteCardBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 
@@ -1322,13 +1330,14 @@ describe('Manage Card Popup', () => {
       )
 
       const activateCardBtn = await screen.findByTestId('activate-card-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(activateCardBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Successfully activated card')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully activated card')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
@@ -1365,8 +1374,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(activateCardBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
@@ -1399,12 +1409,11 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(activateCardBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to activate card due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to activate card due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
@@ -1435,9 +1444,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(activateCardBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 
@@ -1553,14 +1562,15 @@ describe('Manage Card Popup', () => {
         />
       )
 
-      // Perform action — status message should appear
+      // Perform action — toast should be called
       const resetStageBtn = await screen.findByTestId('reset-stage-btn')
       await act(async () => {
         await fireEvent.click(resetStageBtn)
       })
 
-      const submitMessage = screen.getByTestId('status-message')
-      expect(submitMessage).toHaveTextContent('Successfully reset card')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully reset card')
+      })
 
       // Reopen popup with a different card (simulates closing + reopening)
       rerender(
@@ -1576,9 +1586,8 @@ describe('Manage Card Popup', () => {
         />
       )
 
-      // Status message should be cleared
-      const clearedMessage = screen.getByTestId('status-message')
-      expect(clearedMessage).toHaveTextContent('')
+      // Toast was called once (from the first action), no additional calls after reopen
+      expect(toast.success).toHaveBeenCalledTimes(1)
     })
   })
 

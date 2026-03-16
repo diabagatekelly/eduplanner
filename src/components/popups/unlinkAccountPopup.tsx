@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useUnlinkStudent } from '@/hooks/use-student-mutations'
 import { IUser } from '@/types/IUser'
 import { XMarkIcon, MinusIcon } from '@heroicons/react/24/solid'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
+import { toast } from 'sonner'
 
 export default function UnlinkAccountPopup({
   onClose,
@@ -18,7 +20,6 @@ export default function UnlinkAccountPopup({
   const unlinkStudentMutation = useUnlinkStudent(resolvedTeacherId)
 
   const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...user })
-  const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
     getStudentInfo({ ...user })
@@ -28,25 +29,10 @@ export default function UnlinkAccountPopup({
     try {
       if (!resolvedTeacherId) throw new Error('Missing teacherId for unlinkStudent')
       await unlinkStudentMutation.mutateAsync(studentInfo.userId!)
-      setOutcomeMessage('Successfully removed student.')
+      toast.success('Successfully removed student.')
       onClose()
-    } catch (error: any) {
-      console.log(error)
-
-      if (!error.response) {
-        setOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setOutcomeMessage(
-          'Failed to unlink accounts due to an internal error. Please try again later.'
-        )
-      } else {
-        setOutcomeMessage(data.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'unlink accounts')
     }
   }
 
@@ -116,7 +102,6 @@ export default function UnlinkAccountPopup({
               >
                 No, cancel
               </button>
-              <p data-testid="remove-student-outcome-message">{outcomeMessage}</p>
             </div>
           </div>
         </div>

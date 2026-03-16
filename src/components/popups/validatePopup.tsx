@@ -1,18 +1,17 @@
 import { CheckBadgeIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 export default function ValidatePopup({
   onClose,
   showModal,
   item,
   submitList,
-  setFormSubmitOutcomeMessage,
 }: {
   onClose: () => void
   showModal: boolean
   item?: { list: string }
   submitList?: (list: string) => void
-  setFormSubmitOutcomeMessage?: (msg: string) => void
 }) {
   const [itemsToValidate, getItemsToValidate] = useState('')
 
@@ -26,7 +25,7 @@ export default function ValidatePopup({
   }
 
   function cancel() {
-    setFormSubmitOutcomeMessage?.('Validation canceled.')
+    toast.info('Validation canceled.')
     onClose()
   }
 

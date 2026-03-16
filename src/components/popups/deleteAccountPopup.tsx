@@ -4,6 +4,8 @@ import { signOut } from 'next-auth/react'
 import { IUser } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
 import { UserMinusIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
+import { toast } from 'sonner'
 
 export default function DeleteAccountPopup({
   onClose,
@@ -15,7 +17,6 @@ export default function DeleteAccountPopup({
   user?: IUser | Partial<IUser>
 }) {
   const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
-  const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
     getUserInfo({ ...user })
@@ -25,23 +26,8 @@ export default function DeleteAccountPopup({
     try {
       ;(await deleteUser(userInfo.userId!)) as unknown as IResponse
       await onDeleteAccountSuccess()
-    } catch (error: any) {
-      console.log(error)
-
-      if (!error.response) {
-        setOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setOutcomeMessage(
-          'Failed to delete account due to an internal error. Please try again later.'
-        )
-      } else {
-        setOutcomeMessage(data.message)
-      }
+    } catch (error: unknown) {
+      handleMutationError(error, 'delete account')
     }
   }
 
@@ -111,7 +97,6 @@ export default function DeleteAccountPopup({
               >
                 No, cancel
               </button>
-              <p>{outcomeMessage}</p>
             </div>
           </div>
         </div>
