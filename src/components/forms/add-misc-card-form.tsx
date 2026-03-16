@@ -9,6 +9,9 @@ import Popup from '../popups/popup'
 import { useCreateCards } from '@/hooks/use-card-mutations'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { miscCardSchema, MiscCardFormData } from '@/lib/schemas/card.schemas'
 
 export default function AddMiscCardForm({
   isMain,
@@ -21,8 +24,9 @@ export default function AddMiscCardForm({
 }) {
   const createCardsMutation = useCreateCards(user.userId)
 
-  const [typedList, getTypedList] = useState({
-    words: '',
+  const { register, getValues, setValue, formState } = useForm<MiscCardFormData>({
+    resolver: zodResolver(miscCardSchema),
+    defaultValues: { words: '' },
   })
 
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
@@ -30,15 +34,6 @@ export default function AddMiscCardForm({
   const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
   const [showModal, setShowModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-
-  function onTextareaChange(e: React.FormEvent<HTMLTextAreaElement>) {
-    const target = e.target as HTMLTextAreaElement
-
-    setFormSubmitOutcomeMessage('')
-    getTypedList({
-      words: target.value,
-    })
-  }
 
   async function submitList(finalCardList: string) {
     setFormSubmitOutcomeMessage('')
@@ -94,13 +89,14 @@ export default function AddMiscCardForm({
     e.preventDefault()
     setFormSubmitOutcomeMessage('')
 
-    if (typedList.words === '') {
+    const words = getValues('words')
+    if (words === '') {
       setFormSubmitOutcomeMessage('Oops, you are trying to validate an empty list')
       return
     }
 
-    const listOfItemsToValidate = cleanUpList(typedList.words)
-    ;(document.querySelector('#typed') as HTMLTextAreaElement).value = listOfItemsToValidate
+    const listOfItemsToValidate = cleanUpList(words)
+    setValue('words', listOfItemsToValidate)
 
     getPopupItem({ list: listOfItemsToValidate })
     setModalType('validate')
@@ -144,9 +140,8 @@ export default function AddMiscCardForm({
           <textarea
             data-testid="textarea-for-typed-list"
             className="border border-gray-500 p-3"
-            onChange={onTextareaChange}
+            {...register('words')}
             id="typed"
-            name="typed"
             rows={4}
             cols={50}
           ></textarea>

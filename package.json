@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "test": "cross-env TZ=EST jest",
     "test:ui": "cross-env CYPRESS_ENV=development cypress run --browser chrome",
@@ -18,6 +19,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.0.18",
+    "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/postcss": "^4.2.1",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-query-devtools": "^5.91.3",
@@ -32,8 +34,10 @@
     "next-auth": "^5.0.0-beta.30",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-hook-form": "^7.71.2",
     "tailwindcss": "^4.2.1",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.2",

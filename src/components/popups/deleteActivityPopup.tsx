@@ -22,7 +22,6 @@ export default function DeleteActivityPopup({
   const [outcomeMessage, setOutcomeMessage] = useState('')
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     getActivityName(item!.activityName)
     getUserInfo({ ...user })
   }, [showModal, user, item])

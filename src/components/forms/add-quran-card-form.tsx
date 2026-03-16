@@ -9,14 +9,11 @@ import { IUser } from '@/types/IUser'
 import { useCreateCards, useDeleteCard } from '@/hooks/use-card-mutations'
 import { quranCards } from '@/lib/constants/quran-bank'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
-import { ISODateString } from '@/types/isoDateType'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { quranCustomSchema, QuranCustomFormData } from '@/lib/schemas/card.schemas'
 
-interface IAddQuranCardForm {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
-  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
-}
-
-export default function AddQuranCardForm<IAddQuranCardForm>({
+export default function AddQuranCardForm({
   isMain,
   user,
   activity,
@@ -28,10 +25,16 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
   const createCardsMutation = useCreateCards(user.userId)
   const deleteCardMutation = useDeleteCard(user.userId)
 
-  const [formData, setFormData] = useState<IQuranCards[]>([])
-  const [custom, setCustom] = useState({
-    content: '',
+  const {
+    register,
+    getValues,
+    reset: resetForm,
+  } = useForm<QuranCustomFormData>({
+    resolver: zodResolver(quranCustomSchema),
+    defaultValues: { content: '' },
   })
+
+  const [formData, setFormData] = useState<IQuranCards[]>([])
   const [selectedCards, setSelectedCards] = useState<string[]>([])
   const [selectedJuz, setSelectedJuz] = useState<number[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -59,9 +62,8 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
       return card
     })
 
-    setCustom(custom)
     setFormData([...cardsToDisplay])
-  }, [user, activity, custom])
+  }, [user, activity])
 
   function Checkboxes({ quranCard, handleInput }: { quranCard: any; handleInput: any }) {
     if (quranCard.level === 'Juz') {
@@ -155,29 +157,12 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
     setSelectedCards([...alreadySelected])
   }
 
-  function handleCustomInput(e: React.FormEvent<HTMLInputElement>) {
-    const target = e.target as HTMLInputElement
-    const fieldName: string = target.name
-    const fieldValue: any = target.value
-
-    setCustom((prevState) => ({
-      ...prevState,
-      [fieldName]: fieldValue,
-    }))
-  }
-
   async function submitForm(e: FormEvent<HTMLFormElement>): Promise<any> {
     e.preventDefault()
     try {
-      const rawFormData = new FormData(e.currentTarget)
-      const jsonData: Record<string, string> = {
-        content: '',
-      }
-      for (const pair of rawFormData.entries()) {
-        jsonData[pair[0].trim()] = `${(pair[1] as string).trim()}`
-      }
+      const customContent = getValues('content').trim()
 
-      if (!selectedCards.length && jsonData.content === '') {
+      if (!selectedCards.length && customContent === '') {
         setFormSubmitOutcomeMessage('Please select the cards you want to add.')
         return
       }
@@ -212,9 +197,9 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
         }
       })
 
-      if (jsonData.content !== '') {
+      if (customContent !== '') {
         cards.push({
-          cardId: `${btoa(`custom-${jsonData.content}`)}`,
+          cardId: `${btoa(`custom-${customContent}`)}`,
           activity: activity.name,
           activityType: CARD_ACTIVITY_TYPES.QURAN,
           addedOn: null,
@@ -284,11 +269,9 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
               Custom (Surah name range start to range end):
             </label>
             <input
-              onChange={handleCustomInput}
-              value={custom.content}
+              {...register('content')}
               data-testid="custom-quran"
               id="content"
-              name="content"
               type="text"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Naas 1 to 2"

@@ -1,35 +1,35 @@
-import { FormEvent } from 'react'
-import { IUserFormData } from '../../../types/IUser'
+import { UseFormRegister, FieldErrors } from 'react-hook-form'
+import { RegisterFormData } from '@/lib/schemas/auth.schemas'
 
 export default function RegisterForm({
-  handleInput,
-  formData,
-  isLoading,
-  submitForm,
+  register,
+  errors,
+  isSubmitting,
+  onSubmit,
+  onFieldChange,
 }: {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
-  formData: IUserFormData
-  isLoading: boolean
-  submitForm: (e: FormEvent<HTMLFormElement>) => void
+  register: UseFormRegister<RegisterFormData>
+  errors: FieldErrors<RegisterFormData>
+  isSubmitting: boolean
+  onSubmit: () => void
+  onFieldChange: () => void
 }) {
   return (
     <>
-      <form data-testid="register-form" className="space-y-6" onSubmit={submitForm} method="POST">
+      <form data-testid="register-form" className="space-y-6" onSubmit={onSubmit} method="POST">
         <div>
           <label htmlFor="firstName" className="block text-sm font-medium leading-6 text-gray-900">
             First Name:
           </label>
           <div className="mt-2">
             <input
-              onChange={handleInput}
-              value={formData.firstName}
+              {...register('firstName', { onChange: onFieldChange })}
               id="firstName"
-              name="firstName"
               type="text"
               autoComplete="firstName"
-              required
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
+            {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName.message}</p>}
           </div>
         </div>
         <div>
@@ -38,15 +38,13 @@ export default function RegisterForm({
           </label>
           <div className="mt-2">
             <input
-              onChange={handleInput}
-              value={formData.lastName}
+              {...register('lastName', { onChange: onFieldChange })}
               id="lastName"
-              name="lastName"
               type="text"
               autoComplete="lastName"
-              required
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
+            {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
           </div>
         </div>
         <div>
@@ -55,15 +53,13 @@ export default function RegisterForm({
           </label>
           <div className="mt-2">
             <input
-              onChange={handleInput}
-              value={formData.password}
+              {...register('password', { onChange: onFieldChange })}
               id="password"
-              name="password"
               type="password"
               autoComplete="password"
-              required
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
+            {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
           </div>
         </div>
         <div>
@@ -72,26 +68,30 @@ export default function RegisterForm({
           </label>
           <div className="mt-2">
             <input
-              onChange={handleInput}
-              value={formData.email}
+              {...register('email', { onChange: onFieldChange })}
               id="email"
-              name="email"
               type="email"
               autoComplete="email"
-              required
               className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
+            {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
           </div>
         </div>
         <fieldset>
           <legend>Account Type:</legend>
           <div>
-            <input type="radio" id="student" name="accountType" value="student" defaultChecked />
+            <input
+              {...register('accountType')}
+              type="radio"
+              id="student"
+              value="student"
+              defaultChecked
+            />
             <label htmlFor="student">Student</label>
           </div>
 
           <div>
-            <input type="radio" id="teacher" name="accountType" value="teacher" />
+            <input {...register('accountType')} type="radio" id="teacher" value="teacher" />
             <label htmlFor="teacher">Teacher</label>
           </div>
         </fieldset>
@@ -99,10 +99,10 @@ export default function RegisterForm({
         <div>
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isSubmitting}
             className="flex w-full justify-center default-btn"
           >
-            {isLoading ? 'Loading...' : 'Create Account'}
+            {isSubmitting ? 'Loading...' : 'Create Account'}
           </button>
         </div>
       </form>

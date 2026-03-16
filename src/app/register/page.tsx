@@ -1,75 +1,55 @@
 'use client'
 
-import React, { useState, FormEvent } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import RegisterForm from '@/app/register/components/register-form'
-import { IUser, IUserFormData } from '@/types/IUser'
+import { IUser } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
 import { registerUser } from '@/api/controller'
 import { ISODateString } from '@/types/isoDateType'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { registerSchema, RegisterFormData } from '@/lib/schemas/auth.schemas'
 
-interface IRegister {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
-  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
-}
-
-export default function Register<IRegister>() {
+export default function Register() {
   const router = useRouter()
 
-  const [formData, setFormData] = useState<IUserFormData>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    accountType: '',
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      accountType: 'student',
+    },
   })
 
-  const [isLoading, setIsLoading] = useState(false)
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
 
-  function handleInput(e: React.FormEvent<HTMLInputElement>) {
+  function clearMessage() {
     if (formSubmitOutcomeMessage.length) {
       setFormSubmitOutcomeMessage('')
     }
-
-    const target = e.target as HTMLInputElement
-    const fieldName = target.name
-    const fieldValue = target.value
-
-    setFormData((prevState) => ({
-      ...prevState,
-      [fieldName]: fieldValue,
-    }))
   }
 
-  async function submitForm(e: FormEvent<HTMLFormElement>) {
+  async function submitForm(data: RegisterFormData) {
     try {
-      // We don't want the page to refresh
-      e.preventDefault()
-      setIsLoading(true) // Set loading to true when the request starts
-
-      const rawFormData = new FormData(e.currentTarget)
-      const jsonData: IUserFormData = {
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        accountType: '',
-      }
-
-      for (const pair of rawFormData.entries()) {
-        ;(jsonData as Record<string, string>)[pair[0].trim()] = `${(pair[1] as string).trim()}`
-      }
-
-      const userId = btoa(jsonData.email)
-      const username = `${jsonData.firstName}-${jsonData.lastName}`
-      const linkedAccountsData = jsonData.accountType === 'teacher' ? { students: [] } : {}
+      const userId = btoa(data.email)
+      const username = `${data.firstName}-${data.lastName}`
+      const linkedAccountsData = data.accountType === 'teacher' ? { students: [] } : {}
+      const now = new Date()
 
       const userData: IUser = {
-        ...jsonData,
+        ...data,
         userId,
         username,
-        lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {
+        lastLogin: now.toLocaleDateString('en-US', {
           timeZone: 'EST',
         }) as ISODateString,
         activities: [],
@@ -81,22 +61,13 @@ export default function Register<IRegister>() {
         user: IUser
       }>
 
-      const { data } = response
-      setIsLoading(false)
+      const { data: responseData } = response
+      const { message } = responseData
 
-      const { message, details } = data
-
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        accountType: '',
-      })
+      reset()
       setFormSubmitOutcomeMessage(message)
       router.push('/login')
     } catch (error: any) {
-      setIsLoading(false)
       console.log(error)
 
       if (!error.response) {
@@ -104,14 +75,14 @@ export default function Register<IRegister>() {
         return
       }
 
-      const { status, data } = error.response
+      const { status, data: errorData } = error.response
 
       if (status === 500) {
         setFormSubmitOutcomeMessage(
           'Failed to create user due to an internal error. Please try again later.'
         )
       } else {
-        setFormSubmitOutcomeMessage(data.message)
+        setFormSubmitOutcomeMessage(errorData.message)
       }
     }
   }
@@ -126,7 +97,13 @@ export default function Register<IRegister>() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <RegisterForm {...{ handleInput, formData, isLoading, submitForm }} />
+          <RegisterForm
+            register={register}
+            errors={errors}
+            isSubmitting={isSubmitting}
+            onSubmit={handleSubmit(submitForm)}
+            onFieldChange={clearMessage}
+          />
           <div className="submit-form-outcome-message">{formSubmitOutcomeMessage}</div>
         </div>
       </div>

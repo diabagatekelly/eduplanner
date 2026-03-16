@@ -17,7 +17,6 @@ export default function ValidatePopup({
   const [itemsToValidate, getItemsToValidate] = useState('')
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     getItemsToValidate(item!.list)
   }, [showModal, item])
 

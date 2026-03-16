@@ -48,7 +48,7 @@ async function fillTeacherRegisterForm() {
   const lastName = screen.getByLabelText(/Last Name:/i)
   const password = screen.getByLabelText(/Password:/i)
   const email = screen.getByLabelText(/Email:/i)
-  const teacherRadio = screen.getByDisplayValue(/Student/i)
+  const teacherRadio = screen.getByLabelText(/Teacher/i)
 
   await act(() => {
     // fill out the form
@@ -64,9 +64,7 @@ async function fillTeacherRegisterForm() {
     fireEvent.change(email, {
       target: { value: 'mock.user@email.com' },
     })
-    fireEvent.change(teacherRadio, {
-      target: { value: 'teacher' },
-    })
+    fireEvent.click(teacherRadio)
   })
 }
 

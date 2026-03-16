@@ -1,86 +1,60 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState } from 'react'
 import { findUser } from '../../api/controller'
 import SearchUserForm from '../forms/search-user-form'
 import Popup from '../popups/popup'
 import { IUser } from '@/types/IUser'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { searchStudentSchema, SearchStudentFormData } from '@/lib/schemas/student.schemas'
 
-interface IAddStudent {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
-  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
-}
-
-export default function AddStudent<IAddStudent>({ user }: { user: IUser }) {
-  const [formData, setFormData] = useState({
-    email: '',
+export default function AddStudent({ user }: { user: IUser }) {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<SearchStudentFormData>({
+    resolver: zodResolver(searchStudentSchema),
+    defaultValues: { email: '' },
   })
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
   const [newStudent, getStudentInfo] = useState<IUser>({} as IUser)
   const [showModal, setShowModal] = useState(false)
 
   const modalType = 'addStudent'
 
-  function handleInput(e: React.FormEvent<HTMLInputElement>) {
+  function clearMessage() {
     if (formSubmitOutcomeMessage.length) {
       setFormSubmitOutcomeMessage('')
     }
-
-    const target = e.target as HTMLInputElement
-    const fieldName: string = target.name
-    const fieldValue: any = target.value
-
-    setFormData((prevState) => ({
-      ...prevState,
-      [fieldName]: fieldValue,
-    }))
   }
 
-  function _resetForm() {
-    setFormData({
-      email: '',
-    })
-    setIsLoading(false)
-  }
-
-  async function submitForm(e: FormEvent<HTMLFormElement>): Promise<void> {
+  async function submitForm(data: SearchStudentFormData): Promise<void> {
     try {
-      // We don't want the page to refresh
-      e.preventDefault()
-      setIsLoading(true) // Set loading to true when the request starts
-
-      const formData = new FormData(e.currentTarget)
-      const newStudent = { email: '' }
-
-      for (const pair of formData.entries()) {
-        ;(newStudent as Record<string, string>)[pair[0]] = `${pair[1]}`
-      }
-
-      if (newStudent.email === user.email) {
+      if (data.email === user.email) {
         setFormSubmitOutcomeMessage("You can't add yourself as a student.")
-        _resetForm()
+        reset()
         return
       }
 
       const currentStudents = user?.linkedAccountsData?.students
-      if (currentStudents?.some((tuple) => tuple[0] === btoa(newStudent.email))) {
+      if (currentStudents?.some((tuple) => tuple[0] === btoa(data.email))) {
         setFormSubmitOutcomeMessage('This is already one of your students.')
-        _resetForm()
+        reset()
         return
       }
 
-      const newStudentUserId = { userId: btoa(newStudent.email) }
+      const newStudentUserId = { userId: btoa(data.email) }
 
       const response = await findUser(newStudentUserId)
-      const { data } = response
-      const { details }: { message: string; details: { student: IUser } } = data
-      setIsLoading(false)
+      const { data: responseData } = response
+      const { details }: { message: string; details: { student: IUser } } = responseData
       getStudentInfo(details.student)
       setShowModal(true)
     } catch (error: any) {
-      setIsLoading(false)
       console.log(error)
 
       if (!error.response) {
@@ -88,14 +62,14 @@ export default function AddStudent<IAddStudent>({ user }: { user: IUser }) {
         return
       }
 
-      const { status, data } = error.response
+      const { status, data: errorData } = error.response
 
       if (status === 500) {
         setFormSubmitOutcomeMessage(
           'Failed to add new student due to an internal error. Please try again later.'
         )
       } else {
-        setFormSubmitOutcomeMessage(data.message)
+        setFormSubmitOutcomeMessage(errorData.message)
       }
     }
   }
@@ -104,7 +78,13 @@ export default function AddStudent<IAddStudent>({ user }: { user: IUser }) {
     <div className="justify-items-start">
       <h3 className="component-sub-title">Add a new student:</h3>
       <p>Enter your student&#39;s email:</p>
-      <SearchUserForm {...{ handleInput, formData, isLoading, submitForm }} />
+      <SearchUserForm
+        register={register}
+        errors={errors}
+        isSubmitting={isSubmitting}
+        onSubmit={handleSubmit(submitForm)}
+        onFieldChange={clearMessage}
+      />
       <Popup {...{ showModal, modalType, user, newStudent }} onClose={() => setShowModal(false)} />
       <div data-testid="find-student-submit-message">{formSubmitOutcomeMessage}</div>
     </div>
