@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { queryGuard } from '@/lib/helpers/query-guard'
+import { isTeacher as checkIsTeacher } from '@/lib/helpers/isTeacher'
 
 export default function Main(props: { params: ActivityParams }) {
   const params = use(props.params)
@@ -26,7 +27,7 @@ export default function Main(props: { params: ActivityParams }) {
   if (guard) return guard
   if (!user.userId) return null
 
-  const isTeacher: boolean = user.accountType === 'teacher'
+  const isTeacher = checkIsTeacher(user)
   const userActivity = user.activities?.find((activity) => activity?.name === activityFromParams)
 
   return (

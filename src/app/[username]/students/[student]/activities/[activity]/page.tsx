@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { useStudent } from '@/hooks/use-student'
 import { getStudentId } from '@/lib/helpers/getStudentId'
+import { isTeacher as checkIsTeacher } from '@/lib/helpers/isTeacher'
 
 export default function Main(props: { params: ActivityStudentParams }) {
   const params = use(props.params)
@@ -28,7 +29,7 @@ export default function Main(props: { params: ActivityStudentParams }) {
   const userDetails = studentUser
   const isMain = false
 
-  const isTeacher = teacher?.accountType === 'teacher'
+  const isTeacher = checkIsTeacher(teacher)
   const userActivity = userDetails?.activities?.find(
     (activity) => activity?.name === activityFromParams
   )

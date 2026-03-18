@@ -8,6 +8,7 @@ import { IUser } from '@/types/IUser'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { queryGuard } from '@/lib/helpers/query-guard'
+import { isTeacher as checkIsTeacher } from '@/lib/helpers/isTeacher'
 
 export default function Profile() {
   const [showModal, setShowModal] = useState(false)
@@ -20,7 +21,7 @@ export default function Profile() {
   if (guard) return guard
   if (!user.userId) return null
 
-  const isTeacher = user?.accountType === 'teacher'
+  const isTeacher = checkIsTeacher(user)
 
   return (
     <NestedLayout {...{ isTeacher }}>

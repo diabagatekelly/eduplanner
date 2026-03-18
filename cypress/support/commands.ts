@@ -28,7 +28,11 @@ import { IUser } from '@/types/IUser'
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 //
 Cypress.Commands.add('loginBySession', (user: IUser) => {
-  cy.task('auth:createSession', { userId: user.userId, username: user.username }).then((token) => {
+  cy.task('auth:createSession', {
+    userId: user.userId,
+    username: user.username,
+    accountType: user.accountType,
+  }).then((token) => {
     cy.setCookie('authjs.session-token', token as string)
 
     // Intercept the session endpoint so useSession() resolves immediately
