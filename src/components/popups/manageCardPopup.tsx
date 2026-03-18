@@ -1,12 +1,3 @@
-import { useEffect, useState } from 'react'
-import {
-  useEditCard,
-  useEditCardStage,
-  useResetCardStage,
-  useActivateCard,
-  useDeleteCard,
-  useRequestCardReview,
-} from '@/hooks/use-card-mutations'
 import { ICard } from '@/types/ICard'
 import { IUser } from '@/types/IUser'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
@@ -15,9 +6,8 @@ import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
 import { IActivity } from '@/types/IActivity'
 import formatCardName from '@/lib/helpers/formatCardName'
 import { ClipboardDocumentCheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
-import { toast } from 'sonner'
-import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 import { CardAction } from './popup'
+import { useCardActions } from '@/hooks/use-card-actions'
 
 export default function ManageCardPopup({
   onClose,
@@ -25,150 +15,27 @@ export default function ManageCardPopup({
   isMain,
   user,
   item,
-  activity: activityProp,
+  activity,
 }: {
   onClose: () => void
   showModal: boolean
   isMain: boolean
-  user?: IUser | Partial<IUser>
-  activity?: IActivity
-  item?: { card: ICard; action: CardAction }
+  user: IUser | Partial<IUser>
+  activity: IActivity
+  item: { card: ICard; action: CardAction }
 }) {
-  const userId = user?.userId ?? ''
-  const editCardMutation = useEditCard(userId)
-  const editCardStageMutation = useEditCardStage(userId)
-  const resetCardStageMutation = useResetCardStage(userId)
-  const activateCardMutation = useActivateCard(userId)
-  const deleteCardMutation = useDeleteCard(userId)
-  const requestReviewMutation = useRequestCardReview()
-
-  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
-
-  const [card, getCardDetails] = useState<ICard>({ ...item!.card })
-  const [activity, getActivityDetails] = useState<IActivity>({ ...activityProp } as IActivity)
-  const [newStage, setNewStage] = useState('')
-
-  useEffect(() => {
-    getCardDetails(item!.card)
-    getUserInfo({ ...user })
-
-    getActivityDetails(activityProp!)
-  }, [showModal, user, item, activityProp, newStage])
-
-  function assertUserId() {
-    if (!userId) throw new Error('Missing userId for card mutation')
-  }
-
-  async function resetStage() {
-    try {
-      assertUserId()
-      await resetCardStageMutation.mutateAsync({
-        activity: activity.name,
-        cardId: card.cardId,
-      })
-      toast.success('Successfully reset card')
-      onClose()
-    } catch (error: unknown) {
-      handleMutationError(error, 'reset card')
-    }
-  }
-
-  async function submitForReview() {
-    try {
-      assertUserId()
-      const requestReview = {
-        id: card.cardId,
-        teacherId: userInfo.linkedAccountsData!.teacher!,
-        student: {
-          id: userInfo.userId!,
-          fullName: `${userInfo.firstName} ${userInfo.lastName}`,
-          email: userInfo.email!,
-        },
-      }
-
-      await requestReviewMutation.mutateAsync(requestReview)
-
-      await editCardStageMutation.mutateAsync({
-        activity: activity.name,
-        cardId: card.cardId,
-        editData: {
-          completionStatus: CompletionStatus.REVIEW,
-        },
-      })
-
-      toast.success('Request for review successfully sent.')
-      onClose()
-    } catch (error: unknown) {
-      handleMutationError(error, 'request review')
-    }
-  }
-
-  async function overrideStage(e: React.MouseEvent<HTMLButtonElement>) {
-    try {
-      assertUserId()
-      e.preventDefault()
-      const response = await editCardMutation.mutateAsync({
-        activity: activity.name,
-        cardId: card.cardId,
-        editData: {
-          stage: newStage,
-        },
-      })
-      toast.success('Successfully overrode status.')
-      getCardDetails(response.data.details)
-      onClose()
-    } catch (error: unknown) {
-      handleMutationError(error, 'override card stage')
-    }
-  }
-
-  async function submitEditStage(newStageStatus: boolean) {
-    try {
-      assertUserId()
-      await editCardStageMutation.mutateAsync({
-        activity: activity.name,
-        cardId: card.cardId,
-        editData: {
-          stage: card.stage,
-          promote: newStageStatus,
-        },
-      })
-      toast.success('Successfully edited status.')
-      onClose()
-    } catch (error: unknown) {
-      handleMutationError(error, 'update card status')
-    }
-  }
-
-  async function removeCard() {
-    try {
-      assertUserId()
-      await deleteCardMutation.mutateAsync([
-        {
-          activity: activity.name,
-          cardId: card.cardId,
-        },
-      ])
-      toast.success('Successfully removed card')
-      onClose()
-    } catch (error: unknown) {
-      handleMutationError(error, 'remove card')
-    }
-  }
-
-  async function activate() {
-    try {
-      assertUserId()
-      await activateCardMutation.mutateAsync({
-        activity: activity.name,
-        cardId: card.cardId,
-      })
-      toast.success('Successfully activated card')
-      onClose()
-    } catch (error: unknown) {
-      handleMutationError(error, 'activate card')
-    }
-  }
+  const userId = user.userId ?? ''
+  const card = item.card
+  const {
+    resetStage,
+    submitForReview,
+    overrideStage,
+    submitEditStage,
+    removeCard,
+    activate,
+    newStage,
+    setNewStage,
+  } = useCardActions(userId, activity, card, user, onClose)
 
   function formatCardInstructions(cardName: string) {
     if (cardName.includes(CARD_ACTIVITY_TYPES.VOCAB)) {
@@ -195,7 +62,7 @@ export default function ManageCardPopup({
   return (
     <>
       <div
-        data-testid={`manage-card-popup-${item?.action}`}
+        data-testid={`manage-card-popup-${item.action}`}
         aria-hidden="true"
         hidden={!showModal}
         id="popup-modal"
@@ -239,17 +106,17 @@ export default function ManageCardPopup({
                   Manage Card
                 </h3>
                 <div className="text-left">
-                  <h6 data-testid="card-name">{formatCardName(card.cardId, activity?.name)}</h6>
-                  {activity?.name !== ACTIVITY_TYPES.QURAN && (
+                  <h6 data-testid="card-name">{formatCardName(card.cardId, activity.name)}</h6>
+                  {activity.name !== ACTIVITY_TYPES.QURAN && (
                     <h6 data-testid="card-instructions">
                       Instructions:{' '}
-                      {formatCardInstructions(formatCardName(card.cardId, activity?.name))}
+                      {formatCardInstructions(formatCardName(card.cardId, activity.name))}
                     </h6>
                   )}
                   <hr />
                   <div data-testid="card-owner-info" className="my-5">
                     <h6>
-                      Owner: {userInfo.firstName} {userInfo.lastName}
+                      Owner: {user?.firstName} {user?.lastName}
                     </h6>
                     <h6>Activity: {activity.name}</h6>
                     <h6>Created On: {card.addedOn}</h6>
@@ -259,7 +126,7 @@ export default function ManageCardPopup({
                   <hr />
                   <div data-testid="card-stage-management" className="my-5">
                     <h6 className="mb-2">Current status: {card.completionStatus}</h6>
-                    {item?.action === 'override' ? (
+                    {item.action === 'override' ? (
                       <form className="max-w-md mx-auto" onChange={handleOverrideFormChange}>
                         <label
                           htmlFor="countries"
@@ -285,9 +152,9 @@ export default function ManageCardPopup({
                     )}
                   </div>
                 </div>
-                {((isMain && userInfo?.accountType === 'teacher') ||
-                  (!isMain && userInfo?.accountType === 'student')) &&
-                  item?.action === 'override' && (
+                {((isMain && user?.accountType === 'teacher') ||
+                  (!isMain && user?.accountType === 'student')) &&
+                  item.action === 'override' && (
                     <div className="delete-actions mt-5">
                       <button
                         data-testid="override-stage-btn"
@@ -300,9 +167,9 @@ export default function ManageCardPopup({
                       </button>
                     </div>
                   )}
-                {((isMain && userInfo?.accountType === 'teacher') ||
-                  (!isMain && userInfo?.accountType === 'student')) &&
-                  item?.action === 'delete' && (
+                {((isMain && user?.accountType === 'teacher') ||
+                  (!isMain && user?.accountType === 'student')) &&
+                  item.action === 'delete' && (
                     <div className="delete-actions mt-5">
                       <button
                         data-testid="delete-card-btn"
@@ -315,9 +182,9 @@ export default function ManageCardPopup({
                       </button>
                     </div>
                   )}
-                {((isMain && userInfo?.accountType === 'teacher') ||
-                  (!isMain && userInfo?.accountType === 'student')) &&
-                  item?.action === 'activate' && (
+                {((isMain && user?.accountType === 'teacher') ||
+                  (!isMain && user?.accountType === 'student')) &&
+                  item.action === 'activate' && (
                     <div className="activate-actions mt-5">
                       <button
                         data-testid="activate-card-btn"
@@ -330,9 +197,9 @@ export default function ManageCardPopup({
                       </button>
                     </div>
                   )}
-                {((isMain && userInfo?.accountType === 'teacher') ||
-                  (!isMain && userInfo?.accountType === 'student')) &&
-                  item?.action === 'edit' && (
+                {((isMain && user?.accountType === 'teacher') ||
+                  (!isMain && user?.accountType === 'student')) &&
+                  item.action === 'edit' && (
                     <div className="teacher-actions">
                       <button
                         data-testid="reset-stage-btn"
@@ -367,7 +234,7 @@ export default function ManageCardPopup({
                     </div>
                   )}
 
-                {isMain && userInfo?.accountType === 'student' && item?.action !== 'show' && (
+                {isMain && user?.accountType === 'student' && item.action !== 'show' && (
                   <div className="student-actions">
                     <button
                       disabled={[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(

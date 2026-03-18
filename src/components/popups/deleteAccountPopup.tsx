@@ -1,5 +1,4 @@
 import { deleteUser } from '../../api/controller'
-import { useEffect, useState } from 'react'
 import { signOut } from 'next-auth/react'
 import { IUser } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
@@ -14,17 +13,11 @@ export default function DeleteAccountPopup({
 }: {
   onClose: () => void
   showModal: boolean
-  user?: IUser | Partial<IUser>
+  user: IUser | Partial<IUser>
 }) {
-  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
-
-  useEffect(() => {
-    getUserInfo({ ...user })
-  }, [showModal, user])
-
   async function deleteAccount() {
     try {
-      ;(await deleteUser(userInfo.userId!)) as unknown as IResponse
+      ;(await deleteUser(user.userId!)) as unknown as IResponse
       await onDeleteAccountSuccess()
     } catch (error: unknown) {
       handleMutationError(error, 'delete account')
@@ -74,9 +67,7 @@ export default function DeleteAccountPopup({
                   Are you sure you want to delete this account forever?
                 </h3>
                 <h5 className="mb-5">
-                  <span>
-                    {`${userInfo?.firstName} ${userInfo?.lastName} - ${userInfo?.email}`}{' '}
-                  </span>
+                  <span>{`${user?.firstName} ${user?.lastName} - ${user?.email}`} </span>
                 </h5>
               </div>
 
