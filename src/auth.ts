@@ -35,19 +35,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        const u = user as any
-        token.userId = u.userId
-        token.username = u.username
-        token.accountType = u.accountType
-        token.accessToken = u.accessToken
+        token.userId = user.userId
+        token.username = user.username
+        token.accountType = user.accountType
+        token.accessToken = user.accessToken
       }
       return token
     },
     session({ session, token }) {
-      ;(session.user as any).userId = token.userId
-      ;(session.user as any).username = token.username
-      ;(session.user as any).accountType = token.accountType
-      session.accessToken = token.accessToken as string
+      session.user.userId = token.userId ?? ''
+      session.user.username = token.username ?? ''
+      session.user.accountType = token.accountType ?? ''
+      session.accessToken = token.accessToken
       return session
     },
   },

@@ -1,5 +1,18 @@
 import { auth } from '@/auth'
 
+function getAuthUser(req: Parameters<Parameters<typeof auth>[0]>[0]) {
+  const user = req.auth?.user
+  return {
+    username: user?.username ?? '',
+    accountType: user?.accountType ?? '',
+  }
+}
+
+function isTeacherOnlyRoute(pathname: string): boolean {
+  const segments = pathname.split('/').filter(Boolean)
+  return segments.length >= 2 && segments[1] === 'students'
+}
+
 export const middleware = auth((req) => {
   const isAuthenticated = !!req.auth
   const pathname = req.nextUrl.pathname
@@ -14,20 +27,15 @@ export const middleware = auth((req) => {
   }
 
   if (isAuthenticated && (pathname === '/login' || pathname === '/register')) {
-    const username = (req.auth?.user as any)?.username
+    const { username } = getAuthUser(req)
     if (!username) return
     return Response.redirect(new URL(`/${username}`, req.url))
   }
 
-  // Teacher-only routes: /<username>/students and all sub-paths
-  if (isAuthenticated) {
-    const segments = pathname.split('/').filter(Boolean)
-    if (segments.length >= 2 && segments[1] === 'students') {
-      const accountType = (req.auth?.user as any)?.accountType
-      if (accountType === 'student') {
-        const username = (req.auth?.user as any)?.username
-        return Response.redirect(new URL(`/${username}`, req.url))
-      }
+  if (isAuthenticated && isTeacherOnlyRoute(pathname)) {
+    const { username, accountType } = getAuthUser(req)
+    if (accountType === 'student') {
+      return Response.redirect(new URL(`/${username}`, req.url))
     }
   }
 })

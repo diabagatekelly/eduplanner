@@ -10,6 +10,7 @@ import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { useStudent } from '@/hooks/use-student'
 import { getStudentId } from '@/lib/helpers/getStudentId'
+import { isTeacher as checkIsTeacher } from '@/lib/helpers/isTeacher'
 
 export default function Profile() {
   const studentParam = useParams().student as string
@@ -24,7 +25,7 @@ export default function Profile() {
 
   if (!user.userId) return null
 
-  const isTeacher = teacher?.accountType === 'teacher'
+  const isTeacher = checkIsTeacher(teacher)
 
   return (
     <NestedLayout {...{ isTeacher }}>

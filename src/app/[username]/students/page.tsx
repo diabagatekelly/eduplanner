@@ -9,6 +9,7 @@ import { IUser } from '@/types/IUser'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { queryGuard } from '@/lib/helpers/query-guard'
+import { isTeacher as checkIsTeacher } from '@/lib/helpers/isTeacher'
 
 export default function Students() {
   const router = useRouter()
@@ -21,7 +22,7 @@ export default function Students() {
   if (guard) return guard
   if (!user.userId) return null
 
-  const isTeacher = user.accountType === 'teacher'
+  const isTeacher = checkIsTeacher(user)
   const isMain = true
   const userDetails = user
 

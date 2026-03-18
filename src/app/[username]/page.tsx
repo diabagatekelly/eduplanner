@@ -9,6 +9,7 @@ import { UsernameParams } from '@/types/IParams'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { queryGuard } from '@/lib/helpers/query-guard'
+import { isTeacher as checkIsTeacher } from '@/lib/helpers/isTeacher'
 
 export default function Main(props: { params: UsernameParams }) {
   const params = use(props.params)
@@ -22,7 +23,7 @@ export default function Main(props: { params: UsernameParams }) {
   if (guard) return guard
   if (!user.userId) return null
 
-  const isTeacher = user.accountType === 'teacher'
+  const isTeacher = checkIsTeacher(user)
   const userDetails: IUser = user
   const isMain = user.username === usernameFromParams
 

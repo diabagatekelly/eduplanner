@@ -12,7 +12,11 @@ export default defineConfig({
     pageLoadTimeout: 120000,
     setupNodeEvents(on, config) {
       on('task', {
-        async 'auth:createSession'(params) {
+        async 'auth:createSession'(params: {
+          userId: string
+          username: string
+          accountType: string
+        }) {
           const { userId, username, accountType } = params
           const { encode } = await import('next-auth/jwt')
           return encode({
