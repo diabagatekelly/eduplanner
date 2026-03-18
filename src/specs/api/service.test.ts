@@ -87,11 +87,17 @@ describe('Service', () => {
   })
 
   describe('request interceptor', () => {
-    // The interceptor callback was passed to mock.interceptors.request.use() at module load
+    // The interceptor callback was passed to mock.interceptors.request.use() at module load.
+    // It does `await import('next-auth/react')` on each call, so jest.resetModules() +
+    // jest.doMock() before invoking it controls which getSession mock the dynamic import resolves.
     const interceptor = mock.interceptors.request.use.mock.calls[0][0]
 
+    beforeEach(() => {
+      jest.resetModules()
+    })
+
     it('should attach Authorization header when session has accessToken', async () => {
-      jest.mock('next-auth/react', () => ({
+      jest.doMock('next-auth/react', () => ({
         getSession: jest.fn().mockResolvedValue({ accessToken: 'mock-token' }),
       }))
 
@@ -102,7 +108,7 @@ describe('Service', () => {
     })
 
     it('should initialize headers when config.headers is undefined', async () => {
-      jest.mock('next-auth/react', () => ({
+      jest.doMock('next-auth/react', () => ({
         getSession: jest.fn().mockResolvedValue({ accessToken: 'mock-token' }),
       }))
 
@@ -113,10 +119,9 @@ describe('Service', () => {
     })
 
     it('should not attach Authorization header when session is null', async () => {
-      jest.mock('next-auth/react', () => ({
+      jest.doMock('next-auth/react', () => ({
         getSession: jest.fn().mockResolvedValue(null),
       }))
-      jest.resetModules()
 
       const config = { headers: {} } as any
       const result = await interceptor(config)
