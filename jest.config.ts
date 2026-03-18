@@ -162,7 +162,7 @@ const config: Config = {
   // runner: "jest-runner",
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
-  // setupFiles: [],
+  setupFiles: ['../jest.polyfills.ts'],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
   setupFilesAfterEnv: ['../jest.setup.ts'],
@@ -176,7 +176,6 @@ const config: Config = {
   // The test environment that will be used for testing
   testEnvironment: 'jsdom',
 
-  // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
 
   // Adds a location field to test results
@@ -232,7 +231,7 @@ export default async (...args: any[]) => {
   return {
     ...resolvedConfig,
     transformIgnorePatterns: [
-      '/node_modules/(?!(next-auth|@auth|@panva|jose|openid-client|oauth4webapi)/).*',
+      '/node_modules/(?!(next-auth|@auth|@panva|jose|openid-client|oauth4webapi|msw|@mswjs|until-async)/).*',
       '\\.pnp\\.[^\\/]+$',
     ],
   }

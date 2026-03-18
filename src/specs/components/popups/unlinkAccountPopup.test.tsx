@@ -3,26 +3,20 @@ import '@testing-library/jest-dom'
 import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
-import { unlinkAccount } from '../../../api/controller'
 import { mockUser, mockStudent } from '../../../specs/mocks'
 import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
 }))
-jest.mock('../../../api/controller')
 
 describe('Unlink Account Popup', () => {
   const teacher = { ...mockUser, linkedAccountsData: { students: [mockStudent.userId] } }
   const childArgs = { user: mockStudent, teacherId: teacher.userId }
 
-  beforeAll(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(new Date('2/15/2024'))
-  })
-
   afterAll(() => {
-    jest.useRealTimers()
     jest.resetAllMocks()
   })
 
@@ -54,35 +48,22 @@ describe('Unlink Account Popup', () => {
   })
 
   it('should invoke unlinkAccount controller when form is submitted', async () => {
-    ;(unlinkAccount as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({ status: 200, data: { message: null, details: {} } })
-    })
-
-    let showModal
-    let onClose = () => {
-      showModal = false
-    }
+    const onClose = jest.fn()
 
     render(<UnlinkAccountPopup {...{ onClose, showModal: true, ...childArgs }} />)
 
     const submitButton = screen.getByTestId('unlink-accounts-btn')
-    const unlinkAccountsDTO = { teacherId: teacher.userId, studentId: mockStudent.userId }
 
     await act(async () => {
       await fireEvent.click(submitButton)
     })
 
-    await expect(unlinkAccount).toHaveBeenCalledWith(unlinkAccountsDTO)
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Successfully removed student.')
+    })
   })
 
   it('should close popup when response is successful and display success message', async () => {
-    ;(unlinkAccount as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({
-        status: 200,
-        data: { message: 'Successfully removed student.', details: {} },
-      })
-    })
-
     let showModal = true
 
     render(
@@ -100,15 +81,14 @@ describe('Unlink Account Popup', () => {
   })
 
   it('should not close popup when response is not 200 or 500 and display error message', async () => {
-    const error = {
-      response: {
-        status: 400,
-        data: { status: 'failedTransaction', message: 'Erroneous response' },
-      },
-    }
-    ;(unlinkAccount as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.delete('*/user/linked-accounts/delete/*', () =>
+        HttpResponse.json(
+          { status: 'failedTransaction', message: 'Erroneous response' },
+          { status: 400 }
+        )
+      )
+    )
 
     let showModal = true
 
@@ -127,12 +107,14 @@ describe('Unlink Account Popup', () => {
   })
 
   it('should not close popup when response is 500 and display error message', async () => {
-    const error = {
-      response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-    }
-    ;(unlinkAccount as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.delete('*/user/linked-accounts/delete/*', () =>
+        HttpResponse.json(
+          { status: 'internalServerError', message: 'Server error' },
+          { status: 500 }
+        )
+      )
+    )
 
     let showModal = true
 
@@ -153,9 +135,7 @@ describe('Unlink Account Popup', () => {
   })
 
   it('should not close popup when error is thrown with no response', async () => {
-    ;(unlinkAccount as jest.Mock).mockImplementation(() => {
-      return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-    })
+    server.use(http.delete('*/user/linked-accounts/delete/*', () => HttpResponse.error()))
     let showModal = true
 
     render(

@@ -7,7 +7,6 @@ import { mockUser, mockStudent, mockActivity, mockUserCard } from '../../../spec
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
 }))
-jest.mock('../../../api/controller')
 jest.mock('next-auth/react', () => ({
   useSession: jest.fn(() => ({ data: null })),
   signOut: jest.fn(),

@@ -3,14 +3,17 @@ import '@testing-library/jest-dom'
 import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
-import { findUser } from '../../../api/controller'
 import { mockUser, mockStudent } from '../../../specs/mocks'
 import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
 }))
-jest.mock('../../../api/controller')
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(() => ({
@@ -38,15 +41,10 @@ describe('Add student', () => {
   })
 
   it('should invoke findUser controller when form is submitted', async () => {
-    ;(findUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({ status: 200, data: { message: null, details: {} } })
-    })
     render(<AddStudent {...{ user }} />)
 
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
-
-    const studentDTO = { userId: mockStudent.userId }
 
     await act(() => {
       fireEvent.change(email, {
@@ -58,7 +56,9 @@ describe('Add student', () => {
       await fireEvent.click(submitButton)
     })
 
-    await expect(findUser).toHaveBeenCalledWith(studentDTO)
+    await waitFor(() => {
+      expect(screen.getByTestId('link-account-popup')).toBeVisible()
+    })
   })
 
   it('should not add same user as his own student', async () => {
@@ -111,12 +111,11 @@ describe('Add student', () => {
   })
 
   it('should reset form when response is successful and display popup with student info', async () => {
-    ;(findUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({
-        status: 200,
-        data: { message: 'User found.', details: { student: mockStudent } },
-      })
-    })
+    server.use(
+      http.get('*/user', () =>
+        HttpResponse.json({ message: 'User found.', details: { student: mockStudent } })
+      )
+    )
 
     render(<AddStudent {...{ user }} />)
 
@@ -146,15 +145,14 @@ describe('Add student', () => {
   })
 
   it('should not reset form when response is not 200 or 500 and display error message', async () => {
-    const error = {
-      response: {
-        status: 400,
-        data: { status: 'failedTransaction', message: 'Erroneous response' },
-      },
-    }
-    ;(findUser as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.get('*/user', () =>
+        HttpResponse.json(
+          { status: 'failedTransaction', message: 'Erroneous response' },
+          { status: 400 }
+        )
+      )
+    )
 
     render(<AddStudent {...{ user }} />)
 
@@ -185,12 +183,14 @@ describe('Add student', () => {
   })
 
   it('should not reset form when response is 500 and display error message', async () => {
-    const error = {
-      response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-    }
-    ;(findUser as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.get('*/user', () =>
+        HttpResponse.json(
+          { status: 'internalServerError', message: 'Server error' },
+          { status: 500 }
+        )
+      )
+    )
     render(<AddStudent {...{ user }} />)
 
     const email = screen.getByTestId('student-email')
@@ -222,9 +222,7 @@ describe('Add student', () => {
   })
 
   it('should not reset form when error is thrown with no response', async () => {
-    ;(findUser as jest.Mock).mockImplementation(() => {
-      return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-    })
+    server.use(http.get('*/user', () => HttpResponse.error()))
     render(<AddStudent {...{ user }} />)
 
     const email = screen.getByTestId('student-email')

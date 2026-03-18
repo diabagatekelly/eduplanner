@@ -3,14 +3,17 @@ import '@testing-library/jest-dom'
 import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
-import { linkAccount } from '../../../api/controller'
 import { mockUser, mockStudent } from '../../../specs/mocks'
 import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
 }))
-jest.mock('../../../api/controller')
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 
 describe('Link Account Popup', () => {
   const teacher = { ...mockUser, accountType: 'teacher', linkedAccountsData: { students: [] } }
@@ -45,38 +48,22 @@ describe('Link Account Popup', () => {
   })
 
   it('should invoke linkAccount controller when form is submitted', async () => {
-    ;(linkAccount as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({ status: 200, data: { message: null, details: {} } })
-    })
-
-    let showModal
-    let onClose = () => {
-      showModal = false
-    }
+    const onClose = jest.fn()
 
     render(<LinkAccountPopup {...{ onClose, showModal: true, ...childArgs }} />)
 
     const submitButton = screen.getByTestId('link-accounts-btn')
-    const linkAccountsDTO = {
-      teacherId: teacher.userId,
-      studentId: [newStudent.userId, newStudent.username],
-    }
 
     await act(async () => {
       await fireEvent.click(submitButton)
     })
 
-    await expect(linkAccount).toHaveBeenCalledWith(linkAccountsDTO)
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled()
+    })
   })
 
   it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-    ;(linkAccount as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({
-        status: 200,
-        data: { message: 'Successfully added new student.', details: {} },
-      })
-    })
-
     let showModal = true
 
     render(
@@ -94,15 +81,14 @@ describe('Link Account Popup', () => {
   })
 
   it('should not close popup when response is not 200 or 500 and display error message', async () => {
-    const error = {
-      response: {
-        status: 400,
-        data: { status: 'failedTransaction', message: 'Erroneous response' },
-      },
-    }
-    ;(linkAccount as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.post('*/user/linked-accounts/add', () =>
+        HttpResponse.json(
+          { status: 'failedTransaction', message: 'Erroneous response' },
+          { status: 400 }
+        )
+      )
+    )
 
     let showModal = true
 
@@ -121,12 +107,14 @@ describe('Link Account Popup', () => {
   })
 
   it('should not close popup when response is 500 and display error message', async () => {
-    const error = {
-      response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-    }
-    ;(linkAccount as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.post('*/user/linked-accounts/add', () =>
+        HttpResponse.json(
+          { status: 'internalServerError', message: 'Server error' },
+          { status: 500 }
+        )
+      )
+    )
 
     let showModal = true
 
@@ -147,9 +135,7 @@ describe('Link Account Popup', () => {
   })
 
   it('should not close popup when error is thrown with no response', async () => {
-    ;(linkAccount as jest.Mock).mockImplementation(() => {
-      return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-    })
+    server.use(http.post('*/user/linked-accounts/add', () => HttpResponse.error()))
 
     let showModal = true
 

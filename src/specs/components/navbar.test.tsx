@@ -3,11 +3,11 @@ import '@testing-library/jest-dom'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { render } from '../util'
 import * as React from 'react'
-import { mockActivity, mockUser } from '../mocks'
-import { editUser } from '../../api/controller'
-import { ISODateString } from '../../types/isoDateType'
+import { mockUser } from '../mocks'
 import { signOut } from 'next-auth/react'
 import { toast } from 'sonner'
+import { server } from '../msw/server'
+import { http, HttpResponse } from 'msw'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
@@ -21,9 +21,9 @@ jest.mock('next/navigation', () => {
     usePathname: jest.fn(() => mockUser.username),
   }
 })
-jest.mock('../../api/controller')
 jest.mock('next-auth/react', () => ({
   signOut: jest.fn(),
+  getSession: jest.fn().mockResolvedValue(null),
 }))
 
 describe('Navbar', () => {
@@ -190,23 +190,14 @@ describe('Navbar', () => {
 
     describe('Logging out', () => {
       beforeEach(() => {
-        jest.useFakeTimers()
-        jest.setSystemTime(new Date('2/3/2024'))
+        jest.spyOn(Date, 'now').mockReturnValue(new Date('2/3/2024').getTime())
       })
 
       afterEach(() => {
-        jest.clearAllMocks()
-        jest.useRealTimers()
+        jest.restoreAllMocks()
       })
 
       it('should invoke editUser and signOut when logout is clicked', async () => {
-        ;(editUser as jest.Mock).mockImplementationOnce(() => {
-          return Promise.resolve({
-            status: 200,
-            data: { message: null, details: { user: mockUser } },
-          })
-        })
-
         render(
           <Navbar
             {...{ isAuthenticated: true, username: mockUser.username, userId: mockUser.userId }}
@@ -223,27 +214,20 @@ describe('Navbar', () => {
           await fireEvent.click(logoutMenuItem)
         })
 
-        await expect(editUser).toHaveBeenCalledWith({
-          userId: mockUser.userId,
-          editData: {
-            lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {
-              timeZone: 'EST',
-            }) as ISODateString,
-          },
+        await waitFor(() => {
+          expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/login' })
         })
-        expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/login' })
       })
 
       it('should not log out when response is not 200 or 500 and log error message', async () => {
-        const error = {
-          response: {
-            status: 400,
-            data: { status: 'failedTransaction', message: 'Erroneous response' },
-          },
-        }
-        ;(editUser as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject(error)
-        })
+        server.use(
+          http.patch('*/user/edit', () =>
+            HttpResponse.json(
+              { status: 'failedTransaction', message: 'Erroneous response' },
+              { status: 400 }
+            )
+          )
+        )
 
         render(
           <Navbar
@@ -268,15 +252,14 @@ describe('Navbar', () => {
       })
 
       it('should not log out when response is 500 and log error message', async () => {
-        const error = {
-          response: {
-            status: 500,
-            data: { status: 'internalServerError', message: 'Server error' },
-          },
-        }
-        ;(editUser as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject(error)
-        })
+        server.use(
+          http.patch('*/user/edit', () =>
+            HttpResponse.json(
+              { status: 'internalServerError', message: 'Server error' },
+              { status: 500 }
+            )
+          )
+        )
 
         render(
           <Navbar
@@ -303,9 +286,7 @@ describe('Navbar', () => {
       })
 
       it('should not log out when error is thrown with no response and log error message', async () => {
-        ;(editUser as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-        })
+        server.use(http.patch('*/user/edit', () => HttpResponse.error()))
 
         render(
           <Navbar

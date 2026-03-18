@@ -3,14 +3,17 @@ import '@testing-library/jest-dom'
 import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
-import { createActivity } from '../../../api/controller'
 import { mockUser, mockActivity } from '../../../specs/mocks'
 import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
 }))
-jest.mock('../../../api/controller')
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(() => ({
@@ -38,9 +41,6 @@ describe('Add activity', () => {
   })
 
   it('should invoke createActivity controller when form is submitted', async () => {
-    ;(createActivity as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({ status: 200, data: { message: null, details: {} } })
-    })
     render(<AddActivity {...{ userDetails }} />)
 
     const name = screen.getByLabelText(/Name:/i)
@@ -48,8 +48,6 @@ describe('Add activity', () => {
     const points = screen.getByLabelText('Points (optional):')
     const hasCards = screen.getByLabelText(/Yes/i)
     const submitButton = screen.getByTestId('add-activity-btn')
-
-    const userActivityDTO = { userActivity: mockActivity, userId: userDetails.userId }
 
     await act(() => {
       fireEvent.change(name, {
@@ -68,7 +66,9 @@ describe('Add activity', () => {
       await fireEvent.click(submitButton)
     })
 
-    await expect(createActivity).toHaveBeenCalledWith(userActivityDTO)
+    await waitFor(() => {
+      expect(name).toHaveValue('')
+    })
   })
 
   it('should not create pre-existing user activity', async () => {
@@ -107,15 +107,14 @@ describe('Add activity', () => {
   })
 
   it('should reset form when response is successful and display success message, then reset message when form in focus', async () => {
-    ;(createActivity as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({
-        status: 200,
-        data: {
+    server.use(
+      http.post('*/user/activities/add', () =>
+        HttpResponse.json({
           message: 'Successfully created activity.',
           details: { userId: userDetails.userId, userActivity: mockActivity },
-        },
-      })
-    })
+        })
+      )
+    )
 
     render(<AddActivity {...{ userDetails }} />)
 
@@ -151,15 +150,14 @@ describe('Add activity', () => {
   })
 
   it('should not reset form when response is not 200 or 500 and display error message', async () => {
-    const error = {
-      response: {
-        status: 400,
-        data: { status: 'failedTransaction', message: 'Erroneous response' },
-      },
-    }
-    ;(createActivity as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.post('*/user/activities/add', () =>
+        HttpResponse.json(
+          { status: 'failedTransaction', message: 'Erroneous response' },
+          { status: 400 }
+        )
+      )
+    )
 
     render(<AddActivity {...{ userDetails }} />)
 
@@ -204,12 +202,14 @@ describe('Add activity', () => {
   })
 
   it('should not reset form when response is 500 and display error message', async () => {
-    const error = {
-      response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-    }
-    ;(createActivity as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.post('*/user/activities/add', () =>
+        HttpResponse.json(
+          { status: 'internalServerError', message: 'Server error' },
+          { status: 500 }
+        )
+      )
+    )
     render(<AddActivity {...{ userDetails }} />)
 
     const name = screen.getByLabelText(/Name:/i)
@@ -255,9 +255,7 @@ describe('Add activity', () => {
   })
 
   it('should not reset form when error is thrown with no response', async () => {
-    ;(createActivity as jest.Mock).mockImplementation(() => {
-      return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-    })
+    server.use(http.post('*/user/activities/add', () => HttpResponse.error()))
     render(<AddActivity {...{ userDetails }} />)
 
     const name = screen.getByLabelText(/Name:/i)

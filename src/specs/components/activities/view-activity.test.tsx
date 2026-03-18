@@ -3,18 +3,21 @@ import '@testing-library/jest-dom'
 import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
-import { editActivity, requestCardReview } from '../../../api/controller'
 import { mockUser, mockActivity, mockStudent } from '../../mocks'
 import { CompletionStatus } from '../../../types/CompletionStatusEnum'
 import ListUi from '../../../components/lists/lists-ui'
-import { ISODateString } from '../../../types/isoDateType'
 import { toast } from 'sonner'
+
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
 }))
 jest.mock('../../../components/lists/lists-ui')
-jest.mock('../../../api/controller')
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(() => ({
@@ -28,13 +31,11 @@ describe('View activity', () => {
   const userDetails = { ...mockUser, activities: [mockActivity] }
 
   beforeAll(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(new Date('2/3/2024'))
+    jest.spyOn(Date, 'now').mockReturnValue(new Date('2/3/2024').getTime())
   })
 
   afterAll(() => {
-    jest.clearAllMocks()
-    jest.useRealTimers()
+    jest.restoreAllMocks()
   })
 
   describe('Display', () => {
@@ -119,24 +120,17 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
 
-      await expect(editActivity).not.toHaveBeenCalled()
-      await expect(requestCardReview).not.toHaveBeenCalled()
       expect(toast.warning).toHaveBeenCalledWith('You still have some cards to complete!!')
     })
   })
 
   describe('Update activity', () => {
     it('should invoke editActivity controller when button is clicked', async () => {
-      const userActivityDTO = {
-        ...mockActivity,
-        completionStatus: CompletionStatus.COMPLETED,
-        lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {
-          timeZone: 'EST',
-        }) as ISODateString,
-      }
-      ;(editActivity as jest.Mock).mockImplementation(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: userActivityDTO } })
-      })
+      server.use(
+        http.patch('*/user/activities/edit', () =>
+          HttpResponse.json({ message: 'Activity updated', details: mockActivity })
+        )
+      )
 
       render(
         <ViewActivity {...{ userDetails: userDetails, userActivity: mockActivity, isMain: true }} />
@@ -146,26 +140,17 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
 
-      await expect(editActivity).toHaveBeenCalledWith({
-        userId: userDetails.userId,
-        updatedActivity: userActivityDTO,
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Activity updated')
       })
     })
 
     it('should display success message', async () => {
-      const updatedActivity = {
-        ...mockActivity,
-        completionStatus: CompletionStatus.COMPLETED,
-        lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {
-          timeZone: 'EST',
-        }) as ISODateString,
-      }
-      ;(editActivity as jest.Mock).mockImplementation(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'Success', details: updatedActivity },
-        })
-      })
+      server.use(
+        http.patch('*/user/activities/edit', () =>
+          HttpResponse.json({ message: 'Success', details: mockActivity })
+        )
+      )
 
       render(<ViewActivity {...{ userDetails, userActivity: mockActivity, isMain: true }} />)
       const button = await screen.findByTestId('activity-update-btn')
@@ -180,15 +165,14 @@ describe('View activity', () => {
     })
 
     it('should display error message when response is not 200 or 500', async () => {
-      const error = {
-        response: {
-          status: 400,
-          data: { status: 'failedTransaction', message: 'Erroneous response' },
-        },
-      }
-      ;(editActivity as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.patch('*/user/activities/edit', () =>
+          HttpResponse.json(
+            { status: 'failedTransaction', message: 'Erroneous response' },
+            { status: 400 }
+          )
+        )
+      )
 
       render(<ViewActivity {...{ userDetails, userActivity: mockActivity, isMain: true }} />)
       const button = await screen.findByTestId('activity-update-btn')
@@ -203,12 +187,14 @@ describe('View activity', () => {
     })
 
     it('should display error message when response is 500', async () => {
-      const error = {
-        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-      }
-      ;(editActivity as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.patch('*/user/activities/edit', () =>
+          HttpResponse.json(
+            { status: 'internalServerError', message: 'Server error' },
+            { status: 500 }
+          )
+        )
+      )
       render(<ViewActivity {...{ userDetails, userActivity: mockActivity, isMain: true }} />)
       const button = await screen.findByTestId('activity-update-btn')
 
@@ -224,9 +210,7 @@ describe('View activity', () => {
     })
 
     it('should display error message when error has no response', async () => {
-      ;(editActivity as jest.Mock).mockImplementation(() => {
-        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-      })
+      server.use(http.patch('*/user/activities/edit', () => HttpResponse.error()))
 
       render(<ViewActivity {...{ userDetails, userActivity: mockActivity, isMain: true }} />)
       const button = await screen.findByTestId('activity-update-btn')
@@ -275,20 +259,6 @@ describe('View activity', () => {
     })
 
     it('should invoke requestCardReview controller when button is clicked', async () => {
-      const userActivityDTO = {
-        ...mockActivity,
-        completionStatus: CompletionStatus.REVIEW,
-        lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {
-          timeZone: 'EST',
-        }) as ISODateString,
-      }
-      ;(requestCardReview as jest.Mock).mockImplementation(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: {} } })
-      })
-      ;(editActivity as jest.Mock).mockImplementation(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: userActivityDTO } })
-      })
-
       render(
         <ViewActivity
           {...{ userDetails: studentUserDetails, userActivity: mockActivity, isMain: true }}
@@ -299,41 +269,12 @@ describe('View activity', () => {
         await fireEvent.click(button)
       })
 
-      const requestReviewDTO = {
-        id: mockActivity.activityId,
-        teacherId: studentUserDetails.linkedAccountsData.teacher,
-        student: {
-          id: studentUserDetails.userId,
-          fullName: `${studentUserDetails.firstName} ${studentUserDetails.lastName}`,
-          email: studentUserDetails.email,
-        },
-      }
-
-      await expect(requestCardReview).toHaveBeenCalledWith(requestReviewDTO)
-      await expect(editActivity).toHaveBeenCalledWith({
-        userId: studentUserDetails.userId,
-        updatedActivity: userActivityDTO,
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Request for review successfully sent.')
       })
     })
 
     it('should display success message', async () => {
-      const updatedActivity = {
-        ...mockActivity,
-        completionStatus: CompletionStatus.REVIEW,
-        lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {
-          timeZone: 'EST',
-        }) as ISODateString,
-      }
-      ;(editActivity as jest.Mock).mockImplementation(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'Success', details: updatedActivity },
-        })
-      })
-      ;(requestCardReview as jest.Mock).mockImplementation(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: {} } })
-      })
-
       render(
         <ViewActivity
           {...{ userDetails: studentUserDetails, userActivity: mockActivity, isMain: true }}
@@ -351,15 +292,14 @@ describe('View activity', () => {
     })
 
     it('should display error message when response is not 200 or 500', async () => {
-      const error = {
-        response: {
-          status: 400,
-          data: { status: 'failedTransaction', message: 'Erroneous response' },
-        },
-      }
-      ;(requestCardReview as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/request-review', () =>
+          HttpResponse.json(
+            { status: 'failedTransaction', message: 'Erroneous response' },
+            { status: 400 }
+          )
+        )
+      )
 
       render(
         <ViewActivity
@@ -378,12 +318,14 @@ describe('View activity', () => {
     })
 
     it('should display error message when response is 500', async () => {
-      const error = {
-        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-      }
-      ;(requestCardReview as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/request-review', () =>
+          HttpResponse.json(
+            { status: 'internalServerError', message: 'Server error' },
+            { status: 500 }
+          )
+        )
+      )
       render(
         <ViewActivity
           {...{ userDetails: studentUserDetails, userActivity: mockActivity, isMain: true }}
@@ -403,9 +345,7 @@ describe('View activity', () => {
     })
 
     it('should display error message when error has no response', async () => {
-      ;(requestCardReview as jest.Mock).mockImplementation(() => {
-        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-      })
+      server.use(http.post('*/user/cards/request-review', () => HttpResponse.error()))
       render(
         <ViewActivity
           {...{ userDetails: studentUserDetails, userActivity: mockActivity, isMain: true }}

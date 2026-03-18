@@ -54,10 +54,12 @@
     "husky": "^9.1.7",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
+    "msw": "^2.12.13",
     "nyc-config-tsx": "^0.1.0",
     "prettier": "^3.8.1",
     "start-server-and-test": "^2.1.5",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "undici": "^6.24.1"
   },
   "overrides": {
     "@types/react": "19.2.14",
