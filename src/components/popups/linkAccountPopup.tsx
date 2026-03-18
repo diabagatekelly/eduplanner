@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useLinkStudent } from '@/hooks/use-student-mutations'
 import { IUser } from '@/types/IUser'
 import { LinkIcon, XMarkIcon } from '@heroicons/react/24/solid'
@@ -19,18 +18,10 @@ export default function LinkAccountPopup({
   const teacherId = user?.userId ?? ''
   const linkStudentMutation = useLinkStudent(teacherId)
 
-  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...newStudent })
-  const [teacher, getTeacherData] = useState<IUser | Partial<IUser>>({ ...user })
-
-  useEffect(() => {
-    getStudentInfo({ ...newStudent })
-    getTeacherData({ ...user })
-  }, [showModal, newStudent, user])
-
   async function addStudent() {
     try {
       if (!teacherId) throw new Error('Missing teacherId for linkStudent')
-      await linkStudentMutation.mutateAsync([studentInfo.userId!, studentInfo.username!])
+      await linkStudentMutation.mutateAsync([newStudent!.userId!, newStudent!.username!])
       toast.success('Successfully added a new student')
       onClose()
     } catch (error: unknown) {
@@ -82,7 +73,7 @@ export default function LinkAccountPopup({
                 </h3>
                 <h5 className="mb-5">
                   <span>
-                    {studentInfo?.firstName} {studentInfo?.lastName} - {studentInfo?.email}{' '}
+                    {newStudent?.firstName} {newStudent?.lastName} - {newStudent?.email}{' '}
                   </span>
                 </h5>
               </div>

@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useDeleteActivity } from '@/hooks/use-activity-mutations'
 import { IUser } from '@/types/IUser'
 import { BoltSlashIcon, XMarkIcon } from '@heroicons/react/24/solid'
@@ -19,18 +18,10 @@ export default function DeleteActivityPopup({
   const userId = user?.userId ?? ''
   const deleteActivityMutation = useDeleteActivity(userId)
 
-  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
-  const [activityName, getActivityName] = useState('')
-
-  useEffect(() => {
-    getActivityName(item!.activityName)
-    getUserInfo({ ...user })
-  }, [showModal, user, item])
-
   async function deleteUserActivity() {
     try {
       if (!userId) throw new Error('Missing userId for deleteActivity')
-      await deleteActivityMutation.mutateAsync(activityName)
+      await deleteActivityMutation.mutateAsync(item!.activityName)
       toast.success('Successfully deleted activity')
       onClose()
     } catch (error: unknown) {
@@ -81,7 +72,7 @@ export default function DeleteActivityPopup({
                   Are you sure you want to delete this activity?
                 </h3>
                 <h5 className="mb-5">
-                  <span>{activityName}</span>
+                  <span>{item?.activityName}</span>
                 </h5>
               </div>
 

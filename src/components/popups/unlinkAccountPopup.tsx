@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useUnlinkStudent } from '@/hooks/use-student-mutations'
 import { IUser } from '@/types/IUser'
 import { XMarkIcon, MinusIcon } from '@heroicons/react/24/solid'
@@ -19,16 +18,10 @@ export default function UnlinkAccountPopup({
   const resolvedTeacherId = teacherId ?? ''
   const unlinkStudentMutation = useUnlinkStudent(resolvedTeacherId)
 
-  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...user })
-
-  useEffect(() => {
-    getStudentInfo({ ...user })
-  }, [showModal, user])
-
   async function removeOldStudent() {
     try {
       if (!resolvedTeacherId) throw new Error('Missing teacherId for unlinkStudent')
-      await unlinkStudentMutation.mutateAsync(studentInfo.userId!)
+      await unlinkStudentMutation.mutateAsync(user!.userId!)
       toast.success('Successfully removed student.')
       onClose()
     } catch (error: unknown) {
@@ -79,7 +72,7 @@ export default function UnlinkAccountPopup({
                 </h3>
                 <h5 className="mb-5">
                   <span>
-                    {`${studentInfo!.username!.split('-').join(' ')} - ${atob(studentInfo!.userId!)} `}{' '}
+                    {`${user!.username!.split('-').join(' ')} - ${atob(user!.userId!)} `}{' '}
                   </span>
                 </h5>
               </div>

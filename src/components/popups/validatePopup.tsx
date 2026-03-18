@@ -1,5 +1,4 @@
 import { CheckBadgeIcon, XMarkIcon } from '@heroicons/react/24/solid'
-import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 export default function ValidatePopup({
@@ -13,14 +12,8 @@ export default function ValidatePopup({
   item?: { list: string }
   submitList?: (list: string) => void
 }) {
-  const [itemsToValidate, getItemsToValidate] = useState('')
-
-  useEffect(() => {
-    getItemsToValidate(item!.list)
-  }, [showModal, item])
-
   function validate() {
-    submitList?.(itemsToValidate)
+    submitList?.(item!.list)
     onClose()
   }
 
@@ -72,7 +65,7 @@ export default function ValidatePopup({
                   Is this the correct list of cards you want to create?
                 </h3>
                 <h5 className="mb-5">
-                  <span>{itemsToValidate} </span>
+                  <span>{item?.list} </span>
                 </h5>
               </div>
 
