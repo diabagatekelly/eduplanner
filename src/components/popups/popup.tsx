@@ -10,6 +10,8 @@ import { IUser } from '@/types/IUser'
 import { IActivity } from '@/types/IActivity'
 import { ICard } from '@/types/ICard'
 
+export type CardAction = 'show' | 'edit' | 'delete' | 'activate' | 'override'
+
 export type PopupConfig =
   | { type: 'deleteAccount'; user: IUser | Partial<IUser> }
   | { type: 'addStudent'; user: IUser | Partial<IUser>; newStudent: IUser | Partial<IUser> }
@@ -20,7 +22,7 @@ export type PopupConfig =
       isMain: boolean
       user: IUser | Partial<IUser>
       activity: IActivity
-      item: { card: ICard; action: string }
+      item: { card: ICard; action: CardAction }
     }
   | { type: 'validate'; item: { list: string }; submitList: (list: string) => void }
 
@@ -83,5 +85,10 @@ export default function Popup({
           submitList={config.submitList}
         />
       )
+    // istanbul ignore next -- exhaustive guard: unreachable if all PopupConfig types are handled
+    default: {
+      const _exhaustive: never = config
+      throw new Error(`Unhandled popup config: ${JSON.stringify(_exhaustive)}`)
+    }
   }
 }

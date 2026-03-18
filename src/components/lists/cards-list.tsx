@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Popup from '../popups/popup'
+import Popup, { CardAction } from '../popups/popup'
 import { ICard } from '@/types/ICard'
 import { IUser } from '@/types/IUser'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
@@ -30,8 +30,8 @@ export default function CardsList({
   const mounted = useMounted()
 
   const [showModal, setShowModal] = useState(false)
-  const [popupItem, setPopupItem] = useState<{ card: ICard; action: string }>(
-    {} as { card: ICard; action: string }
+  const [popupItem, setPopupItem] = useState<{ card: ICard; action: CardAction }>(
+    {} as { card: ICard; action: CardAction }
   )
   const [popupUserDetails, setPopupUserDetails] = useState<IUser>({} as IUser)
   const [cardsOfTheDay, setCardsOfTheDay] = useState<ICard[]>([])
@@ -82,7 +82,7 @@ export default function CardsList({
     }
   }, [userDetails, activity, mounted])
 
-  function openCardPopup(card: ICard, action: string) {
+  function openCardPopup(card: ICard, action: CardAction) {
     setPopupItem({ card, action })
     setPopupUserDetails(userDetails)
     setShowModal(true)

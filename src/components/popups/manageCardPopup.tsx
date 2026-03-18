@@ -17,6 +17,7 @@ import formatCardName from '@/lib/helpers/formatCardName'
 import { ClipboardDocumentCheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import { toast } from 'sonner'
 import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
+import { CardAction } from './popup'
 
 export default function ManageCardPopup({
   onClose,
@@ -31,7 +32,7 @@ export default function ManageCardPopup({
   isMain: boolean
   user?: IUser | Partial<IUser>
   activity?: IActivity
-  item?: { card: ICard; action: string }
+  item?: { card: ICard; action: CardAction }
 }) {
   const userId = user?.userId ?? ''
   const editCardMutation = useEditCard(userId)
