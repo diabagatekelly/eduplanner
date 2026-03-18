@@ -13,10 +13,10 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       on('task', {
         async 'auth:createSession'(params) {
-          const { userId, username } = params
+          const { userId, username, accountType } = params
           const { encode } = await import('next-auth/jwt')
           return encode({
-            token: { userId, username, accessToken: 'mock-access-token' },
+            token: { userId, username, accountType, accessToken: 'mock-access-token' },
             secret: process.env.AUTH_SECRET ?? 'test-secret',
             salt: 'authjs.session-token',
           })

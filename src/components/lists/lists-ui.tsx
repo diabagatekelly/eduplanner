@@ -1,5 +1,3 @@
-'use client'
-
 import StudentsList from './students-list'
 import ActivitiesList from './activities-list'
 import CardsList from './cards-list'

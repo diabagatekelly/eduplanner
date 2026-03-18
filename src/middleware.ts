@@ -18,6 +18,18 @@ export const middleware = auth((req) => {
     if (!username) return
     return Response.redirect(new URL(`/${username}`, req.url))
   }
+
+  // Teacher-only routes: /<username>/students and all sub-paths
+  if (isAuthenticated) {
+    const segments = pathname.split('/').filter(Boolean)
+    if (segments.length >= 2 && segments[1] === 'students') {
+      const accountType = (req.auth?.user as any)?.accountType
+      if (accountType === 'student') {
+        const username = (req.auth?.user as any)?.username
+        return Response.redirect(new URL(`/${username}`, req.url))
+      }
+    }
+  }
 })
 
 export const config = {

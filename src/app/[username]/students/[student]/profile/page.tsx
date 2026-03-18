@@ -24,7 +24,7 @@ export default function Profile() {
 
   if (!user.userId) return null
 
-  const isTeacher = user?.accountType === 'teacher'
+  const isTeacher = teacher?.accountType === 'teacher'
 
   return (
     <NestedLayout {...{ isTeacher }}>

@@ -21,7 +21,7 @@ export default function Students() {
   if (guard) return guard
   if (!user.userId) return null
 
-  const isTeacher = user.accountType?.includes('teacher')
+  const isTeacher = user.accountType === 'teacher'
   const isMain = true
   const userDetails = user
 
