@@ -125,7 +125,7 @@ describe('View activity', () => {
   })
 
   describe('Update activity', () => {
-    it('should invoke editActivity controller when button is clicked', async () => {
+    it('should show success toast and update button state after marking activity completed', async () => {
       server.use(
         http.patch('*/user/activities/edit', () =>
           HttpResponse.json({ message: 'Activity updated', details: mockActivity })
@@ -258,7 +258,7 @@ describe('View activity', () => {
       })
     })
 
-    it('should invoke requestCardReview controller when button is clicked', async () => {
+    it('should show success toast after requesting review', async () => {
       render(
         <ViewActivity
           {...{ userDetails: studentUserDetails, userActivity: mockActivity, isMain: true }}

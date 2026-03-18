@@ -82,7 +82,7 @@ describe('Register page', () => {
     expect(registerForm).toBeInTheDocument()
   })
 
-  it('should invoke registerUser controller when form is submitted for student', async () => {
+  it('should reset form fields after successful student registration', async () => {
     render(<Register />)
 
     const firstName = screen.getByLabelText(/First Name:/i)
@@ -99,7 +99,7 @@ describe('Register page', () => {
     })
   })
 
-  it('should invoke registerUser controller when form is submitted for teacher', async () => {
+  it('should reset form fields after successful teacher registration', async () => {
     render(<Register />)
 
     const firstName = screen.getByLabelText(/First Name:/i)

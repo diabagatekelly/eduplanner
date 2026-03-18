@@ -117,6 +117,7 @@ describe('Add misc card form', () => {
         await waitFor(() => {
           expect(toast.success).toHaveBeenCalledWith('Cards added')
         })
+        expect(screen.queryByTestId('validate-popup')).toBeNull()
       })
 
       it('should not reset form when response is not 200 or 500 and display error message', async () => {

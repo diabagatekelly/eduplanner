@@ -47,7 +47,7 @@ describe('Unlink Account Popup', () => {
     expect(studentInfo).toHaveTextContent('mock.student@email.com')
   })
 
-  it('should invoke unlinkAccount controller when form is submitted', async () => {
+  it('should show success toast and close popup after unlinking account', async () => {
     const onClose = jest.fn()
 
     render(<UnlinkAccountPopup {...{ onClose, showModal: true, ...childArgs }} />)
@@ -61,6 +61,7 @@ describe('Unlink Account Popup', () => {
     await waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith('Successfully removed student.')
     })
+    expect(onClose).toHaveBeenCalled()
   })
 
   it('should close popup when response is successful and display success message', async () => {

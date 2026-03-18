@@ -226,6 +226,7 @@ describe('Add language card form', () => {
         await waitFor(() => {
           expect(toast.success).toHaveBeenCalledWith('Cards added')
         })
+        expect(screen.queryByTestId('validate-popup')).toBeNull()
       })
     })
   })
@@ -504,6 +505,7 @@ describe('Add language card form', () => {
         await waitFor(() => {
           expect(toast.success).toHaveBeenCalledWith('Cards added')
         })
+        expect(screen.queryByTestId('validate-popup')).toBeNull()
       })
     })
   })

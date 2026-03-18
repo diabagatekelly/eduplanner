@@ -40,7 +40,7 @@ describe('Add activity', () => {
     expect(addActivityForm).toBeInTheDocument()
   })
 
-  it('should invoke createActivity controller when form is submitted', async () => {
+  it('should reset form fields after successful activity creation', async () => {
     render(<AddActivity {...{ userDetails }} />)
 
     const name = screen.getByLabelText(/Name:/i)

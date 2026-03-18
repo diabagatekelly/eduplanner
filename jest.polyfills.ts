@@ -9,11 +9,11 @@ const { TextEncoder, TextDecoder } = require('node:util')
 const { ReadableStream, WritableStream, TransformStream } = require('node:stream/web')
 
 Object.defineProperties(globalThis, {
-  TextEncoder: { value: TextEncoder },
-  TextDecoder: { value: TextDecoder },
-  ReadableStream: { value: ReadableStream },
-  WritableStream: { value: WritableStream },
-  TransformStream: { value: TransformStream },
+  TextEncoder: { value: TextEncoder, configurable: true, writable: true },
+  TextDecoder: { value: TextDecoder, configurable: true, writable: true },
+  ReadableStream: { value: ReadableStream, configurable: true, writable: true },
+  WritableStream: { value: WritableStream, configurable: true, writable: true },
+  TransformStream: { value: TransformStream, configurable: true, writable: true },
 })
 
 const undici = require('undici')

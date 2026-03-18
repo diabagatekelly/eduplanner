@@ -162,6 +162,7 @@ const config: Config = {
   // runner: "jest-runner",
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
+  // Note: rootDir is 'src/', so '../' resolves to repo root (same pattern as setupFilesAfterEnv)
   setupFiles: ['../jest.polyfills.ts'],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
@@ -231,6 +232,7 @@ export default async (...args: any[]) => {
   return {
     ...resolvedConfig,
     transformIgnorePatterns: [
+      // until-async is a real MSW dependency (@mswjs/interceptors uses it)
       '/node_modules/(?!(next-auth|@auth|@panva|jose|openid-client|oauth4webapi|msw|@mswjs|until-async)/).*',
       '\\.pnp\\.[^\\/]+$',
     ],
