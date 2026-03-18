@@ -16,9 +16,9 @@ import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 export function useCardActions(
   userId: string,
-  activity: IActivity | undefined,
-  card: ICard | undefined,
-  user: IUser | Partial<IUser> | undefined,
+  activity: IActivity,
+  card: ICard,
+  user: IUser | Partial<IUser>,
   onClose: () => void
 ) {
   const editCardMutation = useEditCard(userId)
@@ -38,8 +38,8 @@ export function useCardActions(
     try {
       assertUserId()
       await resetCardStageMutation.mutateAsync({
-        activity: activity!.name,
-        cardId: card!.cardId,
+        activity: activity.name,
+        cardId: card.cardId,
       })
       toast.success('Successfully reset card')
       onClose()
@@ -52,20 +52,20 @@ export function useCardActions(
     try {
       assertUserId()
       const requestReview = {
-        id: card!.cardId,
-        teacherId: user!.linkedAccountsData!.teacher!,
+        id: card.cardId,
+        teacherId: user.linkedAccountsData!.teacher!,
         student: {
-          id: user!.userId!,
-          fullName: `${user!.firstName} ${user!.lastName}`,
-          email: user!.email!,
+          id: user.userId!,
+          fullName: `${user.firstName} ${user.lastName}`,
+          email: user.email!,
         },
       }
 
       await requestReviewMutation.mutateAsync(requestReview)
 
       await editCardStageMutation.mutateAsync({
-        activity: activity!.name,
-        cardId: card!.cardId,
+        activity: activity.name,
+        cardId: card.cardId,
         editData: {
           completionStatus: CompletionStatus.REVIEW,
         },
@@ -83,8 +83,8 @@ export function useCardActions(
       assertUserId()
       e.preventDefault()
       await editCardMutation.mutateAsync({
-        activity: activity!.name,
-        cardId: card!.cardId,
+        activity: activity.name,
+        cardId: card.cardId,
         editData: {
           stage: newStage,
         },
@@ -100,10 +100,10 @@ export function useCardActions(
     try {
       assertUserId()
       await editCardStageMutation.mutateAsync({
-        activity: activity!.name,
-        cardId: card!.cardId,
+        activity: activity.name,
+        cardId: card.cardId,
         editData: {
-          stage: card!.stage,
+          stage: card.stage,
           promote: newStageStatus,
         },
       })
@@ -119,8 +119,8 @@ export function useCardActions(
       assertUserId()
       await deleteCardMutation.mutateAsync([
         {
-          activity: activity!.name,
-          cardId: card!.cardId,
+          activity: activity.name,
+          cardId: card.cardId,
         },
       ])
       toast.success('Successfully removed card')
@@ -134,8 +134,8 @@ export function useCardActions(
     try {
       assertUserId()
       await activateCardMutation.mutateAsync({
-        activity: activity!.name,
-        cardId: card!.cardId,
+        activity: activity.name,
+        cardId: card.cardId,
       })
       toast.success('Successfully activated card')
       onClose()

@@ -12,16 +12,16 @@ export default function LinkAccountPopup({
 }: {
   onClose: () => void
   showModal: boolean
-  newStudent?: IUser | Partial<IUser>
-  user?: IUser | Partial<IUser>
+  newStudent: IUser | Partial<IUser>
+  user: IUser | Partial<IUser>
 }) {
-  const teacherId = user?.userId ?? ''
+  const teacherId = user.userId ?? ''
   const linkStudentMutation = useLinkStudent(teacherId)
 
   async function addStudent() {
     try {
       if (!teacherId) throw new Error('Missing teacherId for linkStudent')
-      await linkStudentMutation.mutateAsync([newStudent!.userId!, newStudent!.username!])
+      await linkStudentMutation.mutateAsync([newStudent.userId!, newStudent.username!])
       toast.success('Successfully added a new student')
       onClose()
     } catch (error: unknown) {

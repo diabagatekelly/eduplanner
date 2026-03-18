@@ -13,11 +13,11 @@ export default function DeleteAccountPopup({
 }: {
   onClose: () => void
   showModal: boolean
-  user?: IUser | Partial<IUser>
+  user: IUser | Partial<IUser>
 }) {
   async function deleteAccount() {
     try {
-      ;(await deleteUser(user!.userId!)) as unknown as IResponse
+      ;(await deleteUser(user.userId!)) as unknown as IResponse
       await onDeleteAccountSuccess()
     } catch (error: unknown) {
       handleMutationError(error, 'delete account')

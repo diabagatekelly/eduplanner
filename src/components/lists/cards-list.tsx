@@ -30,7 +30,6 @@ export default function CardsList({
   const mounted = useMounted()
   const { cardsOfTheDay, allActiveCards, allInactiveCards, hash } = useCardFiltering(
     activity,
-    userDetails,
     mounted
   )
 

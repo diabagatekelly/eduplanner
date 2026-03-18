@@ -12,16 +12,16 @@ export default function UnlinkAccountPopup({
 }: {
   onClose: () => void
   showModal: boolean
-  user?: IUser | Partial<IUser>
-  teacherId?: string
+  user: IUser | Partial<IUser>
+  teacherId: string
 }) {
-  const resolvedTeacherId = teacherId ?? ''
+  const resolvedTeacherId = teacherId
   const unlinkStudentMutation = useUnlinkStudent(resolvedTeacherId)
 
   async function removeOldStudent() {
     try {
       if (!resolvedTeacherId) throw new Error('Missing teacherId for unlinkStudent')
-      await unlinkStudentMutation.mutateAsync(user!.userId!)
+      await unlinkStudentMutation.mutateAsync(user.userId!)
       toast.success('Successfully removed student.')
       onClose()
     } catch (error: unknown) {
@@ -71,9 +71,7 @@ export default function UnlinkAccountPopup({
                   Are you sure you want to remove this student?
                 </h3>
                 <h5 className="mb-5">
-                  <span>
-                    {`${user!.username!.split('-').join(' ')} - ${atob(user!.userId!)} `}{' '}
-                  </span>
+                  <span>{`${user.username!.split('-').join(' ')} - ${atob(user.userId!)} `} </span>
                 </h5>
               </div>
 

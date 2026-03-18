@@ -20,12 +20,12 @@ export default function ManageCardPopup({
   onClose: () => void
   showModal: boolean
   isMain: boolean
-  user?: IUser | Partial<IUser>
-  activity?: IActivity
-  item?: { card: ICard; action: CardAction }
+  user: IUser | Partial<IUser>
+  activity: IActivity
+  item: { card: ICard; action: CardAction }
 }) {
-  const userId = user?.userId ?? ''
-  const card = item!.card
+  const userId = user.userId ?? ''
+  const card = item.card
   const {
     resetStage,
     submitForReview,
@@ -62,7 +62,7 @@ export default function ManageCardPopup({
   return (
     <>
       <div
-        data-testid={`manage-card-popup-${item?.action}`}
+        data-testid={`manage-card-popup-${item.action}`}
         aria-hidden="true"
         hidden={!showModal}
         id="popup-modal"
@@ -106,11 +106,11 @@ export default function ManageCardPopup({
                   Manage Card
                 </h3>
                 <div className="text-left">
-                  <h6 data-testid="card-name">{formatCardName(card.cardId, activity?.name)}</h6>
-                  {activity?.name !== ACTIVITY_TYPES.QURAN && (
+                  <h6 data-testid="card-name">{formatCardName(card.cardId, activity.name)}</h6>
+                  {activity.name !== ACTIVITY_TYPES.QURAN && (
                     <h6 data-testid="card-instructions">
                       Instructions:{' '}
-                      {formatCardInstructions(formatCardName(card.cardId, activity?.name))}
+                      {formatCardInstructions(formatCardName(card.cardId, activity.name))}
                     </h6>
                   )}
                   <hr />
@@ -118,7 +118,7 @@ export default function ManageCardPopup({
                     <h6>
                       Owner: {user?.firstName} {user?.lastName}
                     </h6>
-                    <h6>Activity: {activity?.name}</h6>
+                    <h6>Activity: {activity.name}</h6>
                     <h6>Created On: {card.addedOn}</h6>
                     <h6>Last updated: {card.lastUpdatedOn || 'Never'}</h6>
                     <h6>Next show date: {card.nextShowDate || 'Never'}</h6>
@@ -126,7 +126,7 @@ export default function ManageCardPopup({
                   <hr />
                   <div data-testid="card-stage-management" className="my-5">
                     <h6 className="mb-2">Current status: {card.completionStatus}</h6>
-                    {item?.action === 'override' ? (
+                    {item.action === 'override' ? (
                       <form className="max-w-md mx-auto" onChange={handleOverrideFormChange}>
                         <label
                           htmlFor="countries"
@@ -154,7 +154,7 @@ export default function ManageCardPopup({
                 </div>
                 {((isMain && user?.accountType === 'teacher') ||
                   (!isMain && user?.accountType === 'student')) &&
-                  item?.action === 'override' && (
+                  item.action === 'override' && (
                     <div className="delete-actions mt-5">
                       <button
                         data-testid="override-stage-btn"
@@ -169,7 +169,7 @@ export default function ManageCardPopup({
                   )}
                 {((isMain && user?.accountType === 'teacher') ||
                   (!isMain && user?.accountType === 'student')) &&
-                  item?.action === 'delete' && (
+                  item.action === 'delete' && (
                     <div className="delete-actions mt-5">
                       <button
                         data-testid="delete-card-btn"
@@ -184,7 +184,7 @@ export default function ManageCardPopup({
                   )}
                 {((isMain && user?.accountType === 'teacher') ||
                   (!isMain && user?.accountType === 'student')) &&
-                  item?.action === 'activate' && (
+                  item.action === 'activate' && (
                     <div className="activate-actions mt-5">
                       <button
                         data-testid="activate-card-btn"
@@ -199,7 +199,7 @@ export default function ManageCardPopup({
                   )}
                 {((isMain && user?.accountType === 'teacher') ||
                   (!isMain && user?.accountType === 'student')) &&
-                  item?.action === 'edit' && (
+                  item.action === 'edit' && (
                     <div className="teacher-actions">
                       <button
                         data-testid="reset-stage-btn"
@@ -234,7 +234,7 @@ export default function ManageCardPopup({
                     </div>
                   )}
 
-                {isMain && user?.accountType === 'student' && item?.action !== 'show' && (
+                {isMain && user?.accountType === 'student' && item.action !== 'show' && (
                   <div className="student-actions">
                     <button
                       disabled={[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(

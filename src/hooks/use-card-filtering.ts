@@ -1,14 +1,9 @@
 import { useState, useEffect } from 'react'
 import { ICard } from '@/types/ICard'
-import { IUser } from '@/types/IUser'
 import { IActivity } from '@/types/IActivity'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 
-export function useCardFiltering(
-  activity: IActivity | undefined,
-  userDetails: IUser,
-  mounted: boolean | undefined
-) {
+export function useCardFiltering(activity: IActivity | undefined, mounted: boolean | undefined) {
   const [cardsOfTheDay, setCardsOfTheDay] = useState<ICard[]>([])
   const [allActiveCards, setAllActiveCards] = useState<ICard[]>([])
   const [allInactiveCards, setAllInactiveCards] = useState<ICard[]>([])
@@ -55,7 +50,7 @@ export function useCardFiltering(
       const hashReducer = window.location.hash
       setHash(hashReducer)
     }
-  }, [userDetails, activity, mounted])
+  }, [activity, mounted])
 
   return { cardsOfTheDay, allActiveCards, allInactiveCards, hash }
 }

@@ -9,11 +9,11 @@ export default function ValidatePopup({
 }: {
   onClose: () => void
   showModal: boolean
-  item?: { list: string }
-  submitList?: (list: string) => void
+  item: { list: string }
+  submitList: (list: string) => void
 }) {
   function validate() {
-    submitList?.(item!.list)
+    submitList(item.list)
     onClose()
   }
 
@@ -65,7 +65,7 @@ export default function ValidatePopup({
                   Is this the correct list of cards you want to create?
                 </h3>
                 <h5 className="mb-5">
-                  <span>{item?.list} </span>
+                  <span>{item.list} </span>
                 </h5>
               </div>
 
