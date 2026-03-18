@@ -22,11 +22,13 @@ jest.mock('axios', () => {
 })
 
 // Retrieve the singleton instance the factory always returns via create()
-const mock = (axios as any).create() as {
+const mockInstance = (axios as any).create()
+const mock = mockInstance as {
   get: jest.Mock
   post: jest.Mock
   patch: jest.Mock
   delete: jest.Mock
+  interceptors: { request: { use: jest.Mock } }
 }
 
 const mockUrl = 'http://some-mock-url.com'
@@ -82,5 +84,49 @@ describe('Service', () => {
     const res = await deleteCommand(mockUrl, mockUser.userId)
     expect(mock.delete).toHaveBeenCalledWith(finalUrl)
     expect(res).toEqual(mockDeleteResponse)
+  })
+
+  describe('request interceptor', () => {
+    // The interceptor callback was passed to mock.interceptors.request.use() at module load.
+    // It does `await import('next-auth/react')` on each call, so jest.resetModules() +
+    // jest.doMock() before invoking it controls which getSession mock the dynamic import resolves.
+    const interceptor = mock.interceptors.request.use.mock.calls[0][0]
+
+    beforeEach(() => {
+      jest.resetModules()
+    })
+
+    it('should attach Authorization header when session has accessToken', async () => {
+      jest.doMock('next-auth/react', () => ({
+        getSession: jest.fn().mockResolvedValue({ accessToken: 'mock-token' }),
+      }))
+
+      const config = { headers: {} } as any
+      const result = await interceptor(config)
+
+      expect(result.headers.Authorization).toBe('Bearer mock-token')
+    })
+
+    it('should initialize headers when config.headers is undefined', async () => {
+      jest.doMock('next-auth/react', () => ({
+        getSession: jest.fn().mockResolvedValue({ accessToken: 'mock-token' }),
+      }))
+
+      const config = {} as any
+      const result = await interceptor(config)
+
+      expect(result.headers.Authorization).toBe('Bearer mock-token')
+    })
+
+    it('should not attach Authorization header when session is null', async () => {
+      jest.doMock('next-auth/react', () => ({
+        getSession: jest.fn().mockResolvedValue(null),
+      }))
+
+      const config = { headers: {} } as any
+      const result = await interceptor(config)
+
+      expect(result.headers.Authorization).toBeUndefined()
+    })
   })
 })

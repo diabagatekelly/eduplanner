@@ -2,8 +2,8 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 
 const axiosInstance: AxiosInstance = axios.create()
 
-/* istanbul ignore next */
 axiosInstance.interceptors.request.use(async (config) => {
+  // istanbul ignore next -- JSDOM always defines window; server-side branch covered by E2E
   if (typeof window !== 'undefined') {
     try {
       const { getSession } = await import('next-auth/react')

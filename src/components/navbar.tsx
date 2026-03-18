@@ -148,7 +148,7 @@ export default function Navbar({
                             data-testid="profile-link"
                             href={`/${username}/profile`}
                             className={classNames(
-                              /* istanbul ignore next */
+                              /* istanbul ignore next -- Headless UI hover state untestable in JSDOM */
                               active ? 'bg-gray-200' : '',
                               pathname.includes(`/${username}/profile`)
                                 ? 'italic rounded-md border-2 border-gray-700'
@@ -167,7 +167,7 @@ export default function Navbar({
                             onClick={logout}
                             href="#"
                             className={classNames(
-                              /* istanbul ignore next */
+                              /* istanbul ignore next -- Headless UI hover state untestable in JSDOM */
                               active ? 'bg-gray-100' : '',
                               'block px-4 py-2 text-sm text-gray-700'
                             )}
