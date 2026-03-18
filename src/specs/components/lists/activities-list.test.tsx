@@ -5,10 +5,15 @@ import { render } from '../../util'
 import * as React from 'react'
 import { IUser } from '../../../types/IUser'
 import { mockActivity, mockStudent, mockUser } from '../../mocks'
-import { deleteActivity } from '../../../api/controller'
 import { CompletionStatus } from '../../../types/CompletionStatusEnum'
 
-jest.mock('../../../api/controller')
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
+jest.mock('next-auth/react', () => ({
+  signOut: jest.fn(),
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(() => ({
@@ -99,12 +104,6 @@ describe('Activities List', () => {
     it('should delete activity for main user', async () => {
       render(<ActivitiesList {...{ isMain: true, userDetails: teacher }} />)
       const deleteActivitiesList = screen.getAllByTestId('delete-activities-in-list')
-      ;(deleteActivity as jest.Mock).mockImplementation(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'Activity deleted.', details: { activity: mockActivity } },
-        })
-      })
 
       await act(async () => {
         await fireEvent.click(deleteActivitiesList[0])

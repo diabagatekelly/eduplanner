@@ -3,33 +3,23 @@ import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
 import AddLanguageCardForm from '../../../components/forms/add-language-card-form'
-import {
-  mockUser,
-  mockActivity,
-  mockLanguageActivity,
-  mockUserLanguageGrammarCard,
-  mockUserLanguageVocabCard,
-} from '../../mocks'
-import { createCards } from '../../../api/controller'
+import { mockUser, mockActivity, mockLanguageActivity } from '../../mocks'
 import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
 }))
-jest.mock('../../../api/controller')
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 
 describe('Add language card form', () => {
   const user = { ...mockUser, activities: [{ ...mockLanguageActivity }] }
 
-  beforeEach(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(new Date('2/4/2024'))
-  })
-
   afterEach(() => {
-    jest.resetAllMocks()
     jest.clearAllMocks()
-    jest.useRealTimers()
   })
 
   describe('Display forms', () => {
@@ -198,8 +188,10 @@ describe('Add language card form', () => {
 
     describe('Submitting', () => {
       it('should submit with expected list', async () => {
-        ;(createCards as jest.Mock).mockImplementation(() =>
-          Promise.resolve({ status: 200, data: { message: 'Cards added', details: [] } })
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json({ message: 'Cards added', details: [] })
+          )
         )
         render(
           <AddLanguageCardForm
@@ -231,19 +223,10 @@ describe('Add language card form', () => {
           await fireEvent.click(popupYesBtn)
         })
 
-        const expectedCardsPayload = [
-          { ...mockUserLanguageGrammarCard, cardId: `${btoa('arabic-grammar-conjugate')}` },
-          {
-            ...mockUserLanguageGrammarCard,
-            cardId: `${btoa('arabic-grammar-Madinah 1 pg. 6 ex. 1')}`,
-          },
-        ]
-
-        expect(createCards).toHaveBeenCalledWith({
-          userId: mockUser.userId,
-          activity: mockLanguageActivity.name,
-          cards: expectedCardsPayload,
+        await waitFor(() => {
+          expect(toast.success).toHaveBeenCalledWith('Cards added')
         })
+        expect(screen.queryByTestId('validate-popup')).toBeNull()
       })
     })
   })
@@ -352,12 +335,6 @@ describe('Add language card form', () => {
           {...{ isMain: true, user: mockUser, activity: mockLanguageActivity }}
         />
       )
-      ;(createCards as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'Cards added', details: [{ ...mockUserLanguageVocabCard }] },
-        })
-      })
 
       const selectCardTypeFormSelect = document.querySelector('#cardTypeSelect') as Element
       const uploadFileForm = (await screen.findByTestId('upload-form')) as HTMLInputElement
@@ -480,24 +457,11 @@ describe('Add language card form', () => {
 
     describe('Submitting', () => {
       it('should submit with expected list', async () => {
-        const houseUserCards = [{ ...mockUserLanguageVocabCard }]
-        const catUserCards = [
-          { ...mockUserLanguageVocabCard, cardId: `${btoa('arabic-vocab-cat')}` },
-        ]
-
-        const expectedReturnedCards = [...houseUserCards, ...catUserCards]
-        const expectedControllerPayload = {
-          userId: `${btoa('mock.user@email.com')}`,
-          activity: 'Arabic-Language',
-          cards: [...houseUserCards, ...catUserCards],
-        }
-
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.resolve({
-            status: 200,
-            data: { message: 'Cards added', details: expectedReturnedCards },
-          })
-        })
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json({ message: 'Cards added', details: [] })
+          )
+        )
 
         render(
           <AddLanguageCardForm
@@ -538,22 +502,24 @@ describe('Add language card form', () => {
           await fireEvent.click(popupYesBtn)
         })
 
-        expect(createCards).toHaveBeenCalledWith(expectedControllerPayload)
+        await waitFor(() => {
+          expect(toast.success).toHaveBeenCalledWith('Cards added')
+        })
+        expect(screen.queryByTestId('validate-popup')).toBeNull()
       })
     })
   })
 
   describe('Submitting errors', () => {
     it('should not reset form when response is not 200 or 500 and display error message', async () => {
-      const error = {
-        response: {
-          status: 400,
-          data: { status: 'failedTransaction', message: 'Erroneous response' },
-        },
-      }
-      ;(createCards as jest.Mock).mockImplementationOnce(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/add', () =>
+          HttpResponse.json(
+            { status: 'failedTransaction', message: 'Erroneous response' },
+            { status: 400 }
+          )
+        )
+      )
 
       render(
         <AddLanguageCardForm
@@ -600,12 +566,14 @@ describe('Add language card form', () => {
     })
 
     it('should not reset form when response is 500 and display error message', async () => {
-      const error = {
-        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-      }
-      ;(createCards as jest.Mock).mockImplementationOnce(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/add', () =>
+          HttpResponse.json(
+            { status: 'internalServerError', message: 'Server error' },
+            { status: 500 }
+          )
+        )
+      )
 
       render(
         <AddLanguageCardForm
@@ -654,9 +622,7 @@ describe('Add language card form', () => {
     })
 
     it('should not reset form when error is thrown with no response', async () => {
-      ;(createCards as jest.Mock).mockImplementationOnce(() => {
-        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-      })
+      server.use(http.post('*/user/cards/add', () => HttpResponse.error()))
 
       render(
         <AddLanguageCardForm

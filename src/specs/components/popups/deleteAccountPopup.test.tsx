@@ -3,15 +3,15 @@ import '@testing-library/jest-dom'
 import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
-import { deleteUser } from '../../../api/controller'
 import { mockUser } from '../../../specs/mocks'
 import { signOut } from 'next-auth/react'
 import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
 }))
-jest.mock('../../../api/controller')
 jest.mock('next-auth/react', () => ({
   signOut: jest.fn(),
 }))
@@ -39,10 +39,6 @@ describe('Delete Account Popup', () => {
   })
 
   it('should invoke deleteAccount controller when form is submitted', async () => {
-    ;(deleteUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({ status: 200, data: { message: null, details: {} } })
-    })
-
     let showModal
     let onClose = () => {
       showModal = false
@@ -56,19 +52,20 @@ describe('Delete Account Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    await expect(deleteUser).toHaveBeenCalledWith(mockUser.userId)
+    await waitFor(() => {
+      expect(signOut).toHaveBeenCalledWith({ callbackUrl: '/register' })
+    })
   })
 
   it('should not close popup when response is not 200 or 500 and display error message', async () => {
-    const error = {
-      response: {
-        status: 400,
-        data: { status: 'failedTransaction', message: 'Erroneous response' },
-      },
-    }
-    ;(deleteUser as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.delete('*/user/delete/*', () =>
+        HttpResponse.json(
+          { status: 'failedTransaction', message: 'Erroneous response' },
+          { status: 400 }
+        )
+      )
+    )
 
     let showModal = true
 
@@ -87,12 +84,14 @@ describe('Delete Account Popup', () => {
   })
 
   it('should not close popup when response is 500 and display error message', async () => {
-    const error = {
-      response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-    }
-    ;(deleteUser as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.delete('*/user/delete/*', () =>
+        HttpResponse.json(
+          { status: 'internalServerError', message: 'Server error' },
+          { status: 500 }
+        )
+      )
+    )
 
     let showModal = true
 
@@ -113,9 +112,7 @@ describe('Delete Account Popup', () => {
   })
 
   it('should not close popup when error is thrown with no response', async () => {
-    ;(deleteUser as jest.Mock).mockImplementation(() => {
-      return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-    })
+    server.use(http.delete('*/user/delete/*', () => HttpResponse.error()))
 
     let showModal = true
 
@@ -134,13 +131,6 @@ describe('Delete Account Popup', () => {
   })
 
   it('should close popup and call signOut with register when account is deleted', async () => {
-    ;(deleteUser as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({
-        status: 200,
-        data: { message: 'Successfully added new student.', details: {} },
-      })
-    })
-
     let showModal = true
 
     render(

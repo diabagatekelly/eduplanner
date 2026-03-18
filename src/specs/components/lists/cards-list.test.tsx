@@ -27,7 +27,7 @@ jest.mock('../../../lib/helpers/useMounted', () => {
 })
 jest.mock('../../../api/controller')
 
-const hash = global.window.location.hash
+const originalHash = global.window.location.hash
 const activityNoCards = { ...mockActivity }
 const activityWithReviewCards = {
   ...mockActivity,
@@ -77,14 +77,8 @@ const activityWithPendingShowDate = {
 }
 
 describe('Cards List', () => {
-  beforeAll(() => {
-    Object.defineProperty(global.window, 'location', {
-      value: { hash: null },
-    })
-  })
-
   afterAll(() => {
-    global.window.location.hash = hash
+    global.window.location.hash = originalHash
   })
 
   describe('Not mounted', () => {

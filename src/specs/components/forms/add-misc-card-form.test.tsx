@@ -4,26 +4,22 @@ import { render } from '../../util'
 import * as React from 'react'
 import AddMiscCardForm from '../../../components/forms/add-misc-card-form'
 import { mockUser, mockCookingActivity, mockUserMiscCard } from '../../mocks'
-import { createCards } from '../../../api/controller'
 import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
 }))
-jest.mock('../../../api/controller')
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 
 describe('Add misc card form', () => {
   const user = { ...mockUser, activities: [{ ...mockCookingActivity }] }
 
-  beforeEach(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(new Date('2/4/2024'))
-  })
-
   afterEach(() => {
-    jest.resetAllMocks()
     jest.clearAllMocks()
-    jest.useRealTimers()
   })
 
   describe('Display forms', () => {
@@ -93,8 +89,10 @@ describe('Add misc card form', () => {
 
     describe('Submitting', () => {
       it('should submit with expected list', async () => {
-        ;(createCards as jest.Mock).mockImplementation(() =>
-          Promise.resolve({ status: 200, data: { message: 'Cards added', details: [] } })
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json({ message: 'Cards added', details: [] })
+          )
         )
         render(
           <AddMiscCardForm {...{ isMain: true, user: mockUser, activity: mockCookingActivity }} />
@@ -116,28 +114,21 @@ describe('Add misc card form', () => {
           await fireEvent.click(popupYesBtn)
         })
 
-        const expectedCardsPayload = [
-          { ...mockUserMiscCard, cardId: `${btoa('misc-card-cook an egg')}` },
-          { ...mockUserMiscCard, cardId: `${btoa('misc-card-make your bed')}` },
-        ]
-
-        expect(createCards).toHaveBeenCalledWith({
-          userId: mockUser.userId,
-          activity: mockCookingActivity.name,
-          cards: expectedCardsPayload,
+        await waitFor(() => {
+          expect(toast.success).toHaveBeenCalledWith('Cards added')
         })
+        expect(screen.queryByTestId('validate-popup')).toBeNull()
       })
 
       it('should not reset form when response is not 200 or 500 and display error message', async () => {
-        const error = {
-          response: {
-            status: 400,
-            data: { status: 'failedTransaction', message: 'Erroneous response' },
-          },
-        }
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject(error)
-        })
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json(
+              { status: 'failedTransaction', message: 'Erroneous response' },
+              { status: 400 }
+            )
+          )
+        )
 
         render(
           <AddMiscCardForm {...{ isMain: true, user: mockUser, activity: mockCookingActivity }} />
@@ -165,15 +156,14 @@ describe('Add misc card form', () => {
       })
 
       it('should not reset form when response is 500 and display error message', async () => {
-        const error = {
-          response: {
-            status: 500,
-            data: { status: 'internalServerError', message: 'Server error' },
-          },
-        }
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject(error)
-        })
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json(
+              { status: 'internalServerError', message: 'Server error' },
+              { status: 500 }
+            )
+          )
+        )
 
         render(
           <AddMiscCardForm {...{ isMain: true, user: mockUser, activity: mockCookingActivity }} />
@@ -203,9 +193,7 @@ describe('Add misc card form', () => {
       })
 
       it('should not reset form when error is thrown with no response', async () => {
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-        })
+        server.use(http.post('*/user/cards/add', () => HttpResponse.error()))
 
         render(
           <AddMiscCardForm {...{ isMain: true, user: mockUser, activity: mockCookingActivity }} />

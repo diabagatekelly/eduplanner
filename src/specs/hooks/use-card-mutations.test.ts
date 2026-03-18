@@ -1,11 +1,14 @@
 import { renderHook, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useActivateCard, useDeleteCard, useResetCardStage } from '../../hooks/use-card-mutations'
-import { activateCard, deleteCard, resetCardStage } from '../../api/controller'
 import { queryKeys } from '../../lib/query-keys'
 import React from 'react'
+import { server } from '../msw/server'
+import { http, HttpResponse } from 'msw'
 
-jest.mock('../../api/controller')
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 
 function createTestQueryClient() {
   return new QueryClient({
@@ -30,11 +33,6 @@ describe('Card mutation hooks invalidate both user and student query keys on suc
   })
 
   it('useActivateCard should invalidate both user and student queries on success', async () => {
-    ;(activateCard as jest.Mock).mockResolvedValueOnce({
-      status: 200,
-      data: { message: 'ok', details: {} },
-    })
-
     const queryClient = createTestQueryClient()
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries')
 
@@ -51,11 +49,6 @@ describe('Card mutation hooks invalidate both user and student query keys on suc
   })
 
   it('useDeleteCard should invalidate both user and student queries on success', async () => {
-    ;(deleteCard as jest.Mock).mockResolvedValueOnce({
-      status: 200,
-      data: { message: 'ok', details: {} },
-    })
-
     const queryClient = createTestQueryClient()
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries')
 
@@ -72,11 +65,6 @@ describe('Card mutation hooks invalidate both user and student query keys on suc
   })
 
   it('useResetCardStage should invalidate both user and student queries on success', async () => {
-    ;(resetCardStage as jest.Mock).mockResolvedValueOnce({
-      status: 200,
-      data: { message: 'ok', details: {} },
-    })
-
     const queryClient = createTestQueryClient()
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries')
 
@@ -93,7 +81,7 @@ describe('Card mutation hooks invalidate both user and student query keys on suc
   })
 
   it('useActivateCard should not invalidate queries on failure', async () => {
-    ;(activateCard as jest.Mock).mockRejectedValueOnce(new Error('Server error'))
+    server.use(http.post('*/user/cards/activate', () => HttpResponse.error()))
 
     const queryClient = createTestQueryClient()
     const invalidateSpy = jest.spyOn(queryClient, 'invalidateQueries')
