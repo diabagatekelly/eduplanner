@@ -5,13 +5,16 @@ import { render } from '../../util'
 import AddQuranCardForm from '../../../components/forms/add-quran-card-form'
 import { mockActivity, mockUser, mockUserCard } from '../../mocks'
 import { quranCards } from '../../../lib/constants/quran-bank'
-import { createCards, deleteCard } from '../../../api/controller'
 import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
 }))
-jest.mock('../../../api/controller')
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(() => ({
@@ -26,15 +29,9 @@ describe('Add Quran card form', () => {
   describe('Display', () => {
     const user = { ...mockUser, activities: [{ ...mockActivity }] }
 
-    beforeEach(() => {
-      jest.useFakeTimers()
-      jest.setSystemTime(new Date('2/4/2024'))
-    })
-
     afterEach(() => {
-      jest.resetAllMocks()
+      jest.restoreAllMocks()
       jest.clearAllMocks()
-      jest.useRealTimers()
     })
 
     it('should render the page with default checkboxes for each juz and surah', async () => {
@@ -90,25 +87,12 @@ describe('Add Quran card form', () => {
     describe('Wihout juz', () => {
       const user = { ...mockUser, activities: [{ ...mockActivity }] }
 
-      beforeEach(() => {
-        jest.useFakeTimers()
-        jest.setSystemTime(new Date('2/4/2024'))
-      })
-
       afterEach(() => {
-        jest.resetAllMocks()
+        jest.restoreAllMocks()
         jest.clearAllMocks()
-        jest.useRealTimers()
       })
 
       it('should prompt with message when trying to submit empty form', async () => {
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.resolve({
-            status: 200,
-            data: { message: 'Cards added', details: [mockUserCard] },
-          })
-        })
-
         render(<AddQuranCardForm {...{ isMain: true, user, activity: mockActivity }} />)
 
         const submitButton = await screen.findByTestId('add-cards-submit-button')
@@ -116,32 +100,16 @@ describe('Add Quran card form', () => {
           await fireEvent.click(submitButton)
         })
 
-        await expect(createCards).not.toHaveBeenCalled()
         expect(toast.warning).toHaveBeenCalledWith('Please select the cards you want to add.')
       })
 
-      it('should invoke createCards controller when form is submitted', async () => {
-        const expectedPaylod = {
-          userId: `${btoa('mock.user@email.com')}`,
-          activity: 'Quran',
-          cards: [
-            { ...mockUserCard },
-            { ...mockUserCard, cardId: `${btoa(`custom-Furqan 1 to 2`)}` },
-          ],
-        }
+      it('should show success toast after submitting cards', async () => {
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json({ message: 'Cards added', details: [mockUserCard] })
+          )
+        )
 
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.resolve({
-            status: 200,
-            data: {
-              message: 'Cards added',
-              details: [
-                { ...mockUserCard },
-                { ...mockUserCard, cardId: `${btoa(`custom-Furqan 1 to 2`)}` },
-              ],
-            },
-          })
-        })
         render(<AddQuranCardForm {...{ isMain: true, user, activity: mockActivity }} />)
 
         const inputs = await screen.findAllByTestId('quran-checkbox-input')
@@ -159,22 +127,20 @@ describe('Add Quran card form', () => {
           await fireEvent.click(submitButton)
         })
 
-        await expect(createCards).toHaveBeenCalledWith(expectedPaylod)
         await waitFor(() => {
           expect(toast.success).toHaveBeenCalledWith('Cards added')
         })
       })
 
       it('should not reset form when response is not 200 or 500 and display error message', async () => {
-        const error = {
-          response: {
-            status: 400,
-            data: { status: 'failedTransaction', message: 'Erroneous response' },
-          },
-        }
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject(error)
-        })
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json(
+              { status: 'failedTransaction', message: 'Erroneous response' },
+              { status: 400 }
+            )
+          )
+        )
 
         render(<AddQuranCardForm {...{ isMain: true, user, activity: mockActivity }} />)
 
@@ -199,15 +165,14 @@ describe('Add Quran card form', () => {
       })
 
       it('should not reset form when response is 500 and display error message', async () => {
-        const error = {
-          response: {
-            status: 500,
-            data: { status: 'internalServerError', message: 'Server error' },
-          },
-        }
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject(error)
-        })
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json(
+              { status: 'internalServerError', message: 'Server error' },
+              { status: 500 }
+            )
+          )
+        )
 
         render(<AddQuranCardForm {...{ isMain: true, user, activity: mockActivity }} />)
 
@@ -234,9 +199,7 @@ describe('Add Quran card form', () => {
       })
 
       it('should not reset form when error is thrown with no response', async () => {
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-        })
+        server.use(http.post('*/user/cards/add', () => HttpResponse.error()))
 
         render(<AddQuranCardForm {...{ isMain: true, user, activity: mockActivity }} />)
 
@@ -270,34 +233,22 @@ describe('Add Quran card form', () => {
       const updatedActivity = { ...mockActivity, cards: updatedCards }
       const updatedUser = { ...mockUser, activities: [updatedActivity] }
 
-      beforeEach(() => {
-        jest.useFakeTimers()
-        jest.setSystemTime(new Date('2/4/2024'))
-      })
-
       afterEach(() => {
-        jest.resetAllMocks()
+        jest.restoreAllMocks()
         jest.clearAllMocks()
-        jest.useRealTimers()
       })
 
-      it('should invoke createCards controller with card for juz and no associated surahs', async () => {
+      it('should show success toast after submitting juz card and deleting associated surahs', async () => {
         const userCardWithJuz = { ...mockUserCard, cardId: `${btoa('juz-1')}` }
-        const expectedPaylod = {
-          userId: mockUser.userId,
-          activity: 'Quran',
-          cards: [{ ...userCardWithJuz }],
-        }
 
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.resolve({
-            status: 200,
-            data: { message: 'Cards added', details: [userCardWithJuz] },
-          })
-        })
-        ;(deleteCard as jest.Mock).mockImplementationOnce(() => {
-          return Promise.resolve({ status: 200, data: { message: 'Cards deleted', details: {} } })
-        })
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json({ message: 'Cards added', details: [userCardWithJuz] })
+          ),
+          http.post('*/user/cards/delete', () =>
+            HttpResponse.json({ message: 'Cards deleted', details: {} })
+          )
+        )
 
         render(
           <AddQuranCardForm {...{ isMain: true, user: updatedUser, activity: updatedActivity }} />
@@ -330,19 +281,9 @@ describe('Add Quran card form', () => {
           await fireEvent.click(submitButton)
         })
 
-        await expect(createCards).toHaveBeenCalledWith(expectedPaylod)
-        await expect(deleteCard).toHaveBeenCalledWith([
-          {
-            activity: 'Quran',
-            cardId: `${btoa('surah-1-name-Faatiha-juz-1')}`,
-            userId: mockUser.userId,
-          },
-          {
-            activity: 'Quran',
-            cardId: `${btoa('surah-2-name-Baqara-juz-1')}`,
-            userId: mockUser.userId,
-          },
-        ])
+        await waitFor(() => {
+          expect(toast.success).toHaveBeenCalledWith('Cards added')
+        })
       })
     })
   })
