@@ -82,6 +82,14 @@ describe('Manage Card Popup', () => {
     })
 
     it('should show success toast after resetting card stage', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/reset-stage', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: mockUserCard })
+        })
+      )
+
       let showModal
       let onClose = () => {
         showModal = false
@@ -107,6 +115,11 @@ describe('Manage Card Popup', () => {
       })
 
       await waitFor(() => {
+        expect(receivedBody).toEqual({
+          userId: mockUser.userId,
+          activity: mockActivity.name,
+          cardId: mockUserCard.cardId,
+        })
         expect(toast.success).toHaveBeenCalledWith('Successfully reset card')
       })
     })
@@ -290,6 +303,14 @@ describe('Manage Card Popup', () => {
     })
 
     it('should show success toast after requesting review', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/request-review', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: {} })
+        })
+      )
+
       let showModal
       let onClose = () => {
         showModal = false
@@ -315,6 +336,15 @@ describe('Manage Card Popup', () => {
       })
 
       await waitFor(() => {
+        expect(receivedBody).toEqual({
+          id: mockUserCard.cardId,
+          teacherId: mockUser.userId,
+          student: {
+            id: mockStudent.userId,
+            fullName: `${mockStudent.firstName} ${mockStudent.lastName}`,
+            email: mockStudent.email,
+          },
+        })
         expect(toast.success).toHaveBeenCalledWith('Request for review successfully sent.')
       })
     })
@@ -511,6 +541,14 @@ describe('Manage Card Popup', () => {
     })
 
     it('should show success toast after overriding card stage', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/edit', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: mockUserCard })
+        })
+      )
+
       expect(myUser.activities[0].cards[0].stage).toEqual('7')
 
       let showModal
@@ -546,6 +584,12 @@ describe('Manage Card Popup', () => {
       })
 
       await waitFor(() => {
+        expect(receivedBody).toEqual({
+          userId: mockUser.userId,
+          activity: 'Quran',
+          cardId: mockUserCard.cardId,
+          editData: { stage: '30' },
+        })
         expect(toast.success).toHaveBeenCalledWith('Successfully overrode status.')
       })
     })
@@ -719,6 +763,14 @@ describe('Manage Card Popup', () => {
     })
 
     it('should show success toast after promoting stage', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/edit-stage', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: mockUserCard })
+        })
+      )
+
       let showModal
       let onClose = () => {
         showModal = false
@@ -747,11 +799,25 @@ describe('Manage Card Popup', () => {
       })
 
       await waitFor(() => {
+        expect(receivedBody).toEqual({
+          userId: mockUser.userId,
+          activity: 'Quran',
+          cardId: mockUserCard.cardId,
+          editData: { stage: '7', promote: true },
+        })
         expect(toast.success).toHaveBeenCalledWith('Successfully edited status.')
       })
     })
 
     it('should show success toast after demoting stage', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/edit-stage', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: mockUserCard })
+        })
+      )
+
       let showModal
       let onClose = () => {
         showModal = false
@@ -780,6 +846,12 @@ describe('Manage Card Popup', () => {
       })
 
       await waitFor(() => {
+        expect(receivedBody).toEqual({
+          userId: mockUser.userId,
+          activity: 'Quran',
+          cardId: mockUserCard.cardId,
+          editData: { stage: '7', promote: false },
+        })
         expect(toast.success).toHaveBeenCalledWith('Successfully edited status.')
       })
     })
@@ -943,6 +1015,14 @@ describe('Manage Card Popup', () => {
     })
 
     it('should show success toast after deleting card', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/delete', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: {} })
+        })
+      )
+
       let showModal
       let onClose = () => {
         showModal = false
@@ -968,6 +1048,13 @@ describe('Manage Card Popup', () => {
       })
 
       await waitFor(() => {
+        expect(receivedBody).toEqual([
+          {
+            userId: mockUser.userId,
+            activity: mockActivity.name,
+            cardId: mockUserCard.cardId,
+          },
+        ])
         expect(toast.success).toHaveBeenCalledWith('Successfully removed card')
       })
     })
@@ -1119,6 +1206,14 @@ describe('Manage Card Popup', () => {
     })
 
     it('should show success toast after activating card', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/activate', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: {} })
+        })
+      )
+
       let showModal
       let onClose = () => {
         showModal = false
@@ -1144,6 +1239,11 @@ describe('Manage Card Popup', () => {
       })
 
       await waitFor(() => {
+        expect(receivedBody).toEqual({
+          userId: mockUser.userId,
+          activity: mockActivity.name,
+          cardId: mockUserCard.cardId,
+        })
         expect(toast.success).toHaveBeenCalledWith('Successfully activated card')
       })
     })
@@ -1303,6 +1403,14 @@ describe('Manage Card Popup', () => {
       })
 
       it('should show success toast after overriding student card stage', async () => {
+        let receivedBody: any
+        server.use(
+          http.post('*/user/cards/edit', async ({ request }) => {
+            receivedBody = await request.json()
+            return HttpResponse.json({ message: null, details: mockUserCard })
+          })
+        )
+
         let showModal
         let onClose = () => {
           showModal = false
@@ -1336,6 +1444,12 @@ describe('Manage Card Popup', () => {
         })
 
         await waitFor(() => {
+          expect(receivedBody).toEqual({
+            userId: mockStudent.userId,
+            activity: 'Quran',
+            cardId: mockUserCard.cardId,
+            editData: { stage: '30' },
+          })
           expect(toast.success).toHaveBeenCalledWith('Successfully overrode status.')
         })
       })

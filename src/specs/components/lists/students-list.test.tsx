@@ -84,6 +84,12 @@ describe('Students List', () => {
     })
 
     it('should navigate directly using cached student details without API call', async () => {
+      server.use(
+        http.get('*/user', () => {
+          throw new Error('Unexpected /user fetch when students cache is populated')
+        })
+      )
+
       const mockRouter = {
         push: jest.fn(),
       }
@@ -113,10 +119,12 @@ describe('Students List', () => {
     })
 
     it('should fetch student details via API and navigate when students object is not populated', async () => {
+      let fetchCalled = false
       server.use(
-        http.get('*/user', () =>
-          HttpResponse.json({ message: null, details: { student: mockStudent } })
-        )
+        http.get('*/user', () => {
+          fetchCalled = true
+          return HttpResponse.json({ message: null, details: { student: mockStudent } })
+        })
       )
 
       const mockRouter = {
@@ -134,12 +142,18 @@ describe('Students List', () => {
       })
 
       await waitFor(() => {
+        expect(fetchCalled).toBe(true)
         expect(mockRouter.push).toHaveBeenCalledWith(url)
       })
     })
   })
 
   describe('Has students but correct student not yet in object', () => {
+    // Suppress console.log from component error handler to keep test output clean
+    beforeEach(() => {
+      jest.spyOn(console, 'log').mockImplementation(() => null)
+    })
+
     const fakeStudent = {
       ...mockStudent,
       username: 'some-other-student',
@@ -162,10 +176,12 @@ describe('Students List', () => {
     })
 
     it('should fetch missing student details via API and navigate', async () => {
+      let fetchCalled = false
       server.use(
-        http.get('*/user', () =>
-          HttpResponse.json({ message: null, details: { student: mockStudent } })
-        )
+        http.get('*/user', () => {
+          fetchCalled = true
+          return HttpResponse.json({ message: null, details: { student: mockStudent } })
+        })
       )
 
       const mockRouter = {
@@ -183,12 +199,12 @@ describe('Students List', () => {
       })
 
       await waitFor(() => {
+        expect(fetchCalled).toBe(true)
         expect(mockRouter.push).toHaveBeenCalledWith(url)
       })
     })
 
     it('should display error message when response is not 200 or 500', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => null)
       server.use(
         http.get('*/user', () =>
           HttpResponse.json(
@@ -219,7 +235,6 @@ describe('Students List', () => {
     })
 
     it('should display error message when response is 500', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => null)
       server.use(
         http.get('*/user', () =>
           HttpResponse.json(
@@ -252,7 +267,6 @@ describe('Students List', () => {
     })
 
     it('should display error message when error has no response', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => null)
       server.use(http.get('*/user', () => HttpResponse.error()))
 
       const mockRouter = {

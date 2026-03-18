@@ -103,11 +103,13 @@ describe('Add Quran card form', () => {
         expect(toast.warning).toHaveBeenCalledWith('Please select the cards you want to add.')
       })
 
-      it('should show success toast after submitting cards', async () => {
+      it('should send correct payload and show success toast after submitting cards', async () => {
+        let receivedBody: any
         server.use(
-          http.post('*/user/cards/add', () =>
-            HttpResponse.json({ message: 'Cards added', details: [mockUserCard] })
-          )
+          http.post('*/user/cards/add', async ({ request }) => {
+            receivedBody = await request.json()
+            return HttpResponse.json({ message: 'Cards added', details: [mockUserCard] })
+          })
         )
 
         render(<AddQuranCardForm {...{ isMain: true, user, activity: mockActivity }} />)
@@ -128,6 +130,14 @@ describe('Add Quran card form', () => {
         })
 
         await waitFor(() => {
+          expect(receivedBody).toEqual({
+            userId: `${btoa('mock.user@email.com')}`,
+            activity: 'Quran',
+            cards: [
+              { ...mockUserCard },
+              { ...mockUserCard, cardId: `${btoa('custom-Furqan 1 to 2')}` },
+            ],
+          })
           expect(toast.success).toHaveBeenCalledWith('Cards added')
         })
       })
