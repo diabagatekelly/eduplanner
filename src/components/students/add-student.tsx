@@ -22,10 +22,8 @@ export default function AddStudent({ user }: { user: IUser }) {
     defaultValues: { email: '' },
   })
 
-  const [newStudent, getStudentInfo] = useState<IUser>({} as IUser)
+  const [newStudent, setNewStudent] = useState<IUser>({} as IUser)
   const [showModal, setShowModal] = useState(false)
-
-  const modalType = 'addStudent'
 
   async function submitForm(data: SearchStudentFormData): Promise<void> {
     try {
@@ -47,7 +45,7 @@ export default function AddStudent({ user }: { user: IUser }) {
       const response = await findUser(newStudentUserId)
       const { data: responseData } = response
       const { details }: { message: string; details: { student: IUser } } = responseData
-      getStudentInfo(details.student)
+      setNewStudent(details.student)
       setShowModal(true)
     } catch (error: unknown) {
       handleMutationError(error, 'find student')
@@ -64,7 +62,13 @@ export default function AddStudent({ user }: { user: IUser }) {
         isSubmitting={isSubmitting}
         onSubmit={handleSubmit(submitForm)}
       />
-      <Popup {...{ showModal, modalType, user, newStudent }} onClose={() => setShowModal(false)} />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{ type: 'addStudent', user, newStudent }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { use } from 'react'
 import ViewActivity from '@/components/activities/view-activity'
 import Breadcrumbs from '@/components/breadcrumbs'
 import { ActivityStudentParams } from '@/types/IParams'
+import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { useStudent } from '@/hooks/use-student'
@@ -14,6 +15,8 @@ export default function Main(props: { params: ActivityStudentParams }) {
   const params = use(props.params)
   const activityFromParams = params.activity
   const studentFromParams = params.student
+
+  const router = useRouter()
 
   const { data: session } = useSession()
   const teacherId = session?.user?.userId ?? ''
@@ -36,7 +39,7 @@ export default function Main(props: { params: ActivityStudentParams }) {
     <NestedLayout {...{ isTeacher }}>
       <Breadcrumbs />
       <ViewActivity {...{ userDetails, userActivity, isMain }} />
-      <button className="default-btn" onClick={() => window.history.back()}>
+      <button className="default-btn" onClick={() => router.back()}>
         Back
       </button>
     </NestedLayout>

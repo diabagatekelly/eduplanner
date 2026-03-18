@@ -8,66 +8,87 @@ import ManageCardPopup from './manageCardPopup'
 import ValidatePopup from './validatePopup'
 import { IUser } from '@/types/IUser'
 import { IActivity } from '@/types/IActivity'
+import { ICard } from '@/types/ICard'
+
+export type CardAction = 'show' | 'edit' | 'delete' | 'activate' | 'override'
+
+export type PopupConfig =
+  | { type: 'deleteAccount'; user: IUser | Partial<IUser> }
+  | { type: 'addStudent'; user: IUser | Partial<IUser>; newStudent: IUser | Partial<IUser> }
+  | { type: 'removeStudent'; user: IUser | Partial<IUser>; teacherId: string }
+  | { type: 'removeActivity'; user: IUser | Partial<IUser>; item: { activityName: string } }
+  | {
+      type: 'manageCard'
+      isMain: boolean
+      user: IUser | Partial<IUser>
+      activity: IActivity
+      item: { card: ICard; action: CardAction }
+    }
+  | { type: 'validate'; item: { list: string }; submitList: (list: string) => void }
 
 export default function Popup({
   onClose,
   showModal,
-  modalType,
-  isMain,
-  newStudent,
-  user,
-  item,
-  activity,
-  submitList,
-  teacherId,
+  config,
 }: {
   onClose: () => void
   showModal: boolean
-  modalType: string
-  isMain?: boolean
-  newStudent?: IUser | Partial<IUser>
-  user?: IUser | Partial<IUser>
-  item?: any
-  activity?: IActivity
-  submitList?: (list: string) => void
-  teacherId?: string
+  config: PopupConfig
 }) {
-  if (modalType === 'deleteAccount') {
-    return <DeleteAccountPopup onClose={onClose} showModal={showModal} user={user} />
-  } else if (modalType === 'addStudent') {
-    return (
-      <LinkAccountPopup
-        onClose={onClose}
-        showModal={showModal}
-        newStudent={newStudent}
-        user={user}
-      />
-    )
-  } else if (modalType === 'removeStudent') {
-    return (
-      <UnlinkAccountPopup
-        onClose={onClose}
-        showModal={showModal}
-        user={user}
-        teacherId={teacherId}
-      />
-    )
-  } else if (modalType === 'removeActivity') {
-    return <DeleteActivityPopup onClose={onClose} showModal={showModal} user={user} item={item} />
-  } else if (modalType === 'manageCard') {
-    return (
-      <ManageCardPopup
-        onClose={onClose}
-        showModal={showModal}
-        isMain={!!isMain}
-        user={user}
-        item={item}
-        activity={activity}
-      />
-    )
-  } else if (modalType === 'validate') {
-    return (
-      <ValidatePopup onClose={onClose} showModal={showModal} item={item} submitList={submitList} />
-    )
+  switch (config.type) {
+    case 'deleteAccount':
+      return <DeleteAccountPopup onClose={onClose} showModal={showModal} user={config.user} />
+    case 'addStudent':
+      return (
+        <LinkAccountPopup
+          onClose={onClose}
+          showModal={showModal}
+          newStudent={config.newStudent}
+          user={config.user}
+        />
+      )
+    case 'removeStudent':
+      return (
+        <UnlinkAccountPopup
+          onClose={onClose}
+          showModal={showModal}
+          user={config.user}
+          teacherId={config.teacherId}
+        />
+      )
+    case 'removeActivity':
+      return (
+        <DeleteActivityPopup
+          onClose={onClose}
+          showModal={showModal}
+          user={config.user}
+          item={config.item}
+        />
+      )
+    case 'manageCard':
+      return (
+        <ManageCardPopup
+          onClose={onClose}
+          showModal={showModal}
+          isMain={config.isMain}
+          user={config.user}
+          item={config.item}
+          activity={config.activity}
+        />
+      )
+    case 'validate':
+      return (
+        <ValidatePopup
+          onClose={onClose}
+          showModal={showModal}
+          item={config.item}
+          submitList={config.submitList}
+        />
+      )
+    // istanbul ignore next -- exhaustive guard: unreachable if all PopupConfig types are handled
+    default: {
+      const _exhaustive: never = config
+      throw new Error(`Unhandled popup config: ${JSON.stringify(_exhaustive)}`)
+    }
   }
 }

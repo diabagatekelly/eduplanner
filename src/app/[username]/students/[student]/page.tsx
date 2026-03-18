@@ -6,6 +6,7 @@ import Dashboard from '@/components/dashboard'
 import { IUser } from '@/types/IUser'
 import Breadcrumbs from '@/components/breadcrumbs'
 import { StudentParams } from '@/types/IParams'
+import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useUser } from '@/hooks/use-user'
 import { useStudent } from '@/hooks/use-student'
@@ -15,6 +16,8 @@ import { queryGuard } from '@/lib/helpers/query-guard'
 export default function Main(props: { params: StudentParams }) {
   const params = use(props.params)
   const studentFromParams = params.student
+
+  const router = useRouter()
 
   const { data: session } = useSession()
   const teacherId = session?.user?.userId ?? ''
@@ -35,7 +38,7 @@ export default function Main(props: { params: StudentParams }) {
     <NestedLayout {...{ isTeacher }}>
       <Breadcrumbs />
       <Dashboard {...{ userDetails, isMain, isTeacher }} />
-      <button className="default-btn" onClick={() => window.history.back()}>
+      <button className="default-btn" onClick={() => router.back()}>
         Back
       </button>
     </NestedLayout>

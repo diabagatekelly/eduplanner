@@ -8,6 +8,12 @@ import NestedLayout from '../../../../../app/nested-layout'
 import { useSession } from 'next-auth/react'
 import { useUser } from '../../../../../hooks/use-user'
 
+const mockBack = jest.fn()
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(() => ({
+    back: mockBack,
+  })),
+}))
 jest.mock('../../../../../app/nested-layout')
 jest.mock('next-auth/react', () => ({
   useSession: jest.fn(),
@@ -15,18 +21,6 @@ jest.mock('next-auth/react', () => ({
 jest.mock('../../../../../hooks/use-user')
 
 describe('Main user page', () => {
-  const back = window.history.back
-
-  beforeAll(() => {
-    Object.defineProperty(window, 'history', {
-      value: { back: jest.fn() },
-    })
-  })
-
-  afterAll(() => {
-    window.history.back = back
-  })
-
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/3/2024'))
@@ -114,7 +108,7 @@ describe('Main user page', () => {
         children: 'Back',
       })
       ;(NestedLayout as jest.Mock).mock.calls[0][0].children[2].props.onClick()
-      expect(window.history.back).toHaveBeenCalled()
+      expect(mockBack).toHaveBeenCalled()
     })
   })
 

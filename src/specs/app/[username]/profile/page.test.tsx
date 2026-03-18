@@ -237,11 +237,11 @@ describe('Profile', () => {
 
       const profile = render(<Profile />)
       const deleteBtn = profile.container.querySelector('#delete-button') as HTMLButtonElement
-      const popup = profile.container.querySelector('#popup-modal')
 
       act(() => {
         deleteBtn.click()
       })
+      const popup = profile.container.querySelector('#popup-modal')
       expect(popup).toBeVisible()
 
       const popupClosebtn = profile.container.querySelector('#popup-close-btn') as HTMLButtonElement
@@ -250,7 +250,7 @@ describe('Profile', () => {
         popupClosebtn.click()
       })
 
-      expect(popup).not.toBeVisible()
+      expect(profile.container.querySelector('#popup-modal')).toBeNull()
     })
   })
 })

@@ -1,5 +1,3 @@
-'use client'
-
 export default function Footer() {
   return (
     <footer className="fixed bottom w-full bottom-0 bg-gray-800 shadow dark:bg-gray-900">
