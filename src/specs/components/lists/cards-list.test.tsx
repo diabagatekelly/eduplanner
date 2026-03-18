@@ -16,6 +16,12 @@ import {
 } from '../../mocks'
 import { CompletionStatus } from '../../../types/CompletionStatusEnum'
 
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 jest.mock('../../../lib/helpers/useMounted', () => {
   return {
     useMounted: jest
@@ -25,7 +31,6 @@ jest.mock('../../../lib/helpers/useMounted', () => {
       .mockImplementation(() => true),
   }
 })
-jest.mock('../../../api/controller')
 
 const originalHash = global.window.location.hash
 const activityNoCards = { ...mockActivity }
