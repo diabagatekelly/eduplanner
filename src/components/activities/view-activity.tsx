@@ -12,11 +12,7 @@ import { fromDbFormat } from '@/lib/helpers/formatActivityName'
 import { toast } from 'sonner'
 import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
-interface IViewActivity {
-  submit: () => Promise<void>
-}
-
-export default function ViewActivity<IViewActivity>({
+export default function ViewActivity({
   userDetails,
   userActivity,
   isMain,

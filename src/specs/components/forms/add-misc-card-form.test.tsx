@@ -87,7 +87,7 @@ describe('Add misc card form', () => {
         await fireEvent.click(closeBtn)
       })
 
-      await expect(screen.queryByTestId('validate-popup')).toHaveAttribute('hidden')
+      await expect(screen.queryByTestId('validate-popup')).toBeNull()
       expect(toast.info).toHaveBeenCalledWith('Validation canceled.')
     })
 

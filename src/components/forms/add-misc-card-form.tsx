@@ -31,8 +31,7 @@ export default function AddMiscCardForm({
     defaultValues: { words: '' },
   })
 
-  const [modalType, setModalType] = useState('')
-  const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
+  const [popupItem, setPopupItem] = useState<{ list: string }>({ list: '' })
   const [showModal, setShowModal] = useState(false)
 
   async function submitList(finalCardList: string) {
@@ -79,8 +78,7 @@ export default function AddMiscCardForm({
     const listOfItemsToValidate = cleanUpList(words)
     setValue('words', listOfItemsToValidate)
 
-    getPopupItem({ list: listOfItemsToValidate })
-    setModalType('validate')
+    setPopupItem({ list: listOfItemsToValidate })
     setShowModal(true)
   }
 
@@ -138,10 +136,13 @@ export default function AddMiscCardForm({
           </div>
         </div>
       </div>
-      <Popup
-        {...{ showModal, modalType, item: popupItem, submitList }}
-        onClose={() => setShowModal(false)}
-      />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{ type: 'validate', item: popupItem, submitList }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   )
 }

@@ -12,7 +12,7 @@ export default function ListUi({
   userDetails,
   activity,
 }: {
-  listType: string
+  listType: 'students' | 'activities' | 'cards'
   isMain: boolean
   userDetails: IUser
   activity?: IActivity

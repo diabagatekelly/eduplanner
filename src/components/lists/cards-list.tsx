@@ -30,26 +30,20 @@ export default function CardsList({
   const mounted = useMounted()
 
   const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState('')
-  const [popupItem, getPopupItem] = useState<{ card: ICard; action: string }>(
+  const [popupItem, setPopupItem] = useState<{ card: ICard; action: string }>(
     {} as { card: ICard; action: string }
   )
-  const [popupUserDetails, getPopupUserDetails] = useState<IUser>({} as IUser)
-  const [cardsOfTheDay, getCardsOfTheDay] = useState<ICard[]>([])
-  const [allActiveCards, getAllActiveCards] = useState<ICard[]>([])
-  const [allInactiveCards, getAllInactiveCards] = useState<ICard[]>([])
-  const [hash, getHash] = useState('')
+  const [popupUserDetails, setPopupUserDetails] = useState<IUser>({} as IUser)
+  const [cardsOfTheDay, setCardsOfTheDay] = useState<ICard[]>([])
+  const [allActiveCards, setAllActiveCards] = useState<ICard[]>([])
+  const [allInactiveCards, setAllInactiveCards] = useState<ICard[]>([])
+  const [hash, setHash] = useState('')
 
   useEffect(() => {
     const cards: any[] | ICard = activity?.cards || []
 
     if (cards.length) {
-      //if (cards[0].activity === 'Quran') {
-      //sortQuranCards(cards)
-      //}
       cards.map((card) => {
-        // console.log(atob(card.cardId).split('-'))
-        // const cardType = atob(card.cardId).split('-')[0]
         let num = `${atob(card.cardId).split('-')[1]}`
         if (num.length === 1) {
           card.number = `00${num}`
@@ -72,71 +66,25 @@ export default function CardsList({
             new Date().toLocaleDateString('en-US', { timeZone: 'EST' }) === card.addedOn))
       )
     })
-    getCardsOfTheDay(todayCards)
+    setCardsOfTheDay(todayCards)
 
     const activeCards = cards?.filter((card) => card.completionStatus !== CompletionStatus.INACTIVE)
-    getAllActiveCards(activeCards)
+    setAllActiveCards(activeCards)
 
     const inactiveCards = cards?.filter(
       (card) => card.completionStatus === CompletionStatus.INACTIVE
     )
-    getAllInactiveCards(inactiveCards)
+    setAllInactiveCards(inactiveCards)
 
     if (mounted) {
       const hashReducer = window.location.hash
-      getHash(hashReducer)
+      setHash(hashReducer)
     }
   }, [userDetails, activity, mounted])
 
-  // function sortQuranCards(cards) {
-  //   cards.map(card => {
-  //     console.log(atob(card.cardId).split('-'))
-  //     const cardType = atob(card.cardId).split('-')[0]
-  //     let num = `${atob(card.cardId).split('-')[1]}`
-  //     if (num.length === 1) {
-  //       card.number = `00${num}`
-  //     } else if (num.length === 2) {
-  //       card.number = `0${num}`
-  //     } else {
-  //       card.number = `${num}`
-  //     }
-  //   });
-  //   cards.sort((a, b) => a.number - b.number);
-  //   cards.map((card) => delete card.number);
-  // }
-
-  function deleteCard(card: ICard) {
-    getPopupItem({ card, action: 'delete' })
-    getPopupUserDetails(userDetails)
-    setModalType('manageCard')
-    setShowModal(true)
-  }
-
-  function activateCard(card: ICard) {
-    getPopupItem({ card, action: 'activate' })
-    getPopupUserDetails(userDetails)
-    setModalType('manageCard')
-    setShowModal(true)
-  }
-
-  function editCard(card: ICard) {
-    getPopupItem({ card, action: 'edit' })
-    getPopupUserDetails(userDetails)
-    setModalType('manageCard')
-    setShowModal(true)
-  }
-
-  function showCard(card: ICard) {
-    getPopupItem({ card, action: 'show' })
-    getPopupUserDetails(userDetails)
-    setModalType('manageCard')
-    setShowModal(true)
-  }
-
-  function overrideStage(card: ICard) {
-    getPopupItem({ card, action: 'override' })
-    getPopupUserDetails(userDetails)
-    setModalType('manageCard')
+  function openCardPopup(card: ICard, action: string) {
+    setPopupItem({ card, action })
+    setPopupUserDetails(userDetails)
     setShowModal(true)
   }
 
@@ -163,7 +111,7 @@ export default function CardsList({
                     <span
                       data-testid="today-card-show-btn"
                       className="hover:cursor-pointer mx-2"
-                      onClick={() => showCard(card)}
+                      onClick={() => openCardPopup(card, 'show')}
                     >
                       <EyeIcon
                         title="Show today's card"
@@ -178,7 +126,7 @@ export default function CardsList({
                     <span
                       data-testid="today-card-edit-btn"
                       className="hover:cursor-pointer mx-2"
-                      onClick={() => editCard(card)}
+                      onClick={() => openCardPopup(card, 'edit')}
                     >
                       <PencilSquareIcon
                         title="Edit today's card"
@@ -197,7 +145,7 @@ export default function CardsList({
                           ? 'hover:cursor-pointer mx-2'
                           : 'hidden'
                       }
-                      onClick={() => deleteCard(card)}
+                      onClick={() => openCardPopup(card, 'delete')}
                     >
                       <TrashIcon
                         title="Delete card of the day"
@@ -239,7 +187,7 @@ export default function CardsList({
                     <span
                       data-testid="active-card-show-btn"
                       className="hover:cursor-pointer mx-2"
-                      onClick={() => showCard(card)}
+                      onClick={() => openCardPopup(card, 'show')}
                     >
                       <EyeIcon
                         title="Show active card"
@@ -258,7 +206,7 @@ export default function CardsList({
                           ? 'hover:cursor-pointer mx-2'
                           : 'hidden'
                       }
-                      onClick={() => overrideStage(card)}
+                      onClick={() => openCardPopup(card, 'override')}
                     >
                       <DocumentMinusIcon
                         title="Override active card stage"
@@ -277,7 +225,7 @@ export default function CardsList({
                           ? 'hover:cursor-pointer mx-2'
                           : 'hidden'
                       }
-                      onClick={() => deleteCard(card)}
+                      onClick={() => openCardPopup(card, 'delete')}
                     >
                       <TrashIcon
                         title="Delete active card"
@@ -319,7 +267,7 @@ export default function CardsList({
                     <span
                       data-testid="inactive-card-show-btn"
                       className="hover:cursor-pointer mx-2"
-                      onClick={() => showCard(card)}
+                      onClick={() => openCardPopup(card, 'show')}
                     >
                       <EyeIcon
                         title="Show inactive card"
@@ -338,7 +286,7 @@ export default function CardsList({
                           ? 'hover:cursor-pointer mx-2'
                           : 'hidden'
                       }
-                      onClick={() => activateCard(card)}
+                      onClick={() => openCardPopup(card, 'activate')}
                     >
                       <DocumentPlusIcon
                         title="Activate inactive card"
@@ -357,7 +305,7 @@ export default function CardsList({
                           ? 'hover:cursor-pointer mx-2'
                           : 'hidden'
                       }
-                      onClick={() => deleteCard(card)}
+                      onClick={() => openCardPopup(card, 'delete')}
                     >
                       <TrashIcon
                         title="Delete inactive card"
@@ -379,17 +327,19 @@ export default function CardsList({
 
       {hash === '#add' && <AddCard {...{ isMain, userDetails, activity: activity! }} />}
 
-      <Popup
-        {...{
-          showModal,
-          modalType,
-          isMain,
-          user: popupUserDetails,
-          activity: activity,
-          item: popupItem,
-        }}
-        onClose={() => setShowModal(false)}
-      />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{
+            type: 'manageCard',
+            isMain,
+            user: popupUserDetails,
+            activity: activity!,
+            item: popupItem,
+          }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   )
 }

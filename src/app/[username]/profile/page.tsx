@@ -21,8 +21,6 @@ export default function Profile() {
   if (!user.userId) return null
 
   const isTeacher = user?.accountType === 'teacher'
-  const isMain = true
-  const modalType = 'deleteAccount'
 
   return (
     <NestedLayout {...{ isTeacher }}>
@@ -30,7 +28,13 @@ export default function Profile() {
       <button onClick={() => setShowModal(true)} id="delete-button" className="red-btn">
         Delete Account
       </button>
-      <Popup {...{ showModal, modalType, isMain, user }} onClose={() => setShowModal(false)} />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{ type: 'deleteAccount', user }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </NestedLayout>
   )
 }

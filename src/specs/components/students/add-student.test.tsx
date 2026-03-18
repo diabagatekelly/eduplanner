@@ -123,9 +123,6 @@ describe('Add student', () => {
     const email = screen.getByTestId('student-email')
     const submitButton = screen.getByTestId('find-student-btn')
 
-    const linkAccountPopup = screen.getByTestId('link-account-popup')
-    const closePopupBtn = screen.getByTestId('close-link-account-popup')
-
     await act(() => {
       fireEvent.change(email, {
         target: { value: mockStudent.email },
@@ -136,6 +133,8 @@ describe('Add student', () => {
       await fireEvent.click(submitButton)
     })
 
+    const linkAccountPopup = screen.getByTestId('link-account-popup')
+    const closePopupBtn = screen.getByTestId('close-link-account-popup')
     const expectedHTML = 'mock student - mock.student@email.com'
 
     expect(linkAccountPopup).toBeVisible()

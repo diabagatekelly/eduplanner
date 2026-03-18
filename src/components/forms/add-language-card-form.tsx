@@ -41,8 +41,7 @@ export default function AddLanguageCardForm({
   const [grammarCard, createGrammarCard] = useState(false)
   const [vocabCard, createVocabCard] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState('')
-  const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
+  const [popupItem, setPopupItem] = useState<{ list: string }>({ list: '' })
 
   async function onFileInput(e: React.FormEvent<HTMLInputElement>) {
     const files = (e.target as HTMLInputElement).files
@@ -135,8 +134,7 @@ export default function AddLanguageCardForm({
       listOfItemsToValidate = file.content
     }
 
-    getPopupItem({ list: listOfItemsToValidate })
-    setModalType('validate')
+    setPopupItem({ list: listOfItemsToValidate })
     setShowModal(true)
   }
 
@@ -338,10 +336,13 @@ export default function AddLanguageCardForm({
           </div>
         </div>
       </div>
-      <Popup
-        {...{ showModal, modalType, item: popupItem, submitList }}
-        onClose={() => setShowModal(false)}
-      />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{ type: 'validate', item: popupItem, submitList }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   )
 }

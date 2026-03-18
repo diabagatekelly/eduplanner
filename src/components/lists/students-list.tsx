@@ -11,23 +11,21 @@ import { TrashIcon } from '@heroicons/react/24/solid'
 export default function StudentsList({ userDetails }: { userDetails: IUser }) {
   const router = useRouter()
 
-  const [studentIdsList, getStudentIdsList] = useState<[string, string][]>([])
+  const [studentIdsList, setStudentIdsList] = useState<[string, string][]>([])
   const [errorMessage, setErrorMessage] = useState('')
   const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState('')
-  const [popupUserDetails, getPopupUserDetails] = useState<{ userId: string; username: string }>({
+  const [popupUserDetails, setPopupUserDetails] = useState<{ userId: string; username: string }>({
     userId: '',
     username: '',
   })
 
   useEffect(() => {
     const studentIds = userDetails?.linkedAccountsData?.students || []
-    getStudentIdsList([...studentIds])
+    setStudentIdsList([...studentIds])
   }, [userDetails])
 
   function deleteStudent(studentId: string, studentUsername: string) {
-    getPopupUserDetails({ userId: studentId, username: studentUsername })
-    setModalType('removeStudent')
+    setPopupUserDetails({ userId: studentId, username: studentUsername })
     setShowModal(true)
   }
 
@@ -122,10 +120,17 @@ export default function StudentsList({ userDetails }: { userDetails: IUser }) {
       ) : (
         <p data-testid="no-students-message">You have no students yet.</p>
       )}
-      <Popup
-        {...{ showModal, modalType, user: popupUserDetails, teacherId: userDetails?.userId }}
-        onClose={() => setShowModal(false)}
-      />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{
+            type: 'removeStudent',
+            user: popupUserDetails,
+            teacherId: userDetails.userId!,
+          }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   )
 }

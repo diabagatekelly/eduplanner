@@ -20,21 +20,19 @@ export default function ActivitiesList({
   const router = useRouter()
   const pathName = usePathname()
 
-  const [activitiesList, getActivitiesList] = useState<IActivity[]>([])
+  const [activitiesList, setActivitiesList] = useState<IActivity[]>([])
   const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState('')
-  const [popupUserDetails, getPopupUserDetails] = useState<IUser>({} as IUser)
-  const [popupItem, getPopupItem] = useState<{ activityName: string }>({ activityName: '' })
+  const [popupUserDetails, setPopupUserDetails] = useState<IUser>({} as IUser)
+  const [popupItem, setPopupItem] = useState<{ activityName: string }>({ activityName: '' })
 
   useEffect(() => {
     const activities = userDetails?.activities ?? []
-    getActivitiesList([...activities])
+    setActivitiesList([...activities])
   }, [userDetails])
 
   function deleteActivity(activityName: string) {
-    getPopupItem({ activityName })
-    getPopupUserDetails(userDetails)
-    setModalType('removeActivity')
+    setPopupItem({ activityName })
+    setPopupUserDetails(userDetails)
     setShowModal(true)
   }
 
@@ -92,10 +90,13 @@ export default function ActivitiesList({
         <p data-testid="no-activities-message">You have no activities yet.</p>
       )}
 
-      <Popup
-        {...{ showModal, modalType, isMain, user: popupUserDetails, item: popupItem }}
-        onClose={() => setShowModal(false)}
-      />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{ type: 'removeActivity', user: popupUserDetails, item: popupItem }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   )
 }
