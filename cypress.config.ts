@@ -6,18 +6,20 @@ dotenv.config({ path: '.env.local' })
 const local = 'http://localhost:8080'
 const prod = 'https://eduplanner-backend-7fdf262835f2.herokuapp.com'
 
+interface SessionParams {
+  userId: string
+  username: string
+  accountType: string
+}
+
 export default defineConfig({
   e2e: {
     baseUrl: 'http://localhost:3000',
     pageLoadTimeout: 120000,
     setupNodeEvents(on, config) {
       on('task', {
-        async 'auth:createSession'(params: {
-          userId: string
-          username: string
-          accountType: string
-        }) {
-          const { userId, username, accountType } = params
+        async 'auth:createSession'(params) {
+          const { userId, username, accountType } = params as SessionParams
           const { encode } = await import('next-auth/jwt')
           return encode({
             token: { userId, username, accountType, accessToken: 'mock-access-token' },
