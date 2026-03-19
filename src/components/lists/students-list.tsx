@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Popup from '../popups/popup'
 import { findUser } from '@/api/controller'
 import { useRouter } from 'next/navigation'
@@ -11,18 +11,13 @@ import { TrashIcon } from '@heroicons/react/24/solid'
 export default function StudentsList({ userDetails }: { userDetails: IUser }) {
   const router = useRouter()
 
-  const [studentIdsList, setStudentIdsList] = useState<[string, string][]>([])
+  const studentIdsList = userDetails?.linkedAccountsData?.students ?? []
   const [errorMessage, setErrorMessage] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [popupUserDetails, setPopupUserDetails] = useState<{ userId: string; username: string }>({
     userId: '',
     username: '',
   })
-
-  useEffect(() => {
-    const studentIds = userDetails?.linkedAccountsData?.students || []
-    setStudentIdsList([...studentIds])
-  }, [userDetails])
 
   function deleteStudent(studentId: string, studentUsername: string) {
     setPopupUserDetails({ userId: studentId, username: studentUsername })
@@ -55,8 +50,6 @@ export default function StudentsList({ userDetails }: { userDetails: IUser }) {
       const { details }: { message: string; details: { student: IUser } } = data
       onFetchStudentSuccess(details.student)
     } catch (error: any) {
-      console.log(error)
-
       if (!error.response) {
         setErrorMessage('Server is down. Try again later.')
         return

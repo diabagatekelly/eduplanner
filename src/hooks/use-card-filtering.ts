@@ -1,56 +1,52 @@
-import { useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import { ICard } from '@/types/ICard'
 import { IActivity } from '@/types/IActivity'
 import { CompletionStatus } from '@/types/CompletionStatusEnum'
 
 export function useCardFiltering(activity: IActivity | undefined, mounted: boolean | undefined) {
-  const [cardsOfTheDay, setCardsOfTheDay] = useState<ICard[]>([])
-  const [allActiveCards, setAllActiveCards] = useState<ICard[]>([])
-  const [allInactiveCards, setAllInactiveCards] = useState<ICard[]>([])
-  const [hash, setHash] = useState('')
+  const hash = mounted ? window.location.hash : ''
 
-  useEffect(() => {
-    const cards: any[] | ICard = activity?.cards || []
+  const sortedCards = useMemo(() => {
+    const cards: ICard[] = activity?.cards ? [...activity.cards] : []
 
     if (cards.length) {
-      cards.map((card) => {
-        let num = `${atob(card.cardId).split('-')[1]}`
-        if (num.length === 1) {
-          card.number = `00${num}`
-        } else if (num.length === 2) {
-          card.number = `0${num}`
-        } else {
-          card.number = `${num}`
-        }
+      cards.sort((a, b) => {
+        const partA = atob(a.cardId).split('-')[1]
+        const partB = atob(b.cardId).split('-')[1]
+
+        const numA = Number.parseInt(partA, 10)
+        const numB = Number.parseInt(partB, 10)
+
+        const safeA = Number.isNaN(numA) ? Number.POSITIVE_INFINITY : numA
+        const safeB = Number.isNaN(numB) ? Number.POSITIVE_INFINITY : numB
+
+        return safeA - safeB
       })
-      cards.sort((a, b) => a.number - b.number)
-      cards.map((card) => delete card.number)
     }
 
-    const todayCards = cards?.filter((card) => {
-      return (
+    return cards
+  }, [activity])
+
+  const cardsOfTheDay = useMemo(() => {
+    const today = new Date().toLocaleDateString('en-US', { timeZone: 'EST' })
+    return sortedCards.filter(
+      (card) =>
         card.completionStatus === CompletionStatus.REVIEW ||
         (card.completionStatus !== CompletionStatus.INACTIVE &&
           card.completionStatus !== CompletionStatus.COMPLETED &&
-          (new Date().toLocaleDateString('en-US', { timeZone: 'EST' }) === card.nextShowDate ||
-            new Date().toLocaleDateString('en-US', { timeZone: 'EST' }) === card.addedOn))
-      )
-    })
-    setCardsOfTheDay(todayCards)
-
-    const activeCards = cards?.filter((card) => card.completionStatus !== CompletionStatus.INACTIVE)
-    setAllActiveCards(activeCards)
-
-    const inactiveCards = cards?.filter(
-      (card) => card.completionStatus === CompletionStatus.INACTIVE
+          (today === card.nextShowDate || today === card.addedOn))
     )
-    setAllInactiveCards(inactiveCards)
+  }, [sortedCards])
 
-    if (mounted) {
-      const hashReducer = window.location.hash
-      setHash(hashReducer)
-    }
-  }, [activity, mounted])
+  const allActiveCards = useMemo(
+    () => sortedCards.filter((card) => card.completionStatus !== CompletionStatus.INACTIVE),
+    [sortedCards]
+  )
+
+  const allInactiveCards = useMemo(
+    () => sortedCards.filter((card) => card.completionStatus === CompletionStatus.INACTIVE),
+    [sortedCards]
+  )
 
   return { cardsOfTheDay, allActiveCards, allInactiveCards, hash }
 }

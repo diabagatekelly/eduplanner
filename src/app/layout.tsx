@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { auth } from '@/auth'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
@@ -7,6 +8,12 @@ import AppProviders from './providers'
 import { Toaster } from 'sonner'
 
 const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: 'EduPlanner — Education Planning & Tracking',
+  description:
+    'Plan activities, track student progress, and manage educational content with EduPlanner.',
+}
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -19,7 +26,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className={`${inter.className}`}>
         <Navbar isAuthenticated={isAuthenticated} username={username} userId={userId} />
         <AppProviders>
-          <div className="py-20 px-5">{children}</div>
+          <main className="py-20 px-5">{children}</main>
           <Footer />
         </AppProviders>
         <Toaster position="top-right" richColors />

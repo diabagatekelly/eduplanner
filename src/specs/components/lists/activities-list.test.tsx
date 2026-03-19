@@ -6,6 +6,7 @@ import * as React from 'react'
 import { IUser } from '../../../types/IUser'
 import { mockActivity, mockStudent, mockUser } from '../../mocks'
 import { CompletionStatus } from '../../../types/CompletionStatusEnum'
+import { useRouter } from 'next/navigation'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
@@ -65,40 +66,31 @@ describe('Activities List', () => {
     })
 
     it('should fetch activity for main user', async () => {
+      const mockPush = jest.fn()
+      ;(useRouter as jest.Mock).mockReturnValue({ push: mockPush })
+
       render(<ActivitiesList {...{ isMain: true, userDetails: teacher }} />)
       const activitiesList = screen.getAllByTestId('activity-in-list')
 
-      const useRouter = jest.spyOn(require('next/navigation'), 'useRouter')
-      useRouter.mockImplementation(() => ({
-        push: jest.fn(),
-      }))
-
       await act(async () => {
         await fireEvent.click(activitiesList[0])
       })
 
-      expect(useRouter.mock.results[1].value.push).toHaveBeenCalledWith(
-        '/mock-user/activities/Quran'
-      )
+      expect(mockPush).toHaveBeenCalledWith('/mock-user/activities/Quran')
     })
 
     it('should fetch activity for non-main user', async () => {
+      const mockPush = jest.fn()
+      ;(useRouter as jest.Mock).mockReturnValue({ push: mockPush })
+
       render(<ActivitiesList {...{ isMain: false, userDetails: student }} />)
       const activitiesList = screen.getAllByTestId('activity-in-list')
-
-      const useRouter = jest.spyOn(require('next/navigation'), 'useRouter')
-
-      useRouter.mockImplementation(() => ({
-        push: jest.fn(),
-      }))
 
       await act(async () => {
         await fireEvent.click(activitiesList[0])
       })
 
-      expect(useRouter.mock.results[1].value.push).toHaveBeenCalledWith(
-        '/mock-user/students/mock-student/activities/Quran'
-      )
+      expect(mockPush).toHaveBeenCalledWith('/mock-user/students/mock-student/activities/Quran')
     })
 
     it('should delete activity for main user', async () => {

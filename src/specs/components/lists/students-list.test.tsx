@@ -149,11 +149,6 @@ describe('Students List', () => {
   })
 
   describe('Has students but correct student not yet in object', () => {
-    // Suppress console.log from component error handler to keep test output clean
-    beforeEach(() => {
-      jest.spyOn(console, 'log').mockImplementation(() => null)
-    })
-
     const fakeStudent = {
       ...mockStudent,
       username: 'some-other-student',

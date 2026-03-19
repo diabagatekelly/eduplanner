@@ -68,8 +68,6 @@ export default function Register() {
       setFormSubmitOutcomeMessage(message)
       router.push('/login')
     } catch (error: any) {
-      console.log(error)
-
       if (!error.response) {
         setFormSubmitOutcomeMessage('Server is down. Try again later.')
         return
