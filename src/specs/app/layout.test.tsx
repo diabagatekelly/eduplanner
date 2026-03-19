@@ -1,4 +1,4 @@
-import RootLayout from '../../app/layout'
+import RootLayout, { metadata } from '../../app/layout'
 import Home from '../../app/home/page'
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
@@ -28,6 +28,11 @@ jest.mock('next/navigation', () => {
 describe('Root layout', () => {
   afterEach(() => {
     jest.clearAllMocks()
+  })
+
+  it('should export metadata with title and description', () => {
+    expect(metadata.title).toBeDefined()
+    expect(metadata.description).toBeDefined()
   })
 
   it('should render as expected', async () => {

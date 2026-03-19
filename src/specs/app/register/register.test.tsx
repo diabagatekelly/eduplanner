@@ -163,8 +163,6 @@ describe('Register page', () => {
   })
 
   it('should not reset form when response is not 200 or 500 and display error message', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
-
     server.use(
       http.post('*/user/register', () =>
         HttpResponse.json(
@@ -203,8 +201,6 @@ describe('Register page', () => {
   })
 
   it('should not reset form when response is 500 and display error message', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
-
     server.use(
       http.post('*/user/register', () =>
         HttpResponse.json(
@@ -244,8 +240,6 @@ describe('Register page', () => {
   })
 
   it('should not reset form when error is thrown with no response', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
-
     server.use(http.post('*/user/register', () => HttpResponse.error()))
     render(<Register />)
 

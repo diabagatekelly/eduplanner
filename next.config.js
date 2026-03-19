@@ -1,3 +1,9 @@
+import bundleAnalyzer from '@next/bundle-analyzer'
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 /** @type {import('next').NextConfig} */
 export const nextConfig = {
   env: {
@@ -19,8 +25,7 @@ export const nextConfig = {
     NEXT_RESET_CARD_STAGE_URL: process.env.NEXT_RESET_CARD_STAGE_URL,
     NEXT_REQUEST_REVIEW_CARD_URL: process.env.NEXT_REQUEST_REVIEW_CARD_URL,
     NEXT_ACTIVATE_CARD_URL: process.env.NEXT_ACTIVATE_CARD_URL,
-    CI: 'false',
   },
 }
 
-export default nextConfig
+export default withBundleAnalyzer(nextConfig)

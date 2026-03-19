@@ -212,7 +212,7 @@ export default function ManageCardPopup({
                       </button>
                       <button
                         data-testid="promote-stage-btn"
-                        disabled={false} //TODO - revert to card.completionStatus === completed once pending reset automatically
+                        disabled={false}
                         onClick={async () => await submitEditStage(true)}
                         data-modal-hide="popup-modal"
                         type="button"
@@ -223,7 +223,7 @@ export default function ManageCardPopup({
 
                       <button
                         data-testid="demote-stage-btn"
-                        disabled={false} //TODO - revert to card.completionStatus === completed once pending reset automatically
+                        disabled={false}
                         onClick={async () => await submitEditStage(false)}
                         data-modal-hide="popup-modal"
                         type="button"

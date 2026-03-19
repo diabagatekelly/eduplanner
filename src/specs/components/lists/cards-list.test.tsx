@@ -14,6 +14,7 @@ import {
   mockUserLanguageVocabCard,
   mockUserMiscCard,
 } from '../../mocks'
+import { useMounted } from '../../../lib/helpers/useMounted'
 import { CompletionStatus } from '../../../types/CompletionStatusEnum'
 
 jest.mock('sonner', () => ({
@@ -22,15 +23,9 @@ jest.mock('sonner', () => ({
 jest.mock('next-auth/react', () => ({
   getSession: jest.fn().mockResolvedValue(null),
 }))
-jest.mock('../../../lib/helpers/useMounted', () => {
-  return {
-    useMounted: jest
-      .fn()
-      .mockImplementationOnce(() => false)
-      .mockImplementationOnce(() => false)
-      .mockImplementation(() => true),
-  }
-})
+jest.mock('../../../lib/helpers/useMounted', () => ({
+  useMounted: jest.fn(() => true),
+}))
 
 const originalHash = global.window.location.hash
 const activityNoCards = { ...mockActivity }
@@ -88,11 +83,13 @@ describe('Cards List', () => {
 
   describe('Not mounted', () => {
     beforeEach(() => {
+      ;(useMounted as jest.Mock).mockReturnValue(false)
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
     })
 
     afterEach(() => {
+      ;(useMounted as jest.Mock).mockReturnValue(true)
       jest.clearAllMocks()
       jest.useRealTimers()
     })

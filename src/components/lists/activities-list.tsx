@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Popup from '../popups/popup'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { IUser } from '@/types/IUser'
-import { IActivity } from '@/types/IActivity'
 import { fromDbFormat } from '@/lib/helpers/formatActivityName'
 import { getBorderColor } from '@/lib/helpers/getBorderColor'
 import { TrashIcon } from '@heroicons/react/24/solid'
@@ -20,15 +19,10 @@ export default function ActivitiesList({
   const router = useRouter()
   const pathName = usePathname()
 
-  const [activitiesList, setActivitiesList] = useState<IActivity[]>([])
+  const activitiesList = userDetails?.activities ?? []
   const [showModal, setShowModal] = useState(false)
   const [popupUserDetails, setPopupUserDetails] = useState<IUser>({} as IUser)
   const [popupItem, setPopupItem] = useState<{ activityName: string }>({ activityName: '' })
-
-  useEffect(() => {
-    const activities = userDetails?.activities ?? []
-    setActivitiesList([...activities])
-  }, [userDetails])
 
   function deleteActivity(activityName: string) {
     setPopupItem({ activityName })
