@@ -11,9 +11,16 @@ export function useCardFiltering(activity: IActivity | undefined, mounted: boole
 
     if (cards.length) {
       cards.sort((a, b) => {
-        const numA = parseInt(atob(a.cardId).split('-')[1]) || 0
-        const numB = parseInt(atob(b.cardId).split('-')[1]) || 0
-        return numA - numB
+        const partA = atob(a.cardId).split('-')[1]
+        const partB = atob(b.cardId).split('-')[1]
+
+        const numA = Number.parseInt(partA, 10)
+        const numB = Number.parseInt(partB, 10)
+
+        const safeA = Number.isNaN(numA) ? Number.POSITIVE_INFINITY : numA
+        const safeB = Number.isNaN(numB) ? Number.POSITIVE_INFINITY : numB
+
+        return safeA - safeB
       })
     }
 

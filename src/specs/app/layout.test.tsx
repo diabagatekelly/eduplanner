@@ -31,8 +31,8 @@ describe('Root layout', () => {
   })
 
   it('should export metadata with title and description', () => {
-    expect(metadata.title).toBeDefined()
-    expect(metadata.description).toBeDefined()
+    expect(metadata.title).toBe('EduPlanner — Education Planning & Tracking')
+    expect(metadata.description).toContain('EduPlanner')
   })
 
   it('should render as expected', async () => {
