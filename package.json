@@ -11,6 +11,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "test": "cross-env TZ=EST jest",
+    "typecheck": "tsc --noEmit",
     "test:ui": "cross-env CYPRESS_ENV=development cypress run --browser chrome",
     "test:ui:open": "cross-env CYPRESS_ENV=development cypress open",
     "prepare": "husky"
