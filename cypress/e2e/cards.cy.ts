@@ -1,7 +1,7 @@
 import { IUser } from '../../src/types/IUser'
 import { ICard } from '../../src/types/ICard'
-import { ISODateString } from '../../src/types/isoDateType'
-import { CompletionStatus } from '../../src/types/CompletionStatusEnum'
+import { ISODateString } from '../../src/types/ISODateString'
+import { COMPLETION_STATUS } from '../../src/lib/constants/completion-status'
 import {
   mockActivity,
   mockLanguageActivity,
@@ -260,7 +260,7 @@ describe('Card Management — Delete', () => {
 describe('Active Cards Display', () => {
   const mockActiveCard: ICard = {
     ...mockUserCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
   }
   const userWithActiveCard: IUser = {
     ...mockUser,
@@ -287,7 +287,7 @@ describe('Today Cards Display', () => {
   }) as ISODateString
   const mockTodayCard: ICard = {
     ...mockUserCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
     addedOn: today,
   }
   const userWithTodayCard: IUser = {
@@ -313,7 +313,7 @@ describe('Card Management — Promote', () => {
   }) as ISODateString
   const mockTodayCard: ICard = {
     ...mockUserCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
     addedOn: today,
   }
   const userWithTodayCard: IUser = {
@@ -350,7 +350,7 @@ describe('Card Management — Reset Stage', () => {
   }) as ISODateString
   const mockTodayCard: ICard = {
     ...mockUserCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
     addedOn: today,
   }
   const userWithTodayCard: IUser = {
@@ -384,7 +384,7 @@ describe('Card Management — Reset Stage', () => {
 describe('Card Management — Override Stage', () => {
   const mockActiveCard: ICard = {
     ...mockUserCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
   }
   const userWithActiveCard: IUser = {
     ...mockUser,
@@ -424,7 +424,7 @@ describe('Card Management — Submit for Review', () => {
   const mockTodayCard: ICard = {
     ...mockUserCard,
     activity: mockActivity.name,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
     addedOn: today,
   }
   const mockStudentWithTeacher = {
@@ -444,7 +444,7 @@ describe('Card Management — Submit for Review', () => {
       body: {
         status: 'success',
         message: 'Card stage updated.',
-        details: { ...mockTodayCard, completionStatus: CompletionStatus.REVIEW },
+        details: { ...mockTodayCard, completionStatus: COMPLETION_STATUS.REVIEW },
       },
     }).as('editCardStage')
   })

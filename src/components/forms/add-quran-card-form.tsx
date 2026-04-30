@@ -4,11 +4,11 @@ import { FormEvent, useEffect, useState } from 'react'
 import { ICard, IQuranCards } from '../../types/ICard'
 import React from 'react'
 import { IActivity } from '@/types/IActivity'
-import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/card-types'
 import { IUser } from '@/types/IUser'
 import { useCreateCards, useDeleteCard } from '@/hooks/use-card-mutations'
 import { quranCards } from '@/lib/constants/quran-bank'
-import { CompletionStatus } from '@/types/CompletionStatusEnum'
+import { COMPLETION_STATUS } from '@/lib/constants/completion-status'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { quranCustomSchema, QuranCustomFormData } from '@/lib/schemas/card.schemas'
@@ -193,7 +193,7 @@ export default function AddQuranCardForm({
           lastUpdatedOn: null,
           nextShowDate: null,
           stage: '0',
-          completionStatus: CompletionStatus.INACTIVE,
+          completionStatus: COMPLETION_STATUS.INACTIVE,
         }
       })
 
@@ -206,7 +206,7 @@ export default function AddQuranCardForm({
           lastUpdatedOn: null,
           nextShowDate: null,
           stage: '0',
-          completionStatus: CompletionStatus.INACTIVE,
+          completionStatus: COMPLETION_STATUS.INACTIVE,
         })
       }
 

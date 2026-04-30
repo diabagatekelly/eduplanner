@@ -15,7 +15,7 @@ import {
   mockUserMiscCard,
 } from '../../mocks'
 import { useMounted } from '../../../lib/helpers/useMounted'
-import { CompletionStatus } from '../../../types/CompletionStatusEnum'
+import { COMPLETION_STATUS } from '../../../lib/constants/completion-status'
 
 jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
@@ -31,33 +31,33 @@ const originalHash = global.window.location.hash
 const activityNoCards = { ...mockActivity }
 const activityWithReviewCards = {
   ...mockActivity,
-  cards: [{ ...mockUserCard, completionStatus: CompletionStatus.REVIEW }],
+  cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.REVIEW }],
 }
 const activityWithMultipleReviewCards = {
   ...mockActivity,
   cards: [
-    { ...mockUserCard, completionStatus: CompletionStatus.REVIEW },
+    { ...mockUserCard, completionStatus: COMPLETION_STATUS.REVIEW },
     {
       ...mockUserCard,
-      completionStatus: CompletionStatus.REVIEW,
+      completionStatus: COMPLETION_STATUS.REVIEW,
       cardId: `${btoa('surah-109-name-Naas-juz-30')}`,
     },
   ],
 }
 const activityWithInactiveCards = {
   ...mockActivity,
-  cards: [{ ...mockUserCard, completionStatus: CompletionStatus.INACTIVE }],
+  cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.INACTIVE }],
 }
 const activityWithCompletedCards = {
   ...mockActivity,
-  cards: [{ ...mockUserCard, completionStatus: CompletionStatus.COMPLETED }],
+  cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED }],
 }
 const activityWithPendingAddedToday = {
   ...mockActivity,
   cards: [
     {
       ...mockUserCard,
-      completionStatus: CompletionStatus.PENDING,
+      completionStatus: COMPLETION_STATUS.PENDING,
       addedOn: '2/3/2024',
       cardId: `${btoa('juz-30')}`,
     },
@@ -68,7 +68,7 @@ const activityWithPendingShowDate = {
   cards: [
     {
       ...mockUserCard,
-      completionStatus: CompletionStatus.PENDING,
+      completionStatus: COMPLETION_STATUS.PENDING,
       addedOn: '2/1/2024',
       nextShowDate: '2/3/2024',
       cardId: `${btoa('custom-Furqan 1 to 2')}`,
@@ -186,7 +186,7 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserLanguageGrammarCard,
-                  completionStatus: CompletionStatus.PENDING,
+                  completionStatus: COMPLETION_STATUS.PENDING,
                   addedOn: '2/3/2024',
                   cardId: `${btoa('arabic-grammar-conjugate')}`,
                 },
@@ -318,7 +318,7 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserLanguageVocabCard,
-                  completionStatus: CompletionStatus.REVIEW,
+                  completionStatus: COMPLETION_STATUS.REVIEW,
                   cardId: `${btoa('arabic-vocab-house')}`,
                 },
               ],
@@ -360,7 +360,7 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserMiscCard,
-                  completionStatus: CompletionStatus.PENDING,
+                  completionStatus: COMPLETION_STATUS.PENDING,
                   addedOn: '2/3/2024',
                   cardId: `${btoa('misc-card-cook an egg')}`,
                 },
@@ -466,7 +466,7 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserCard,
-                  completionStatus: CompletionStatus.INACTIVE,
+                  completionStatus: COMPLETION_STATUS.INACTIVE,
                   cardId: `${btoa('surah-1-name-Faatiha-juz-1')}`,
                 },
               ],
@@ -508,7 +508,7 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserCard,
-                  completionStatus: CompletionStatus.INACTIVE,
+                  completionStatus: COMPLETION_STATUS.INACTIVE,
                   addedOn: '2/3/2024',
                   cardId: `${btoa('juz-30')}`,
                 },
@@ -547,7 +547,7 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserCard,
-                  completionStatus: CompletionStatus.INACTIVE,
+                  completionStatus: COMPLETION_STATUS.INACTIVE,
                   addedOn: '2/1/2024',
                   nextShowDate: '2/3/2024',
                   cardId: `${btoa('custom-Furqan 1 to 2')}`,
@@ -685,7 +685,7 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserCard,
-                  completionStatus: CompletionStatus.INACTIVE,
+                  completionStatus: COMPLETION_STATUS.INACTIVE,
                   addedOn: '2/3/2024',
                   cardId: `${btoa('juz-30')}`,
                 },
@@ -710,7 +710,7 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserCard,
-                  completionStatus: CompletionStatus.INACTIVE,
+                  completionStatus: COMPLETION_STATUS.INACTIVE,
                   addedOn: '2/3/2024',
                   cardId: `${btoa('juz-30')}`,
                 },

@@ -10,7 +10,7 @@ import {
 import { ICard } from '@/types/ICard'
 import { IUser } from '@/types/IUser'
 import { IActivity } from '@/types/IActivity'
-import { CompletionStatus } from '@/types/CompletionStatusEnum'
+import { COMPLETION_STATUS } from '@/lib/constants/completion-status'
 import { toast } from 'sonner'
 import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
@@ -67,7 +67,7 @@ export function useCardActions(
         activity: activity.name,
         cardId: card.cardId,
         editData: {
-          completionStatus: CompletionStatus.REVIEW,
+          completionStatus: COMPLETION_STATUS.REVIEW,
         },
       })
 

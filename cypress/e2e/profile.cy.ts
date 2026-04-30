@@ -1,6 +1,6 @@
 import { mockUser } from '../../src/specs/mocks'
 import { IUser } from '../../src/types/IUser'
-import { ISODateString } from '../../src/types/isoDateType'
+import { ISODateString } from '../../src/types/ISODateString'
 
 describe('User Profile', () => {
   const user: IUser = { ...mockUser, lastLogin: mockUser.lastLogin as ISODateString }

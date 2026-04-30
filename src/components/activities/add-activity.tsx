@@ -3,8 +3,8 @@
 import AddActivityForm from '../forms/add-activity-form'
 import { useCreateActivity } from '@/hooks/use-activity-mutations'
 import { IActivity } from '../../types/IActivity'
-import { CompletionStatus } from '@/types/CompletionStatusEnum'
-import { ISODateString } from '@/types/isoDateType'
+import { CompletionStatus, COMPLETION_STATUS } from '@/lib/constants/completion-status'
+import { ISODateString } from '@/types/ISODateString'
 import { IUser } from '@/types/IUser'
 import { toDbFormat } from '@/lib/helpers/formatActivityName'
 import { useForm } from 'react-hook-form'
@@ -47,7 +47,7 @@ export default function AddActivity({ userDetails }: { userDetails: IUser }) {
         activityId: btoa(`${userDetails.email}-${dbActivityName}`),
         name: dbActivityName!,
         points: Number(data.points),
-        completionStatus: CompletionStatus.PENDING,
+        completionStatus: COMPLETION_STATUS.PENDING,
         hasCards: data.hasCards === 'true' ? true : false,
         createdOn: now.toLocaleDateString('en-US', {
           timeZone: 'EST',

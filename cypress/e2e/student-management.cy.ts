@@ -1,7 +1,7 @@
 import { IUser } from '../../src/types/IUser'
 import { ICard } from '../../src/types/ICard'
-import { ISODateString } from '../../src/types/isoDateType'
-import { CompletionStatus } from '../../src/types/CompletionStatusEnum'
+import { ISODateString } from '../../src/types/ISODateString'
+import { COMPLETION_STATUS } from '../../src/lib/constants/completion-status'
 import { mockActivity, mockUser, mockStudent, mockUserCard } from '../../src/specs/mocks'
 
 /**
@@ -18,7 +18,7 @@ const today = new Date(Date.now()).toLocaleDateString('en-US', {
 
 const studentCard: ICard = {
   ...mockUserCard,
-  completionStatus: CompletionStatus.INACTIVE,
+  completionStatus: COMPLETION_STATUS.INACTIVE,
 }
 
 const studentWithActivity: IUser = {
@@ -115,7 +115,7 @@ describe('Teacher Managing Student — Delete Card', () => {
 describe('Teacher Managing Student — Override Stage', () => {
   const activeStudentCard: ICard = {
     ...studentCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
   }
   const studentWithActiveCard: IUser = {
     ...mockStudent,
@@ -169,7 +169,7 @@ describe('Teacher Managing Student — Override Stage', () => {
 describe('Teacher Managing Student — Reset Stage', () => {
   const todayStudentCard: ICard = {
     ...studentCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
     addedOn: today,
   }
   const studentWithTodayCard: IUser = {

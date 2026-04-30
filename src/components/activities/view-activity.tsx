@@ -3,10 +3,10 @@
 import { useEditActivity } from '@/hooks/use-activity-mutations'
 import { useRequestCardReview } from '@/hooks/use-card-mutations'
 import ListUi from '@/components/lists/lists-ui'
-import { CompletionStatus } from '../../types/CompletionStatusEnum'
+import { CompletionStatus, COMPLETION_STATUS } from '@/lib/constants/completion-status'
 import { IActivity } from '@/types/IActivity'
 import { IUser } from '@/types/IUser'
-import { ISODateString } from '@/types/isoDateType'
+import { ISODateString } from '@/types/ISODateString'
 import { ICard } from '@/types/ICard'
 import { fromDbFormat } from '@/lib/helpers/formatActivityName'
 import { toast } from 'sonner'
@@ -28,7 +28,8 @@ export default function ViewActivity({
     if (
       userActivity.cards?.some(
         (card: ICard) =>
-          ![CompletionStatus.COMPLETED, CompletionStatus.INACTIVE].includes(card.completionStatus)
+          card.completionStatus !== COMPLETION_STATUS.COMPLETED &&
+          card.completionStatus !== COMPLETION_STATUS.INACTIVE
       )
     ) {
       toast.warning('You still have some cards to complete!!')
@@ -61,7 +62,7 @@ export default function ViewActivity({
         lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {
           timeZone: 'EST',
         }) as ISODateString,
-        completionStatus: CompletionStatus.REVIEW,
+        completionStatus: COMPLETION_STATUS.REVIEW,
       }
 
       await editActivityMutation.mutateAsync(updatedActivity)
@@ -79,7 +80,7 @@ export default function ViewActivity({
         lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {
           timeZone: 'EST',
         }) as ISODateString,
-        completionStatus: CompletionStatus.COMPLETED,
+        completionStatus: COMPLETION_STATUS.COMPLETED,
       }
 
       const response = await editActivityMutation.mutateAsync(updatedActivity)
@@ -103,28 +104,28 @@ export default function ViewActivity({
 
       <button
         data-testid="activity-update-btn"
-        disabled={userActivity?.completionStatus === CompletionStatus.COMPLETED}
+        disabled={userActivity?.completionStatus === COMPLETION_STATUS.COMPLETED}
         type="button"
         className={
-          userActivity?.completionStatus !== CompletionStatus.COMPLETED
+          userActivity?.completionStatus !== COMPLETION_STATUS.COMPLETED
             ? 'green-btn mr-2'
             : 'disabled-btn mr-2'
         }
         onClick={submit}
       >
         {(!isMain || (isMain && userDetails?.accountType === 'teacher')) &&
-          userActivity?.completionStatus === CompletionStatus.COMPLETED &&
+          userActivity?.completionStatus === COMPLETION_STATUS.COMPLETED &&
           'Already completed'}
         {(!isMain || (isMain && userDetails?.accountType === 'teacher')) &&
-          userActivity?.completionStatus !== CompletionStatus.COMPLETED &&
+          userActivity?.completionStatus !== COMPLETION_STATUS.COMPLETED &&
           'Mark completed'}
         {isMain &&
           userDetails?.accountType === 'student' &&
-          userActivity?.completionStatus === CompletionStatus.COMPLETED &&
+          userActivity?.completionStatus === COMPLETION_STATUS.COMPLETED &&
           'Already completed'}
         {isMain &&
           userDetails?.accountType === 'student' &&
-          userActivity?.completionStatus !== CompletionStatus.COMPLETED &&
+          userActivity?.completionStatus !== COMPLETION_STATUS.COMPLETED &&
           'Request review'}
       </button>
       <hr className="my-5" />

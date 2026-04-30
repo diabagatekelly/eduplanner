@@ -11,7 +11,7 @@ import {
   mockLanguageActivity,
   mockUserLanguageVocabCard,
 } from '../../../specs/mocks'
-import { CompletionStatus } from '../../../types/CompletionStatusEnum'
+import { COMPLETION_STATUS } from '../../../lib/constants/completion-status'
 import { toast } from 'sonner'
 import { server } from '../../msw/server'
 import { http, HttpResponse } from 'msw'
@@ -494,7 +494,7 @@ describe('Manage Card Popup', () => {
         activities: [
           {
             ...mockActivity,
-            cards: [{ ...mockUserCard, completionStatus: CompletionStatus.REVIEW }],
+            cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.REVIEW }],
           },
         ],
       }
@@ -513,7 +513,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.REVIEW },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.REVIEW },
               action: 'edit',
             },
           }}
@@ -531,7 +531,7 @@ describe('Manage Card Popup', () => {
       activities: [
         {
           ...mockActivity,
-          cards: [{ ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' }],
+          cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' }],
         },
       ],
     }
@@ -565,7 +565,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' },
               action: 'override',
             },
           }}
@@ -609,7 +609,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' },
               action: 'override',
             },
           }}
@@ -653,7 +653,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' },
               action: 'override',
             },
           }}
@@ -693,7 +693,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' },
               action: 'override',
             },
           }}
@@ -729,7 +729,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' },
               action: 'override',
             },
           }}
@@ -753,7 +753,7 @@ describe('Manage Card Popup', () => {
       activities: [
         {
           ...mockActivity,
-          cards: [{ ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' }],
+          cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' }],
         },
       ],
     }
@@ -785,7 +785,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -832,7 +832,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -871,7 +871,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -913,7 +913,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -953,7 +953,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -989,7 +989,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -1393,7 +1393,7 @@ describe('Manage Card Popup', () => {
       activities: [
         {
           ...mockActivity,
-          cards: [{ ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' }],
+          cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' }],
         },
       ],
     }
@@ -1425,7 +1425,11 @@ describe('Manage Card Popup', () => {
               user: myUser,
               activity: mockActivity,
               item: {
-                card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+                card: {
+                  ...mockUserCard,
+                  completionStatus: COMPLETION_STATUS.COMPLETED,
+                  stage: '7',
+                },
                 action: 'override',
               },
             }}
