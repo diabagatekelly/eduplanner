@@ -5,7 +5,7 @@ import { render } from '../../util'
 import * as React from 'react'
 import { IUser } from '../../../types/IUser'
 import { mockActivity, mockStudent, mockUser } from '../../mocks'
-import { CompletionStatus } from '../../../types/CompletionStatusEnum'
+import { COMPLETION_STATUS } from '../../../lib/constants/completion-status'
 import { useRouter } from 'next/navigation'
 
 jest.mock('sonner', () => ({
@@ -47,13 +47,13 @@ describe('Activities List', () => {
     const mockActivity2 = { ...mockActivity, name: 'Reading' }
     const student = {
       ...mockStudent,
-      activities: [{ ...mockActivity1, completionStatus: CompletionStatus.COMPLETED }],
+      activities: [{ ...mockActivity1, completionStatus: COMPLETION_STATUS.COMPLETED }],
     }
     const teacher: IUser = {
       ...mockUser,
       activities: [
         mockActivity1,
-        { ...mockActivity2, completionStatus: CompletionStatus.DELINQUENT },
+        { ...mockActivity2, completionStatus: COMPLETION_STATUS.DELINQUENT },
       ],
     }
 

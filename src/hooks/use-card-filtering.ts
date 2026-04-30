@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { ICard } from '@/types/ICard'
 import { IActivity } from '@/types/IActivity'
-import { CompletionStatus } from '@/types/CompletionStatusEnum'
+import { COMPLETION_STATUS } from '@/lib/constants/completion-status'
 
 export function useCardFiltering(activity: IActivity | undefined, mounted: boolean | undefined) {
   const hash = mounted ? window.location.hash : ''
@@ -31,20 +31,20 @@ export function useCardFiltering(activity: IActivity | undefined, mounted: boole
     const today = new Date().toLocaleDateString('en-US', { timeZone: 'EST' })
     return sortedCards.filter(
       (card) =>
-        card.completionStatus === CompletionStatus.REVIEW ||
-        (card.completionStatus !== CompletionStatus.INACTIVE &&
-          card.completionStatus !== CompletionStatus.COMPLETED &&
+        card.completionStatus === COMPLETION_STATUS.REVIEW ||
+        (card.completionStatus !== COMPLETION_STATUS.INACTIVE &&
+          card.completionStatus !== COMPLETION_STATUS.COMPLETED &&
           (today === card.nextShowDate || today === card.addedOn))
     )
   }, [sortedCards])
 
   const allActiveCards = useMemo(
-    () => sortedCards.filter((card) => card.completionStatus !== CompletionStatus.INACTIVE),
+    () => sortedCards.filter((card) => card.completionStatus !== COMPLETION_STATUS.INACTIVE),
     [sortedCards]
   )
 
   const allInactiveCards = useMemo(
-    () => sortedCards.filter((card) => card.completionStatus === CompletionStatus.INACTIVE),
+    () => sortedCards.filter((card) => card.completionStatus === COMPLETION_STATUS.INACTIVE),
     [sortedCards]
   )
 

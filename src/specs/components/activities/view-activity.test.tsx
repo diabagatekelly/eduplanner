@@ -4,7 +4,7 @@ import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
 import { mockUser, mockActivity, mockStudent } from '../../mocks'
-import { CompletionStatus } from '../../../types/CompletionStatusEnum'
+import { COMPLETION_STATUS } from '../../../lib/constants/completion-status'
 import ListUi from '../../../components/lists/lists-ui'
 import { toast } from 'sonner'
 
@@ -79,7 +79,7 @@ describe('View activity', () => {
       })
 
       it('should display disabled gray button if activity is completed', async () => {
-        const activity = { ...mockActivity, completionStatus: CompletionStatus.COMPLETED }
+        const activity = { ...mockActivity, completionStatus: COMPLETION_STATUS.COMPLETED }
         const withCompletedActivity = { ...userDetails, activities: [activity] }
         render(
           <ViewActivity
@@ -98,7 +98,7 @@ describe('View activity', () => {
   describe('Prevent submitting', () => {
     const lazyUser = {
       ...mockUser,
-      activities: [{ ...mockActivity, cards: [{ completionStatus: CompletionStatus.PENDING }] }],
+      activities: [{ ...mockActivity, cards: [{ completionStatus: COMPLETION_STATUS.PENDING }] }],
     }
 
     it('should not submit and display message if any card is not COMPLETED or is INACTIVE', async () => {
@@ -108,7 +108,7 @@ describe('View activity', () => {
             userDetails: lazyUser,
             userActivity: {
               ...mockActivity,
-              cards: [{ completionStatus: CompletionStatus.PENDING }],
+              cards: [{ completionStatus: COMPLETION_STATUS.PENDING }],
             },
             isMain: true,
           }}
@@ -243,7 +243,7 @@ describe('View activity', () => {
       })
 
       it('should display disabled gray button if activity is completed', async () => {
-        const activity = { ...mockActivity, completionStatus: CompletionStatus.COMPLETED }
+        const activity = { ...mockActivity, completionStatus: COMPLETION_STATUS.COMPLETED }
         const withCompletedActivity = { ...studentUserDetails, activities: [activity] }
         render(
           <ViewActivity

@@ -1,11 +1,11 @@
 import { IUser } from '../types/IUser'
 import { ICard } from '../types/ICard'
 import { IActivity } from '../types/IActivity'
-import { CompletionStatus } from '../types/CompletionStatusEnum'
-import { ISODateString } from '../types/isoDateType'
+import { CompletionStatus, COMPLETION_STATUS } from '../lib/constants/completion-status'
+import { ISODateString } from '../types/ISODateString'
 import { IQuranSurahCard, IQuranJuzCard } from '@/types/ICard'
-import { ACTIVITY_TYPES } from '../lib/constants/activityTypes'
-import { CARD_ACTIVITY_TYPES } from '../lib/constants/cardTypes'
+import { ACTIVITY_TYPES } from '../lib/constants/activity-types'
+import { CARD_ACTIVITY_TYPES } from '../lib/constants/card-types'
 
 export const mockUser: IUser = {
   userId: btoa('mock.user@email.com'),
@@ -38,7 +38,7 @@ export const mockActivity: IActivity = {
   name: ACTIVITY_TYPES.QURAN,
   points: 15,
   description: 'Quran memorization',
-  completionStatus: CompletionStatus.PENDING,
+  completionStatus: COMPLETION_STATUS.PENDING,
   hasCards: true,
   createdOn: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
   lastUpdatedOn: null,
@@ -49,7 +49,7 @@ export const mockLanguageActivity: IActivity = {
   name: 'Arabic-Language',
   points: 10,
   description: 'Arabic language',
-  completionStatus: CompletionStatus.PENDING,
+  completionStatus: COMPLETION_STATUS.PENDING,
   hasCards: true,
   createdOn: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
   lastUpdatedOn: null,
@@ -60,7 +60,7 @@ export const mockCookingActivity: IActivity = {
   name: 'Cooking',
   points: 3,
   description: 'practice cooking',
-  completionStatus: CompletionStatus.PENDING,
+  completionStatus: COMPLETION_STATUS.PENDING,
   hasCards: true,
   createdOn: new Date(Date.now()).toLocaleDateString('en-US', { timeZone: 'EST' }) as ISODateString,
   lastUpdatedOn: null,
@@ -74,7 +74,7 @@ export const mockUserCard: ICard = {
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE,
+  completionStatus: COMPLETION_STATUS.INACTIVE,
 }
 
 export const mockUserLanguageVocabCard: ICard = {
@@ -85,7 +85,7 @@ export const mockUserLanguageVocabCard: ICard = {
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE,
+  completionStatus: COMPLETION_STATUS.INACTIVE,
 }
 
 export const mockUserLanguageGrammarCard: ICard = {
@@ -96,7 +96,7 @@ export const mockUserLanguageGrammarCard: ICard = {
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE,
+  completionStatus: COMPLETION_STATUS.INACTIVE,
 }
 
 export const mockUserMiscCard: ICard = {
@@ -107,7 +107,7 @@ export const mockUserMiscCard: ICard = {
   lastUpdatedOn: null,
   nextShowDate: null,
   stage: '0',
-  completionStatus: CompletionStatus.INACTIVE,
+  completionStatus: COMPLETION_STATUS.INACTIVE,
 }
 
 export const mockBankSurahCard: IQuranSurahCard = {

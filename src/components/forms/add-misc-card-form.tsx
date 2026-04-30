@@ -7,8 +7,8 @@ import { IUser } from '@/types/IUser'
 import { IActivity } from '@/types/IActivity'
 import Popup from '../popups/popup'
 import { useCreateCards } from '@/hooks/use-card-mutations'
-import { CompletionStatus } from '@/types/CompletionStatusEnum'
-import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
+import { COMPLETION_STATUS } from '@/lib/constants/completion-status'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/card-types'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { miscCardSchema, MiscCardFormData } from '@/lib/schemas/card.schemas'
@@ -45,7 +45,7 @@ export default function AddMiscCardForm({
         lastUpdatedOn: null,
         nextShowDate: null,
         stage: '0',
-        completionStatus: CompletionStatus.INACTIVE,
+        completionStatus: COMPLETION_STATUS.INACTIVE,
       }
 
       finalCardListAsArr.forEach((word) => {

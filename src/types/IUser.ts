@@ -1,6 +1,6 @@
 import { IActivity } from './IActivity'
 import { ILinkedAccounts } from './ILinkedAccounts'
-import { ISODateString } from './isoDateType'
+import { ISODateString } from './ISODateString'
 
 export interface IUser {
   userId: string // btoa(email)

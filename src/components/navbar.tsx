@@ -7,7 +7,7 @@ import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { editUser } from '../api/controller'
-import { ISODateString } from '@/types/isoDateType'
+import { ISODateString } from '@/types/ISODateString'
 import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 function classNames(...classes: string[]) {

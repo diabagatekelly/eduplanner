@@ -7,8 +7,8 @@ import { IUser } from '@/types/IUser'
 import Popup from '../popups/popup'
 import { ICard } from '@/types/ICard'
 import { useCreateCards } from '@/hooks/use-card-mutations'
-import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
-import { CompletionStatus } from '@/types/CompletionStatusEnum'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/card-types'
+import { COMPLETION_STATUS } from '@/lib/constants/completion-status'
 import { DocumentMinusIcon } from '@heroicons/react/24/solid'
 import { useForm } from 'react-hook-form'
 import { languageCardSchema, LanguageCardFormData } from '@/lib/schemas/card.schemas'
@@ -150,7 +150,7 @@ export default function AddLanguageCardForm({
         lastUpdatedOn: null,
         nextShowDate: null,
         stage: '0',
-        completionStatus: CompletionStatus.INACTIVE,
+        completionStatus: COMPLETION_STATUS.INACTIVE,
       }
 
       finalCardListAsArr.forEach((word) => {

@@ -1,4 +1,4 @@
-import { CARD_ACTIVITY_TYPES } from './cardTypes'
+import { CARD_ACTIVITY_TYPES } from './card-types'
 
 export const quranCards = [
   {

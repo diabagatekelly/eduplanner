@@ -1,8 +1,8 @@
 import { ICard } from '@/types/ICard'
 import { IUser } from '@/types/IUser'
-import { CompletionStatus } from '@/types/CompletionStatusEnum'
-import { ACTIVITY_TYPES } from '@/lib/constants/activityTypes'
-import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
+import { COMPLETION_STATUS } from '@/lib/constants/completion-status'
+import { ACTIVITY_TYPES } from '@/lib/constants/activity-types'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/card-types'
 import { IActivity } from '@/types/IActivity'
 import formatCardName from '@/lib/helpers/formatCardName'
 import { ClipboardDocumentCheckIcon, XMarkIcon } from '@heroicons/react/24/solid'
@@ -36,6 +36,9 @@ export default function ManageCardPopup({
     newStage,
     setNewStage,
   } = useCardActions(userId, activity, card, user, onClose)
+  const isAlreadySubmitted =
+    card.completionStatus === COMPLETION_STATUS.COMPLETED ||
+    card.completionStatus === COMPLETION_STATUS.REVIEW
 
   function formatCardInstructions(cardName: string) {
     if (cardName.includes(CARD_ACTIVITY_TYPES.VOCAB)) {
@@ -237,26 +240,14 @@ export default function ManageCardPopup({
                 {isMain && user?.accountType === 'student' && item.action !== 'show' && (
                   <div className="student-actions">
                     <button
-                      disabled={[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
-                        card.completionStatus
-                      )}
+                      disabled={isAlreadySubmitted}
                       onClick={submitForReview}
                       data-testid="submit-review-btn"
                       data-modal-hide="popup-modal"
                       type="button"
-                      className={
-                        [CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
-                          card.completionStatus
-                        )
-                          ? 'disabled-btn mr-2'
-                          : 'green-btn'
-                      }
+                      className={isAlreadySubmitted ? 'disabled-btn mr-2' : 'green-btn'}
                     >
-                      {[CompletionStatus.COMPLETED, CompletionStatus.REVIEW].includes(
-                        card.completionStatus
-                      )
-                        ? 'Already submitted for review'
-                        : 'Submit for review'}
+                      {isAlreadySubmitted ? 'Already submitted for review' : 'Submit for review'}
                     </button>
                   </div>
                 )}
