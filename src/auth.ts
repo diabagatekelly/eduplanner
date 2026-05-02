@@ -1,8 +1,6 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { loginUser } from '@/api/controller'
-import { IResponse } from '@/types/IApiResponse'
-import { IUser } from '@/types/IUser'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -15,10 +13,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!credentials?.userId || !credentials?.password) return null
 
         try {
-          const response = (await loginUser({
+          const response = await loginUser({
             userId: credentials.userId as string,
             password: credentials.password as string,
-          })) as unknown as IResponse<{ token: string; user: IUser }>
+          })
 
           if (response?.status === 200) {
             const { token, user } = response.data.details

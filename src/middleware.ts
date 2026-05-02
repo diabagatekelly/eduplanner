@@ -1,6 +1,7 @@
+import type { NextAuthRequest } from 'next-auth'
 import { auth } from '@/auth'
 
-function getAuthUser(req: Parameters<Parameters<typeof auth>[0]>[0]) {
+function getAuthUser(req: NextAuthRequest) {
   const user = req.auth?.user
   return {
     username: user?.username ?? '',
@@ -17,6 +18,10 @@ export const middleware = auth((req) => {
   const isAuthenticated = !!req.auth
   const pathname = req.nextUrl.pathname
   if (pathname === '/') {
+    if (isAuthenticated) {
+      const { username } = getAuthUser(req)
+      if (username) return Response.redirect(new URL(`/${username}`, req.url))
+    }
     return Response.redirect(new URL('/login', req.url))
   }
 

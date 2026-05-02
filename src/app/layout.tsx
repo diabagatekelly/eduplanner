@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
   const isAuthenticated = !!session
-  const username = (session?.user as any)?.username ?? ''
-  const userId = (session?.user as any)?.userId ?? ''
+  const username = session?.user?.username ?? ''
+  const userId = session?.user?.userId ?? ''
 
   return (
     <html lang="en">
