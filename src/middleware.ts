@@ -4,8 +4,8 @@ import { auth } from '@/auth'
 function getAuthUser(req: NextAuthRequest) {
   const user = req.auth?.user
   return {
-    username: user?.username ?? '',
-    accountType: user?.accountType ?? '',
+    username: user?.username,
+    accountType: user?.accountType,
   }
 }
 
@@ -39,7 +39,7 @@ export const middleware = auth((req) => {
 
   if (isAuthenticated && isTeacherOnlyRoute(pathname)) {
     const { username, accountType } = getAuthUser(req)
-    if (accountType === 'student') {
+    if (accountType === 'student' && username) {
       return Response.redirect(new URL(`/${username}`, req.url))
     }
   }
