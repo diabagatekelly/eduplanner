@@ -1,7 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { useParams, usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { IUser } from '@/types/IUser'
 import { fromDbFormat } from '@/lib/helpers/formatActivityName'
 import {
@@ -15,15 +16,11 @@ import { useUser } from '@/hooks/use-user'
 import { useStudent } from '@/hooks/use-student'
 import { getStudentId } from '@/lib/helpers/getStudentId'
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
-}
-
 export default function NestedLayout({
   children,
   isTeacher,
 }: {
-  children: any
+  children: ReactNode
   isTeacher: boolean
 }) {
   const pathname = usePathname()
@@ -46,16 +43,14 @@ export default function NestedLayout({
     (activity) => activity.name === activityPath
   )?.hasCards
 
-  function toggleDrawer(open: boolean) {
-    open === true ? setOpenDrawer(true) : setOpenDrawer(false)
-    return
-  }
+  const dashboardHref = `/${user.username}`
+  const studentsHref = `/${user.username}/students`
 
   return (
     <>
       <button
         data-testid="drawer-button"
-        onClick={() => toggleDrawer(!openDrawer)}
+        onClick={() => setOpenDrawer((prev) => !prev)}
         data-drawer-target="default-sidebar"
         data-drawer-toggle="default-sidebar"
         aria-controls="default-sidebar"
@@ -64,7 +59,7 @@ export default function NestedLayout({
       >
         <span className="sr-only">Open sidebar</span>
         <Bars3BottomLeftIcon
-          title={`${openDrawer ? 'Open' : 'Close'} sidebar`}
+          title={`${openDrawer ? 'Close' : 'Open'} sidebar`}
           className="w-6 h-6"
           aria-hidden="true"
           fill="currentColor"
@@ -84,16 +79,11 @@ export default function NestedLayout({
         <div className="h-full px-3 py-4 overflow-y-auto bg-gray-100 dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
             <li className="menu-item">
-              <a
-                href={`/${user.username}`}
-                className={
-                  'flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group' +
-                  classNames(
-                    pathname === `/${user.username}`
-                      ? ' bg-gray-800 text-white hover:bg-gray-700'
-                      : ''
-                  )
-                }
+              <Link
+                href={dashboardHref}
+                className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group${
+                  pathname === dashboardHref ? ' bg-gray-800 text-white hover:bg-gray-700' : ''
+                }`}
               >
                 <ChartPieIcon
                   className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -101,20 +91,15 @@ export default function NestedLayout({
                   fill="currentColor"
                 />
                 <span className="ml-3">Dashboard</span>
-              </a>
+              </Link>
             </li>
-            {isTeacher ? (
+            {isTeacher && (
               <li className="menu-item">
-                <a
-                  href={`/${user.username}/students`}
-                  className={
-                    'flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group' +
-                    classNames(
-                      pathname === `/${user.username}/students`
-                        ? ' bg-gray-800 text-white hover:bg-gray-700'
-                        : ''
-                    )
-                  }
+                <Link
+                  href={studentsHref}
+                  className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group${
+                    pathname === studentsHref ? ' bg-gray-800 text-white hover:bg-gray-700' : ''
+                  }`}
                 >
                   <UserGroupIcon
                     className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -122,24 +107,15 @@ export default function NestedLayout({
                     fill="currentColor"
                   />
                   <span className="flex-1 ml-3 whitespace-nowrap">Manage Students</span>
-                </a>
+                </Link>
               </li>
-            ) : (
-              ''
             )}
-            {cardSubMenu ? (
+            {cardSubMenu && (
               <>
                 <li className="menu-item">
-                  <a
+                  <Link
                     href={pathname}
-                    className={
-                      'flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group' +
-                      classNames(
-                        pathname === `/${user.username}/students`
-                          ? ' bg-gray-800 text-white hover:bg-gray-700'
-                          : ''
-                      )
-                    }
+                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                   >
                     <LightBulbIcon
                       className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -149,39 +125,37 @@ export default function NestedLayout({
                     <span className="flex-1 ml-3 whitespace-nowrap">
                       Activity: {fromDbFormat(activityPath as string)}
                     </span>
-                  </a>
+                  </Link>
                 </li>
                 <li className="menu-item-cards">
-                  <a
-                    href={`${pathname}/#active`}
+                  <Link
+                    href={`${pathname}#active`}
                     className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                   >
                     <span className="flex-1 ml-7 whitespace-nowrap italic">
                       View All Active Cards
                     </span>
-                  </a>
+                  </Link>
                 </li>
                 <li className="menu-item-cards">
-                  <a
-                    href={`${pathname}/#inactive`}
+                  <Link
+                    href={`${pathname}#inactive`}
                     className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                   >
                     <span className="flex-1 ml-7 whitespace-nowrap italic">
                       View All Inactive Cards
                     </span>
-                  </a>
+                  </Link>
                 </li>
                 <li className="menu-item-cards">
-                  <a
-                    href={`${pathname}/#add`}
+                  <Link
+                    href={`${pathname}#add`}
                     className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                   >
                     <span className="flex-1 ml-7 whitespace-nowrap italic">Add new card</span>
-                  </a>
+                  </Link>
                 </li>
               </>
-            ) : (
-              ''
             )}
           </ul>
         </div>
