@@ -128,32 +128,32 @@ export default function NestedLayout({
                   </Link>
                 </li>
                 <li className="menu-item-cards">
-                  <Link
-                    href={`${pathname}#active`}
+                  <a
+                    href={`${pathname}/#active`}
                     className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                   >
                     <span className="flex-1 ml-7 whitespace-nowrap italic">
                       View All Active Cards
                     </span>
-                  </Link>
+                  </a>
                 </li>
                 <li className="menu-item-cards">
-                  <Link
-                    href={`${pathname}#inactive`}
+                  <a
+                    href={`${pathname}/#inactive`}
                     className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                   >
                     <span className="flex-1 ml-7 whitespace-nowrap italic">
                       View All Inactive Cards
                     </span>
-                  </Link>
+                  </a>
                 </li>
                 <li className="menu-item-cards">
-                  <Link
-                    href={`${pathname}#add`}
+                  <a
+                    href={`${pathname}/#add`}
                     className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                   >
                     <span className="flex-1 ml-7 whitespace-nowrap italic">Add new card</span>
-                  </Link>
+                  </a>
                 </li>
               </>
             )}
