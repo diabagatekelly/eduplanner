@@ -16,6 +16,10 @@ import { useUser } from '@/hooks/use-user'
 import { useStudent } from '@/hooks/use-student'
 import { getStudentId } from '@/lib/helpers/getStudentId'
 
+const MENU_ITEM_BASE =
+  'flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group'
+const MENU_ITEM_ACTIVE = 'bg-gray-800 text-white hover:bg-gray-700'
+
 export default function NestedLayout({
   children,
   isTeacher,
@@ -81,9 +85,11 @@ export default function NestedLayout({
             <li className="menu-item">
               <Link
                 href={dashboardHref}
-                className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group${
-                  pathname === dashboardHref ? ' bg-gray-800 text-white hover:bg-gray-700' : ''
-                }`}
+                className={
+                  pathname === dashboardHref
+                    ? `${MENU_ITEM_BASE} ${MENU_ITEM_ACTIVE}`
+                    : MENU_ITEM_BASE
+                }
               >
                 <ChartPieIcon
                   className="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -97,9 +103,11 @@ export default function NestedLayout({
               <li className="menu-item">
                 <Link
                   href={studentsHref}
-                  className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group${
-                    pathname === studentsHref ? ' bg-gray-800 text-white hover:bg-gray-700' : ''
-                  }`}
+                  className={
+                    pathname === studentsHref
+                      ? `${MENU_ITEM_BASE} ${MENU_ITEM_ACTIVE}`
+                      : MENU_ITEM_BASE
+                  }
                 >
                   <UserGroupIcon
                     className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -113,10 +121,7 @@ export default function NestedLayout({
             {cardSubMenu && (
               <>
                 <li className="menu-item">
-                  <Link
-                    href={pathname}
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                  >
+                  <Link href={pathname} className={MENU_ITEM_BASE}>
                     <LightBulbIcon
                       className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                       aria-hidden="true"
@@ -128,30 +133,21 @@ export default function NestedLayout({
                   </Link>
                 </li>
                 <li className="menu-item-cards">
-                  <a
-                    href={`${pathname}/#active`}
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                  >
+                  <a href={`${pathname}/#active`} className={MENU_ITEM_BASE}>
                     <span className="flex-1 ml-7 whitespace-nowrap italic">
                       View All Active Cards
                     </span>
                   </a>
                 </li>
                 <li className="menu-item-cards">
-                  <a
-                    href={`${pathname}/#inactive`}
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                  >
+                  <a href={`${pathname}/#inactive`} className={MENU_ITEM_BASE}>
                     <span className="flex-1 ml-7 whitespace-nowrap italic">
                       View All Inactive Cards
                     </span>
                   </a>
                 </li>
                 <li className="menu-item-cards">
-                  <a
-                    href={`${pathname}/#add`}
-                    className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                  >
+                  <a href={`${pathname}/#add`} className={MENU_ITEM_BASE}>
                     <span className="flex-1 ml-7 whitespace-nowrap italic">Add new card</span>
                   </a>
                 </li>
