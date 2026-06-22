@@ -95,6 +95,7 @@ describe('Breadcrumbs', () => {
 
       expect(breadcrumbsActivity).toHaveTextContent('Arabic Language')
       expect(breadcrumbsActivity).not.toHaveAttribute('href')
+      expect(breadcrumbsActivity).toHaveAttribute('aria-current', 'page')
     })
   })
   describe('Student', () => {
@@ -115,6 +116,7 @@ describe('Breadcrumbs', () => {
 
         expect(breadcrumbsStudent).toHaveTextContent('Yusuf Spencer')
         expect(breadcrumbsStudent).not.toHaveAttribute('href')
+        expect(breadcrumbsStudent).toHaveAttribute('aria-current', 'page')
       })
     })
 
@@ -144,6 +146,7 @@ describe('Breadcrumbs', () => {
         expect(breadcrumbsStudentActivity).toHaveTextContent('Arabic Language')
 
         expect(breadcrumbsStudentActivity).not.toHaveAttribute('href')
+        expect(breadcrumbsStudentActivity).toHaveAttribute('aria-current', 'page')
 
         breadcrumbsStudentActivities.addEventListener('click', (e) => {
           e.preventDefault()
