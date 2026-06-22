@@ -1,15 +1,20 @@
 import StudentsList from '../../../components/lists/students-list'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
 import { IUser } from '../../../types/IUser'
 import { mockStudent, mockUser } from '../../mocks'
-import store from '../../../store/store'
-import { findUser } from '../../../api/controller'
 import { useRouter } from 'next/navigation'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
-jest.mock('../../../api/controller')
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(),
@@ -19,11 +24,6 @@ jest.mock('next/navigation', () => {
 describe('Students List', () => {
   describe('No students', () => {
     const teacher: IUser = { ...mockUser, linkedAccountsData: { students: [] } }
-
-    beforeEach(() => {
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
-    })
 
     it('should display "no students" message when teacher has no students', () => {
       render(<StudentsList {...{ userDetails: undefined }} />)
@@ -38,11 +38,6 @@ describe('Students List', () => {
       linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]] },
       students: { [mockStudent.username]: mockStudent },
     }
-
-    beforeEach(() => {
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
-    })
 
     it('should open delete popup when trying to remove user as a student', async () => {
       render(<StudentsList {...{ userDetails: teacher }} />)
@@ -77,21 +72,8 @@ describe('Students List', () => {
       students: { [mockStudent.username]: mockStudent },
     }
 
-    beforeEach(() => {
-      jest.useFakeTimers()
-      jest.setSystemTime(new Date('2/3/2024'))
-      window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
-    })
-
     afterEach(() => {
       jest.clearAllMocks()
-      window.sessionStorage.clear()
-      jest.useRealTimers()
     })
 
     it('should display a list of student names', () => {
@@ -101,13 +83,13 @@ describe('Students List', () => {
       expect(studentList).toHaveTextContent(`${mockStudent.username.split('-').join(' ')}`)
     })
 
-    it('should not make an API call, but rather use existing student details', async () => {
-      ;(findUser as jest.Mock).mockImplementation(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'User found.', details: { student: mockStudent } },
+    it('should navigate directly using cached student details without API call', async () => {
+      server.use(
+        http.get('*/user', () => {
+          throw new Error('Unexpected /user fetch when students cache is populated')
         })
-      })
+      )
+
       const mockRouter = {
         push: jest.fn(),
       }
@@ -122,7 +104,6 @@ describe('Students List', () => {
         await fireEvent.click(studentEmail)
       })
 
-      expect(findUser).not.toHaveBeenCalled()
       expect(mockRouter.push).toHaveBeenCalledWith(url)
     })
   })
@@ -133,30 +114,19 @@ describe('Students List', () => {
       linkedAccountsData: { students: [[mockStudent.userId, mockStudent.username]] },
     }
 
-    beforeEach(() => {
-      jest.useFakeTimers()
-      jest.setSystemTime(new Date('2/3/2024'))
-      window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
-    })
-
     afterEach(() => {
       jest.clearAllMocks()
-      window.sessionStorage.clear()
-      jest.useRealTimers()
     })
 
-    it('should make API an API call to get student details if there are no populated students', async () => {
-      ;(findUser as jest.Mock).mockImplementation(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'User found.', details: { student: mockStudent } },
+    it('should fetch student details via API and navigate when students object is not populated', async () => {
+      let fetchCalled = false
+      server.use(
+        http.get('*/user', () => {
+          fetchCalled = true
+          return HttpResponse.json({ message: null, details: { student: mockStudent } })
         })
-      })
+      )
+
       const mockRouter = {
         push: jest.fn(),
       }
@@ -171,8 +141,10 @@ describe('Students List', () => {
         await fireEvent.click(studentEmail)
       })
 
-      expect(findUser).toHaveBeenCalledWith({ userId: mockStudent.userId })
-      expect(mockRouter.push).toHaveBeenCalledWith(url)
+      await waitFor(() => {
+        expect(fetchCalled).toBe(true)
+        expect(mockRouter.push).toHaveBeenCalledWith(url)
+      })
     })
   })
 
@@ -194,30 +166,19 @@ describe('Students List', () => {
       students: { 'some-other-student': fakeStudent },
     }
 
-    beforeEach(() => {
-      jest.useFakeTimers()
-      jest.setSystemTime(new Date('2/3/2024'))
-      window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
-    })
-
     afterEach(() => {
       jest.clearAllMocks()
-      window.sessionStorage.clear()
-      jest.useRealTimers()
     })
 
-    it('should make API an API call to get student details if there are no populated students', async () => {
-      ;(findUser as jest.Mock).mockImplementation(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'User found.', details: { student: mockStudent } },
+    it('should fetch missing student details via API and navigate', async () => {
+      let fetchCalled = false
+      server.use(
+        http.get('*/user', () => {
+          fetchCalled = true
+          return HttpResponse.json({ message: null, details: { student: mockStudent } })
         })
-      })
+      )
+
       const mockRouter = {
         push: jest.fn(),
       }
@@ -232,75 +193,51 @@ describe('Students List', () => {
         await fireEvent.click(studentUsername)
       })
 
-      expect(findUser).toHaveBeenCalledWith({ userId: mockStudent.userId })
-      expect(findUser).not.toHaveBeenCalledWith({ userId: fakeStudent.userId })
-      expect(mockRouter.push).toHaveBeenCalledWith(url)
+      await waitFor(() => {
+        expect(fetchCalled).toBe(true)
+        expect(mockRouter.push).toHaveBeenCalledWith(url)
+      })
     })
 
-    it('should not reset form when response is not 200 or 500 and display error message', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => null)
-      const error = {
-        response: {
-          status: 400,
-          data: { status: 'failedTransaction', message: 'Erroneous response' },
-        },
-      }
-      ;(findUser as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
-      const mockRouter = {
-        push: jest.fn(),
-      }
-      ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
-
-      render(<StudentsList {...{ userDetails: teacher }} />)
-
-      const studentUsername = screen.getAllByTestId('students-email')[0]
-
-      await act(async () => {
-        await fireEvent.click(studentUsername)
-      })
-
-      const errorMessage = screen.getByText(/Erroneous response/i)
-
-      expect(mockRouter.push).not.toHaveBeenCalled()
-      expect(errorMessage).toBeInTheDocument()
-    })
-
-    it('should not reset form when response is 500 and display error message', async () => {
-      const error = {
-        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-      }
-      ;(findUser as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
-
-      const mockRouter = {
-        push: jest.fn(),
-      }
-      ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
-
-      render(<StudentsList {...{ userDetails: teacher }} />)
-
-      const studentUsername = screen.getAllByTestId('students-email')[0]
-
-      await act(async () => {
-        await fireEvent.click(studentUsername)
-      })
-
-      const errorMessage = await screen.getByText(
-        /Failed to fetch student details due to an internal error. Please try again later./i
+    it('should display error message when response is not 200 or 500', async () => {
+      server.use(
+        http.get('*/user', () =>
+          HttpResponse.json(
+            { status: 'failedTransaction', message: 'Erroneous response' },
+            { status: 400 }
+          )
+        )
       )
 
+      const mockRouter = {
+        push: jest.fn(),
+      }
+      ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+
+      render(<StudentsList {...{ userDetails: teacher }} />)
+
+      const studentUsername = screen.getAllByTestId('students-email')[0]
+
+      await act(async () => {
+        await fireEvent.click(studentUsername)
+      })
+
+      await waitFor(() => {
+        const errorMessage = screen.getByText(/Erroneous response/i)
+        expect(errorMessage).toBeInTheDocument()
+      })
       expect(mockRouter.push).not.toHaveBeenCalled()
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
     })
 
-    it('should not reset form when error is thrown with no response', async () => {
-      ;(findUser as jest.Mock).mockImplementation(() => {
-        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-      })
+    it('should display error message when response is 500', async () => {
+      server.use(
+        http.get('*/user', () =>
+          HttpResponse.json(
+            { status: 'internalServerError', message: 'Server error' },
+            { status: 500 }
+          )
+        )
+      )
 
       const mockRouter = {
         push: jest.fn(),
@@ -315,10 +252,36 @@ describe('Students List', () => {
         await fireEvent.click(studentUsername)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
+      await waitFor(() => {
+        const errorMessage = screen.getByText(
+          /Failed to fetch student details due to an internal error. Please try again later./i
+        )
+        expect(errorMessage).toBeInTheDocument()
+      })
       expect(mockRouter.push).not.toHaveBeenCalled()
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+    })
+
+    it('should display error message when error has no response', async () => {
+      server.use(http.get('*/user', () => HttpResponse.error()))
+
+      const mockRouter = {
+        push: jest.fn(),
+      }
+      ;(useRouter as jest.Mock).mockReturnValue(mockRouter)
+
+      render(<StudentsList {...{ userDetails: teacher }} />)
+
+      const studentUsername = screen.getAllByTestId('students-email')[0]
+
+      await act(async () => {
+        await fireEvent.click(studentUsername)
+      })
+
+      await waitFor(() => {
+        const errorMessage = screen.getByText(/Server is down. Try again later./i)
+        expect(errorMessage).toBeInTheDocument()
+      })
+      expect(mockRouter.push).not.toHaveBeenCalled()
     })
   })
 })

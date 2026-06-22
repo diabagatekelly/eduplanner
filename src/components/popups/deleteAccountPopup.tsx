@@ -1,12 +1,10 @@
-import { removeAuthToken } from '@/store/actions/authActions'
-import { resetUser } from '@/store/actions/userActions'
-import { useRouter } from 'next/navigation'
 import { deleteUser } from '../../api/controller'
-import { useEffect, useState } from 'react'
-import { useAppDispatch } from '@/store/hooks'
+import { signOut } from 'next-auth/react'
 import { IUser } from '@/types/IUser'
 import { IResponse } from '@/types/IApiResponse'
 import { UserMinusIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
+import { toast } from 'sonner'
 
 export default function DeleteAccountPopup({
   onClose,
@@ -15,47 +13,20 @@ export default function DeleteAccountPopup({
 }: {
   onClose: () => void
   showModal: boolean
-  user?: IUser | Partial<IUser>
+  user: IUser | Partial<IUser>
 }) {
-  const dispatch = useAppDispatch()
-  const router = useRouter()
-
-  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
-  const [outcomeMessage, setOutcomeMessage] = useState('')
-
-  useEffect(() => {
-    getUserInfo({ ...user })
-  }, [showModal, user])
-
   async function deleteAccount() {
     try {
-      ;(await deleteUser(userInfo.userId!)) as unknown as IResponse
-      onDeleteAccountSuccess()
-    } catch (error: any) {
-      console.log(error)
-
-      if (!error.response) {
-        setOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setOutcomeMessage(
-          'Failed to delete account due to an internal error. Please try again later.'
-        )
-      } else {
-        setOutcomeMessage(data.message)
-      }
+      ;(await deleteUser(user.userId!)) as unknown as IResponse
+      await onDeleteAccountSuccess()
+    } catch (error: unknown) {
+      handleMutationError(error, 'delete account')
     }
   }
 
-  function onDeleteAccountSuccess() {
-    dispatch(resetUser())
-    dispatch(removeAuthToken())
+  async function onDeleteAccountSuccess() {
     onClose()
-    router.push('/register')
+    await signOut({ callbackUrl: '/register' })
   }
 
   return (
@@ -96,9 +67,7 @@ export default function DeleteAccountPopup({
                   Are you sure you want to delete this account forever?
                 </h3>
                 <h5 className="mb-5">
-                  <span>
-                    {`${userInfo?.firstName} ${userInfo?.lastName} - ${userInfo?.email}`}{' '}
-                  </span>
+                  <span>{`${user?.firstName} ${user?.lastName} - ${user?.email}`} </span>
                 </h5>
               </div>
 
@@ -119,7 +88,6 @@ export default function DeleteAccountPopup({
               >
                 No, cancel
               </button>
-              <p>{outcomeMessage}</p>
             </div>
           </div>
         </div>

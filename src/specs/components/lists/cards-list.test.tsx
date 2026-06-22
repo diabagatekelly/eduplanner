@@ -14,50 +14,50 @@ import {
   mockUserLanguageVocabCard,
   mockUserMiscCard,
 } from '../../mocks'
-import { CompletionStatus } from '../../../types/CompletionStatusEnum'
+import { useMounted } from '../../../lib/helpers/useMounted'
+import { COMPLETION_STATUS } from '../../../lib/constants/completion-status'
 
-jest.mock('../../../lib/helpers/useMounted', () => {
-  return {
-    useMounted: jest
-      .fn()
-      .mockImplementationOnce(() => false)
-      .mockImplementationOnce(() => false)
-      .mockImplementation(() => true),
-  }
-})
-jest.mock('../../../api/controller')
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
+jest.mock('../../../lib/helpers/useMounted', () => ({
+  useMounted: jest.fn(() => true),
+}))
 
-const hash = global.window.location.hash
+const originalHash = global.window.location.hash
 const activityNoCards = { ...mockActivity }
 const activityWithReviewCards = {
   ...mockActivity,
-  cards: [{ ...mockUserCard, completionStatus: CompletionStatus.REVIEW }],
+  cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.REVIEW }],
 }
 const activityWithMultipleReviewCards = {
   ...mockActivity,
   cards: [
-    { ...mockUserCard, completionStatus: CompletionStatus.REVIEW },
+    { ...mockUserCard, completionStatus: COMPLETION_STATUS.REVIEW },
     {
       ...mockUserCard,
-      completionStatus: CompletionStatus.REVIEW,
+      completionStatus: COMPLETION_STATUS.REVIEW,
       cardId: `${btoa('surah-109-name-Naas-juz-30')}`,
     },
   ],
 }
 const activityWithInactiveCards = {
   ...mockActivity,
-  cards: [{ ...mockUserCard, completionStatus: CompletionStatus.INACTIVE }],
+  cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.INACTIVE }],
 }
 const activityWithCompletedCards = {
   ...mockActivity,
-  cards: [{ ...mockUserCard, completionStatus: CompletionStatus.COMPLETED }],
+  cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED }],
 }
 const activityWithPendingAddedToday = {
   ...mockActivity,
   cards: [
     {
       ...mockUserCard,
-      completionStatus: CompletionStatus.PENDING,
+      completionStatus: COMPLETION_STATUS.PENDING,
       addedOn: '2/3/2024',
       cardId: `${btoa('juz-30')}`,
     },
@@ -68,7 +68,7 @@ const activityWithPendingShowDate = {
   cards: [
     {
       ...mockUserCard,
-      completionStatus: CompletionStatus.PENDING,
+      completionStatus: COMPLETION_STATUS.PENDING,
       addedOn: '2/1/2024',
       nextShowDate: '2/3/2024',
       cardId: `${btoa('custom-Furqan 1 to 2')}`,
@@ -77,30 +77,21 @@ const activityWithPendingShowDate = {
 }
 
 describe('Cards List', () => {
-  beforeAll(() => {
-    Object.defineProperty(global.window, 'location', {
-      value: { hash: null },
-    })
-  })
-
   afterAll(() => {
-    global.window.location.hash = hash
+    global.window.location.hash = originalHash
   })
 
   describe('Not mounted', () => {
     beforeEach(() => {
-      sessionStorage.setItem(
-        'user_data',
-        JSON.stringify({ ...mockUser, activities: activityWithReviewCards })
-      )
+      ;(useMounted as jest.Mock).mockReturnValue(false)
       jest.useFakeTimers()
       jest.setSystemTime(new Date('2/3/2024'))
     })
 
     afterEach(() => {
+      ;(useMounted as jest.Mock).mockReturnValue(true)
       jest.clearAllMocks()
       jest.useRealTimers()
-      sessionStorage.clear()
     })
 
     it('should display no list due to not mounted', async () => {
@@ -121,10 +112,6 @@ describe('Cards List', () => {
       describe('Cards of the day', () => {
         describe('No cards of the day', () => {
           beforeEach(() => {
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityNoCards })
-            )
             jest.useFakeTimers()
             jest.setSystemTime(new Date('2/3/2024'))
           })
@@ -132,7 +119,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display no list', async () => {
@@ -156,15 +142,10 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display review cards today', async () => {
             window.location.hash = ''
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithMultipleReviewCards })
-            )
             render(
               <CardsList
                 {...{
@@ -205,16 +186,12 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserLanguageGrammarCard,
-                  completionStatus: CompletionStatus.PENDING,
+                  completionStatus: COMPLETION_STATUS.PENDING,
                   addedOn: '2/3/2024',
                   cardId: `${btoa('arabic-grammar-conjugate')}`,
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: updatedActivity })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockUser, activity: updatedActivity }} />
             )
@@ -243,10 +220,6 @@ describe('Cards List', () => {
 
           it('should display pending cards next show date today', async () => {
             window.location.hash = ''
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithPendingShowDate })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithPendingShowDate }}
@@ -278,10 +251,6 @@ describe('Cards List', () => {
 
           it('should not display inactive cards today', async () => {
             window.location.hash = ''
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithInactiveCards })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithInactiveCards }}
@@ -295,10 +264,6 @@ describe('Cards List', () => {
 
           it('should not display completed cards today', async () => {
             window.location.hash = ''
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithCompletedCards })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithCompletedCards }}
@@ -315,10 +280,6 @@ describe('Cards List', () => {
       describe('Active cards', () => {
         describe('No active cards', () => {
           beforeEach(() => {
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityNoCards })
-            )
             jest.useFakeTimers()
             jest.setSystemTime(new Date('2/3/2024'))
           })
@@ -326,7 +287,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display no list', async () => {
@@ -350,7 +310,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display active cards', async () => {
@@ -359,16 +318,12 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserLanguageVocabCard,
-                  completionStatus: CompletionStatus.REVIEW,
+                  completionStatus: COMPLETION_STATUS.REVIEW,
                   cardId: `${btoa('arabic-vocab-house')}`,
                 },
               ],
             }
             window.location.hash = '#active'
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithReviewCards2 })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithReviewCards2 }}
@@ -405,16 +360,12 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserMiscCard,
-                  completionStatus: CompletionStatus.PENDING,
+                  completionStatus: COMPLETION_STATUS.PENDING,
                   addedOn: '2/3/2024',
                   cardId: `${btoa('misc-card-cook an egg')}`,
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: updatedActivity })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockUser, activity: updatedActivity }} />
             )
@@ -443,10 +394,6 @@ describe('Cards List', () => {
 
           it('should display pending cards next show date active', async () => {
             window.location.hash = '#active'
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithPendingShowDate })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithPendingShowDate }}
@@ -481,10 +428,6 @@ describe('Cards List', () => {
       describe('Inactive cards', () => {
         describe('No inactive cards', () => {
           beforeEach(() => {
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityNoCards })
-            )
             jest.useFakeTimers()
             jest.setSystemTime(new Date('2/3/2024'))
           })
@@ -492,7 +435,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display no list', async () => {
@@ -516,7 +458,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display active cards', async () => {
@@ -525,16 +466,12 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserCard,
-                  completionStatus: CompletionStatus.INACTIVE,
+                  completionStatus: COMPLETION_STATUS.INACTIVE,
                   cardId: `${btoa('surah-1-name-Faatiha-juz-1')}`,
                 },
               ],
             }
             window.location.hash = '#inactive'
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: activityWithReviewCards2 })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockUser, activity: activityWithReviewCards2 }}
@@ -571,16 +508,12 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserCard,
-                  completionStatus: CompletionStatus.INACTIVE,
+                  completionStatus: COMPLETION_STATUS.INACTIVE,
                   addedOn: '2/3/2024',
                   cardId: `${btoa('juz-30')}`,
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: inactiveCards })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockUser, activity: inactiveCards }} />
             )
@@ -614,17 +547,13 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserCard,
-                  completionStatus: CompletionStatus.INACTIVE,
+                  completionStatus: COMPLETION_STATUS.INACTIVE,
                   addedOn: '2/1/2024',
                   nextShowDate: '2/3/2024',
                   cardId: `${btoa('custom-Furqan 1 to 2')}`,
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockUser, activities: inactiveCards })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockUser, activity: inactiveCards }} />
             )
@@ -666,15 +595,10 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display review cards today', async () => {
             window.location.hash = ''
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockStudent, activities: activityWithReviewCards })
-            )
             render(
               <CardsList
                 {...{ isMain: true, userDetails: mockStudent, activity: activityWithReviewCards }}
@@ -697,15 +621,10 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display pending cards added today', async () => {
             window.location.hash = '#active'
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockStudent, activities: activityWithPendingAddedToday })
-            )
             render(
               <CardsList
                 {...{
@@ -726,10 +645,6 @@ describe('Cards List', () => {
 
           it('should display pending cards next show date active', async () => {
             window.location.hash = '#active'
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockStudent, activities: activityWithPendingShowDate })
-            )
             render(
               <CardsList
                 {...{
@@ -761,7 +676,6 @@ describe('Cards List', () => {
           afterEach(() => {
             jest.clearAllMocks()
             jest.useRealTimers()
-            sessionStorage.clear()
           })
 
           it('should display inactive cards no activate', async () => {
@@ -771,16 +685,12 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserCard,
-                  completionStatus: CompletionStatus.INACTIVE,
+                  completionStatus: COMPLETION_STATUS.INACTIVE,
                   addedOn: '2/3/2024',
                   cardId: `${btoa('juz-30')}`,
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockStudent, activities: inactiveCards })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockStudent, activity: inactiveCards }} />
             )
@@ -800,16 +710,12 @@ describe('Cards List', () => {
               cards: [
                 {
                   ...mockUserCard,
-                  completionStatus: CompletionStatus.INACTIVE,
+                  completionStatus: COMPLETION_STATUS.INACTIVE,
                   addedOn: '2/3/2024',
                   cardId: `${btoa('juz-30')}`,
                 },
               ],
             }
-            sessionStorage.setItem(
-              'user_data',
-              JSON.stringify({ ...mockStudent, activities: inactiveCards })
-            )
             render(
               <CardsList {...{ isMain: true, userDetails: mockStudent, activity: inactiveCards }} />
             )

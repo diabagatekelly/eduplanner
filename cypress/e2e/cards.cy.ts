@@ -1,7 +1,7 @@
 import { IUser } from '../../src/types/IUser'
 import { ICard } from '../../src/types/ICard'
-import { ISODateString } from '../../src/types/isoDateType'
-import { CompletionStatus } from '../../src/types/CompletionStatusEnum'
+import { ISODateString } from '../../src/types/ISODateString'
+import { COMPLETION_STATUS } from '../../src/lib/constants/completion-status'
 import {
   mockActivity,
   mockLanguageActivity,
@@ -19,17 +19,9 @@ describe('Add Quran Cards', () => {
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockActivity, cards: [] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithActivity },
-      },
-    })
+    cy.loginBySession(userWithActivity)
     cy.intercept(Cypress.env('CREATE_CARD_URL'), {
       statusCode: 200,
       body: {
@@ -41,8 +33,6 @@ describe('Add Quran Cards', () => {
   })
 
   it('should navigate to add-card form via sidebar and submit Quran cards', () => {
-    cy.login({ email: userWithActivity.email, password: userWithActivity.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.contains('Add new card').click()
@@ -51,7 +41,7 @@ describe('Add Quran Cards', () => {
     cy.get('[data-testid="quran-checkbox-input"]').first().check()
     cy.get('[data-testid="add-cards-submit-button"]').click()
     cy.wait('@createCards')
-    cy.get('[data-testid="outcome-message"]').should('not.be.empty')
+    cy.contains('Cards added.')
   })
 })
 
@@ -61,17 +51,9 @@ describe('Add Quran Custom Card', () => {
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockActivity, cards: [] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithActivity },
-      },
-    })
+    cy.loginBySession(userWithActivity)
     cy.intercept(Cypress.env('CREATE_CARD_URL'), {
       statusCode: 200,
       body: {
@@ -83,8 +65,6 @@ describe('Add Quran Custom Card', () => {
   })
 
   it('should add a custom Quran card via text input and submit', () => {
-    cy.login({ email: userWithActivity.email, password: userWithActivity.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.contains('Add new card').click()
@@ -93,7 +73,7 @@ describe('Add Quran Custom Card', () => {
     cy.get('[data-testid="custom-quran"]').type('Naas 1 to 2')
     cy.get('[data-testid="add-cards-submit-button"]').click()
     cy.wait('@createCards')
-    cy.get('[data-testid="outcome-message"]').should('not.be.empty')
+    cy.contains('Cards added.')
   })
 })
 
@@ -103,17 +83,9 @@ describe('Add Language Cards', () => {
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockLanguageActivity, cards: [] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithLanguageActivity },
-      },
-    })
+    cy.loginBySession(userWithLanguageActivity)
     cy.intercept(Cypress.env('CREATE_CARD_URL'), {
       statusCode: 200,
       body: {
@@ -125,8 +97,6 @@ describe('Add Language Cards', () => {
   })
 
   it('should add a grammar card via type list and validate popup', () => {
-    cy.login({ email: userWithLanguageActivity.email, password: userWithLanguageActivity.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Arabic-Language')
     cy.contains('Add new card').click()
@@ -147,17 +117,9 @@ describe('Add Misc Cards', () => {
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockCookingActivity, cards: [] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithMiscActivity },
-      },
-    })
+    cy.loginBySession(userWithMiscActivity)
     cy.intercept(Cypress.env('CREATE_CARD_URL'), {
       statusCode: 200,
       body: {
@@ -169,8 +131,6 @@ describe('Add Misc Cards', () => {
   })
 
   it('should add a misc card via type list and validate popup', () => {
-    cy.login({ email: userWithMiscActivity.email, password: userWithMiscActivity.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Cooking')
     cy.contains('Add new card').click()
@@ -190,22 +150,12 @@ describe('Cards list display', () => {
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockActivity, cards: [mockUserCard] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithCards },
-      },
-    })
+    cy.loginBySession(userWithCards)
   })
 
   it('should show inactive cards tab with existing cards', () => {
-    cy.login({ email: userWithCards.email, password: userWithCards.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.contains('View All Inactive Cards').click()
@@ -220,17 +170,9 @@ describe('Card Management — Activate', () => {
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockActivity, cards: [mockUserCard] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithInactiveCard },
-      },
-    })
+    cy.loginBySession(userWithInactiveCard)
     cy.intercept(Cypress.env('ACTIVATE_CARD_URL'), {
       statusCode: 200,
       body: {
@@ -242,8 +184,6 @@ describe('Card Management — Activate', () => {
   })
 
   it('should open activate popup and call activate API on confirm', () => {
-    cy.login({ email: userWithInactiveCard.email, password: userWithInactiveCard.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.contains('View All Inactive Cards').click()
@@ -261,17 +201,9 @@ describe('Add Language Vocab Cards', () => {
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockLanguageActivity, cards: [] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithLanguageActivity },
-      },
-    })
+    cy.loginBySession(userWithLanguageActivity)
     cy.intercept(Cypress.env('CREATE_CARD_URL'), {
       statusCode: 200,
       body: {
@@ -283,8 +215,6 @@ describe('Add Language Vocab Cards', () => {
   })
 
   it('should add a vocab card via type list and validate popup', () => {
-    cy.login({ email: userWithLanguageActivity.email, password: userWithLanguageActivity.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Arabic-Language')
     cy.contains('Add new card').click()
@@ -306,17 +236,9 @@ describe('Card Management — Delete', () => {
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockActivity, cards: [mockUserCard] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithInactiveCard },
-      },
-    })
+    cy.loginBySession(userWithInactiveCard)
     cy.intercept(Cypress.env('DELETE_CARD_URL'), {
       statusCode: 200,
       body: { status: 'success', message: 'Card deleted.' },
@@ -324,8 +246,6 @@ describe('Card Management — Delete', () => {
   })
 
   it('should open delete popup and call delete API on confirm', () => {
-    cy.login({ email: userWithInactiveCard.email, password: userWithInactiveCard.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.contains('View All Inactive Cards').click()
@@ -340,29 +260,19 @@ describe('Card Management — Delete', () => {
 describe('Active Cards Display', () => {
   const mockActiveCard: ICard = {
     ...mockUserCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
   }
   const userWithActiveCard: IUser = {
     ...mockUser,
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockActivity, cards: [mockActiveCard] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithActiveCard },
-      },
-    })
+    cy.loginBySession(userWithActiveCard)
   })
 
   it('should show active cards tab with existing active cards', () => {
-    cy.login({ email: userWithActiveCard.email, password: userWithActiveCard.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.contains('View All Active Cards').click()
@@ -377,7 +287,7 @@ describe('Today Cards Display', () => {
   }) as ISODateString
   const mockTodayCard: ICard = {
     ...mockUserCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
     addedOn: today,
   }
   const userWithTodayCard: IUser = {
@@ -385,22 +295,12 @@ describe('Today Cards Display', () => {
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockActivity, cards: [mockTodayCard] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithTodayCard },
-      },
-    })
+    cy.loginBySession(userWithTodayCard)
   })
 
   it('should show cards of the day on default activity view', () => {
-    cy.login({ email: userWithTodayCard.email, password: userWithTodayCard.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.get('[data-testid="list-today-cards"]').should('exist')
@@ -413,7 +313,7 @@ describe('Card Management — Promote', () => {
   }) as ISODateString
   const mockTodayCard: ICard = {
     ...mockUserCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
     addedOn: today,
   }
   const userWithTodayCard: IUser = {
@@ -421,17 +321,9 @@ describe('Card Management — Promote', () => {
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockActivity, cards: [mockTodayCard] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithTodayCard },
-      },
-    })
+    cy.loginBySession(userWithTodayCard)
     cy.intercept(Cypress.env('EDIT_CARD_STAGE_URL'), {
       statusCode: 200,
       body: {
@@ -443,8 +335,6 @@ describe('Card Management — Promote', () => {
   })
 
   it('should open edit popup and promote card stage', () => {
-    cy.login({ email: userWithTodayCard.email, password: userWithTodayCard.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.get('[data-testid="today-card-edit-btn"]').first().click()
@@ -460,7 +350,7 @@ describe('Card Management — Reset Stage', () => {
   }) as ISODateString
   const mockTodayCard: ICard = {
     ...mockUserCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
     addedOn: today,
   }
   const userWithTodayCard: IUser = {
@@ -468,17 +358,9 @@ describe('Card Management — Reset Stage', () => {
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockActivity, cards: [mockTodayCard] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithTodayCard },
-      },
-    })
+    cy.loginBySession(userWithTodayCard)
     cy.intercept(Cypress.env('RESET_CARD_STAGE_URL'), {
       statusCode: 200,
       body: {
@@ -490,8 +372,6 @@ describe('Card Management — Reset Stage', () => {
   })
 
   it('should open edit popup and reset card stage', () => {
-    cy.login({ email: userWithTodayCard.email, password: userWithTodayCard.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.get('[data-testid="today-card-edit-btn"]').first().click()
@@ -504,24 +384,16 @@ describe('Card Management — Reset Stage', () => {
 describe('Card Management — Override Stage', () => {
   const mockActiveCard: ICard = {
     ...mockUserCard,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
   }
   const userWithActiveCard: IUser = {
     ...mockUser,
     lastLogin: mockUser.lastLogin as ISODateString,
     activities: [{ ...mockActivity, cards: [mockActiveCard] }],
   }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
 
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: userWithActiveCard },
-      },
-    })
+    cy.loginBySession(userWithActiveCard)
     cy.intercept(Cypress.env('EDIT_CARD_URL'), {
       statusCode: 200,
       body: {
@@ -533,8 +405,6 @@ describe('Card Management — Override Stage', () => {
   })
 
   it('should open override popup, select a stage, and call edit card API on confirm', () => {
-    cy.login({ email: userWithActiveCard.email, password: userWithActiveCard.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.contains('View All Active Cards').click()
@@ -554,7 +424,7 @@ describe('Card Management — Submit for Review', () => {
   const mockTodayCard: ICard = {
     ...mockUserCard,
     activity: mockActivity.name,
-    completionStatus: CompletionStatus.PENDING,
+    completionStatus: COMPLETION_STATUS.PENDING,
     addedOn: today,
   }
   const mockStudentWithTeacher = {
@@ -563,18 +433,8 @@ describe('Card Management — Submit for Review', () => {
     linkedAccountsData: { teacher: mockUser.userId },
     activities: [{ ...mockActivity, cards: [mockTodayCard] }],
   }
-  // btoa('mock.student@email.com') URL-encoded
-  const studentLoginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay5zdHVkZW50QGVtYWlsLmNvbQ%3D%3D&password=password`
-
   beforeEach(() => {
-    cy.intercept(studentLoginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user: mockStudentWithTeacher },
-      },
-    })
+    cy.loginBySession(mockStudentWithTeacher)
     cy.intercept(Cypress.env('REQUEST_REVIEW_URL'), {
       statusCode: 200,
       body: { status: 'success', message: 'Review requested.' },
@@ -584,14 +444,12 @@ describe('Card Management — Submit for Review', () => {
       body: {
         status: 'success',
         message: 'Card stage updated.',
-        details: { ...mockTodayCard, completionStatus: CompletionStatus.REVIEW },
+        details: { ...mockTodayCard, completionStatus: COMPLETION_STATUS.REVIEW },
       },
     }).as('editCardStage')
   })
 
   it('should submit card for teacher review as a student', () => {
-    cy.login({ email: mockStudentWithTeacher.email, password: mockStudentWithTeacher.password })
-    cy.wait(100)
     cy.get('[data-testid="activity-in-list"]').first().click()
     cy.url().should('include', '/activities/Quran')
     cy.get('[data-testid="today-card-edit-btn"]').first().click()

@@ -1,5 +1,3 @@
-'use client'
-
 import StudentsList from './students-list'
 import ActivitiesList from './activities-list'
 import CardsList from './cards-list'
@@ -12,7 +10,7 @@ export default function ListUi({
   userDetails,
   activity,
 }: {
-  listType: string
+  listType: 'students' | 'activities' | 'cards'
   isMain: boolean
   userDetails: IUser
   activity?: IActivity

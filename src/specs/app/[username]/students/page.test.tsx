@@ -1,10 +1,11 @@
 import Students from '../../../../app/[username]/students/page'
 import '@testing-library/jest-dom'
-import { render } from '../../../util'
+import { render, screen } from '../../../util'
 import * as React from 'react'
 import { mockUser } from '../../../../specs/mocks'
 import NestedLayout from '../../../../app/nested-layout'
-import store from '../../../../store/store'
+import { useSession } from 'next-auth/react'
+import { useUser } from '../../../../hooks/use-user'
 
 jest.mock('../../../../app/nested-layout')
 jest.mock('next/navigation', () => {
@@ -15,6 +16,10 @@ jest.mock('next/navigation', () => {
     })),
   }
 })
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(),
+}))
+jest.mock('../../../../hooks/use-user')
 
 describe('Students list', () => {
   const teacher = {
@@ -25,24 +30,50 @@ describe('Students list', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/3/2024'))
-    window.sessionStorage.setItem('user_data', JSON.stringify(teacher))
-    window.sessionStorage.setItem('user_token', 'xxxxxx')
-    window.sessionStorage.setItem('created_on', '2/3/2024')
-
-    const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: teacher }
-    jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+    ;(useSession as jest.Mock).mockReturnValue({
+      data: { user: { userId: teacher.userId, username: teacher.username } },
+    })
+    ;(useUser as jest.Mock).mockReturnValue({ data: teacher })
     ;(NestedLayout as jest.Mock).mockImplementation(() => null)
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-    window.sessionStorage.clear()
     jest.useRealTimers()
+  })
+
+  it('should render with no session', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: null })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined })
+    const { container } = render(<Students />)
+    // Loading guard returns null when userId is missing
+    expect(container.querySelector('.py-20')!.innerHTML).toBe('')
+    expect(NestedLayout).not.toHaveBeenCalled()
+  })
+
+  it('should render skeleton when loading', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined, isLoading: true, isError: false })
+    const { container } = render(<Students />)
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
+  })
+
+  it('should render error display when query fails', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error('Failed'),
+      refetch: jest.fn(),
+    })
+    render(<Students />)
+    expect(screen.getByText('Failed to load data')).toBeInTheDocument()
   })
 
   it('should pass the correct isTeacher values for student to NestedLayout', () => {
     render(<Students />)
-    expect((NestedLayout as jest.Mock).mock.calls[1][0]).toEqual(
+    expect((NestedLayout as jest.Mock).mock.calls[0][0]).toEqual(
       expect.objectContaining({ isTeacher: true })
     )
   })
@@ -50,7 +81,7 @@ describe('Students list', () => {
   it('should pass the correct user to AddStudent', () => {
     render(<Students />)
     const expectedAddStudentArgs = { user: teacher }
-    const addStudentChild = (NestedLayout as jest.Mock).mock.calls[1][0].children[0].props
+    const addStudentChild = (NestedLayout as jest.Mock).mock.calls[0][0].children[0].props
       .children[1].props
     expect(addStudentChild).toMatchObject(expectedAddStudentArgs)
   })
@@ -58,14 +89,14 @@ describe('Students list', () => {
   it('should pass the correct listType, isMain, and userDetails to ListUi', () => {
     render(<Students />)
     const expectedListUiArgs = { listType: 'students', isMain: true, userDetails: teacher }
-    const listUiChild = (NestedLayout as jest.Mock).mock.calls[1][0].children[0].props.children[3]
+    const listUiChild = (NestedLayout as jest.Mock).mock.calls[0][0].children[0].props.children[3]
       .props.children[1].props
     expect(listUiChild).toMatchObject(expectedListUiArgs)
   })
 
   it('should display back button', async () => {
     render(<Students />)
-    expect((NestedLayout as jest.Mock).mock.calls[1][0].children[1].props).toMatchObject({
+    expect((NestedLayout as jest.Mock).mock.calls[0][0].children[1].props).toMatchObject({
       children: 'Back',
     })
 
@@ -73,7 +104,7 @@ describe('Students list', () => {
     useRouter.mockImplementation(() => ({
       push: jest.fn(),
     }))
-    ;(NestedLayout as jest.Mock).mock.calls[1][0].children[1].props.onClick()
-    expect(useRouter.mock.results[1].value.push).toHaveBeenCalledWith(`/${mockUser.username}`)
+    ;(NestedLayout as jest.Mock).mock.calls[0][0].children[1].props.onClick()
+    expect(useRouter.mock.results[0].value.push).toHaveBeenCalledWith(`/${mockUser.username}`)
   })
 })

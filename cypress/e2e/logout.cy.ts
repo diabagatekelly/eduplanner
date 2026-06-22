@@ -1,20 +1,11 @@
 import { mockUser } from '../../src/specs/mocks'
 import { IUser } from '../../src/types/IUser'
-import { ISODateString } from '../../src/types/isoDateType'
+import { ISODateString } from '../../src/types/ISODateString'
 
 describe('Logout', () => {
   const user: IUser = { ...mockUser, lastLogin: mockUser.lastLogin as ISODateString }
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
-
   beforeEach(() => {
-    cy.intercept(loginUrl, {
-      statusCode: 200,
-      body: {
-        status: 'success',
-        message: 'User found',
-        details: { token: 'xxxxxx', user },
-      },
-    })
+    cy.loginBySession(user)
     cy.intercept(
       { method: 'PATCH', url: Cypress.env('EDIT_USER_URL') },
       {
@@ -25,11 +16,10 @@ describe('Logout', () => {
   })
 
   it('should call edit API and redirect to login page on logout', () => {
-    cy.login({ email: user.email, password: user.password })
-    cy.wait(100)
+    cy.get('[data-testid="user-icon"]').should('have.attr', 'aria-expanded')
     cy.get('[data-testid="user-icon"]').click()
     cy.get('[data-testid="logout-link"]').click()
     cy.wait('@editUser')
-    cy.url().should('include', '/login')
+    cy.url({ timeout: 10000 }).should('include', '/login')
   })
 })

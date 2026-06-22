@@ -1,12 +1,16 @@
 import DeleteActivityPopup from '../../../components/popups/deleteActivityPopup'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
-import { deleteActivity } from '../../../api/controller'
 import { mockActivity, mockUser } from '../../../specs/mocks'
+import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
-jest.mock('../../../api/controller')
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(),
@@ -17,26 +21,20 @@ jest.mock('next/navigation', () => {
 describe('Delete Activity Popup', () => {
   const childArgs = { user: mockUser, item: { activityName: mockActivity.name } }
 
-  beforeEach(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(new Date('2/3/2024'))
-    window.sessionStorage.setItem('user_data', JSON.stringify(mockUser))
-    window.sessionStorage.setItem('user_token', 'xxxxxx')
-    window.sessionStorage.setItem('created_on', '2/3/2024')
-
-    // Mock window.location.reload
-    Object.defineProperty(window, 'location', {
-      value: {
-        reload: jest.fn(),
-      },
-      writable: true,
-    })
-  })
-
   afterEach(() => {
     jest.clearAllMocks()
-    window.sessionStorage.clear()
-    jest.useRealTimers()
+  })
+
+  it('should show error when userId is missing and submit is clicked', async () => {
+    const args = { user: {} as any, item: { activityName: 'Test' } }
+    render(<DeleteActivityPopup {...{ onClose: jest.fn(), showModal: true, ...args }} />)
+    const submitButton = screen.getByTestId('delete-activity-btn')
+    await act(async () => {
+      await fireEvent.click(submitButton)
+    })
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+    })
   })
 
   it('should render popup to delete activity for main', async () => {
@@ -55,14 +53,7 @@ describe('Delete Activity Popup', () => {
   })
 
   it('should invoke deleteActivity controller when form is submitted', async () => {
-    ;(deleteActivity as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({ status: 200, data: { message: null, details: {} } })
-    })
-
-    let showModal
-    let onClose = () => {
-      showModal = false
-    }
+    const onClose = jest.fn()
 
     render(<DeleteActivityPopup {...{ onClose, showModal: true, ...childArgs }} />)
     const submitButton = screen.getByTestId('delete-activity-btn')
@@ -71,23 +62,20 @@ describe('Delete Activity Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    await expect(deleteActivity).toHaveBeenCalledWith({
-      userId: mockUser.userId,
-      activityName: mockActivity.name,
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Successfully deleted activity')
     })
   })
 
   it('should not close popup when response is not 200 or 500 and display error message', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
-    const error = {
-      response: {
-        status: 400,
-        data: { status: 'failedTransaction', message: 'Erroneous response' },
-      },
-    }
-    ;(deleteActivity as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.delete('*/user/activities/delete/*', () =>
+        HttpResponse.json(
+          { status: 'failedTransaction', message: 'Erroneous response' },
+          { status: 400 }
+        )
+      )
+    )
 
     let showModal
     let onClose = () => {
@@ -101,17 +89,20 @@ describe('Delete Activity Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.findByText(/Erroneous response/i)
-    expect(errorMessage).toBeInTheDocument()
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+    })
   })
 
   it('should not close popup when response is 500 and display error message', async () => {
-    const error = {
-      response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-    }
-    ;(deleteActivity as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.delete('*/user/activities/delete/*', () =>
+        HttpResponse.json(
+          { status: 'internalServerError', message: 'Server error' },
+          { status: 500 }
+        )
+      )
+    )
 
     let showModal
     let onClose = () => {
@@ -125,18 +116,15 @@ describe('Delete Activity Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(
-      /Failed to delete activity due to an internal error. Please try again later./i
-    )
-
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith(error)
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        'Failed to delete activity due to an internal error. Please try again later.'
+      )
+    })
   })
 
   it('should not close popup when error is thrown with no response', async () => {
-    ;(deleteActivity as jest.Mock).mockImplementation(() => {
-      return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-    })
+    server.use(http.delete('*/user/activities/delete/*', () => HttpResponse.error()))
 
     let showModal
     let onClose = () => {
@@ -150,19 +138,12 @@ describe('Delete Activity Popup', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+    })
   })
 
   it('should close popup when response is successful', async () => {
-    ;(deleteActivity as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({
-        status: 200,
-        data: { message: 'Successfully deleted activity.', details: {} },
-      })
-    })
-
     let showModal
     let onClose = () => {
       showModal = false
@@ -170,12 +151,13 @@ describe('Delete Activity Popup', () => {
 
     render(<DeleteActivityPopup {...{ onClose, showModal: true, ...childArgs }} />)
     const submitButton = screen.getByTestId('delete-activity-btn')
-    const submitMessage = await screen.findByTestId('delete-activity-outcome-message')
 
     await act(async () => {
       await fireEvent.click(submitButton)
     })
 
-    expect(submitMessage).toHaveTextContent('Successfully deleted activity')
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Successfully deleted activity')
+    })
   })
 })

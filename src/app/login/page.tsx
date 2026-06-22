@@ -1,103 +1,72 @@
 'use client'
 
 import LoginForm from '@/app/login/components/login-form'
-import React, { useState, FormEvent } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { IUser, IUserLogin } from '@/types/IUser'
-import { IResponse } from '@/types/IApiResponse'
+import { signIn, getSession } from 'next-auth/react'
 import Link from 'next/link'
-import { setAuthToken } from '@/store/actions/authActions'
-import { useAppDispatch } from '@/store/hooks'
-import { populateUser } from '@/store/actions/userActions'
-import { loginUser } from '@/api/controller'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { loginSchema, LoginFormData } from '@/lib/schemas/auth.schemas'
 
-interface ILogin {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
-  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
-}
-
-export default function Login<ILogin>() {
-  const dispatch = useAppDispatch()
+export default function Login() {
   const router = useRouter()
 
-  const [formData, setFormData] = useState<{ email: string; password: string }>({
-    email: '',
-    password: '',
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
   })
 
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
 
-  function handleInput(e: React.FormEvent<HTMLInputElement>) {
+  function clearMessage() {
     if (formSubmitOutcomeMessage.length) {
       setFormSubmitOutcomeMessage('')
     }
-
-    const target = e.target as HTMLInputElement
-    const fieldName: string = target.name
-    const fieldValue: any = target.value
-
-    setFormData((prevState) => ({
-      ...prevState,
-      [fieldName]: fieldValue,
-    }))
   }
 
-  async function submitForm(e: FormEvent<HTMLFormElement>) {
+  async function submitForm(data: LoginFormData) {
     try {
-      // We don't want the page to refresh
-      e.preventDefault()
-      setIsLoading(true) // Set loading to true when the request starts
-
-      const rawFormData = new FormData(e.currentTarget)
-      const userFormInfo: { email: string; password: string } = {
-        email: '',
-        password: '',
-      }
-
-      for (const pair of rawFormData.entries()) {
-        ;(userFormInfo as Record<string, string>)[pair[0]] = `${pair[1]}`
-      }
-
-      const userCredentials: IUserLogin = {
-        userId: btoa(userFormInfo.email),
-        password: userFormInfo.password,
-      }
-
-      const response = (await loginUser(userCredentials)) as unknown as IResponse<{
-        token: string
-        user: IUser
-      }>
-      const { data } = response
-      const { details } = data
-
-      setIsLoading(false)
-      setFormData({
-        email: '',
-        password: '',
+      const result = await signIn('credentials', {
+        userId: btoa(data.email),
+        password: data.password,
+        redirect: false,
       })
-      setFormSubmitOutcomeMessage('Logging in ...')
-      dispatch(setAuthToken(details))
-      dispatch(populateUser())
-      router.push('/' + details.user.username)
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
 
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
+      if (result?.error) {
+        setFormSubmitOutcomeMessage(
+          result.code === 'credentials'
+            ? 'User not found. Incorrect email or password. Please try again.'
+            : 'Failed to login due to an internal error. Please try again later.'
+        )
         return
       }
 
-      const { status, data } = error.response
+      reset()
+      setFormSubmitOutcomeMessage('Logging in ...')
 
-      if (status === 500) {
+      const session = await getSession()
+
+      const username = (session?.user as any)?.username
+      if (!username) {
         setFormSubmitOutcomeMessage(
           'Failed to login due to an internal error. Please try again later.'
         )
-      } else {
-        setFormSubmitOutcomeMessage(data.message)
+        return
       }
+
+      // Full navigation needed to reload auth session — router.push won't suffice
+      // eslint-disable-next-line react-hooks/immutability
+      window.location.href = '/' + username
+    } catch {
+      setFormSubmitOutcomeMessage(
+        'Failed to login due to an internal error. Please try again later.'
+      )
     }
   }
 
@@ -110,7 +79,13 @@ export default function Login<ILogin>() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <LoginForm {...{ handleInput, formData, isLoading, submitForm }} />
+        <LoginForm
+          register={register}
+          errors={errors}
+          isSubmitting={isSubmitting}
+          onSubmit={handleSubmit(submitForm)}
+          onFieldChange={clearMessage}
+        />
         <div className="mt-3 text-center">{formSubmitOutcomeMessage}</div>
 
         <p className="mt-10 text-center text-sm text-gray-500">

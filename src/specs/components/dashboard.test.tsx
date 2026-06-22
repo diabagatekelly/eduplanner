@@ -5,30 +5,19 @@ import { render } from '../util'
 import * as React from 'react'
 import { mockUser } from '../../specs/mocks'
 
+const mockBack = jest.fn()
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(() => ({
       push: jest.fn(),
       replace: jest.fn(),
+      back: mockBack,
     })),
     usePathname: jest.fn(),
   }
 })
 
 describe('Dashboard', () => {
-  const back = window.history.back
-
-  beforeAll(() => {
-    Object.defineProperty(window, 'history', {
-      value: { back: jest.fn() },
-    })
-  })
-
-  afterAll(() => {
-    sessionStorage.clear()
-    window.history.back = back
-  })
-
   it('should mention student info if not main user page', async () => {
     const userDetails = { ...mockUser }
     render(<Dashboard {...{ userDetails, isMain: false, isTeacher: false }} />)
@@ -94,6 +83,6 @@ describe('Dashboard', () => {
     await act(async () => {
       await fireEvent.click(backButton)
     })
-    expect(window.history.back).toHaveBeenCalled()
+    expect(mockBack).toHaveBeenCalled()
   })
 })

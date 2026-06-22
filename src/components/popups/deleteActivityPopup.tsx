@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react'
-import { useAppDispatch } from '@/store/hooks'
-import { removeUserActivity } from '@/store/actions/userActions'
-import { deleteActivity } from '../../api/controller'
+import { useDeleteActivity } from '@/hooks/use-activity-mutations'
 import { IUser } from '@/types/IUser'
 import { BoltSlashIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
+import { toast } from 'sonner'
 
 export default function DeleteActivityPopup({
   onClose,
@@ -13,51 +12,21 @@ export default function DeleteActivityPopup({
 }: {
   onClose: () => void
   showModal: boolean
-  user?: IUser | Partial<IUser>
-  item?: { activityName: string }
+  user: IUser | Partial<IUser>
+  item: { activityName: string }
 }) {
-  const dispatch = useAppDispatch()
-
-  const [userInfo, getUserInfo] = useState<IUser | Partial<IUser>>({ ...user })
-  const [activityName, getActivityName] = useState('')
-  const [outcomeMessage, setOutcomeMessage] = useState('')
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    getActivityName(item!.activityName)
-    getUserInfo({ ...user })
-  }, [showModal, user, item])
+  const userId = user.userId ?? ''
+  const deleteActivityMutation = useDeleteActivity(userId)
 
   async function deleteUserActivity() {
     try {
-      const activityData = { userId: userInfo.userId!, activityName }
-      await deleteActivity(activityData)
-      onDeleteActivitySuccess()
-      window.location.reload()
-    } catch (error: any) {
-      console.log(error)
-
-      if (!error.response) {
-        setOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setOutcomeMessage(
-          'Failed to delete activity due to an internal error. Please try again later.'
-        )
-      } else {
-        setOutcomeMessage(data.message)
-      }
+      if (!userId) throw new Error('Missing userId for deleteActivity')
+      await deleteActivityMutation.mutateAsync(item.activityName)
+      toast.success('Successfully deleted activity')
+      onClose()
+    } catch (error: unknown) {
+      handleMutationError(error, 'delete activity')
     }
-  }
-
-  function onDeleteActivitySuccess() {
-    dispatch(removeUserActivity(userInfo.username!, activityName))
-    setOutcomeMessage('Successfully deleted activity')
-    onClose()
   }
 
   return (
@@ -103,7 +72,7 @@ export default function DeleteActivityPopup({
                   Are you sure you want to delete this activity?
                 </h3>
                 <h5 className="mb-5">
-                  <span>{activityName}</span>
+                  <span>{item.activityName}</span>
                 </h5>
               </div>
 
@@ -124,7 +93,6 @@ export default function DeleteActivityPopup({
               >
                 No, cancel
               </button>
-              <p data-testid="delete-activity-outcome-message">{outcomeMessage}</p>
             </div>
           </div>
         </div>

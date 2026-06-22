@@ -1,24 +1,27 @@
 'use client'
 
 import NestedLayout from '@/app/nested-layout'
-import store from '@/store/store'
 import Popup from '@/components/popups/popup'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import UserProfile from '@/app/[username]/profile/components/user-profile'
 import { IUser } from '@/types/IUser'
+import { useSession } from 'next-auth/react'
+import { useUser } from '@/hooks/use-user'
+import { queryGuard } from '@/lib/helpers/query-guard'
+import { isTeacher as checkIsTeacher } from '@/lib/helpers/isTeacher'
 
 export default function Profile() {
   const [showModal, setShowModal] = useState(false)
-  const [user, getUserData] = useState<IUser>({} as IUser)
 
-  useEffect(() => {
-    const { userReducer } = store.getState()
-    getUserData(userReducer)
-  }, [])
+  const { data: session } = useSession()
+  const userId = session?.user?.userId ?? ''
+  const { data: user = {} as IUser, isLoading, isError, error, refetch } = useUser(userId)
 
-  const isTeacher = user?.accountType === 'teacher'
-  const isMain = true
-  const modalType = 'deleteAccount'
+  const guard = queryGuard({ isLoading, isError, error, refetch })
+  if (guard) return guard
+  if (!user.userId) return null
+
+  const isTeacher = checkIsTeacher(user)
 
   return (
     <NestedLayout {...{ isTeacher }}>
@@ -26,7 +29,13 @@ export default function Profile() {
       <button onClick={() => setShowModal(true)} id="delete-button" className="red-btn">
         Delete Account
       </button>
-      <Popup {...{ showModal, modalType, isMain, user }} onClose={() => setShowModal(false)} />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{ type: 'deleteAccount', user }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </NestedLayout>
   )
 }

@@ -3,7 +3,7 @@
 import AddActivity from './activities/add-activity'
 import { IUser } from '@/types/IUser'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import ListUi from '@/components/lists/lists-ui'
 
 export default function Dashboard({
@@ -15,6 +15,7 @@ export default function Dashboard({
   isMain: boolean
   isTeacher: boolean
 }) {
+  const router = useRouter()
   const fullName = `${userDetails?.firstName} ${userDetails?.lastName}`
   const currentPath = usePathname()
 
@@ -46,7 +47,7 @@ export default function Dashboard({
               </div>
               <hr />
               <ListUi {...{ listType: 'activities', isMain, userDetails }} />
-              <button className="default-btn" onClick={() => window.history.back()}>
+              <button className="default-btn" onClick={() => router.back()}>
                 Back
               </button>
             </div>

@@ -1,24 +1,28 @@
 'use client'
 
 import NestedLayout from '@/app/nested-layout'
-import store from '@/store/store'
-import { useEffect, useState } from 'react'
 import AddStudent from '@/components/students/add-student'
 import ListUi from '@/components/lists/lists-ui'
 import { useRouter } from 'next/navigation'
 import Breadcrumbs from '@/components/breadcrumbs'
 import { IUser } from '@/types/IUser'
+import { useSession } from 'next-auth/react'
+import { useUser } from '@/hooks/use-user'
+import { queryGuard } from '@/lib/helpers/query-guard'
+import { isTeacher as checkIsTeacher } from '@/lib/helpers/isTeacher'
 
 export default function Students() {
   const router = useRouter()
-  const [user, getUserData] = useState({} as IUser)
 
-  useEffect(() => {
-    const { userReducer } = store.getState()
-    getUserData(userReducer)
-  }, [])
+  const { data: session } = useSession()
+  const userId = session?.user?.userId ?? ''
+  const { data: user = {} as IUser, isLoading, isError, error, refetch } = useUser(userId)
 
-  const isTeacher = user.accountType?.includes('teacher')
+  const guard = queryGuard({ isLoading, isError, error, refetch })
+  if (guard) return guard
+  if (!user.userId) return null
+
+  const isTeacher = checkIsTeacher(user)
   const isMain = true
   const userDetails = user
 

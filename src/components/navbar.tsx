@@ -1,17 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { useAppDispatch } from '@/store/hooks'
-import { removeAuthToken } from '../store/actions/authActions'
-import { resetUser } from '../store/actions/userActions'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import { editUser } from '../api/controller'
-import store from '../store/store'
-import { IUser } from '@/types/IUser'
-import { ISODateString } from '@/types/isoDateType'
+import { ISODateString } from '@/types/ISODateString'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
@@ -20,20 +17,13 @@ function classNames(...classes: string[]) {
 export default function Navbar({
   isAuthenticated,
   username,
+  userId,
 }: {
   isAuthenticated: boolean
   username: string
+  userId: string
 }) {
-  const dispatch = useAppDispatch()
-  const router = useRouter()
   const pathname = usePathname()
-
-  const [user, getUserData] = useState<IUser>({} as IUser)
-
-  useEffect(() => {
-    const { userReducer } = store.getState()
-    getUserData(userReducer)
-  }, [user])
 
   const navigation = [
     { name: 'Home', href: '/home', current: pathname === '/home', dataTestId: 'home-btn' },
@@ -42,33 +32,16 @@ export default function Navbar({
   async function logout() {
     try {
       await editUser({
-        userId: user.userId,
+        userId,
         editData: {
           lastLogin: new Date(Date.now()).toLocaleDateString('en-US', {
             timeZone: 'EST',
           }) as ISODateString,
         },
       })
-      dispatch(removeAuthToken())
-      dispatch(resetUser())
-      router.push('/login')
-    } catch (error: any) {
-      console.log(error)
-
-      if (!error.response) {
-        console.log('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        console.log(
-          'Oops, something went wrong in updating and logging out. Please try again later.'
-        )
-      } else {
-        console.log(data.message)
-      }
+      await signOut({ callbackUrl: '/login' })
+    } catch (error: unknown) {
+      handleMutationError(error, 'update and log out')
     }
   }
 
@@ -175,7 +148,7 @@ export default function Navbar({
                             data-testid="profile-link"
                             href={`/${username}/profile`}
                             className={classNames(
-                              /* istanbul ignore next */
+                              /* istanbul ignore next -- Headless UI hover state untestable in JSDOM */
                               active ? 'bg-gray-200' : '',
                               pathname.includes(`/${username}/profile`)
                                 ? 'italic rounded-md border-2 border-gray-700'
@@ -194,7 +167,7 @@ export default function Navbar({
                             onClick={logout}
                             href="#"
                             className={classNames(
-                              /* istanbul ignore next */
+                              /* istanbul ignore next -- Headless UI hover state untestable in JSDOM */
                               active ? 'bg-gray-100' : '',
                               'block px-4 py-2 text-sm text-gray-700'
                             )}

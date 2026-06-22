@@ -1,33 +1,24 @@
 import { CheckBadgeIcon, XMarkIcon } from '@heroicons/react/24/solid'
-import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 export default function ValidatePopup({
   onClose,
   showModal,
   item,
   submitList,
-  setFormSubmitOutcomeMessage,
 }: {
   onClose: () => void
   showModal: boolean
-  item?: { list: string }
-  submitList?: (list: string) => void
-  setFormSubmitOutcomeMessage?: (msg: string) => void
+  item: { list: string }
+  submitList: (list: string) => void
 }) {
-  const [itemsToValidate, getItemsToValidate] = useState('')
-
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    getItemsToValidate(item!.list)
-  }, [showModal, item])
-
   function validate() {
-    submitList?.(itemsToValidate)
+    submitList(item.list)
     onClose()
   }
 
   function cancel() {
-    setFormSubmitOutcomeMessage?.('Validation canceled.')
+    toast.info('Validation canceled.')
     onClose()
   }
 
@@ -74,7 +65,7 @@ export default function ValidatePopup({
                   Is this the correct list of cards you want to create?
                 </h3>
                 <h5 className="mb-5">
-                  <span>{itemsToValidate} </span>
+                  <span>{item.list} </span>
                 </h5>
               </div>
 

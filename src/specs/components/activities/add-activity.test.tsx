@@ -1,12 +1,19 @@
 import AddActivity from '../../../components/activities/add-activity'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
-import { createActivity } from '../../../api/controller'
 import { mockUser, mockActivity } from '../../../specs/mocks'
+import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
-jest.mock('../../../api/controller')
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 jest.mock('next/navigation', () => {
   return {
     useRouter: jest.fn(() => ({
@@ -18,18 +25,9 @@ jest.mock('next/navigation', () => {
 
 describe('Add activity', () => {
   const userDetails = { ...mockUser }
-  const reload = window.location.reload
 
-  beforeAll(() => {
-    sessionStorage.setItem('user_data', JSON.stringify(userDetails))
-    Object.defineProperty(window, 'location', {
-      value: { reload: jest.fn() },
-    })
-  })
-
-  afterAll(() => {
-    sessionStorage.clear()
-    window.location.reload = reload
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   it('should render form to add an activity', async () => {
@@ -42,10 +40,7 @@ describe('Add activity', () => {
     expect(addActivityForm).toBeInTheDocument()
   })
 
-  it('should invoke createActivity controller when form is submitted', async () => {
-    ;(createActivity as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({ status: 200, data: { message: null, details: {} } })
-    })
+  it('should reset form fields after successful activity creation', async () => {
     render(<AddActivity {...{ userDetails }} />)
 
     const name = screen.getByLabelText(/Name:/i)
@@ -53,8 +48,6 @@ describe('Add activity', () => {
     const points = screen.getByLabelText('Points (optional):')
     const hasCards = screen.getByLabelText(/Yes/i)
     const submitButton = screen.getByTestId('add-activity-btn')
-
-    const userActivityDTO = { userActivity: mockActivity, userId: userDetails.userId }
 
     await act(() => {
       fireEvent.change(name, {
@@ -73,7 +66,9 @@ describe('Add activity', () => {
       await fireEvent.click(submitButton)
     })
 
-    await expect(createActivity).toHaveBeenCalledWith(userActivityDTO)
+    await waitFor(() => {
+      expect(name).toHaveValue('')
+    })
   })
 
   it('should not create pre-existing user activity', async () => {
@@ -86,8 +81,6 @@ describe('Add activity', () => {
     const hasCards = screen.getByLabelText(/Yes/i)
     const submitButton = screen.getByTestId('add-activity-btn')
 
-    const submitMessage = await screen.findByTestId('add-activity-submit-message')
-
     await act(() => {
       fireEvent.change(name, {
         target: { value: 'Quran' },
@@ -105,22 +98,23 @@ describe('Add activity', () => {
       await fireEvent.click(submitButton)
     })
 
-    expect(submitMessage).toHaveTextContent('This is already one of your activities.')
+    await waitFor(() => {
+      expect(toast.warning).toHaveBeenCalledWith('This is already one of your activities.')
+    })
     expect(name).toHaveValue('')
     expect(description).toHaveValue('')
     expect(points).toHaveValue(0)
   })
 
   it('should reset form when response is successful and display success message, then reset message when form in focus', async () => {
-    ;(createActivity as jest.Mock).mockImplementationOnce(() => {
-      return Promise.resolve({
-        status: 200,
-        data: {
+    server.use(
+      http.post('*/user/activities/add', () =>
+        HttpResponse.json({
           message: 'Successfully created activity.',
           details: { userId: userDetails.userId, userActivity: mockActivity },
-        },
-      })
-    })
+        })
+      )
+    )
 
     render(<AddActivity {...{ userDetails }} />)
 
@@ -129,8 +123,6 @@ describe('Add activity', () => {
     const points = screen.getByLabelText('Points (optional):')
     const hasCards = screen.getByLabelText(/Yes/i)
     const submitButton = screen.getByTestId('add-activity-btn')
-
-    const submitMessage = await screen.findByTestId('add-activity-submit-message')
 
     await act(() => {
       fireEvent.change(name, {
@@ -149,31 +141,23 @@ describe('Add activity', () => {
       await fireEvent.click(submitButton)
     })
 
-    expect(submitMessage).toHaveTextContent('Successfully created activity.')
+    await waitFor(() => {
+      expect(toast.success).toHaveBeenCalledWith('Successfully created activity.')
+    })
     expect(name).toHaveValue('')
     expect(description).toHaveValue('')
     expect(points).toHaveValue(0)
-
-    await act(() => {
-      fireEvent.change(name, {
-        target: { value: 'Quran' },
-      })
-    })
-    expect(submitMessage).toHaveTextContent('')
   })
 
   it('should not reset form when response is not 200 or 500 and display error message', async () => {
-    jest.spyOn(console, 'log').mockImplementation(() => null)
-
-    const error = {
-      response: {
-        status: 400,
-        data: { status: 'failedTransaction', message: 'Erroneous response' },
-      },
-    }
-    ;(createActivity as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.post('*/user/activities/add', () =>
+        HttpResponse.json(
+          { status: 'failedTransaction', message: 'Erroneous response' },
+          { status: 400 }
+        )
+      )
+    )
 
     render(<AddActivity {...{ userDetails }} />)
 
@@ -208,21 +192,24 @@ describe('Add activity', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.findByText(/Erroneous response/i)
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+    })
 
     expect(name).toHaveValue('Quran')
     expect(description).toHaveValue('Quran memorization')
     expect(points).toHaveValue(15)
-    expect(errorMessage).toBeInTheDocument()
   })
 
   it('should not reset form when response is 500 and display error message', async () => {
-    const error = {
-      response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-    }
-    ;(createActivity as jest.Mock).mockImplementation(() => {
-      return Promise.reject(error)
-    })
+    server.use(
+      http.post('*/user/activities/add', () =>
+        HttpResponse.json(
+          { status: 'internalServerError', message: 'Server error' },
+          { status: 500 }
+        )
+      )
+    )
     render(<AddActivity {...{ userDetails }} />)
 
     const name = screen.getByLabelText(/Name:/i)
@@ -256,21 +243,19 @@ describe('Add activity', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(
-      /Failed to create activity due to an internal error. Please try again later./i
-    )
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        'Failed to create activity due to an internal error. Please try again later.'
+      )
+    })
 
     expect(name).toHaveValue('Quran')
     expect(description).toHaveValue('Quran memorization')
     expect(points).toHaveValue(15)
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith(error)
   })
 
   it('should not reset form when error is thrown with no response', async () => {
-    ;(createActivity as jest.Mock).mockImplementation(() => {
-      return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-    })
+    server.use(http.post('*/user/activities/add', () => HttpResponse.error()))
     render(<AddActivity {...{ userDetails }} />)
 
     const name = screen.getByLabelText(/Name:/i)
@@ -304,8 +289,8 @@ describe('Add activity', () => {
       await fireEvent.click(submitButton)
     })
 
-    const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-    expect(errorMessage).toBeInTheDocument()
-    expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+    })
   })
 })

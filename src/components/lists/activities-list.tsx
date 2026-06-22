@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Popup from '../popups/popup'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { IUser } from '@/types/IUser'
-import { IActivity } from '@/types/IActivity'
 import { fromDbFormat } from '@/lib/helpers/formatActivityName'
 import { getBorderColor } from '@/lib/helpers/getBorderColor'
 import { TrashIcon } from '@heroicons/react/24/solid'
@@ -20,21 +19,14 @@ export default function ActivitiesList({
   const router = useRouter()
   const pathName = usePathname()
 
-  const [activitiesList, getActivitiesList] = useState<IActivity[]>([])
+  const activitiesList = userDetails?.activities ?? []
   const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState('')
-  const [popupUserDetails, getPopupUserDetails] = useState<IUser>({} as IUser)
-  const [popupItem, getPopupItem] = useState<{ activityName: string }>({ activityName: '' })
-
-  useEffect(() => {
-    const activities = userDetails?.activities
-    getActivitiesList([...([] as IActivity[]).concat(activities as IActivity[])])
-  }, [userDetails])
+  const [popupUserDetails, setPopupUserDetails] = useState<IUser>({} as IUser)
+  const [popupItem, setPopupItem] = useState<{ activityName: string }>({ activityName: '' })
 
   function deleteActivity(activityName: string) {
-    getPopupItem({ activityName })
-    getPopupUserDetails(userDetails)
-    setModalType('removeActivity')
+    setPopupItem({ activityName })
+    setPopupUserDetails(userDetails)
     setShowModal(true)
   }
 
@@ -92,10 +84,13 @@ export default function ActivitiesList({
         <p data-testid="no-activities-message">You have no activities yet.</p>
       )}
 
-      <Popup
-        {...{ showModal, modalType, isMain, user: popupUserDetails, item: popupItem }}
-        onClose={() => setShowModal(false)}
-      />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{ type: 'removeActivity', user: popupUserDetails, item: popupItem }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   )
 }

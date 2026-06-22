@@ -1,9 +1,8 @@
-import { linkAccount } from '../../api/controller'
-import { useEffect, useState } from 'react'
-import { useAppDispatch } from '@/store/hooks'
-import { addNewStudent, saveStudentDetails } from '@/store/actions/userActions'
+import { useLinkStudent } from '@/hooks/use-student-mutations'
 import { IUser } from '@/types/IUser'
 import { LinkIcon, XMarkIcon } from '@heroicons/react/24/solid'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
+import { toast } from 'sonner'
 
 export default function LinkAccountPopup({
   onClose,
@@ -13,58 +12,21 @@ export default function LinkAccountPopup({
 }: {
   onClose: () => void
   showModal: boolean
-  newStudent?: IUser | Partial<IUser>
-  user?: IUser | Partial<IUser>
+  newStudent: IUser | Partial<IUser>
+  user: IUser | Partial<IUser>
 }) {
-  const dispatch = useAppDispatch()
-
-  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...newStudent })
-  const [teacher, getTeacherData] = useState<IUser | Partial<IUser>>({ ...user })
-  const [outcomeMessage, setOutcomeMessage] = useState('')
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  useEffect(() => {
-    getStudentInfo({ ...newStudent })
-    getTeacherData({ ...user })
-  }, [showModal, newStudent, user])
+  const teacherId = user.userId ?? ''
+  const linkStudentMutation = useLinkStudent(teacherId)
 
   async function addStudent() {
     try {
-      setIsLoading(true)
-      const linkAccountsData: { teacherId: string; studentId: [string, string] } = {
-        teacherId: teacher.userId!,
-        studentId: [studentInfo.userId!, studentInfo.username!],
-      }
-      await linkAccount(linkAccountsData)
-      onLinkAccountSuccess()
-      setIsLoading(false)
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setOutcomeMessage(
-          'Failed to add new student due to an internal error. Please try again later.'
-        )
-      } else {
-        setOutcomeMessage(data.message)
-      }
+      if (!teacherId) throw new Error('Missing teacherId for linkStudent')
+      await linkStudentMutation.mutateAsync([newStudent.userId!, newStudent.username!])
+      toast.success('Successfully added a new student')
+      onClose()
+    } catch (error: unknown) {
+      handleMutationError(error, 'add new student')
     }
-  }
-
-  function onLinkAccountSuccess() {
-    dispatch(addNewStudent(studentInfo as IUser))
-    dispatch(saveStudentDetails(studentInfo as IUser))
-    setOutcomeMessage('Successfully added a new student')
-    onClose()
-    window.location.reload()
   }
 
   return (
@@ -111,7 +73,7 @@ export default function LinkAccountPopup({
                 </h3>
                 <h5 className="mb-5">
                   <span>
-                    {studentInfo?.firstName} {studentInfo?.lastName} - {studentInfo?.email}{' '}
+                    {newStudent?.firstName} {newStudent?.lastName} - {newStudent?.email}{' '}
                   </span>
                 </h5>
               </div>
@@ -133,7 +95,6 @@ export default function LinkAccountPopup({
               >
                 No, cancel
               </button>
-              <p data-testid="add-student-outcome-message">{outcomeMessage}</p>
             </div>
           </div>
         </div>

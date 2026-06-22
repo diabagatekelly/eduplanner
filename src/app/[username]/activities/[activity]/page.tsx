@@ -3,32 +3,38 @@
 import NestedLayout from '@/app/nested-layout'
 import ViewActivity from '@/components/activities/view-activity'
 import { IUser } from '@/types/IUser'
-import store from '@/store/store'
-import { useEffect, useState, use } from 'react'
+import { use } from 'react'
 import Breadcrumbs from '@/components/breadcrumbs'
 import { ActivityParams } from '@/types/IParams'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { useUser } from '@/hooks/use-user'
+import { queryGuard } from '@/lib/helpers/query-guard'
+import { isTeacher as checkIsTeacher } from '@/lib/helpers/isTeacher'
 
 export default function Main(props: { params: ActivityParams }) {
   const params = use(props.params)
   const activityFromParams = params.activity
 
+  const router = useRouter()
   const isMain = true
 
-  const [user, getUserData] = useState<IUser>({} as IUser)
+  const { data: session } = useSession()
+  const userId = session?.user?.userId ?? ''
+  const { data: user = {} as IUser, isLoading, isError, error, refetch } = useUser(userId)
 
-  useEffect(() => {
-    const { userReducer } = store.getState()
-    getUserData(userReducer)
-  }, [])
+  const guard = queryGuard({ isLoading, isError, error, refetch })
+  if (guard) return guard
+  if (!user.userId) return null
 
-  const isTeacher: boolean = user.accountType === 'teacher'
+  const isTeacher = checkIsTeacher(user)
   const userActivity = user.activities?.find((activity) => activity?.name === activityFromParams)
 
   return (
     <NestedLayout {...{ isTeacher }}>
       <Breadcrumbs />
       <ViewActivity {...{ userDetails: user, userActivity: userActivity!, isMain }} />
-      <button className="default-btn" onClick={() => window.history.back()}>
+      <button className="default-btn" onClick={() => router.back()}>
         Back
       </button>
     </NestedLayout>

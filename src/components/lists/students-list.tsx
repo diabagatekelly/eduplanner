@@ -1,36 +1,26 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Popup from '../popups/popup'
 import { findUser } from '@/api/controller'
-import { useAppDispatch } from '@/store/hooks'
-import { saveStudentDetails } from '@/store/actions/userActions'
 import { useRouter } from 'next/navigation'
 import { IUser } from '@/types/IUser'
 import { getBorderColor } from '@/lib/helpers/getBorderColor'
 import { TrashIcon } from '@heroicons/react/24/solid'
 
 export default function StudentsList({ userDetails }: { userDetails: IUser }) {
-  const dispatch = useAppDispatch()
   const router = useRouter()
 
-  const [studentIdsList, getStudentIdsList] = useState<[string, string][]>([])
+  const studentIdsList = userDetails?.linkedAccountsData?.students ?? []
   const [errorMessage, setErrorMessage] = useState('')
   const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState('')
-  const [popupUserDetails, getPopupUserDetails] = useState<{ userId: string; username: string }>({
+  const [popupUserDetails, setPopupUserDetails] = useState<{ userId: string; username: string }>({
     userId: '',
     username: '',
   })
 
-  useEffect(() => {
-    const studentIds = userDetails?.linkedAccountsData?.students || []
-    getStudentIdsList([...studentIds])
-  }, [userDetails])
-
   function deleteStudent(studentId: string, studentUsername: string) {
-    getPopupUserDetails({ userId: studentId, username: studentUsername })
-    setModalType('removeStudent')
+    setPopupUserDetails({ userId: studentId, username: studentUsername })
     setShowModal(true)
   }
 
@@ -60,8 +50,6 @@ export default function StudentsList({ userDetails }: { userDetails: IUser }) {
       const { details }: { message: string; details: { student: IUser } } = data
       onFetchStudentSuccess(details.student)
     } catch (error: any) {
-      console.log(error)
-
       if (!error.response) {
         setErrorMessage('Server is down. Try again later.')
         return
@@ -80,7 +68,6 @@ export default function StudentsList({ userDetails }: { userDetails: IUser }) {
   }
 
   function onFetchStudentSuccess(studentDetails: IUser) {
-    dispatch(saveStudentDetails(studentDetails))
     setShowModal(false)
     router.push(`/${userDetails.username}/students/${studentDetails.username}`)
   }
@@ -126,10 +113,17 @@ export default function StudentsList({ userDetails }: { userDetails: IUser }) {
       ) : (
         <p data-testid="no-students-message">You have no students yet.</p>
       )}
-      <Popup
-        {...{ showModal, modalType, user: popupUserDetails }}
-        onClose={() => setShowModal(false)}
-      />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{
+            type: 'removeStudent',
+            user: popupUserDetails,
+            teacherId: userDetails.userId!,
+          }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   )
 }

@@ -1,62 +1,32 @@
-import { useEffect, useState } from 'react'
-import store from '../../store/store'
-import { useAppDispatch } from '@/store/hooks'
-import { removeStudent } from '@/store/actions/userActions'
-import { unlinkAccount } from '../../api/controller'
+import { useUnlinkStudent } from '@/hooks/use-student-mutations'
 import { IUser } from '@/types/IUser'
 import { XMarkIcon, MinusIcon } from '@heroicons/react/24/solid'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
+import { toast } from 'sonner'
 
 export default function UnlinkAccountPopup({
   onClose,
   showModal,
   user,
+  teacherId,
 }: {
   onClose: () => void
   showModal: boolean
-  user?: IUser | Partial<IUser>
+  user: IUser | Partial<IUser>
+  teacherId: string
 }) {
-  const dispatch = useAppDispatch()
-
-  const [studentInfo, getStudentInfo] = useState<IUser | Partial<IUser>>({ ...user })
-  const [teacherInfo, getTeacherInfo] = useState<IUser | Partial<IUser>>({})
-  const [outcomeMessage, setOutcomeMessage] = useState('')
-
-  useEffect(() => {
-    getStudentInfo({ ...user })
-
-    const { userReducer } = store.getState()
-    getTeacherInfo(userReducer)
-  }, [showModal, user])
+  const resolvedTeacherId = teacherId
+  const unlinkStudentMutation = useUnlinkStudent(resolvedTeacherId)
 
   async function removeOldStudent() {
     try {
-      await unlinkAccount({ teacherId: teacherInfo.userId!, studentId: studentInfo.userId! })
-      onUnlinkAccountSuccess()
-    } catch (error: any) {
-      console.log(error)
-
-      if (!error.response) {
-        setOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setOutcomeMessage(
-          'Failed to unlink accounts due to an internal error. Please try again later.'
-        )
-      } else {
-        setOutcomeMessage(data.message)
-      }
+      if (!resolvedTeacherId) throw new Error('Missing teacherId for unlinkStudent')
+      await unlinkStudentMutation.mutateAsync(user.userId!)
+      toast.success('Successfully removed student.')
+      onClose()
+    } catch (error: unknown) {
+      handleMutationError(error, 'unlink accounts')
     }
-  }
-
-  function onUnlinkAccountSuccess() {
-    dispatch(removeStudent(studentInfo.userId!))
-    setOutcomeMessage('Successfully removed student.')
-    onClose()
-    window.location.reload()
   }
 
   return (
@@ -101,9 +71,7 @@ export default function UnlinkAccountPopup({
                   Are you sure you want to remove this student?
                 </h3>
                 <h5 className="mb-5">
-                  <span>
-                    {`${studentInfo!.username!.split('-').join(' ')} - ${atob(studentInfo!.userId!)} `}{' '}
-                  </span>
+                  <span>{`${user.username!.split('-').join(' ')} - ${atob(user.userId!)} `} </span>
                 </h5>
               </div>
 
@@ -125,7 +93,6 @@ export default function UnlinkAccountPopup({
               >
                 No, cancel
               </button>
-              <p data-testid="remove-student-outcome-message">{outcomeMessage}</p>
             </div>
           </div>
         </div>

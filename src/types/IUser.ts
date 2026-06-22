@@ -1,6 +1,6 @@
 import { IActivity } from './IActivity'
 import { ILinkedAccounts } from './ILinkedAccounts'
-import { ISODateString } from './isoDateType'
+import { ISODateString } from './ISODateString'
 
 export interface IUser {
   userId: string // btoa(email)
@@ -15,12 +15,5 @@ export interface IUser {
   activities: IActivity[]
   students?: Record<string, IUser>
 }
-
-export type IUserFormData = Required<
-  Omit<
-    IUser,
-    'userId' | 'username' | 'lastLogin' | 'activities' | 'linkedAccountsData' | 'students'
-  >
->
 
 export type IUserLogin = Pick<IUser, 'userId' | 'password'> & Partial<Pick<IUser, 'userId'>>

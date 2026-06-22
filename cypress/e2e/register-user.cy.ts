@@ -20,7 +20,8 @@ describe('Register user', () => {
       cy.navigateToRegisterPage()
       cy.contains('Create an account').should('exist')
       cy.register(user)
-      cy.wait(100)
+      cy.url().should('include', '/login')
+      cy.loginBySession(user)
       cy.contains(`Welcome ${mockUser.firstName} ${mockUser.lastName}!`)
       cy.url().should('include', `${mockUser.username}`)
     })
@@ -39,8 +40,8 @@ describe('Register user', () => {
 
     it('should display error message and stay on the register page', () => {
       cy.navigateToRegisterPage()
+      cy.contains('Create an account').should('exist')
       cy.register(user)
-      cy.wait(100)
       cy.contains('This user altready exists.')
       cy.url().should('not.include', `${mockUser.username}`)
     })

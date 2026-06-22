@@ -1,13 +1,18 @@
 import React from 'react'
 import { render } from '@testing-library/react'
-import store from '@/store/store'
-import { Provider } from 'react-redux'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 function RootLayout({ children }: { children: React.ReactNode }) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  })
   return (
-    <Provider store={store}>
+    <QueryClientProvider client={queryClient}>
       <div className="py-20 px-5">{children}</div>
-    </Provider>
+    </QueryClientProvider>
   )
 }
 

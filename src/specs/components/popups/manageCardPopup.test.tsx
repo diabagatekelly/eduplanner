@@ -1,16 +1,8 @@
 import ManageCardPopup from '../../../components/popups/manageCardPopup'
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
-import {
-  activateCard,
-  deleteCard,
-  editCardStage,
-  editAnyCardAttr,
-  requestCardReview,
-  resetCardStage,
-} from '../../../api/controller'
 import {
   mockUser,
   mockStudent,
@@ -19,37 +11,40 @@ import {
   mockLanguageActivity,
   mockUserLanguageVocabCard,
 } from '../../../specs/mocks'
-import { CompletionStatus } from '../../../types/CompletionStatusEnum'
+import { COMPLETION_STATUS } from '../../../lib/constants/completion-status'
+import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
-jest.mock('../../../api/controller')
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 
 describe('Manage Card Popup', () => {
-  const reload = window.location.reload
+  it('should show error when userId is missing and action is triggered', async () => {
+    const args = {
+      user: { accountType: 'teacher' } as any,
+      activity: mockActivity,
+      item: { card: mockUserCard, action: 'edit' },
+    }
+    render(<ManageCardPopup {...{ onClose: jest.fn(), showModal: true, isMain: true, ...args }} />)
+    const resetBtn = screen.getByTestId('reset-stage-btn')
+    await act(async () => {
+      await fireEvent.click(resetBtn)
+    })
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+    })
+  })
 
   describe('Reset stage', () => {
     const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
-
-    beforeEach(() => {
-      jest.useFakeTimers()
-      jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-    })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
-      jest.useRealTimers()
     })
 
     it('should render popup to reset card stage', async () => {
@@ -86,10 +81,14 @@ describe('Manage Card Popup', () => {
       expect(cardInstructions).not.toBeInTheDocument()
     })
 
-    it('should invoke resetCardStage controller when form is submitted', async () => {
-      ;(resetCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
-      })
+    it('should show success toast after resetting card stage', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/reset-stage', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: mockUserCard })
+        })
+      )
 
       let showModal
       let onClose = () => {
@@ -110,27 +109,22 @@ describe('Manage Card Popup', () => {
       )
 
       const resetStageBtn = await screen.findByTestId('reset-stage-btn')
-      const resetCardStageDTO = {
-        userId: mockUser.userId,
-        activity: mockActivity.name,
-        cardId: mockUserCard.cardId,
-      }
 
       await act(async () => {
         await fireEvent.click(resetStageBtn)
       })
 
-      await expect(resetCardStage).toHaveBeenCalledWith(resetCardStageDTO)
+      await waitFor(() => {
+        expect(receivedBody).toEqual({
+          userId: mockUser.userId,
+          activity: mockActivity.name,
+          cardId: mockUserCard.cardId,
+        })
+        expect(toast.success).toHaveBeenCalledWith('Successfully reset card')
+      })
     })
 
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      ;(resetCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'Successfully reset card.', details: {} },
-        })
-      })
-
       let showModal
       let onClose = () => {
         showModal = false
@@ -150,26 +144,25 @@ describe('Manage Card Popup', () => {
       )
 
       const resetStageBtn = await screen.findByTestId('reset-stage-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(resetStageBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Successfully reset card')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully reset card')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      jest.spyOn(console, 'log').mockImplementation(() => null)
-      const error = {
-        response: {
-          status: 400,
-          data: { status: 'failedTransaction', message: 'Erroneous response' },
-        },
-      }
-      ;(resetCardStage as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/reset-stage', () =>
+          HttpResponse.json(
+            { status: 'failedTransaction', message: 'Erroneous response' },
+            { status: 400 }
+          )
+        )
+      )
 
       let showModal = true
       let onClose = () => {
@@ -194,17 +187,20 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(resetStageBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {
-        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-      }
-      ;(resetCardStage as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/reset-stage', () =>
+          HttpResponse.json(
+            { status: 'internalServerError', message: 'Server error' },
+            { status: 500 }
+          )
+        )
+      )
       let showModal = true
       let onClose = () => {
         showModal = false
@@ -228,18 +224,15 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(resetStageBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to reset card due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to reset card due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      ;(resetCardStage as jest.Mock).mockImplementation(() => {
-        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-      })
+      server.use(http.post('*/user/cards/reset-stage', () => HttpResponse.error()))
 
       let showModal = true
       let onClose = () => {
@@ -264,9 +257,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(resetStageBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 
@@ -276,28 +269,9 @@ describe('Manage Card Popup', () => {
       linkedAccountsData: { teacher: mockUser.userId },
       activities: [{ ...mockActivity, cards: [mockUserCard] }],
     }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
-
-    beforeEach(() => {
-      jest.useFakeTimers()
-      jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-    })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
-      jest.useRealTimers()
     })
 
     it('should render popup to submit form for review', async () => {
@@ -328,13 +302,14 @@ describe('Manage Card Popup', () => {
       )
     })
 
-    it('should invoke requestCardReview controller when form is submitted', async () => {
-      ;(requestCardReview as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: {} } })
-      })
-      ;(editCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
-      })
+    it('should show success toast after requesting review', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/request-review', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: {} })
+        })
+      )
 
       let showModal
       let onClose = () => {
@@ -355,34 +330,26 @@ describe('Manage Card Popup', () => {
       )
 
       const requestReviewBtn = await screen.findByTestId('submit-review-btn')
-      const resetCardStageDTO = {
-        id: mockUserCard.cardId,
-        teacherId: mockUser.userId,
-        student: {
-          id: mockStudent.userId,
-          fullName: `${mockStudent.firstName} ${mockStudent.lastName}`,
-          email: mockStudent.email,
-        },
-      }
 
       await act(async () => {
         await fireEvent.click(requestReviewBtn)
       })
 
-      await expect(requestCardReview).toHaveBeenCalledWith(resetCardStageDTO)
+      await waitFor(() => {
+        expect(receivedBody).toEqual({
+          id: mockUserCard.cardId,
+          teacherId: mockUser.userId,
+          student: {
+            id: mockStudent.userId,
+            fullName: `${mockStudent.firstName} ${mockStudent.lastName}`,
+            email: mockStudent.email,
+          },
+        })
+        expect(toast.success).toHaveBeenCalledWith('Request for review successfully sent.')
+      })
     })
 
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      ;(requestCardReview as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'Successfully request review for card.', details: {} },
-        })
-      })
-      ;(editCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
-      })
-
       let showModal
       let onClose = () => {
         showModal = false
@@ -402,25 +369,25 @@ describe('Manage Card Popup', () => {
       )
 
       const requestReviewBtn = await screen.findByTestId('submit-review-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(requestReviewBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Request for review successfully sent.')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Request for review successfully sent.')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      const error = {
-        response: {
-          status: 400,
-          data: { status: 'failedTransaction', message: 'Erroneous response' },
-        },
-      }
-      ;(requestCardReview as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/request-review', () =>
+          HttpResponse.json(
+            { status: 'failedTransaction', message: 'Erroneous response' },
+            { status: 400 }
+          )
+        )
+      )
 
       let showModal = true
       let onClose = () => {
@@ -445,17 +412,20 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(requestReviewBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {
-        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-      }
-      ;(requestCardReview as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/request-review', () =>
+          HttpResponse.json(
+            { status: 'internalServerError', message: 'Server error' },
+            { status: 500 }
+          )
+        )
+      )
       let showModal = true
       let onClose = () => {
         showModal = false
@@ -479,18 +449,15 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(requestReviewBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to request review due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to request review due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      ;(requestCardReview as jest.Mock).mockImplementation(() => {
-        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-      })
+      server.use(http.post('*/user/cards/request-review', () => HttpResponse.error()))
 
       let showModal = true
       let onClose = () => {
@@ -515,9 +482,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(requestReviewBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
 
     it('should display disabled button when card already reviewed', async () => {
@@ -527,7 +494,7 @@ describe('Manage Card Popup', () => {
         activities: [
           {
             ...mockActivity,
-            cards: [{ ...mockUserCard, completionStatus: CompletionStatus.REVIEW }],
+            cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.REVIEW }],
           },
         ],
       }
@@ -546,7 +513,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.REVIEW },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.REVIEW },
               action: 'edit',
             },
           }}
@@ -564,39 +531,25 @@ describe('Manage Card Popup', () => {
       activities: [
         {
           ...mockActivity,
-          cards: [{ ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' }],
+          cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' }],
         },
       ],
     }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
-
-    beforeEach(() => {
-      jest.useFakeTimers()
-      jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-    })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
-      jest.useRealTimers()
     })
 
-    it('should invoke editAnyCardAttr controller when form is submitted', async () => {
+    it('should show success toast after overriding card stage', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/edit', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: mockUserCard })
+        })
+      )
+
       expect(myUser.activities[0].cards[0].stage).toEqual('7')
-      ;(editAnyCardAttr as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
-      })
 
       let showModal
       let onClose = () => {
@@ -612,7 +565,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' },
               action: 'override',
             },
           }}
@@ -625,31 +578,23 @@ describe('Manage Card Popup', () => {
 
       expect(stageManagementBlock).toHaveTextContent('Override current stage: 7')
 
-      const overrideStageDTO = {
-        userId: mockUser.userId,
-        activity: 'Quran',
-        cardId: mockUserCard.cardId,
-        editData: {
-          stage: '30',
-        },
-      }
-
       await act(async () => {
         fireEvent.change(overrideStageForm, { target: { value: '30' } })
         await fireEvent.click(overrideStageBtn)
       })
 
-      await expect(editAnyCardAttr).toHaveBeenCalledWith(overrideStageDTO)
+      await waitFor(() => {
+        expect(receivedBody).toEqual({
+          userId: mockUser.userId,
+          activity: 'Quran',
+          cardId: mockUserCard.cardId,
+          editData: { stage: '30' },
+        })
+        expect(toast.success).toHaveBeenCalledWith('Successfully overrode status.')
+      })
     })
 
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      ;(editAnyCardAttr as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'Successfully overrode status.', details: mockUserCard },
-        })
-      })
-
       let showModal
       let onClose = () => {
         showModal = false
@@ -664,7 +609,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' },
               action: 'override',
             },
           }}
@@ -673,26 +618,26 @@ describe('Manage Card Popup', () => {
 
       const overrideStageForm = await screen.findByTestId('override-stge-form')
       const overrideStageBtn = await screen.findByTestId('override-stage-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         fireEvent.change(overrideStageForm, { target: { value: '30' } })
         await fireEvent.click(overrideStageBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Successfully overrode status.')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully overrode status.')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      const error = {
-        response: {
-          status: 400,
-          data: { status: 'failedTransaction', message: 'Erroneous response' },
-        },
-      }
-      ;(editAnyCardAttr as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/edit', () =>
+          HttpResponse.json(
+            { status: 'failedTransaction', message: 'Erroneous response' },
+            { status: 400 }
+          )
+        )
+      )
 
       let showModal = true
       let onClose = () => {
@@ -708,7 +653,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' },
               action: 'override',
             },
           }}
@@ -720,17 +665,20 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(overrideStageBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {
-        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-      }
-      ;(editAnyCardAttr as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/edit', () =>
+          HttpResponse.json(
+            { status: 'internalServerError', message: 'Server error' },
+            { status: 500 }
+          )
+        )
+      )
       let showModal = true
       let onClose = () => {
         showModal = false
@@ -745,7 +693,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' },
               action: 'override',
             },
           }}
@@ -757,18 +705,15 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(overrideStageBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to override card stage due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to override card stage due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      ;(editAnyCardAttr as jest.Mock).mockImplementation(() => {
-        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-      })
+      server.use(http.post('*/user/cards/edit', () => HttpResponse.error()))
 
       let showModal = true
       let onClose = () => {
@@ -784,7 +729,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' },
               action: 'override',
             },
           }}
@@ -796,9 +741,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(overrideStageBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 
@@ -808,38 +753,23 @@ describe('Manage Card Popup', () => {
       activities: [
         {
           ...mockActivity,
-          cards: [{ ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' }],
+          cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' }],
         },
       ],
     }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
-
-    beforeEach(() => {
-      jest.useFakeTimers()
-      jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-    })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
-      jest.useRealTimers()
     })
 
-    it('should invoke editCardStage controller when promote form is submitted', async () => {
-      ;(editCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
-      })
+    it('should show success toast after promoting stage', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/edit-stage', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: mockUserCard })
+        })
+      )
 
       let showModal
       let onClose = () => {
@@ -855,7 +785,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -864,27 +794,29 @@ describe('Manage Card Popup', () => {
 
       const promoteStageBtn = await screen.findByTestId('promote-stage-btn')
 
-      const promoteStageDTO = {
-        userId: mockUser.userId,
-        activity: 'Quran',
-        cardId: mockUserCard.cardId,
-        editData: {
-          stage: '7',
-          promote: true,
-        },
-      }
-
       await act(async () => {
         await fireEvent.click(promoteStageBtn)
       })
 
-      await expect(editCardStage).toHaveBeenCalledWith(promoteStageDTO)
+      await waitFor(() => {
+        expect(receivedBody).toEqual({
+          userId: mockUser.userId,
+          activity: 'Quran',
+          cardId: mockUserCard.cardId,
+          editData: { stage: '7', promote: true },
+        })
+        expect(toast.success).toHaveBeenCalledWith('Successfully edited status.')
+      })
     })
 
-    it('should invoke editCardStage controller when demote form is submitted', async () => {
-      ;(editCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
-      })
+    it('should show success toast after demoting stage', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/edit-stage', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: mockUserCard })
+        })
+      )
 
       let showModal
       let onClose = () => {
@@ -900,7 +832,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -909,31 +841,22 @@ describe('Manage Card Popup', () => {
 
       const demoteStageBtn = await screen.findByTestId('demote-stage-btn')
 
-      const demoteStageDTO = {
-        userId: mockUser.userId,
-        activity: 'Quran',
-        cardId: mockUserCard.cardId,
-        editData: {
-          stage: '7',
-          promote: false,
-        },
-      }
-
       await act(async () => {
         await fireEvent.click(demoteStageBtn)
       })
 
-      await expect(editCardStage).toHaveBeenCalledWith(demoteStageDTO)
+      await waitFor(() => {
+        expect(receivedBody).toEqual({
+          userId: mockUser.userId,
+          activity: 'Quran',
+          cardId: mockUserCard.cardId,
+          editData: { stage: '7', promote: false },
+        })
+        expect(toast.success).toHaveBeenCalledWith('Successfully edited status.')
+      })
     })
 
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      ;(editCardStage as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'Successfully edited status.', details: mockUserCard },
-        })
-      })
-
       let showModal
       let onClose = () => {
         showModal = false
@@ -948,7 +871,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -956,25 +879,25 @@ describe('Manage Card Popup', () => {
       )
 
       const demoteStageBtn = await screen.findByTestId('demote-stage-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(demoteStageBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Successfully edited status.')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully edited status.')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      const error = {
-        response: {
-          status: 400,
-          data: { status: 'failedTransaction', message: 'Erroneous response' },
-        },
-      }
-      ;(editCardStage as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/edit-stage', () =>
+          HttpResponse.json(
+            { status: 'failedTransaction', message: 'Erroneous response' },
+            { status: 400 }
+          )
+        )
+      )
 
       let showModal = true
       let onClose = () => {
@@ -990,7 +913,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -1002,17 +925,20 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(demoteStageBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {
-        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-      }
-      ;(editCardStage as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/edit-stage', () =>
+          HttpResponse.json(
+            { status: 'internalServerError', message: 'Server error' },
+            { status: 500 }
+          )
+        )
+      )
       let showModal = true
       let onClose = () => {
         showModal = false
@@ -1027,7 +953,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -1039,18 +965,15 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(demoteStageBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to update card status due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to update card status due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      ;(editCardStage as jest.Mock).mockImplementation(() => {
-        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-      })
+      server.use(http.post('*/user/cards/edit-stage', () => HttpResponse.error()))
 
       let showModal = true
       let onClose = () => {
@@ -1066,7 +989,7 @@ describe('Manage Card Popup', () => {
             user: myUser,
             activity: mockActivity,
             item: {
-              card: { ...mockUserCard, completionStatus: CompletionStatus.PENDING, stage: '7' },
+              card: { ...mockUserCard, completionStatus: COMPLETION_STATUS.PENDING, stage: '7' },
               action: 'edit',
             },
           }}
@@ -1078,42 +1001,27 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(demoteStageBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 
   describe('Remove card', () => {
     const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
-
-    beforeEach(() => {
-      jest.useFakeTimers()
-      jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-    })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
-      jest.useRealTimers()
     })
 
-    it('should invoke deleteCard controller when form is submitted', async () => {
-      ;(deleteCard as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: {} } })
-      })
+    it('should show success toast after deleting card', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/delete', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: {} })
+        })
+      )
 
       let showModal
       let onClose = () => {
@@ -1134,29 +1042,24 @@ describe('Manage Card Popup', () => {
       )
 
       const deleteCardBtn = await screen.findByTestId('delete-card-btn')
-      const deleteCardDTO = [
-        {
-          userId: mockUser.userId,
-          activity: mockActivity.name,
-          cardId: mockUserCard.cardId,
-        },
-      ]
 
       await act(async () => {
         await fireEvent.click(deleteCardBtn)
       })
 
-      await expect(deleteCard).toHaveBeenCalledWith(deleteCardDTO)
+      await waitFor(() => {
+        expect(receivedBody).toEqual([
+          {
+            userId: mockUser.userId,
+            activity: mockActivity.name,
+            cardId: mockUserCard.cardId,
+          },
+        ])
+        expect(toast.success).toHaveBeenCalledWith('Successfully removed card')
+      })
     })
 
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      ;(deleteCard as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'Successfully removed card.', details: {} },
-        })
-      })
-
       let showModal
       let onClose = () => {
         showModal = false
@@ -1176,25 +1079,25 @@ describe('Manage Card Popup', () => {
       )
 
       const deleteCardBtn = await screen.findByTestId('delete-card-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(deleteCardBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Successfully removed card')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully removed card')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      const error = {
-        response: {
-          status: 400,
-          data: { status: 'failedTransaction', message: 'Erroneous response' },
-        },
-      }
-      ;(deleteCard as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/delete', () =>
+          HttpResponse.json(
+            { status: 'failedTransaction', message: 'Erroneous response' },
+            { status: 400 }
+          )
+        )
+      )
 
       let showModal = true
       let onClose = () => {
@@ -1219,17 +1122,20 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(deleteCardBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {
-        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-      }
-      ;(deleteCard as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/delete', () =>
+          HttpResponse.json(
+            { status: 'internalServerError', message: 'Server error' },
+            { status: 500 }
+          )
+        )
+      )
       let showModal = true
       let onClose = () => {
         showModal = false
@@ -1253,18 +1159,15 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(deleteCardBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to remove card due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to remove card due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      ;(deleteCard as jest.Mock).mockImplementation(() => {
-        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-      })
+      server.use(http.post('*/user/cards/delete', () => HttpResponse.error()))
 
       let showModal = true
       let onClose = () => {
@@ -1289,42 +1192,27 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(deleteCardBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 
   describe('Activate card', () => {
     const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
-    beforeAll(() => {
-      Object.defineProperty(window, 'location', {
-        value: { reload: jest.fn() },
-      })
-    })
-
-    afterAll(() => {
-      window.location.reload = reload
-    })
-
-    beforeEach(() => {
-      jest.useFakeTimers()
-      jest.setSystemTime(new Date('2/3/2024'))
-      sessionStorage.setItem('user_data', JSON.stringify(myUser))
-      window.sessionStorage.setItem('user_token', 'xxxxxx')
-      window.sessionStorage.setItem('created_on', '2/3/2024')
-    })
 
     afterEach(() => {
-      sessionStorage.clear()
       jest.clearAllMocks()
-      jest.useRealTimers()
     })
 
-    it('should invoke activateCard controller when form is submitted', async () => {
-      ;(activateCard as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
-      })
+    it('should show success toast after activating card', async () => {
+      let receivedBody: any
+      server.use(
+        http.post('*/user/cards/activate', async ({ request }) => {
+          receivedBody = await request.json()
+          return HttpResponse.json({ message: null, details: {} })
+        })
+      )
 
       let showModal
       let onClose = () => {
@@ -1345,27 +1233,22 @@ describe('Manage Card Popup', () => {
       )
 
       const activateCardBtn = await screen.findByTestId('activate-card-btn')
-      const activateCardDTO = {
-        userId: mockUser.userId,
-        activity: mockActivity.name,
-        cardId: mockUserCard.cardId,
-      }
 
       await act(async () => {
         await fireEvent.click(activateCardBtn)
       })
 
-      await expect(activateCard).toHaveBeenCalledWith(activateCardDTO)
+      await waitFor(() => {
+        expect(receivedBody).toEqual({
+          userId: mockUser.userId,
+          activity: mockActivity.name,
+          cardId: mockUserCard.cardId,
+        })
+        expect(toast.success).toHaveBeenCalledWith('Successfully activated card')
+      })
     })
 
     it('should close popup when response is successful and display success message, then reset message when form in focus', async () => {
-      ;(activateCard as jest.Mock).mockImplementationOnce(() => {
-        return Promise.resolve({
-          status: 200,
-          data: { message: 'Successfully activated card.', details: {} },
-        })
-      })
-
       let showModal
       let onClose = () => {
         showModal = false
@@ -1385,25 +1268,25 @@ describe('Manage Card Popup', () => {
       )
 
       const activateCardBtn = await screen.findByTestId('activate-card-btn')
-      const submitMessage = await screen.findByTestId('status-message')
 
       await act(async () => {
         await fireEvent.click(activateCardBtn)
       })
 
-      expect(submitMessage).toHaveTextContent('Successfully activated card')
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully activated card')
+      })
     })
 
     it('should not close popup when response is not 200 or 500 and display error message', async () => {
-      const error = {
-        response: {
-          status: 400,
-          data: { status: 'failedTransaction', message: 'Erroneous response' },
-        },
-      }
-      ;(activateCard as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/activate', () =>
+          HttpResponse.json(
+            { status: 'failedTransaction', message: 'Erroneous response' },
+            { status: 400 }
+          )
+        )
+      )
 
       let showModal = true
       let onClose = () => {
@@ -1428,17 +1311,20 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(activateCardBtn)
       })
 
-      const errorMessage = await screen.findByText(/Erroneous response/i)
-      expect(errorMessage).toBeInTheDocument()
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+      })
     })
 
     it('should not close popup when response is 500 and display error message', async () => {
-      const error = {
-        response: { status: 500, data: { status: 'internalServerError', message: 'Server error' } },
-      }
-      ;(activateCard as jest.Mock).mockImplementation(() => {
-        return Promise.reject(error)
-      })
+      server.use(
+        http.post('*/user/cards/activate', () =>
+          HttpResponse.json(
+            { status: 'internalServerError', message: 'Server error' },
+            { status: 500 }
+          )
+        )
+      )
       let showModal = true
       let onClose = () => {
         showModal = false
@@ -1462,18 +1348,15 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(activateCardBtn)
       })
 
-      const errorMessage = await screen.getByText(
-        /Failed to activate card due to an internal error. Please try again later./i
-      )
-
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith(error)
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith(
+          'Failed to activate card due to an internal error. Please try again later.'
+        )
+      })
     })
 
     it('should not close popup when error is thrown with no response', async () => {
-      ;(activateCard as jest.Mock).mockImplementation(() => {
-        return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-      })
+      server.use(http.post('*/user/cards/activate', () => HttpResponse.error()))
 
       let showModal = true
       let onClose = () => {
@@ -1498,9 +1381,9 @@ describe('Manage Card Popup', () => {
         await fireEvent.click(activateCardBtn)
       })
 
-      const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-      expect(errorMessage).toBeInTheDocument()
-      expect(console.log).toHaveBeenCalledWith({ status: 500, message: 'Error thrown and caught.' })
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
+      })
     })
   })
 
@@ -1510,39 +1393,23 @@ describe('Manage Card Popup', () => {
       activities: [
         {
           ...mockActivity,
-          cards: [{ ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' }],
+          cards: [{ ...mockUserCard, completionStatus: COMPLETION_STATUS.COMPLETED, stage: '7' }],
         },
       ],
     }
     describe('Override stage', () => {
-      beforeAll(() => {
-        Object.defineProperty(window, 'location', {
-          value: { reload: jest.fn() },
-        })
-      })
-
-      afterAll(() => {
-        window.location.reload = reload
-      })
-
-      beforeEach(() => {
-        jest.useFakeTimers()
-        jest.setSystemTime(new Date('2/3/2024'))
-        sessionStorage.setItem('user_data', JSON.stringify(myUser))
-        window.sessionStorage.setItem('user_token', 'xxxxxx')
-        window.sessionStorage.setItem('created_on', '2/3/2024')
-      })
-
       afterEach(() => {
-        sessionStorage.clear()
         jest.clearAllMocks()
-        jest.useRealTimers()
       })
 
-      it('should invoke editAnyCardAttr controller when form is submitted', async () => {
-        ;(editAnyCardAttr as jest.Mock).mockImplementationOnce(() => {
-          return Promise.resolve({ status: 200, data: { message: null, details: mockUserCard } })
-        })
+      it('should show success toast after overriding student card stage', async () => {
+        let receivedBody: any
+        server.use(
+          http.post('*/user/cards/edit', async ({ request }) => {
+            receivedBody = await request.json()
+            return HttpResponse.json({ message: null, details: mockUserCard })
+          })
+        )
 
         let showModal
         let onClose = () => {
@@ -1558,7 +1425,11 @@ describe('Manage Card Popup', () => {
               user: myUser,
               activity: mockActivity,
               item: {
-                card: { ...mockUserCard, completionStatus: CompletionStatus.COMPLETED, stage: '7' },
+                card: {
+                  ...mockUserCard,
+                  completionStatus: COMPLETION_STATUS.COMPLETED,
+                  stage: '7',
+                },
                 action: 'override',
               },
             }}
@@ -1571,22 +1442,109 @@ describe('Manage Card Popup', () => {
 
         expect(stageManagementBlock).toHaveTextContent('Override current stage: 7')
 
-        const overrideStageDTO = {
-          userId: mockStudent.userId,
-          activity: 'Quran',
-          cardId: mockUserCard.cardId,
-          editData: {
-            stage: '30',
-          },
-        }
-
         await act(async () => {
           fireEvent.change(overrideStageForm, { target: { value: '30' } })
           await fireEvent.click(overrideStageBtn)
         })
 
-        await expect(editAnyCardAttr).toHaveBeenCalledWith(overrideStageDTO)
+        await waitFor(() => {
+          expect(receivedBody).toEqual({
+            userId: mockStudent.userId,
+            activity: 'Quran',
+            cardId: mockUserCard.cardId,
+            editData: { stage: '30' },
+          })
+          expect(toast.success).toHaveBeenCalledWith('Successfully overrode status.')
+        })
       })
+    })
+  })
+
+  describe('Status message reset on reopen', () => {
+    const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
+    const secondCard = {
+      ...mockUserCard,
+      cardId: `${btoa('surah-113-name-Falaq-juz-30')}`,
+    }
+
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('should clear status message when popup reopens with a different card', async () => {
+      const onClose = jest.fn()
+
+      const { rerender } = render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'edit' },
+          }}
+        />
+      )
+
+      // Perform action — toast should be called
+      const resetStageBtn = await screen.findByTestId('reset-stage-btn')
+      await act(async () => {
+        await fireEvent.click(resetStageBtn)
+      })
+
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Successfully reset card')
+      })
+
+      // Reopen popup with a different card (simulates closing + reopening)
+      rerender(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: secondCard, action: 'edit' },
+          }}
+        />
+      )
+
+      // Toast was called once (from the first action), no additional calls after reopen
+      expect(toast.success).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('Popup closes after successful card mutation', () => {
+    const myUser = { ...mockUser, activities: [{ ...mockActivity, cards: [mockUserCard] }] }
+
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('should call onClose after successful card activation', async () => {
+      const onClose = jest.fn()
+
+      render(
+        <ManageCardPopup
+          {...{
+            onClose,
+            showModal: true,
+            isMain: true,
+            user: myUser,
+            activity: mockActivity,
+            item: { card: mockUserCard, action: 'activate' },
+          }}
+        />
+      )
+
+      const activateCardBtn = await screen.findByTestId('activate-card-btn')
+      await act(async () => {
+        await fireEvent.click(activateCardBtn)
+      })
+
+      expect(onClose).toHaveBeenCalled()
     })
   })
 })

@@ -2,6 +2,8 @@
 
 All user-facing interaction paths across the app and which Cypress spec covers each one.
 
+Legend: **—** = no spec yet
+
 ---
 
 ## Auth
@@ -9,9 +11,21 @@ All user-facing interaction paths across the app and which Cypress spec covers e
 | Journey                        | Spec                  |
 | ------------------------------ | --------------------- |
 | Register new account           | `register-user.cy.ts` |
+| Register failure (duplicate)   | `register-user.cy.ts` |
 | Login                          | `login-user.cy.ts`    |
 | Login failure (wrong password) | `login-user.cy.ts`    |
 | Logout                         | `logout.cy.ts`        |
+
+---
+
+## Navigation
+
+| Journey                                                      | Spec               |
+| ------------------------------------------------------------ | ------------------ |
+| Blank / root URL redirects to `/login`                       | `navigation.cy.ts` |
+| Unauthenticated route redirects to login                     | **—**              |
+| Drawer sidebar (teacher sees students)                       | **—**              |
+| Drawer activity sub-nav (active / inactive / add hash links) | **—**              |
 
 ---
 
@@ -21,10 +35,11 @@ All user-facing interaction paths across the app and which Cypress spec covers e
 | ------------------------------------- | --------------- |
 | View profile (name, email displayed)  | `profile.cy.ts` |
 | Delete account → redirect to register | `account.cy.ts` |
+| Delete account failure (API error)    | **—**           |
 
 ---
 
-## Activities — Teacher
+## Activities — Teacher (own dashboard)
 
 | Journey                                    | Spec             |
 | ------------------------------------------ | ---------------- |
@@ -46,7 +61,7 @@ All user-facing interaction paths across the app and which Cypress spec covers e
 
 ---
 
-## Cards — Quran
+## Cards — Add (Quran)
 
 | Journey                              | Spec          |
 | ------------------------------------ | ------------- |
@@ -55,7 +70,7 @@ All user-facing interaction paths across the app and which Cypress spec covers e
 
 ---
 
-## Cards — Language (Arabic)
+## Cards — Add (Language / Arabic)
 
 | Journey                                          | Spec          |
 | ------------------------------------------------ | ------------- |
@@ -64,7 +79,7 @@ All user-facing interaction paths across the app and which Cypress spec covers e
 
 ---
 
-## Cards — Misc
+## Cards — Add (Misc)
 
 | Journey                                       | Spec          |
 | --------------------------------------------- | ------------- |
@@ -72,16 +87,18 @@ All user-facing interaction paths across the app and which Cypress spec covers e
 
 ---
 
-## Card Views & Management — Teacher
+## Card Views & Management — Teacher (own cards)
 
 | Journey                               | Spec          |
 | ------------------------------------- | ------------- |
-| View inactive cards list              | `cards.cy.ts` |
-| View active cards list                | `cards.cy.ts` |
 | View today's cards (Cards of the Day) | `cards.cy.ts` |
+| View active cards list                | `cards.cy.ts` |
+| View inactive cards list              | `cards.cy.ts` |
+| Show card details (eye icon popup)    | **—**         |
 | Activate card (inactive → active)     | `cards.cy.ts` |
 | Delete card                           | `cards.cy.ts` |
 | Promote card stage                    | `cards.cy.ts` |
+| Demote card stage                     | **—**         |
 | Reset card stage                      | `cards.cy.ts` |
 | Override card stage                   | `cards.cy.ts` |
 
@@ -105,3 +122,22 @@ All user-facing interaction paths across the app and which Cypress spec covers e
 | View linked students list        | `students.cy.ts` |
 | Navigate to student dashboard    | `students.cy.ts` |
 | Unlink (remove) a student        | `students.cy.ts` |
+
+---
+
+## Teacher Managing Student — Activities & Cards
+
+These journeys use the **student dashboard** (`/[teacher]/students/[student]/...`),
+where the teacher views and manages a student's data. They exercise the `useStudent`
+query key path, which is different from the teacher's own `useUser` path.
+
+| Journey                                           | Spec                       |
+| ------------------------------------------------- | -------------------------- |
+| View student profile from student dashboard       | **—**                      |
+| Add activity for student                          | **—**                      |
+| Delete activity for student                       | **—**                      |
+| View student's card lists (today/active/inactive) | `student-management.cy.ts` |
+| Activate student's card                           | `student-management.cy.ts` |
+| Delete student's card                             | `student-management.cy.ts` |
+| Override student's card stage                     | `student-management.cy.ts` |
+| Reset student's card stage                        | `student-management.cy.ts` |

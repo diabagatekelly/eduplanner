@@ -3,9 +3,11 @@ import { render } from '../../../util'
 import { screen, act } from '@testing-library/react'
 import * as React from 'react'
 import { mockUser, mockStudent } from '../../../../specs/mocks'
-import store from '../../../../store/store'
 import Profile from '../../../../app/[username]/profile/page'
-import { ISODateString } from '../../../../types/isoDateType'
+import { ISODateString } from '../../../../types/ISODateString'
+import { useSession } from 'next-auth/react'
+import { useUser } from '../../../../hooks/use-user'
+import { useStudent } from '../../../../hooks/use-student'
 
 jest.mock('next/navigation', () => {
   return {
@@ -17,17 +19,52 @@ jest.mock('next/navigation', () => {
     useParams: jest.fn(),
   }
 })
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(),
+}))
+jest.mock('../../../../hooks/use-user')
+jest.mock('../../../../hooks/use-student')
 
 describe('Profile', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/15/2024'))
+    ;(useStudent as jest.Mock).mockReturnValue({ data: undefined })
   })
 
   afterEach(() => {
     jest.useRealTimers()
     jest.resetAllMocks()
-    window.sessionStorage.clear()
+  })
+
+  it('should render with no session', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: null })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined })
+    const useParams = jest.spyOn(require('next/navigation'), 'useParams')
+    useParams.mockReturnValue({})
+    const { container } = render(<Profile />)
+    // Loading guard returns null when userId is missing
+    expect(container.querySelector('.py-20')!.innerHTML).toBe('')
+  })
+
+  it('should render skeleton when loading', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined, isLoading: true, isError: false })
+    const { container } = render(<Profile />)
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
+  })
+
+  it('should render error display when query fails', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error('Failed'),
+      refetch: jest.fn(),
+    })
+    render(<Profile />)
+    expect(screen.getByText('Failed to load data')).toBeInTheDocument()
   })
 
   describe('Student profiles', () => {
@@ -38,8 +75,10 @@ describe('Profile', () => {
           timeZone: 'EST',
         }) as ISODateString,
       }
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: user }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      ;(useSession as jest.Mock).mockReturnValue({
+        data: { user: { userId: user.userId, username: user.username } },
+      })
+      ;(useUser as jest.Mock).mockReturnValue({ data: user })
       const useParams = jest.spyOn(require('next/navigation'), 'useParams')
       useParams.mockReturnValue({ activity: 'Quran' })
 
@@ -65,8 +104,10 @@ describe('Profile', () => {
         }) as ISODateString,
         linkedAccountsData: { teacher: btoa('some-teacher@email.com') },
       }
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: user }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      ;(useSession as jest.Mock).mockReturnValue({
+        data: { user: { userId: user.userId, username: user.username } },
+      })
+      ;(useUser as jest.Mock).mockReturnValue({ data: user })
       const useParams = jest.spyOn(require('next/navigation'), 'useParams')
       useParams.mockReturnValue({ activity: 'Quran' })
 
@@ -93,8 +134,10 @@ describe('Profile', () => {
           timeZone: 'EST',
         }) as ISODateString,
       }
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: user }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      ;(useSession as jest.Mock).mockReturnValue({
+        data: { user: { userId: user.userId, username: user.username } },
+      })
+      ;(useUser as jest.Mock).mockReturnValue({ data: user })
       const useParams = jest.spyOn(require('next/navigation'), 'useParams')
       useParams.mockReturnValue({ activity: 'Quran' })
 
@@ -120,8 +163,10 @@ describe('Profile', () => {
         }) as ISODateString,
         linkedAccountsData: { students: [[btoa('student1@email.com'), 'student1']] },
       }
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: user }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      ;(useSession as jest.Mock).mockReturnValue({
+        data: { user: { userId: user.userId, username: user.username } },
+      })
+      ;(useUser as jest.Mock).mockReturnValue({ data: user })
       const useParams = jest.spyOn(require('next/navigation'), 'useParams')
       useParams.mockReturnValue({ activity: 'Quran' })
 
@@ -152,8 +197,10 @@ describe('Profile', () => {
           ],
         },
       }
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: user }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      ;(useSession as jest.Mock).mockReturnValue({
+        data: { user: { userId: user.userId, username: user.username } },
+      })
+      ;(useUser as jest.Mock).mockReturnValue({ data: user })
       const useParams = jest.spyOn(require('next/navigation'), 'useParams')
       useParams.mockReturnValue({ activity: 'Quran' })
 
@@ -181,18 +228,20 @@ describe('Profile', () => {
         }) as ISODateString,
         linkedAccountsData: { students: [btoa('student1@email.com'), btoa('student2@email.com')] },
       }
-      const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: user }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      ;(useSession as jest.Mock).mockReturnValue({
+        data: { user: { userId: user.userId, username: user.username } },
+      })
+      ;(useUser as jest.Mock).mockReturnValue({ data: user })
       const useParams = jest.spyOn(require('next/navigation'), 'useParams')
       useParams.mockReturnValue({ activity: 'Quran' })
 
       const profile = render(<Profile />)
       const deleteBtn = profile.container.querySelector('#delete-button') as HTMLButtonElement
-      const popup = profile.container.querySelector('#popup-modal')
 
       act(() => {
         deleteBtn.click()
       })
+      const popup = profile.container.querySelector('#popup-modal')
       expect(popup).toBeVisible()
 
       const popupClosebtn = profile.container.querySelector('#popup-close-btn') as HTMLButtonElement
@@ -201,7 +250,7 @@ describe('Profile', () => {
         popupClosebtn.click()
       })
 
-      expect(popup).not.toBeVisible()
+      expect(profile.container.querySelector('#popup-modal')).toBeNull()
     })
   })
 })

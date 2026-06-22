@@ -1,41 +1,25 @@
 import '@testing-library/jest-dom'
-import { screen, fireEvent, act } from '@testing-library/react'
+import { screen, fireEvent, act, waitFor } from '@testing-library/react'
 import { render } from '../../util'
 import * as React from 'react'
 import AddMiscCardForm from '../../../components/forms/add-misc-card-form'
 import { mockUser, mockCookingActivity, mockUserMiscCard } from '../../mocks'
-import { createCards } from '../../../api/controller'
+import { toast } from 'sonner'
+import { server } from '../../msw/server'
+import { http, HttpResponse } from 'msw'
 
-jest.mock('../../../api/controller')
+jest.mock('sonner', () => ({
+  toast: { success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() },
+}))
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn().mockResolvedValue(null),
+}))
 
 describe('Add misc card form', () => {
-  const reload = window.location.reload
-
-  beforeAll(() => {
-    Object.defineProperty(window, 'location', {
-      value: { reload: jest.fn() },
-    })
-  })
-
-  afterAll(() => {
-    window.location.reload = reload
-  })
-
   const user = { ...mockUser, activities: [{ ...mockCookingActivity }] }
 
-  beforeEach(() => {
-    jest.useFakeTimers()
-    jest.setSystemTime(new Date('2/4/2024'))
-    window.sessionStorage.setItem('user_data', JSON.stringify(user))
-    window.sessionStorage.setItem('user_token', 'xxxxxx')
-    window.sessionStorage.setItem('created_on', '2/3/2024')
-  })
-
   afterEach(() => {
-    jest.resetAllMocks()
     jest.clearAllMocks()
-    window.sessionStorage.clear()
-    jest.useRealTimers()
   })
 
   describe('Display forms', () => {
@@ -55,13 +39,12 @@ describe('Add misc card form', () => {
       )
 
       const validateTypeBoxBtn = await screen.findByTestId('add-type-cards-validate-button')
-      const outcomeMsg = await screen.findByTestId('outcome-message')
 
       await act(async () => {
         fireEvent.click(validateTypeBoxBtn)
       })
 
-      expect(outcomeMsg).toHaveTextContent('Oops, you are trying to validate an empty list')
+      expect(toast.warning).toHaveBeenCalledWith('Oops, you are trying to validate an empty list')
     })
 
     it('should allow unlimited number of cards to be created', async () => {
@@ -70,13 +53,12 @@ describe('Add misc card form', () => {
       )
 
       const textArea = (await screen.findByTestId('textarea-for-typed-list')) as HTMLTextAreaElement
-      const outcomeMsg = await screen.findByTestId('outcome-message')
 
       await act(async () => {
         await fireEvent.change(textArea, { target: { value: '1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 2' } })
       })
 
-      expect(outcomeMsg).not.toHaveTextContent('Oops, this is as long as your list can get!')
+      expect(toast.warning).not.toHaveBeenCalledWith('Oops, this is as long as your list can get!')
     })
 
     it('should open popup with expected list', async () => {
@@ -86,7 +68,6 @@ describe('Add misc card form', () => {
 
       const textArea = (await screen.findByTestId('textarea-for-typed-list')) as HTMLTextAreaElement
       const validateTypeBoxBtn = await screen.findByTestId('add-type-cards-validate-button')
-      const outcomeMsg = await screen.findByTestId('outcome-message')
 
       await act(async () => {
         await fireEvent.change(textArea, { target: { value: '1, 2 , 3, 4, 5, , 7' } })
@@ -102,14 +83,16 @@ describe('Add misc card form', () => {
         await fireEvent.click(closeBtn)
       })
 
-      await expect(screen.queryByTestId('validate-popup')).toHaveAttribute('hidden')
-      expect(outcomeMsg).toHaveTextContent('Validation canceled.')
+      await expect(screen.queryByTestId('validate-popup')).toBeNull()
+      expect(toast.info).toHaveBeenCalledWith('Validation canceled.')
     })
 
     describe('Submitting', () => {
       it('should submit with expected list', async () => {
-        ;(createCards as jest.Mock).mockImplementation(() =>
-          Promise.resolve({ status: 200, data: { message: 'Cards added', details: [] } })
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json({ message: 'Cards added', details: [] })
+          )
         )
         render(
           <AddMiscCardForm {...{ isMain: true, user: mockUser, activity: mockCookingActivity }} />
@@ -131,29 +114,21 @@ describe('Add misc card form', () => {
           await fireEvent.click(popupYesBtn)
         })
 
-        const expectedCardsPayload = [
-          { ...mockUserMiscCard, cardId: `${btoa('misc-card-cook an egg')}` },
-          { ...mockUserMiscCard, cardId: `${btoa('misc-card-make your bed')}` },
-        ]
-
-        expect(createCards).toHaveBeenCalledWith({
-          userId: mockUser.userId,
-          activity: mockCookingActivity.name,
-          cards: expectedCardsPayload,
+        await waitFor(() => {
+          expect(toast.success).toHaveBeenCalledWith('Cards added')
         })
+        expect(screen.queryByTestId('validate-popup')).toBeNull()
       })
 
       it('should not reset form when response is not 200 or 500 and display error message', async () => {
-        jest.spyOn(console, 'log').mockImplementation(() => null)
-        const error = {
-          response: {
-            status: 400,
-            data: { status: 'failedTransaction', message: 'Erroneous response' },
-          },
-        }
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject(error)
-        })
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json(
+              { status: 'failedTransaction', message: 'Erroneous response' },
+              { status: 400 }
+            )
+          )
+        )
 
         render(
           <AddMiscCardForm {...{ isMain: true, user: mockUser, activity: mockCookingActivity }} />
@@ -175,20 +150,20 @@ describe('Add misc card form', () => {
           await fireEvent.click(popupYesBtn)
         })
 
-        const errorMessage = await screen.findByText(/Erroneous response/i)
-        expect(errorMessage).toBeInTheDocument()
+        await waitFor(() => {
+          expect(toast.error).toHaveBeenCalledWith('Erroneous response')
+        })
       })
 
       it('should not reset form when response is 500 and display error message', async () => {
-        const error = {
-          response: {
-            status: 500,
-            data: { status: 'internalServerError', message: 'Server error' },
-          },
-        }
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject(error)
-        })
+        server.use(
+          http.post('*/user/cards/add', () =>
+            HttpResponse.json(
+              { status: 'internalServerError', message: 'Server error' },
+              { status: 500 }
+            )
+          )
+        )
 
         render(
           <AddMiscCardForm {...{ isMain: true, user: mockUser, activity: mockCookingActivity }} />
@@ -210,18 +185,15 @@ describe('Add misc card form', () => {
           await fireEvent.click(popupYesBtn)
         })
 
-        const errorMessage = await screen.getByText(
-          /Failed to add cards due to an internal error. Please try again later./i
-        )
-
-        expect(errorMessage).toBeInTheDocument()
-        expect(console.log).toHaveBeenCalledWith(error)
+        await waitFor(() => {
+          expect(toast.error).toHaveBeenCalledWith(
+            'Failed to add cards due to an internal error. Please try again later.'
+          )
+        })
       })
 
       it('should not reset form when error is thrown with no response', async () => {
-        ;(createCards as jest.Mock).mockImplementationOnce(() => {
-          return Promise.reject({ status: 500, message: 'Error thrown and caught.' })
-        })
+        server.use(http.post('*/user/cards/add', () => HttpResponse.error()))
 
         render(
           <AddMiscCardForm {...{ isMain: true, user: mockUser, activity: mockCookingActivity }} />
@@ -243,11 +215,8 @@ describe('Add misc card form', () => {
           await fireEvent.click(popupYesBtn)
         })
 
-        const errorMessage = await screen.getByText(/Server is down. Try again later./i)
-        expect(errorMessage).toBeInTheDocument()
-        expect(console.log).toHaveBeenCalledWith({
-          status: 500,
-          message: 'Error thrown and caught.',
+        await waitFor(() => {
+          expect(toast.error).toHaveBeenCalledWith('Server is down. Try again later.')
         })
       })
     })

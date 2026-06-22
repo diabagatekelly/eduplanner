@@ -7,7 +7,7 @@ import AddQuranCardForm from '../forms/add-quran-card-form'
 import { IUser } from '@/types/IUser'
 import { IActivity } from '@/types/IActivity'
 import AddLanguageCardForm from '../forms/add-language-card-form'
-import { ACTIVITY_TYPES } from '@/lib/constants/activityTypes'
+import { ACTIVITY_TYPES } from '@/lib/constants/activity-types'
 
 export default function AddCard({
   isMain,

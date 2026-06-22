@@ -1,27 +1,16 @@
 import { mockUser, mockStudent } from '../../src/specs/mocks'
 import { IUser } from '../../src/types/IUser'
-import { ISODateString } from '../../src/types/isoDateType'
+import { ISODateString } from '../../src/types/ISODateString'
 
 describe('Students Page', () => {
-  const loginUrl = `${Cypress.env('LOGIN_USER_URL')}?userId=bW9jay51c2VyQGVtYWlsLmNvbQ%3D%3D&password=password`
-
   describe('No students yet', () => {
     const user: IUser = { ...mockUser, lastLogin: mockUser.lastLogin as ISODateString }
 
     beforeEach(() => {
-      cy.intercept(loginUrl, {
-        statusCode: 200,
-        body: {
-          status: 'success',
-          message: 'User found',
-          details: { token: 'xxxxxx', user },
-        },
-      })
+      cy.loginBySession(user)
     })
 
     it('should show empty state when teacher has no students', () => {
-      cy.login({ email: user.email, password: user.password })
-      cy.wait(100)
       cy.contains('Manage Students').click()
       cy.url().should('include', '/students')
       cy.get('[data-testid="no-students-message"]').should('exist')
@@ -33,25 +22,20 @@ describe('Students Page', () => {
     const student: IUser = { ...mockStudent, lastLogin: mockStudent.lastLogin as ISODateString }
 
     beforeEach(() => {
-      cy.intercept(loginUrl, {
-        statusCode: 200,
-        body: {
-          status: 'success',
-          message: 'User found',
-          details: { token: 'xxxxxx', user },
-        },
-      })
-      cy.intercept(
-        { method: 'GET', url: `${Cypress.env('GET_USER_URL')}*` },
-        {
-          statusCode: 200,
-          body: {
-            status: 'success',
-            message: 'User found.',
-            details: { student },
-          },
+      cy.loginBySession(user)
+      cy.intercept('GET', `${Cypress.env('GET_USER_URL')}*`, (req) => {
+        const url = new URL(req.url)
+        if (url.searchParams.get('userId') === student.userId) {
+          req.reply({
+            statusCode: 200,
+            body: {
+              status: 'success',
+              message: 'User found.',
+              details: { student },
+            },
+          })
         }
-      ).as('findUser')
+      }).as('findUser')
       cy.intercept(Cypress.env('LINK_ACCOUNT_URL'), {
         statusCode: 200,
         body: { status: 'success', message: 'Accounts linked.' },
@@ -59,8 +43,6 @@ describe('Students Page', () => {
     })
 
     it('should find student by email, open link popup, and confirm link', () => {
-      cy.login({ email: user.email, password: user.password })
-      cy.wait(100)
       cy.contains('Manage Students').click()
       cy.url().should('include', '/students')
       cy.get('[data-testid="student-email"]').type(student.email)
@@ -83,19 +65,10 @@ describe('Students Page', () => {
     }
 
     beforeEach(() => {
-      cy.intercept(loginUrl, {
-        statusCode: 200,
-        body: {
-          status: 'success',
-          message: 'User found',
-          details: { token: 'xxxxxx', user: userWithStudent },
-        },
-      })
+      cy.loginBySession(userWithStudent)
     })
 
     it('should display linked student in the students list', () => {
-      cy.login({ email: userWithStudent.email, password: userWithStudent.password })
-      cy.wait(100)
       cy.contains('Manage Students').click()
       cy.url().should('include', '/students')
       cy.get('[data-testid="students-list"]').should('exist')
@@ -113,32 +86,25 @@ describe('Students Page', () => {
     }
 
     beforeEach(() => {
-      cy.intercept(loginUrl, {
-        statusCode: 200,
-        body: {
-          status: 'success',
-          message: 'User found',
-          details: { token: 'xxxxxx', user: userWithStudent },
-        },
-      })
-      cy.intercept(
-        { method: 'GET', url: `${Cypress.env('GET_USER_URL')}*` },
-        {
-          statusCode: 200,
-          body: {
-            status: 'success',
-            message: 'User found.',
-            details: {
-              student: { ...mockStudent, lastLogin: mockStudent.lastLogin as ISODateString },
+      cy.loginBySession(userWithStudent)
+      cy.intercept('GET', `${Cypress.env('GET_USER_URL')}*`, (req) => {
+        const url = new URL(req.url)
+        if (url.searchParams.get('userId') === mockStudent.userId) {
+          req.reply({
+            statusCode: 200,
+            body: {
+              status: 'success',
+              message: 'User found.',
+              details: {
+                student: { ...mockStudent, lastLogin: mockStudent.lastLogin as ISODateString },
+              },
             },
-          },
+          })
         }
-      ).as('findStudent')
+      }).as('findStudent')
     })
 
     it('should navigate to student dashboard when teacher clicks student name', () => {
-      cy.login({ email: userWithStudent.email, password: userWithStudent.password })
-      cy.wait(100)
       cy.contains('Manage Students').click()
       cy.url().should('include', '/students')
       cy.get('[data-testid="students-email"]').first().click()
@@ -157,14 +123,7 @@ describe('Students Page', () => {
     }
 
     beforeEach(() => {
-      cy.intercept(loginUrl, {
-        statusCode: 200,
-        body: {
-          status: 'success',
-          message: 'User found',
-          details: { token: 'xxxxxx', user: userWithStudent },
-        },
-      })
+      cy.loginBySession(userWithStudent)
       cy.intercept(
         { method: 'DELETE', url: `${Cypress.env('UNLINK_ACCOUNT_URL')}/**` },
         {
@@ -175,8 +134,6 @@ describe('Students Page', () => {
     })
 
     it('should open unlink popup and call unlink API on confirm', () => {
-      cy.login({ email: userWithStudent.email, password: userWithStudent.password })
-      cy.wait(100)
       cy.contains('Manage Students').click()
       cy.url().should('include', '/students')
       cy.get('[data-testid="student-list-delete"]').first().click()

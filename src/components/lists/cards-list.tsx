@@ -1,15 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Popup from '../popups/popup'
+import { useState } from 'react'
+import Popup, { CardAction } from '../popups/popup'
 import { ICard } from '@/types/ICard'
 import { IUser } from '@/types/IUser'
-import { CompletionStatus } from '@/types/CompletionStatusEnum'
 import AddCard from '../cards/add-card'
 import { IActivity } from '@/types/IActivity'
 import { useMounted } from '@/lib/helpers/useMounted'
 import { getBorderColor } from '@/lib/helpers/getBorderColor'
 import formatCardName from '@/lib/helpers/formatCardName'
+import { useCardFiltering } from '@/hooks/use-card-filtering'
 import {
   DocumentMinusIcon,
   DocumentPlusIcon,
@@ -28,115 +28,18 @@ export default function CardsList({
   activity?: IActivity
 }) {
   const mounted = useMounted()
+  const { cardsOfTheDay, allActiveCards, allInactiveCards, hash } = useCardFiltering(
+    activity,
+    mounted
+  )
 
   const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState('')
-  const [popupItem, getPopupItem] = useState<{ card: ICard; action: string }>(
-    {} as { card: ICard; action: string }
+  const [popupItem, setPopupItem] = useState<{ card: ICard; action: CardAction }>(
+    {} as { card: ICard; action: CardAction }
   )
-  const [popupUserDetails, getPopupUserDetails] = useState<IUser>({} as IUser)
-  const [cardsOfTheDay, getCardsOfTheDay] = useState<ICard[]>([])
-  const [allActiveCards, getAllActiveCards] = useState<ICard[]>([])
-  const [allInactiveCards, getAllInactiveCards] = useState<ICard[]>([])
-  const [hash, getHash] = useState('')
 
-  useEffect(() => {
-    const cards: any[] | ICard = activity?.cards || []
-
-    if (cards.length) {
-      //if (cards[0].activity === 'Quran') {
-      //sortQuranCards(cards)
-      //}
-      cards.map((card) => {
-        // console.log(atob(card.cardId).split('-'))
-        // const cardType = atob(card.cardId).split('-')[0]
-        let num = `${atob(card.cardId).split('-')[1]}`
-        if (num.length === 1) {
-          card.number = `00${num}`
-        } else if (num.length === 2) {
-          card.number = `0${num}`
-        } else {
-          card.number = `${num}`
-        }
-      })
-      cards.sort((a, b) => a.number - b.number)
-      cards.map((card) => delete card.number)
-    }
-
-    const todayCards = cards?.filter((card) => {
-      return (
-        card.completionStatus === CompletionStatus.REVIEW ||
-        (card.completionStatus !== CompletionStatus.INACTIVE &&
-          card.completionStatus !== CompletionStatus.COMPLETED &&
-          (new Date().toLocaleDateString('en-US', { timeZone: 'EST' }) === card.nextShowDate ||
-            new Date().toLocaleDateString('en-US', { timeZone: 'EST' }) === card.addedOn))
-      )
-    })
-    getCardsOfTheDay(todayCards)
-
-    const activeCards = cards?.filter((card) => card.completionStatus !== CompletionStatus.INACTIVE)
-    getAllActiveCards(activeCards)
-
-    const inactiveCards = cards?.filter(
-      (card) => card.completionStatus === CompletionStatus.INACTIVE
-    )
-    getAllInactiveCards(inactiveCards)
-
-    if (mounted) {
-      const hashReducer = window.location.hash
-      getHash(hashReducer)
-    }
-  }, [userDetails, activity, mounted])
-
-  // function sortQuranCards(cards) {
-  //   cards.map(card => {
-  //     console.log(atob(card.cardId).split('-'))
-  //     const cardType = atob(card.cardId).split('-')[0]
-  //     let num = `${atob(card.cardId).split('-')[1]}`
-  //     if (num.length === 1) {
-  //       card.number = `00${num}`
-  //     } else if (num.length === 2) {
-  //       card.number = `0${num}`
-  //     } else {
-  //       card.number = `${num}`
-  //     }
-  //   });
-  //   cards.sort((a, b) => a.number - b.number);
-  //   cards.map((card) => delete card.number);
-  // }
-
-  function deleteCard(card: ICard) {
-    getPopupItem({ card, action: 'delete' })
-    getPopupUserDetails(userDetails)
-    setModalType('manageCard')
-    setShowModal(true)
-  }
-
-  function activateCard(card: ICard) {
-    getPopupItem({ card, action: 'activate' })
-    getPopupUserDetails(userDetails)
-    setModalType('manageCard')
-    setShowModal(true)
-  }
-
-  function editCard(card: ICard) {
-    getPopupItem({ card, action: 'edit' })
-    getPopupUserDetails(userDetails)
-    setModalType('manageCard')
-    setShowModal(true)
-  }
-
-  function showCard(card: ICard) {
-    getPopupItem({ card, action: 'show' })
-    getPopupUserDetails(userDetails)
-    setModalType('manageCard')
-    setShowModal(true)
-  }
-
-  function overrideStage(card: ICard) {
-    getPopupItem({ card, action: 'override' })
-    getPopupUserDetails(userDetails)
-    setModalType('manageCard')
+  function openCardPopup(card: ICard, action: CardAction) {
+    setPopupItem({ card, action })
     setShowModal(true)
   }
 
@@ -163,7 +66,7 @@ export default function CardsList({
                     <span
                       data-testid="today-card-show-btn"
                       className="hover:cursor-pointer mx-2"
-                      onClick={() => showCard(card)}
+                      onClick={() => openCardPopup(card, 'show')}
                     >
                       <EyeIcon
                         title="Show today's card"
@@ -178,7 +81,7 @@ export default function CardsList({
                     <span
                       data-testid="today-card-edit-btn"
                       className="hover:cursor-pointer mx-2"
-                      onClick={() => editCard(card)}
+                      onClick={() => openCardPopup(card, 'edit')}
                     >
                       <PencilSquareIcon
                         title="Edit today's card"
@@ -197,7 +100,7 @@ export default function CardsList({
                           ? 'hover:cursor-pointer mx-2'
                           : 'hidden'
                       }
-                      onClick={() => deleteCard(card)}
+                      onClick={() => openCardPopup(card, 'delete')}
                     >
                       <TrashIcon
                         title="Delete card of the day"
@@ -239,7 +142,7 @@ export default function CardsList({
                     <span
                       data-testid="active-card-show-btn"
                       className="hover:cursor-pointer mx-2"
-                      onClick={() => showCard(card)}
+                      onClick={() => openCardPopup(card, 'show')}
                     >
                       <EyeIcon
                         title="Show active card"
@@ -258,7 +161,7 @@ export default function CardsList({
                           ? 'hover:cursor-pointer mx-2'
                           : 'hidden'
                       }
-                      onClick={() => overrideStage(card)}
+                      onClick={() => openCardPopup(card, 'override')}
                     >
                       <DocumentMinusIcon
                         title="Override active card stage"
@@ -277,7 +180,7 @@ export default function CardsList({
                           ? 'hover:cursor-pointer mx-2'
                           : 'hidden'
                       }
-                      onClick={() => deleteCard(card)}
+                      onClick={() => openCardPopup(card, 'delete')}
                     >
                       <TrashIcon
                         title="Delete active card"
@@ -319,7 +222,7 @@ export default function CardsList({
                     <span
                       data-testid="inactive-card-show-btn"
                       className="hover:cursor-pointer mx-2"
-                      onClick={() => showCard(card)}
+                      onClick={() => openCardPopup(card, 'show')}
                     >
                       <EyeIcon
                         title="Show inactive card"
@@ -338,7 +241,7 @@ export default function CardsList({
                           ? 'hover:cursor-pointer mx-2'
                           : 'hidden'
                       }
-                      onClick={() => activateCard(card)}
+                      onClick={() => openCardPopup(card, 'activate')}
                     >
                       <DocumentPlusIcon
                         title="Activate inactive card"
@@ -357,7 +260,7 @@ export default function CardsList({
                           ? 'hover:cursor-pointer mx-2'
                           : 'hidden'
                       }
-                      onClick={() => deleteCard(card)}
+                      onClick={() => openCardPopup(card, 'delete')}
                     >
                       <TrashIcon
                         title="Delete inactive card"
@@ -379,17 +282,19 @@ export default function CardsList({
 
       {hash === '#add' && <AddCard {...{ isMain, userDetails, activity: activity! }} />}
 
-      <Popup
-        {...{
-          showModal,
-          modalType,
-          isMain,
-          user: popupUserDetails,
-          activity: activity,
-          item: popupItem,
-        }}
-        onClose={() => setShowModal(false)}
-      />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{
+            type: 'manageCard',
+            isMain,
+            user: userDetails,
+            activity: activity!,
+            item: popupItem,
+          }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   )
 }

@@ -1,6 +1,6 @@
-import { CompletionStatus } from './CompletionStatusEnum'
+import { CompletionStatus } from '@/lib/constants/completion-status'
 import { ICard } from './ICard'
-import { ISODateString } from './isoDateType'
+import { ISODateString } from './ISODateString'
 
 export interface IActivity {
   activityId: string // btoa(userEmail-activityName)
@@ -13,8 +13,3 @@ export interface IActivity {
   lastUpdatedOn: ISODateString | null
   cards?: ICard[] | []
 }
-
-export type IActivityFormData = Omit<
-  IActivity,
-  'activityId' | 'completionStatus' | 'createdOn' | 'lastUpdatedOn' | 'cards'
->

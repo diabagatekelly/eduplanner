@@ -5,7 +5,9 @@ import { render } from '../util'
 import * as React from 'react'
 import Dashboard from '../../components/dashboard'
 import { mockUser, mockActivity, mockStudent, mockLanguageActivity } from '../mocks'
-import store from '../../store/store'
+import { useSession } from 'next-auth/react'
+import { useUser } from '../../hooks/use-user'
+import { useStudent } from '../../hooks/use-student'
 
 jest.mock('next/navigation', () => {
   return {
@@ -21,11 +23,33 @@ jest.mock('next/navigation', () => {
     }),
   }
 })
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(),
+}))
+jest.mock('../../hooks/use-user')
+jest.mock('../../hooks/use-student')
 
 describe('Nested layout', () => {
   afterEach(() => {
     global.window.innerWidth = 1200
     jest.clearAllMocks()
+  })
+
+  it('should render with no session', () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: null })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined })
+    ;(useStudent as jest.Mock).mockReturnValue({ data: undefined })
+    render(
+      <NestedLayout
+        {...{
+          children: <div>test</div>,
+          isTeacher: false,
+        }}
+      />
+    )
+    // Loading guard renders minimal wrapper without drawer when userId is missing
+    expect(screen.queryByTestId('drawer-button')).not.toBeInTheDocument()
+    expect(screen.getByText('test')).toBeInTheDocument()
   })
 
   it('should toggle drawer as expected and highlight Manage Students', async () => {
@@ -34,8 +58,11 @@ describe('Nested layout', () => {
       .spyOn(require('next/navigation'), 'usePathname')
       .mockImplementation(() => '/mock-user/students')
     const userDetails = { ...mockUser, activities: [mockActivity] }
-    const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: userDetails }
-    jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+    ;(useSession as jest.Mock).mockReturnValue({
+      data: { user: { userId: mockUser.userId, username: mockUser.username } },
+    })
+    ;(useUser as jest.Mock).mockReturnValue({ data: userDetails })
+    ;(useStudent as jest.Mock).mockReturnValue({ data: undefined })
     render(
       <NestedLayout
         {...{
@@ -77,8 +104,11 @@ describe('Nested layout', () => {
     jest.spyOn(require('next/navigation'), 'usePathname').mockImplementation(() => '/mock-user')
 
     const userDetails = { ...mockUser, activities: [mockActivity] }
-    const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: userDetails }
-    jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+    ;(useSession as jest.Mock).mockReturnValue({
+      data: { user: { userId: mockUser.userId, username: mockUser.username } },
+    })
+    ;(useUser as jest.Mock).mockReturnValue({ data: userDetails })
+    ;(useStudent as jest.Mock).mockReturnValue({ data: undefined })
     render(
       <NestedLayout
         {...{
@@ -105,8 +135,11 @@ describe('Nested layout', () => {
       return { activity: 'Quran', student: undefined }
     })
     const userDetails = { ...mockUser, activities: [{ ...mockActivity, hasCards: true }] }
-    const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: userDetails }
-    jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+    ;(useSession as jest.Mock).mockReturnValue({
+      data: { user: { userId: mockUser.userId, username: mockUser.username } },
+    })
+    ;(useUser as jest.Mock).mockReturnValue({ data: userDetails })
+    ;(useStudent as jest.Mock).mockReturnValue({ data: undefined })
     render(
       <NestedLayout
         {...{
@@ -120,29 +153,35 @@ describe('Nested layout', () => {
     expect(cardSubmenu).toHaveTextContent('Cards')
   })
 
-  it('should display cards submenu for main user', async () => {
+  it('should display cards submenu for student page', async () => {
     jest
       .spyOn(require('next/navigation'), 'usePathname')
       .mockImplementation(() => '/mock-user/students/mock-student/activities/Arabic-Language')
     jest.spyOn(require('next/navigation'), 'useParams').mockImplementation(() => {
       return { activity: 'Arabic-Language', student: 'mock-student' }
     })
-    const userDetails = {
+    const studentWithCards = {
+      ...mockStudent,
+      activities: [{ ...mockLanguageActivity, hasCards: true }],
+    }
+    const teacherDetails = {
       ...mockUser,
-      students: {
-        'mock-student': {
-          ...mockStudent,
-          activities: [{ ...mockLanguageActivity, hasCards: true }],
-        },
+      linkedAccountsData: {
+        students: [[mockStudent.userId, mockStudent.username]],
       },
       activities: [{ ...mockActivity }],
     }
-    const mockStoreState = { authReducer: { isAuthenticated: true }, userReducer: userDetails }
-    jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+    ;(useSession as jest.Mock).mockReturnValue({
+      data: { user: { userId: mockUser.userId, username: mockUser.username } },
+    })
+    ;(useUser as jest.Mock).mockReturnValue({ data: teacherDetails })
+    ;(useStudent as jest.Mock).mockReturnValue({ data: studentWithCards })
     render(
       <NestedLayout
         {...{
-          children: <Dashboard {...{ userDetails, isMain: false, isTeacher: false }} />,
+          children: (
+            <Dashboard {...{ userDetails: studentWithCards, isMain: false, isTeacher: false }} />
+          ),
           isTeacher: false,
         }}
       />
@@ -150,5 +189,35 @@ describe('Nested layout', () => {
 
     const cardSubmenu = document.querySelectorAll('.menu-item-cards')[0] as Element
     expect(cardSubmenu).toHaveTextContent('Cards')
+  })
+
+  it('should not render cards submenu when student route has no matching linked student', async () => {
+    jest
+      .spyOn(require('next/navigation'), 'usePathname')
+      .mockImplementation(() => '/mock-user/students/unknown-student/activities/Arabic-Language')
+    jest.spyOn(require('next/navigation'), 'useParams').mockImplementation(() => {
+      return { activity: 'Arabic-Language', student: 'unknown-student' }
+    })
+    const teacherDetails = {
+      ...mockUser,
+      linkedAccountsData: { students: [] },
+      activities: [{ ...mockActivity }],
+    }
+    ;(useSession as jest.Mock).mockReturnValue({
+      data: { user: { userId: mockUser.userId, username: mockUser.username } },
+    })
+    ;(useUser as jest.Mock).mockReturnValue({ data: teacherDetails })
+    ;(useStudent as jest.Mock).mockReturnValue({ data: undefined })
+    render(
+      <NestedLayout
+        {...{
+          children: <div>Content</div>,
+          isTeacher: true,
+        }}
+      />
+    )
+
+    const cardSubmenu = document.querySelectorAll('.menu-item-cards')[0]
+    expect(cardSubmenu).toBeUndefined()
   })
 })

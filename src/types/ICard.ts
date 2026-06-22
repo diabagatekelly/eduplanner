@@ -1,7 +1,7 @@
-import { CompletionStatus } from './CompletionStatusEnum'
-import { ISODateString } from './isoDateType'
-import type { CardActivityType } from '@/lib/constants/cardTypes'
-export type { CardActivityType } from '@/lib/constants/cardTypes'
+import { CompletionStatus } from '@/lib/constants/completion-status'
+import { ISODateString } from './ISODateString'
+import type { CardActivityType } from '@/lib/constants/card-types'
+export type { CardActivityType } from '@/lib/constants/card-types'
 
 export interface ICard {
   cardId: string

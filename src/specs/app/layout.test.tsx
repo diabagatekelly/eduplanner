@@ -1,9 +1,18 @@
-import RootLayout from '../../app/layout'
+import RootLayout, { metadata } from '../../app/layout'
 import Home from '../../app/home/page'
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import * as React from 'react'
 import { act } from 'react'
+
+jest.mock('../../auth', () => ({
+  auth: jest.fn().mockResolvedValue(null),
+}))
+
+jest.mock('../../app/providers', () => ({
+  __esModule: true,
+  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}))
 
 jest.mock('next/navigation', () => {
   return {
@@ -21,10 +30,15 @@ describe('Root layout', () => {
     jest.clearAllMocks()
   })
 
+  it('should export metadata with title and description', () => {
+    expect(metadata.title).toBe('EduPlanner — Education Planning & Tracking')
+    expect(metadata.description).toContain('EduPlanner')
+  })
+
   it('should render as expected', async () => {
     jest.spyOn(console, 'error').mockImplementation(() => null)
     await act(async () => {
-      render(<RootLayout {...{ children: <Home /> }} />)
+      render(await RootLayout({ children: <Home /> }))
     })
     expect(await screen.findByTestId('home')).toBeInTheDocument()
   })

@@ -1,39 +1,32 @@
-import { FormEvent } from 'react'
-import { IActivityFormData } from '../../types/IActivity'
+import { UseFormRegister, FieldErrors } from 'react-hook-form'
+import { ActivityFormData } from '@/lib/schemas/activity.schemas'
 
 export default function AddActivityForm({
-  handleInput,
-  formData,
-  isLoading,
-  submitForm,
+  register,
+  errors,
+  isSubmitting,
+  onSubmit,
 }: {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
-  formData: IActivityFormData
-  isLoading: boolean
-  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
+  register: UseFormRegister<ActivityFormData>
+  errors: FieldErrors<ActivityFormData>
+  isSubmitting: boolean
+  onSubmit: () => void
 }) {
   return (
     <>
-      <form
-        data-testid="add-activity-form"
-        className="space-y-6"
-        onSubmit={submitForm}
-        method="POST"
-      >
+      <form data-testid="add-activity-form" className="space-y-6" onSubmit={onSubmit}>
         <span className="inline-block w-auto mr-2">
           <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">
             Name:
           </label>
           <input
-            onChange={handleInput}
-            value={formData.name}
+            {...register('name')}
             id="name"
-            name="name"
             type="text"
             autoComplete="name"
-            required
             className="inline-block  rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
+          {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
         </span>
 
         <span className="inline-block w-auto mr-2">
@@ -44,10 +37,8 @@ export default function AddActivityForm({
             Description (optional):
           </label>
           <input
-            onChange={handleInput}
-            value={formData.description}
+            {...register('description')}
             id="description"
-            name="description"
             type="text"
             autoComplete="description"
             className="inline-block  rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -59,10 +50,8 @@ export default function AddActivityForm({
             Points (optional):
           </label>
           <input
-            onChange={handleInput}
-            value={formData.points}
+            {...register('points', { valueAsNumber: true })}
             id="points"
-            name="points"
             type="number"
             className="inline-block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
@@ -71,12 +60,18 @@ export default function AddActivityForm({
         <fieldset>
           <legend>Has cards?:</legend>
           <div>
-            <input type="radio" id="yesDecks" name="hasCards" value="true" />
+            <input {...register('hasCards')} type="radio" id="yesDecks" value="true" />
             <label htmlFor="yesDecks">Yes</label>
           </div>
 
           <div>
-            <input type="radio" id="noDecks" name="hasCards" value="false" defaultChecked />
+            <input
+              {...register('hasCards')}
+              type="radio"
+              id="noDecks"
+              value="false"
+              defaultChecked
+            />
             <label htmlFor="noDecks">No</label>
           </div>
         </fieldset>
@@ -85,7 +80,7 @@ export default function AddActivityForm({
           <button
             data-testid="add-activity-btn"
             type="submit"
-            disabled={isLoading}
+            disabled={isSubmitting}
             className="default-btn"
           >
             Add activity

@@ -1,23 +1,18 @@
 'use client'
 
-import { useState } from 'react'
-import { editActivity, requestCardReview } from '../../api/controller'
-import { useAppDispatch } from '@/store/hooks'
-import { editUserActivity } from '../../store/actions/userActions'
+import { useEditActivity } from '@/hooks/use-activity-mutations'
+import { useRequestCardReview } from '@/hooks/use-card-mutations'
 import ListUi from '@/components/lists/lists-ui'
-import { CompletionStatus } from '../../types/CompletionStatusEnum'
+import { CompletionStatus, COMPLETION_STATUS } from '@/lib/constants/completion-status'
 import { IActivity } from '@/types/IActivity'
 import { IUser } from '@/types/IUser'
-import { ISODateString } from '@/types/isoDateType'
-import { IResponse } from '@/types/IApiResponse'
+import { ISODateString } from '@/types/ISODateString'
 import { ICard } from '@/types/ICard'
 import { fromDbFormat } from '@/lib/helpers/formatActivityName'
+import { toast } from 'sonner'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
-interface IViewActivity {
-  submit: () => Promise<void>
-}
-
-export default function ViewActivity<IViewActivity>({
+export default function ViewActivity({
   userDetails,
   userActivity,
   isMain,
@@ -26,20 +21,18 @@ export default function ViewActivity<IViewActivity>({
   userActivity: IActivity
   isMain: boolean
 }) {
-  const dispatch = useAppDispatch()
-  let args
-
-  const [isLoading, setIsLoading] = useState(false)
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
+  const editActivityMutation = useEditActivity(userDetails.userId)
+  const requestReviewMutation = useRequestCardReview()
 
   async function submit(): Promise<void> {
     if (
       userActivity.cards?.some(
         (card: ICard) =>
-          ![CompletionStatus.COMPLETED, CompletionStatus.INACTIVE].includes(card.completionStatus)
+          card.completionStatus !== COMPLETION_STATUS.COMPLETED &&
+          card.completionStatus !== COMPLETION_STATUS.INACTIVE
       )
     ) {
-      setFormSubmitOutcomeMessage('You still have some cards to complete!!')
+      toast.warning('You still have some cards to complete!!')
       return
     }
 
@@ -62,46 +55,21 @@ export default function ViewActivity<IViewActivity>({
         },
       }
 
-      await requestCardReview(requestReview)
+      await requestReviewMutation.mutateAsync(requestReview)
 
       const updatedActivity: IActivity = {
         ...userActivity,
         lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {
           timeZone: 'EST',
         }) as ISODateString,
-        completionStatus: CompletionStatus.REVIEW,
+        completionStatus: COMPLETION_STATUS.REVIEW,
       }
 
-      const response = (await editActivity({
-        userId: userDetails.userId,
-        updatedActivity,
-      })) as unknown as IResponse<IActivity>
-      const { data } = response
-      const { message, details }: { message: string; details: IActivity } = data
-      dispatch(editUserActivity({ username: userDetails.username, updatedActivity: details }))
+      await editActivityMutation.mutateAsync(updatedActivity)
 
-      setIsLoading(false)
-
-      setFormSubmitOutcomeMessage('Request for review successfully sent.')
-      window.location.reload()
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setFormSubmitOutcomeMessage(
-          'Failed to request review due to an internal error. Please try again later.'
-        )
-      } else {
-        setFormSubmitOutcomeMessage(data.message)
-      }
+      toast.success('Request for review successfully sent.')
+    } catch (error: unknown) {
+      handleMutationError(error, 'request review')
     }
   }
 
@@ -112,36 +80,13 @@ export default function ViewActivity<IViewActivity>({
         lastUpdatedOn: new Date(Date.now()).toLocaleDateString('en-US', {
           timeZone: 'EST',
         }) as ISODateString,
-        completionStatus: CompletionStatus.COMPLETED,
+        completionStatus: COMPLETION_STATUS.COMPLETED,
       }
 
-      const response = (await editActivity({
-        userId: userDetails.userId,
-        updatedActivity,
-      })) as unknown as IResponse<IActivity>
-      const { data } = response
-      const { message, details }: { message: string; details: IActivity } = data
-      dispatch(editUserActivity({ username: userDetails.username, updatedActivity: details }))
-      setFormSubmitOutcomeMessage(message)
-      window.location.reload()
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setFormSubmitOutcomeMessage(
-          'Failed to edit activity due to an internal error. Please try again later.'
-        )
-      } else {
-        setFormSubmitOutcomeMessage(data.message)
-      }
+      const response = await editActivityMutation.mutateAsync(updatedActivity)
+      toast.success(response.data.message)
+    } catch (error: unknown) {
+      handleMutationError(error, 'edit activity')
     }
   }
 
@@ -159,31 +104,30 @@ export default function ViewActivity<IViewActivity>({
 
       <button
         data-testid="activity-update-btn"
-        disabled={userActivity?.completionStatus === CompletionStatus.COMPLETED}
+        disabled={userActivity?.completionStatus === COMPLETION_STATUS.COMPLETED}
         type="button"
         className={
-          userActivity?.completionStatus !== CompletionStatus.COMPLETED
+          userActivity?.completionStatus !== COMPLETION_STATUS.COMPLETED
             ? 'green-btn mr-2'
             : 'disabled-btn mr-2'
         }
         onClick={submit}
       >
         {(!isMain || (isMain && userDetails?.accountType === 'teacher')) &&
-          userActivity?.completionStatus === CompletionStatus.COMPLETED &&
+          userActivity?.completionStatus === COMPLETION_STATUS.COMPLETED &&
           'Already completed'}
         {(!isMain || (isMain && userDetails?.accountType === 'teacher')) &&
-          userActivity?.completionStatus !== CompletionStatus.COMPLETED &&
+          userActivity?.completionStatus !== COMPLETION_STATUS.COMPLETED &&
           'Mark completed'}
         {isMain &&
           userDetails?.accountType === 'student' &&
-          userActivity?.completionStatus === CompletionStatus.COMPLETED &&
+          userActivity?.completionStatus === COMPLETION_STATUS.COMPLETED &&
           'Already completed'}
         {isMain &&
           userDetails?.accountType === 'student' &&
-          userActivity?.completionStatus !== CompletionStatus.COMPLETED &&
+          userActivity?.completionStatus !== COMPLETION_STATUS.COMPLETED &&
           'Request review'}
       </button>
-      <p data-testid="update-activity-outcome">{formSubmitOutcomeMessage}</p>
       <hr className="my-5" />
       {userActivity?.hasCards && (
         <div>

@@ -4,22 +4,18 @@ import { FormEvent, useEffect, useState } from 'react'
 import { ICard, IQuranCards } from '../../types/ICard'
 import React from 'react'
 import { IActivity } from '@/types/IActivity'
-import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/card-types'
 import { IUser } from '@/types/IUser'
-import { useAppDispatch } from '@/store/hooks'
-import { createCards, deleteCard } from '@/api/controller'
+import { useCreateCards, useDeleteCard } from '@/hooks/use-card-mutations'
 import { quranCards } from '@/lib/constants/quran-bank'
-import { CompletionStatus } from '@/types/CompletionStatusEnum'
-import { ISODateString } from '@/types/isoDateType'
-import { createUserCard, removeUserCard } from '@/store/actions/userActions'
-import { IResponse } from '@/types/IApiResponse'
+import { COMPLETION_STATUS } from '@/lib/constants/completion-status'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { quranCustomSchema, QuranCustomFormData } from '@/lib/schemas/card.schemas'
+import { toast } from 'sonner'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
-interface IAddQuranCardForm {
-  handleInput: (e: React.FormEvent<HTMLInputElement>) => void
-  submitForm: (e: FormEvent<HTMLFormElement>) => Promise<void>
-}
-
-export default function AddQuranCardForm<IAddQuranCardForm>({
+export default function AddQuranCardForm({
   isMain,
   user,
   activity,
@@ -28,16 +24,21 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
   user: IUser
   activity: IActivity
 }) {
-  const dispatch = useAppDispatch()
+  const createCardsMutation = useCreateCards(user.userId)
+  const deleteCardMutation = useDeleteCard(user.userId)
+
+  const {
+    register,
+    getValues,
+    reset: resetForm,
+  } = useForm<QuranCustomFormData>({
+    resolver: zodResolver(quranCustomSchema),
+    defaultValues: { content: '' },
+  })
 
   const [formData, setFormData] = useState<IQuranCards[]>([])
-  const [custom, setCustom] = useState({
-    content: '',
-  })
   const [selectedCards, setSelectedCards] = useState<string[]>([])
   const [selectedJuz, setSelectedJuz] = useState<number[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
 
   useEffect(() => {
     const selectedJuz = [...quranCards]
@@ -61,9 +62,8 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
       return card
     })
 
-    setCustom(custom)
     setFormData([...cardsToDisplay])
-  }, [user, activity, custom])
+  }, [user, activity])
 
   function Checkboxes({ quranCard, handleInput }: { quranCard: any; handleInput: any }) {
     if (quranCard.level === 'Juz') {
@@ -157,30 +157,13 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
     setSelectedCards([...alreadySelected])
   }
 
-  function handleCustomInput(e: React.FormEvent<HTMLInputElement>) {
-    const target = e.target as HTMLInputElement
-    const fieldName: string = target.name
-    const fieldValue: any = target.value
-
-    setCustom((prevState) => ({
-      ...prevState,
-      [fieldName]: fieldValue,
-    }))
-  }
-
   async function submitForm(e: FormEvent<HTMLFormElement>): Promise<any> {
     e.preventDefault()
     try {
-      const rawFormData = new FormData(e.currentTarget)
-      const jsonData: Record<string, string> = {
-        content: '',
-      }
-      for (const pair of rawFormData.entries()) {
-        jsonData[pair[0].trim()] = `${(pair[1] as string).trim()}`
-      }
+      const customContent = getValues('content').trim()
 
-      if (!selectedCards.length && jsonData.content === '') {
-        setFormSubmitOutcomeMessage('Please select the cards you want to add.')
+      if (!selectedCards.length && customContent === '') {
+        toast.warning('Please select the cards you want to add.')
         return
       }
 
@@ -210,67 +193,38 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
           lastUpdatedOn: null,
           nextShowDate: null,
           stage: '0',
-          completionStatus: CompletionStatus.INACTIVE,
+          completionStatus: COMPLETION_STATUS.INACTIVE,
         }
       })
 
-      if (jsonData.content !== '') {
+      if (customContent !== '') {
         cards.push({
-          cardId: `${btoa(`custom-${jsonData.content}`)}`,
+          cardId: `${btoa(`custom-${customContent}`)}`,
           activity: activity.name,
           activityType: CARD_ACTIVITY_TYPES.QURAN,
           addedOn: null,
           lastUpdatedOn: null,
           nextShowDate: null,
           stage: '0',
-          completionStatus: CompletionStatus.INACTIVE,
+          completionStatus: COMPLETION_STATUS.INACTIVE,
         })
       }
 
-      const createResponse = (await createCards({
-        userId: user.userId,
+      const createResponse = await createCardsMutation.mutateAsync({
         activity: activity.name,
         cards,
-      })) as unknown as IResponse<ICard[]>
+      })
       const { data } = createResponse
-      const { message, details }: { message: string; details: ICard[] } = data
-      dispatch(
-        createUserCard({ username: user.username, activityName: activity.name, newCards: details })
-      )
 
       if (cardsToRemove.length) {
-        await deleteCard(cardsToRemove)
-        for (let card of cardsToRemove) {
-          dispatch(
-            removeUserCard({
-              cardId: card.cardId,
-              activityName: card.activity,
-              username: user.username,
-            })
-          )
-        }
-      }
-
-      setFormSubmitOutcomeMessage(message)
-      window.location.reload()
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setFormSubmitOutcomeMessage(
-          'Failed to add cards due to an internal error. Please try again later.'
+        await deleteCardMutation.mutateAsync(
+          cardsToRemove.map((card) => ({ activity: card.activity, cardId: card.cardId }))
         )
-      } else {
-        setFormSubmitOutcomeMessage(data.message)
       }
+
+      toast.success(data.message)
+    } catch (error: unknown) {
+      handleMutationError(error, 'add cards')
     }
   }
 
@@ -299,11 +253,9 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
               Custom (Surah name range start to range end):
             </label>
             <input
-              onChange={handleCustomInput}
-              value={custom.content}
+              {...register('content')}
               data-testid="custom-quran"
               id="content"
-              name="content"
               type="text"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Naas 1 to 2"
@@ -314,14 +266,13 @@ export default function AddQuranCardForm<IAddQuranCardForm>({
           <button
             data-testid="add-cards-submit-button"
             type="submit"
-            disabled={isLoading || (isMain && user.accountType === 'student')}
+            disabled={createCardsMutation.isPending || (isMain && user.accountType === 'student')}
             className={'default-btn'}
           >
             Submit Cards
           </button>
         </div>
       </form>
-      <p data-testid="outcome-message">{formSubmitOutcomeMessage}</p>
     </>
   )
 }

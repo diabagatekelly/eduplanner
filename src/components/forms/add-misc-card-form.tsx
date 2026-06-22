@@ -6,12 +6,14 @@ import React from 'react'
 import { IUser } from '@/types/IUser'
 import { IActivity } from '@/types/IActivity'
 import Popup from '../popups/popup'
-import { createCards } from '@/api/controller'
-import { IResponse } from '@/types/IApiResponse'
-import { createUserCard } from '@/store/actions/userActions'
-import { useAppDispatch } from '@/store/hooks'
-import { CompletionStatus } from '@/types/CompletionStatusEnum'
-import { CARD_ACTIVITY_TYPES } from '@/lib/constants/cardTypes'
+import { useCreateCards } from '@/hooks/use-card-mutations'
+import { COMPLETION_STATUS } from '@/lib/constants/completion-status'
+import { CARD_ACTIVITY_TYPES } from '@/lib/constants/card-types'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { miscCardSchema, MiscCardFormData } from '@/lib/schemas/card.schemas'
+import { toast } from 'sonner'
+import { handleMutationError } from '@/lib/helpers/mutation-error-handler'
 
 export default function AddMiscCardForm({
   isMain,
@@ -22,30 +24,17 @@ export default function AddMiscCardForm({
   user: IUser
   activity: IActivity
 }) {
-  const dispatch = useAppDispatch()
+  const createCardsMutation = useCreateCards(user.userId)
 
-  const [typedList, getTypedList] = useState({
-    words: '',
+  const { register, getValues, setValue, formState } = useForm<MiscCardFormData>({
+    resolver: zodResolver(miscCardSchema),
+    defaultValues: { words: '' },
   })
 
-  const [formSubmitOutcomeMessage, setFormSubmitOutcomeMessage] = useState('')
-  const [modalType, setModalType] = useState('')
-  const [popupItem, getPopupItem] = useState<{ list: string }>({ list: '' })
+  const [popupItem, setPopupItem] = useState<{ list: string }>({ list: '' })
   const [showModal, setShowModal] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-
-  function onTextareaChange(e: React.FormEvent<HTMLTextAreaElement>) {
-    const target = e.target as HTMLTextAreaElement
-
-    setFormSubmitOutcomeMessage('')
-    getTypedList({
-      words: target.value,
-    })
-  }
 
   async function submitList(finalCardList: string) {
-    setFormSubmitOutcomeMessage('')
-
     try {
       const finalCardListAsArr = finalCardList.split(', ')
       let cards: ICard[] = []
@@ -56,7 +45,7 @@ export default function AddMiscCardForm({
         lastUpdatedOn: null,
         nextShowDate: null,
         stage: '0',
-        completionStatus: CompletionStatus.INACTIVE,
+        completionStatus: COMPLETION_STATUS.INACTIVE,
       }
 
       finalCardListAsArr.forEach((word) => {
@@ -67,56 +56,29 @@ export default function AddMiscCardForm({
         })
       })
 
-      const payload = {
-        userId: user.userId,
+      const createdCards = await createCardsMutation.mutateAsync({
         activity: activity?.name,
         cards,
-      }
-
-      const createdCards = (await createCards(payload)) as unknown as IResponse<ICard[]>
-      const { data } = createdCards
-      const { message, details }: { message: string; details: ICard[] } = data
-      dispatch(
-        createUserCard({ username: user.username, activityName: activity.name, newCards: details })
-      )
-
-      setFormSubmitOutcomeMessage(message)
-      window.location.reload()
-    } catch (error: any) {
-      setIsLoading(false)
-      console.log(error)
-
-      if (!error.response) {
-        setFormSubmitOutcomeMessage('Server is down. Try again later.')
-        return
-      }
-
-      const { status, data } = error.response
-
-      if (status === 500) {
-        setFormSubmitOutcomeMessage(
-          'Failed to add cards due to an internal error. Please try again later.'
-        )
-      } else {
-        setFormSubmitOutcomeMessage(data.message)
-      }
+      })
+      toast.success(createdCards.data.message)
+    } catch (error: unknown) {
+      handleMutationError(error, 'add cards')
     }
   }
 
   function validateInput(e: React.FormEvent<HTMLButtonElement>) {
     e.preventDefault()
-    setFormSubmitOutcomeMessage('')
 
-    if (typedList.words === '') {
-      setFormSubmitOutcomeMessage('Oops, you are trying to validate an empty list')
+    const words = getValues('words')
+    if (words === '') {
+      toast.warning('Oops, you are trying to validate an empty list')
       return
     }
 
-    const listOfItemsToValidate = cleanUpList(typedList.words)
-    ;(document.querySelector('#typed') as HTMLTextAreaElement).value = listOfItemsToValidate
+    const listOfItemsToValidate = cleanUpList(words)
+    setValue('words', listOfItemsToValidate)
 
-    getPopupItem({ list: listOfItemsToValidate })
-    setModalType('validate')
+    setPopupItem({ list: listOfItemsToValidate })
     setShowModal(true)
   }
 
@@ -157,9 +119,8 @@ export default function AddMiscCardForm({
           <textarea
             data-testid="textarea-for-typed-list"
             className="border border-gray-500 p-3"
-            onChange={onTextareaChange}
+            {...register('words')}
             id="typed"
-            name="typed"
             rows={4}
             cols={50}
           ></textarea>
@@ -167,7 +128,7 @@ export default function AddMiscCardForm({
             <button
               data-testid="add-type-cards-validate-button"
               onClick={validateInput}
-              disabled={isLoading || (isMain && user.accountType === 'student')}
+              disabled={createCardsMutation.isPending || (isMain && user.accountType === 'student')}
               className={'inline-block mr-5 default-btn'}
             >
               Validate Typed List
@@ -175,11 +136,13 @@ export default function AddMiscCardForm({
           </div>
         </div>
       </div>
-      <p data-testid="outcome-message">{formSubmitOutcomeMessage}</p>
-      <Popup
-        {...{ showModal, modalType, item: popupItem, submitList, setFormSubmitOutcomeMessage }}
-        onClose={() => setShowModal(false)}
-      />
+      {showModal && (
+        <Popup
+          showModal={showModal}
+          config={{ type: 'validate', item: popupItem, submitList }}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   )
 }

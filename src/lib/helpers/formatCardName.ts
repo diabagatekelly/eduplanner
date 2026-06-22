@@ -1,7 +1,6 @@
-import { ACTIVITY_TYPES } from '@/lib/constants/activityTypes'
+import { ACTIVITY_TYPES } from '@/lib/constants/activity-types'
 
 export default function formatCardName(cardId: string, activityName: string | undefined) {
-  /* istanbul ignore next */
   if (!activityName) return ''
   if (activityName === ACTIVITY_TYPES.QURAN) {
     return _formatQuranCardName(cardId)

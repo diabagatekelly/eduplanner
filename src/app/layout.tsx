@@ -1,74 +1,36 @@
-'use client'
-
+import type { Metadata } from 'next'
+import { auth } from '@/auth'
 import { Inter } from 'next/font/google'
-import { Provider } from 'react-redux'
-import { useAppDispatch } from '@/store/hooks'
-import { Suspense, useEffect, useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
 import '@/styles/globals.css'
-import store from '@/store/store'
-import { hasExpired, hasToken } from '@/store/actions/authActions'
-import { populateUser } from '@/store/actions/userActions'
 import Navbar from '@/components/navbar'
 import Footer from '@/components/footer'
-import { useMounted } from '@/lib/helpers/useMounted'
-import { IUser } from '@/types/IUser'
+import AppProviders from './providers'
+import { Toaster } from 'sonner'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const metadata: Metadata = {
+  title: 'EduPlanner — Education Planning & Tracking',
+  description:
+    'Plan activities, track student progress, and manage educational content with EduPlanner.',
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth()
+  const isAuthenticated = !!session
+  const username = session?.user?.username ?? ''
+  const userId = session?.user?.userId ?? ''
+
   return (
     <html lang="en">
       <body className={`${inter.className}`}>
-        <Provider store={store}>
-          <Reloader />
-          <div className="py-20 px-5">{children}</div>
+        <Navbar isAuthenticated={isAuthenticated} username={username} userId={userId} />
+        <AppProviders>
+          <main className="py-20 px-5">{children}</main>
           <Footer />
-        </Provider>
+        </AppProviders>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
-  )
-}
-
-const Reloader = () => {
-  const dispatch = useAppDispatch()
-  const pathname = usePathname()
-  // const searchParams = useSearchParams()
-  const router = useRouter()
-  const mounted = useMounted()
-
-  const [userState, setUserState] = useState({ isAuthenticated: false, userReducer: {} as IUser })
-
-  useEffect(() => {
-    /* istanbul ignore next */
-    if (window.Cypress) {
-      //@ts-ignore
-      window.store = store
-    }
-    dispatch(hasExpired())
-    dispatch(hasToken())
-    dispatch(populateUser())
-    const { authReducer, userReducer } = store.getState()
-    const isAuthenticated = authReducer.isAuthenticated
-    setUserState({ isAuthenticated, userReducer })
-  }, [pathname, dispatch])
-
-  const username = userState.userReducer.username
-  const isAuthenticated = userState.isAuthenticated
-
-  if (mounted) {
-    if (
-      !window?.sessionStorage.getItem('user_token') &&
-      pathname !== '/login' &&
-      pathname !== '/register'
-    ) {
-      router.push('/login')
-    }
-  }
-
-  return (
-    <Suspense fallback={null}>
-      <Navbar {...{ isAuthenticated, username }} />
-    </Suspense>
   )
 }

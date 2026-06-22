@@ -1,50 +1,79 @@
 import Main from '../../../../../app/[username]/activities/[activity]/page'
 import '@testing-library/jest-dom'
-import { render } from '../../../../util'
+import { render, screen } from '../../../../util'
 import * as React from 'react'
 import { act } from 'react'
 import { mockUser, mockStudent, mockActivity } from '../../../../../specs/mocks'
 import NestedLayout from '../../../../../app/nested-layout'
-import store from '../../../../../store/store'
+import { useSession } from 'next-auth/react'
+import { useUser } from '../../../../../hooks/use-user'
 
+const mockBack = jest.fn()
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(() => ({
+    back: mockBack,
+  })),
+}))
 jest.mock('../../../../../app/nested-layout')
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(),
+}))
+jest.mock('../../../../../hooks/use-user')
 
 describe('Main user page', () => {
-  const back = window.history.back
-
-  beforeAll(() => {
-    Object.defineProperty(window, 'history', {
-      value: { back: jest.fn() },
-    })
-  })
-
-  afterAll(() => {
-    sessionStorage.clear()
-    window.history.back = back
-  })
-
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2/3/2024'))
-    window.sessionStorage.setItem('user_data', JSON.stringify(mockUser))
-    window.sessionStorage.setItem('user_token', 'xxxxxx')
-    window.sessionStorage.setItem('created_on', '2/3/2024')
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-    window.sessionStorage.clear()
     jest.useRealTimers()
+  })
+
+  it('should render with no session', async () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: null })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined })
+    ;(NestedLayout as jest.Mock).mockImplementation(() => null)
+    const { container } = await act(async () => {
+      return render(<Main {...{ params: Promise.resolve({ activity: 'Quran' }) }} />)
+    })
+    // Loading guard returns null when userId is missing
+    expect(container.querySelector('.py-20')!.innerHTML).toBe('')
+    expect(NestedLayout).not.toHaveBeenCalled()
+  })
+
+  it('should render skeleton when loading', async () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({ data: undefined, isLoading: true, isError: false })
+    const { container } = await act(async () => {
+      return render(<Main {...{ params: Promise.resolve({ activity: 'Quran' }) }} />)
+    })
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
+  })
+
+  it('should render error display when query fails', async () => {
+    ;(useSession as jest.Mock).mockReturnValue({ data: { user: { userId: 'x' } } })
+    ;(useUser as jest.Mock).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      error: new Error('Failed'),
+      refetch: jest.fn(),
+    })
+    await act(async () => {
+      render(<Main {...{ params: Promise.resolve({ activity: 'Quran' }) }} />)
+    })
+    expect(screen.getByText('Failed to load data')).toBeInTheDocument()
   })
 
   describe('Main - Student', () => {
     const mockStudentWithActivity = { ...mockStudent, activities: [mockActivity] }
     beforeEach(() => {
-      const mockStoreState = {
-        authReducer: { isAuthenticated: true },
-        userReducer: mockStudentWithActivity,
-      }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      ;(useSession as jest.Mock).mockReturnValue({
+        data: { user: { userId: mockStudent.userId, username: mockStudent.username } },
+      })
+      ;(useUser as jest.Mock).mockReturnValue({ data: mockStudentWithActivity })
       ;(NestedLayout as jest.Mock).mockImplementation(() => null)
     })
 
@@ -52,7 +81,7 @@ describe('Main user page', () => {
       await act(async () => {
         render(<Main {...{ params: Promise.resolve({ activity: 'Quran' }) }} />)
       })
-      expect((NestedLayout as jest.Mock).mock.calls[1][0]).toEqual(
+      expect((NestedLayout as jest.Mock).mock.calls[0][0]).toEqual(
         expect.objectContaining({ isTeacher: false })
       )
     })
@@ -66,7 +95,7 @@ describe('Main user page', () => {
         userDetails: mockStudentWithActivity,
         userActivity: mockActivity,
       }
-      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[1].props).toMatchObject(
+      expect((NestedLayout as jest.Mock).mock.calls[0][0].children[1].props).toMatchObject(
         expectedViewActivityArgs
       )
     })
@@ -75,22 +104,21 @@ describe('Main user page', () => {
       await act(async () => {
         render(<Main {...{ params: Promise.resolve({ activity: 'Quran' }) }} />)
       })
-      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[2].props).toMatchObject({
+      expect((NestedLayout as jest.Mock).mock.calls[0][0].children[2].props).toMatchObject({
         children: 'Back',
       })
-      ;(NestedLayout as jest.Mock).mock.calls[1][0].children[2].props.onClick()
-      expect(window.history.back).toHaveBeenCalled()
+      ;(NestedLayout as jest.Mock).mock.calls[0][0].children[2].props.onClick()
+      expect(mockBack).toHaveBeenCalled()
     })
   })
 
   describe('Main - Teacher', () => {
     const mockUserWithActivity = { ...mockUser, activities: [mockActivity] }
     beforeEach(() => {
-      const mockStoreState = {
-        authReducer: { isAuthenticated: true },
-        userReducer: mockUserWithActivity,
-      }
-      jest.spyOn(store, 'getState').mockReturnValue(mockStoreState)
+      ;(useSession as jest.Mock).mockReturnValue({
+        data: { user: { userId: mockUser.userId, username: mockUser.username } },
+      })
+      ;(useUser as jest.Mock).mockReturnValue({ data: mockUserWithActivity })
       ;(NestedLayout as jest.Mock).mockImplementation(() => null)
     })
 
@@ -98,7 +126,7 @@ describe('Main user page', () => {
       await act(async () => {
         render(<Main {...{ params: Promise.resolve({ activity: 'Quran' }) }} />)
       })
-      expect((NestedLayout as jest.Mock).mock.calls[1][0]).toEqual(
+      expect((NestedLayout as jest.Mock).mock.calls[0][0]).toEqual(
         expect.objectContaining({ isTeacher: true })
       )
     })
@@ -112,7 +140,7 @@ describe('Main user page', () => {
         userDetails: mockUserWithActivity,
         userActivity: mockActivity,
       }
-      expect((NestedLayout as jest.Mock).mock.calls[1][0].children[1].props).toMatchObject(
+      expect((NestedLayout as jest.Mock).mock.calls[0][0].children[1].props).toMatchObject(
         expectedViewActivityArgs
       )
     })
