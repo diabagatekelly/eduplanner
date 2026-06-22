@@ -5,7 +5,7 @@ import { ChevronRightIcon, HomeIcon } from '@heroicons/react/24/solid'
 import { useParams, usePathname } from 'next/navigation'
 import { useMemo } from 'react'
 
-type Crumb = { label: string; href: string | null }
+type Crumb = { label: string; href?: string }
 
 export default function Breadcrumbs() {
   const params = useParams()
@@ -15,6 +15,7 @@ export default function Breadcrumbs() {
   const pathName = usePathname()
 
   const breadcrumbs = useMemo<Crumb[]>(() => {
+    if (!pathName) return []
     const segments = pathName.split('/')
     const crumbs: Crumb[] = []
 
@@ -28,16 +29,16 @@ export default function Breadcrumbs() {
           break
         case 3:
           if (segments[2] === 'activities') {
-            crumbs.push({ label: pathCurrentActivity, href: null })
+            crumbs.push({ label: pathCurrentActivity })
           } else if (segments[2] === 'students') {
             if (segments.length === 4) {
-              crumbs.push({ label: pathStudent, href: null })
+              crumbs.push({ label: pathStudent })
             } else if (segments.length > 4) {
               crumbs.push({
                 label: `All ${pathStudent}'s Activities`,
                 href: `/${pathUsername}/students/${pathStudent}`,
               })
-              crumbs.push({ label: pathCurrentActivity, href: null })
+              crumbs.push({ label: pathCurrentActivity })
             }
           }
           break
@@ -69,15 +70,7 @@ export default function Breadcrumbs() {
                 strokeLinejoin="round"
               />
             )}
-            {crumb.href === null ? (
-              <span
-                data-testid={`breadcrumbs-${crumb.label}`}
-                aria-current="page"
-                className="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400"
-              >
-                {formatBreadcrumbText(crumb.label)}
-              </span>
-            ) : (
+            {crumb.href ? (
               <Link
                 data-testid={`breadcrumbs-${crumb.label}`}
                 href={crumb.href}
@@ -92,6 +85,14 @@ export default function Breadcrumbs() {
                 )}
                 {formatBreadcrumbText(crumb.label)}
               </Link>
+            ) : (
+              <span
+                data-testid={`breadcrumbs-${crumb.label}`}
+                aria-current="page"
+                className="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400"
+              >
+                {formatBreadcrumbText(crumb.label)}
+              </span>
             )}
           </li>
         ))}

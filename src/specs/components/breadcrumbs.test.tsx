@@ -33,6 +33,7 @@ describe('Breadcrumbs', () => {
       const breadcrumbsHome = await screen.findByTestId('breadcrumbs-Home')
       expect(breadcrumbsHome).toBeInTheDocument()
       expect(breadcrumbsHome).toHaveTextContent('Home')
+      expect(breadcrumbsHome).not.toHaveAttribute('aria-current')
 
       breadcrumbsHome.addEventListener('click', (e) => {
         e.preventDefault()
@@ -62,6 +63,8 @@ describe('Breadcrumbs', () => {
       expect(breadcrumbsDashboard).toBeInTheDocument()
 
       expect(breadcrumbsDashboard).toHaveTextContent('Dashboard')
+      expect(breadcrumbsHome).not.toHaveAttribute('aria-current')
+      expect(breadcrumbsDashboard).not.toHaveAttribute('aria-current')
 
       breadcrumbsDashboard.addEventListener('click', (e) => {
         e.preventDefault()
@@ -96,6 +99,8 @@ describe('Breadcrumbs', () => {
       expect(breadcrumbsActivity).toHaveTextContent('Arabic Language')
       expect(breadcrumbsActivity).not.toHaveAttribute('href')
       expect(breadcrumbsActivity).toHaveAttribute('aria-current', 'page')
+      expect(breadcrumbsHome).not.toHaveAttribute('aria-current')
+      expect(breadcrumbsDashboard).not.toHaveAttribute('aria-current')
     })
   })
   describe('Student', () => {
@@ -117,6 +122,8 @@ describe('Breadcrumbs', () => {
         expect(breadcrumbsStudent).toHaveTextContent('Yusuf Spencer')
         expect(breadcrumbsStudent).not.toHaveAttribute('href')
         expect(breadcrumbsStudent).toHaveAttribute('aria-current', 'page')
+        expect(breadcrumbsHome).not.toHaveAttribute('aria-current')
+        expect(breadcrumbsDashboard).not.toHaveAttribute('aria-current')
       })
     })
 
@@ -147,6 +154,9 @@ describe('Breadcrumbs', () => {
 
         expect(breadcrumbsStudentActivity).not.toHaveAttribute('href')
         expect(breadcrumbsStudentActivity).toHaveAttribute('aria-current', 'page')
+        expect(breadcrumbsHome).not.toHaveAttribute('aria-current')
+        expect(breadcrumbsDashboard).not.toHaveAttribute('aria-current')
+        expect(breadcrumbsStudentActivities).not.toHaveAttribute('aria-current')
 
         breadcrumbsStudentActivities.addEventListener('click', (e) => {
           e.preventDefault()
@@ -160,6 +170,18 @@ describe('Breadcrumbs', () => {
           await fireEvent.click(breadcrumbsStudentActivities)
         })
       })
+    })
+  })
+
+  describe('Missing pathname', () => {
+    it('should render no breadcrumbs when usePathname returns null', () => {
+      jest
+        .spyOn(require('next/navigation'), 'usePathname')
+        .mockImplementation(() => null as unknown as string)
+      render(<Breadcrumbs />)
+
+      expect(screen.queryByTestId('breadcrumbs-Home')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('breadcrumbs-Dashboard')).not.toBeInTheDocument()
     })
   })
 })
